@@ -1,0 +1,90 @@
+#pragma once
+#include "Io/Logger.h"
+#include "Scene/DebugCamera.h"
+#include "Asset/Material.h"
+#include "Object/Transform.h"
+#include "Graphics/GPUData/TransformationMatrix.h"
+#include "Graphics/GPUData/VertexData.h"
+#include "Graphics/GPUData/LightsForGPU.h"
+#include "Object/LightManager.h"
+#include "BlendMode.h"
+#include "SRVManager.h"
+#include "CameraForGPU.h"
+#include "Asset/Model/Node.h"
+#include "Asset/Model/Mesh.h"
+
+#include <wrl.h>
+#include <dxgi1_6.h>
+#include <d3d12.h>
+#include <dxcapi.h>
+#include <memory>
+
+class Model;
+class InstancedModel;
+class Sprite;
+class ParticleSystem;
+class DirectXContext;
+class Camera;
+
+class Renderer {
+public:
+
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	void Initialize(DirectXContext* dxContext);
+
+	/// <summary>
+	/// トランスフォーム更新
+	/// </summary>
+	void UpdateModelTransforms(Model* model, Camera* camera);
+
+	void UpdateSpriteTransform(Sprite* sprite);
+
+	/// <summary>
+	/// モデル描画
+	/// </summary>
+	/// <param name="blendMode">ブレンドモード</param>
+	void DrawModel(Model* model, Camera* camera, LightManager* lightManager, int blendMode);
+
+	/// <summary>
+	/// インスタンスモデル描画
+	/// </summary>
+	/// <param name="model">複数インスタンスを持つモデル</param>
+	/// <param name="blendMode">ブレンドモード</param>
+	void DrawModelInstance(InstancedModel* model, Camera* camera, LightManager* lightManager, int blendMode);
+
+	void DrawParticles(ParticleSystem* particleSys, Camera* camera, int blendMode);
+
+	void DrawSprite(Sprite* sprite, int blendMode);
+
+	// ノードごとに描画
+	void DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parent);
+
+	// メッシュを描画
+	void DrawMesh(Model* model, Mesh* mesh);
+
+	// インスタンシング描画版
+	void DrawNodeInstance(InstancedModel* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld);
+	void DrawMeshInstance(InstancedModel* model, Mesh* mesh);
+
+	/// <summary>
+	/// フレーム開始時の処理(描画開始時に行う)
+	/// </summary>
+	void BeginFrame();
+
+	/// <summary>
+	/// フレーム終了時の処理(描画終了時に行う)
+	/// </summary>
+	void EndFrame();
+
+private:
+	DirectXContext* dxContext_ = nullptr;
+
+	// カメラ位置(GPU転送)
+	CameraForGPU* cameraData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraBuffer_;
+
+	LightsForGPU* dummyLight_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> dummyLightBuffer_;
+};
