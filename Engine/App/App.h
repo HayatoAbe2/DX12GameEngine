@@ -2,14 +2,14 @@
 #include "Window.h"
 #include "Io/DumpExporter.h"
 #include "Io/Logger.h"
-#include "Io/Audio.h"
-#include "Io/Input.h"
+#include "Io/AudioSystem.h"
+#include "Io/InputSystem.h"
 #include "Graphics/directXContext.h"
 #include "Graphics/Renderer.h"
 #include "Asset/Manager/AssetManager.h"
 #include "Object/LightManager.h"
 #include "Scene/SceneManager.h"
-#include "Scene/GameContext.h"
+#include "Engine/Contexts/GameContext/GameContext.h"
 
 #include <memory>
 #include <Windows.h>
@@ -82,10 +82,10 @@ private:
 	std::unique_ptr<Window> window_ = nullptr;
 
 	// 音声の出力
-	std::unique_ptr<Audio> audio_ = nullptr;
+	std::unique_ptr<AudioSystem> audio_ = nullptr;
 
 	// キー・コントローラー入力
-	std::unique_ptr<Input> input_ = nullptr;
+	std::unique_ptr<InputSystem> input_ = nullptr;
 
 	// DirectX管理
 	std::unique_ptr<DirectXContext> dxContext_ = nullptr;

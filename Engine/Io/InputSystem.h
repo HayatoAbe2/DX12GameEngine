@@ -4,12 +4,12 @@
 #include <cstdint>
 #include <wrl.h>
 #include "../Math/MathUtils.h"
-class Input {
+class InputSystem {
 public:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-	Input(HINSTANCE hInstance, HWND hwnd);
-	~Input();
+	InputSystem(HINSTANCE hInstance, HWND hwnd);
+	~InputSystem();
 	void Update();
 
 	void SetRange();

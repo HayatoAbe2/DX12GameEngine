@@ -1,8 +1,8 @@
 #pragma once
 #include "Object/Transform.h"
 #include "Math/MathUtils.h"
+#include "Engine/Scene/DebugCamera.h"
 class Renderer;
-class DebugCamera;
 class GameContext;
 
 class Camera {
@@ -15,9 +15,8 @@ public:
 	/// <summary>
 	/// view,projection行列の更新
 	/// </summary>
-	/// <param name="graphics"></param>
-	/// <param name="debugCamera"></param>
-	void Update(GameContext* context, DebugCamera* debugCamera = nullptr);
+	/// <param name="debugCamera">デバッグカメラ(なければnullptr)</param>
+	void Update(DebugCamera* debugCamera = nullptr);
 
 	void StartShake(float amplitude, int frame);
 private:

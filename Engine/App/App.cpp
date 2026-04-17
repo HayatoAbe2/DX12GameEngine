@@ -3,12 +3,12 @@
 #include "Graphics/DeviceManager.h"
 #include "Io/DumpExporter.h"
 #include "Io/Logger.h"
-#include "Io/Audio.h"
-#include "Io/Input.h"
+#include "Io/AudioSystem.h"
+#include "Io/InputSystem.h"
 #include "Asset/Manager/AssetManager.h"
 #include "Object/LightManager.h"
 #include "Scene/SceneManager.h"
-#include "Scene/GameContext.h"
+#include "Contexts/GameContext/GameContext.h"
 
 #include <format>
 #include <cassert>
@@ -47,13 +47,13 @@ void App::Initialize() {
 #endif
 
 	// XAudio2
-	audio_ = std::make_unique<Audio>();
+	audio_ = std::make_unique<AudioSystem>();
 	audio_->Initialize();
 	assert(&audio_);
-	logger_->Log(logger_->GetStream(), std::format("[Audio] Initialization complete.\n"));
+	logger_->Log(logger_->GetStream(), std::format("[AudioSystem] Initialization complete.\n"));
 
 	// DirectInputの初期化
-	input_ = std::make_unique<Input>(window_->GetInstance(), window_->GetHwnd());
+	input_ = std::make_unique<InputSystem>(window_->GetInstance(), window_->GetHwnd());
 	assert(&input_);
 	logger_->Log(logger_->GetStream(), std::format("[Input] Initialization complete.\n"));
 
@@ -76,6 +76,7 @@ void App::Initialize() {
 
 	// コンテキスト
 	gameContext_ = std::make_unique<GameContext>(renderer_.get(), audio_.get(), input_.get(), assetManager_.get(), lightManager_.get());
+	gameContext_->Set(gameContext_.get());
 
 	// シーンマネージャー
 	sceneManager_ = std::make_unique<SceneManager>(gameContext_.get());
@@ -139,11 +140,11 @@ void App::Finalize() {
 
 		gameContext_.reset();
 
-		// Audio
+		// AudioSystem
 		audio_->StopAll();
 		audio_->Finalize();
 		audio_.reset();
-		logger_->Log(logger_->GetStream(), std::format("[Audio] Shutdown complete.\n"));
+		logger_->Log(logger_->GetStream(), std::format("[AudioSystem] Shutdown complete.\n"));
 
 		// 描画クラス実体解放
 		renderer_.reset();

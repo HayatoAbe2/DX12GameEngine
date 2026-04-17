@@ -1,11 +1,11 @@
 #include "DebugCamera.h"
-#include "GameContext.h"
+#include "Engine/Contexts/GameContext/GameContext.h"
 
 #include "numbers"
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-void DebugCamera::Initialize(GameContext* context) {
+void DebugCamera::Initialize() {
 	translation_ = { 0, 0, -50 };
 	matRot_ = MakeIdentity4x4();
 	target_ = { 0, 0, 0 };
@@ -14,18 +14,19 @@ void DebugCamera::Initialize(GameContext* context) {
 	pitch_ = 0.0f;
 	viewMatrix_ = MakeIdentity4x4();
 	isEnable_ = false;
-	context_ = context;
+
+	auto& ctx = GameContext::GetInstance();
+	inputCtx_ = &ctx.Input();
 }
 
 void DebugCamera::Update() {
-	if (context_->IsTrigger(DIK_RSHIFT)) {
+	if (inputCtx_->IsTrigger(DIK_RSHIFT)) {
 		// デバッグカメラの切り替え
 		isEnable_ = !isEnable_;
 	}
 
 	if (isEnable_) {
 		ControlCamera();
-
 		UpdateView();
 	}
 }
@@ -37,10 +38,10 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	Vector3 up = { 0,1,0 };
 
 	// shift+マウスホイール押し込み中,ドラッグで視点移動
-	if (context_->IsPress(DIK_LSHIFT) && context_->IsClickWheel()) {
+	if (inputCtx_->IsPress(DIK_LSHIFT) && inputCtx_->IsClickWheel()) {
 
-		float moveX = context_->GetMouseMove().x * kMoveSpeed_;
-		float moveY = context_->GetMouseMove().y * kMoveSpeed_;
+		float moveX = inputCtx_->GetMouseMove().x * kMoveSpeed_;
+		float moveY = inputCtx_->GetMouseMove().y * kMoveSpeed_;
 
 		target_ = target_ + moveX * -right;
 		target_ = target_+ moveY * up;
@@ -48,10 +49,10 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	} else {
 
 		// マウスホイール押し込み中,ドラッグで視点回転
-		if (context_->IsClickWheel()) {
+		if (inputCtx_->IsClickWheel()) {
 			// マウスの移動量に回転速度を掛ける
-			float deltaYaw = context_->GetMouseMove().x * kRotateSpeed_;   // マウスXでY軸回転（左右）
-			float deltaPitch = context_->GetMouseMove().y * kRotateSpeed_; // マウスYでX軸回転（上下）
+			float deltaYaw = inputCtx_->GetMouseMove().x * kRotateSpeed_;   // マウスXでY軸回転（左右）
+			float deltaPitch = inputCtx_->GetMouseMove().y * kRotateSpeed_; // マウスYでX軸回転（上下）
 
 			Matrix4x4 matRotDelta = MakeIdentity4x4();
 			matRotDelta = Multiply(MakeRotateYMatrix(deltaYaw), matRotDelta);
@@ -62,7 +63,7 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	}
 
 	// マウスホイールでズームイン・ズームアウト
-	float moveZ = context_->GetMouseMove().z * kMoveSpeed_;
+	float moveZ = inputCtx_->GetMouseMove().z * kMoveSpeed_;
 	distance_ += -moveZ;
 
 	// カメラは注視点から後ろ向きにdistance_移動した位置

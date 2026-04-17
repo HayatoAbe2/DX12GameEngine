@@ -138,7 +138,7 @@
     <ClCompile Include="Engine\Scene\DebugCamera.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Scene\GameContext.cpp">
+    <ClCompile Include="Engine\Contexts\GameContext\GameContext.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
@@ -156,13 +156,13 @@
     <ClCompile Include="Engine\Math\Sphere.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Io\Audio.cpp">
+    <ClCompile Include="Engine\Io\AudioSystem.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Io\DumpExporter.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Io\Input.cpp">
+    <ClCompile Include="Engine\Io\InputSystem.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Io\Logger.cpp">
@@ -205,6 +205,11 @@
     <ClCompile Include="Engine\Asset\Manager\TextureManager.cpp" />
     <ClCompile Include="Engine\Graphics\ConstantBufferManager.cpp" />
     <ClCompile Include="Engine\Graphics\BufferManager.cpp" />
+    <ClCompile Include="Engine\Contexts\RenderContext\RenderContext.cpp" />
+    <ClCompile Include="Engine\Contexts\AudioContext\AudioContext.cpp" />
+    <ClCompile Include="Engine\Contexts\InputContext\InputContext.cpp" />
+    <ClCompile Include="Engine\Contexts\AssetContext\AssetContext.cpp" />
+    <ClCompile Include="Engine\Contexts\LightContext\LightContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Grid.PS.hlsl">
@@ -323,19 +328,19 @@
     <ClInclude Include="Engine\Scene\DebugCamera.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Scene\GameContext.h">
+    <ClInclude Include="Engine\Contexts\GameContext\GameContext.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Asset\Model\Model.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Io\Audio.h">
+    <ClInclude Include="Engine\Io\AudioSystem.h">
       <Filter>Engine\IO</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Io\DumpExporter.h">
       <Filter>Engine\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Io\Input.h">
+    <ClInclude Include="Engine\Io\InputSystem.h">
       <Filter>Engine\IO</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Io\Logger.h">
@@ -434,6 +439,12 @@
     <ClInclude Include="Engine\Asset\Manager\TextureManager.h" />
     <ClInclude Include="Engine\Graphics\ConstantBufferManager.h" />
     <ClInclude Include="Engine\Graphics\BufferManager.h" />
+    <ClInclude Include="Engine\Contexts\RenderContext\RenderContext.h" />
+    <ClInclude Include="Engine\Contexts\AudioContext\AudioContext.h" />
+    <ClInclude Include="Engine\Contexts\InputContext\InputContext.h" />
+    <ClInclude Include="Engine\Contexts\AssetContext\AssetContext.h" />
+    <ClInclude Include="Engine\Contexts\LightContext\LightContext.h" />
+    <ClInclude Include="Engine\Scene\GameCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

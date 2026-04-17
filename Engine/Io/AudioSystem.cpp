@@ -1,4 +1,4 @@
-#include "Audio.h"
+#include "AudioSystem.h"
 #include <cassert>
 #include <mfapi.h>
 #include <mfidl.h>
@@ -8,7 +8,7 @@
 #pragma comment(lib, "mfplat.lib")
 #include <vector>
 
-void Audio::Initialize() {
+void AudioSystem::Initialize() {
 	HRESULT hr;
 	// XAudioエンジンのインスタンスを生成する
 	hr = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
@@ -21,7 +21,7 @@ void Audio::Initialize() {
 	assert(SUCCEEDED(hr));
 }
 
-void Audio::Finalize() {
+void AudioSystem::Finalize() {
 	HRESULT result;
 
 	if (masterVoice_) {
@@ -35,7 +35,7 @@ void Audio::Finalize() {
 	assert(SUCCEEDED(result));
 }
 
-void Audio::SoundLoad(const wchar_t* filename) {
+void AudioSystem::SoundLoad(const wchar_t* filename) {
 	// 読み込み済みなら何もしない
 	if (soundMap_.contains(filename)) return;
 
@@ -105,11 +105,11 @@ void Audio::SoundLoad(const wchar_t* filename) {
 	CoTaskMemFree(waveFormat);
 }
 
-void Audio::SoundUnload(const wchar_t* filename) {
+void AudioSystem::SoundUnload(const wchar_t* filename) {
 	soundMap_.erase(filename); // マップから削除
 }
 
-void Audio::SoundPlay(const wchar_t* filename,bool isLoop,float volume) {
+void AudioSystem::SoundPlay(const wchar_t* filename,bool isLoop,float volume) {
 	if (soundMap_.find(filename) == soundMap_.end()) {
 		return; // 存在しない場合は何もしない
 	}
@@ -141,7 +141,7 @@ void Audio::SoundPlay(const wchar_t* filename,bool isLoop,float volume) {
 	voices_.push_back(sourceVoice);
 }
 
-void Audio::StopAll() {
+void AudioSystem::StopAll() {
 	for (auto* voice : voices_) {
 		if (!voice) continue;
 

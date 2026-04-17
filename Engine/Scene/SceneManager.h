@@ -3,8 +3,8 @@
 #include <memory>
 
 class Renderer;
-class Input;
-class Audio;
+class InputSystem;
+class AudioSystem;
 class GameContext;
 
 /// <summary>

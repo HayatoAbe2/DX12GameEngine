@@ -3,7 +3,7 @@
 #include <wrl.h>
 #include <string>
 #include <unordered_map>
-class Audio {
+class AudioSystem {
 	// 音声データ
 	struct SoundData {
 		// 波形フォーマット

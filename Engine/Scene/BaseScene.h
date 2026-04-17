@@ -1,5 +1,5 @@
 #pragma once
-#include "GameContext.h"
+#include "Engine/Scene/GameCommon.h"
 
 /// <summary>
 /// 各シーンの基底クラス
@@ -33,9 +33,6 @@ public:
 		return false;
 	};
 
-	// コンテキストをセット
-	virtual void SetGameContext(GameContext* gameContext) { context_ = gameContext; }
-
 	// 次のシーンを取得
 	virtual BaseScene* GetNextScene() const { return nextScene_; }
 
@@ -48,5 +45,12 @@ protected:
 
 	// 次シーン
 	BaseScene* nextScene_ = nullptr;
+
+	// カメラ
+	std::unique_ptr<Camera> camera_ = nullptr;
+	float cameraDistance_ = 20.0f;
+
+	// デバッグカメラ
+	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 };
 

@@ -102,7 +102,7 @@ std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, cons
 
 				texture->SetMtlFilePath(directoryPath + "/" + textureFilePath.C_Str());
 			} else {
-				texture->SetMtlFilePath("Resources/white1x1.png");
+				texture->SetMtlFilePath("Resources/Debug/white1x1.png");
 			}
 
 			// SRVを作成

@@ -80,14 +80,14 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 
 	// Shaderをコンパイルする
 	pipelineStateManager_ = std::make_unique<PipelineStateManager>();
-	pipelineStateManager_->SetVSBlob(shaderCompiler_->Compile(L"Resources/shaders/Object3D.VS.hlsl", L"vs_6_0", logger_));
-	pipelineStateManager_->SetPSBlob(shaderCompiler_->Compile(L"Resources/shaders/Object3D.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetVSBlob(shaderCompiler_->Compile(L"Resources/Shaders/Object3D.VS.hlsl", L"vs_6_0", logger_));
+	pipelineStateManager_->SetPSBlob(shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_));
 
-	pipelineStateManager_->SetInstancingVSBlob(shaderCompiler_->Compile(L"Resources/shaders/Instance.VS.hlsl", L"vs_6_0", logger_));
-	pipelineStateManager_->SetInstancingPSBlob(shaderCompiler_->Compile(L"Resources/shaders/Instance.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetInstancingVSBlob(shaderCompiler_->Compile(L"Resources/Shaders/Instance.VS.hlsl", L"vs_6_0", logger_));
+	pipelineStateManager_->SetInstancingPSBlob(shaderCompiler_->Compile(L"Resources/Shaders/Instance.PS.hlsl", L"ps_6_0", logger_));
 	
-	pipelineStateManager_->SetParticleVSBlob(shaderCompiler_->Compile(L"Resources/shaders/Particle.VS.hlsl", L"vs_6_0", logger_));
-	pipelineStateManager_->SetParticlePSBlob(shaderCompiler_->Compile(L"Resources/shaders/Particle.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetParticleVSBlob(shaderCompiler_->Compile(L"Resources/Shaders/Particle.VS.hlsl", L"vs_6_0", logger_));
+	pipelineStateManager_->SetParticlePSBlob(shaderCompiler_->Compile(L"Resources/Shaders/Particle.PS.hlsl", L"ps_6_0", logger_));
 
 	// PSOマネージャー
 	pipelineStateManager_->Initialize(deviceManager_->GetDevice(), rootSignatureManager_->GetStandardRootSignature(), rootSignatureManager_->GetInstancingRootSignature(),rootSignatureManager_->GetParticleRootSignature());

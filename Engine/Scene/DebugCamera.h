@@ -2,18 +2,17 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include "dinput.h"
 #include "Math/MathUtils.h"
-#include "Io/Input.h"
+#include "Engine/Contexts/InputContext/InputContext.h"
+
 /// <summary>
 /// デバッグカメラ
 /// </summary>
- 
-class GameContext;
 class DebugCamera {
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(GameContext* context);
+	void Initialize();
 
 	/// <summary>
 	/// 更新
@@ -67,6 +66,7 @@ private:
 	// 射影行列
 	Matrix4x4 orthographicMatrix_;
 
-	GameContext* context_ = nullptr;
+	// 操作用入力
+	InputContext* inputCtx_;
 };
 

@@ -1,6 +1,6 @@
-#include "Input.h"
+#include "InputSystem.h"
 
-Input::Input(HINSTANCE hInstance, HWND hwnd) {
+InputSystem::InputSystem(HINSTANCE hInstance, HWND hwnd) {
 	HRESULT hr;
 
 	// オブジェクト生成
@@ -60,7 +60,7 @@ Input::Input(HINSTANCE hInstance, HWND hwnd) {
 	directInput_->EnumDevices(
 			DI8DEVCLASS_GAMECTRL,
 			[](const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) -> BOOL {
-				auto self = reinterpret_cast<Input*>(pContext);
+				auto self = reinterpret_cast<InputSystem*>(pContext);
 				if (SUCCEEDED(self->directInput_->CreateDevice(pdidInstance->guidInstance, &self->controller_, NULL))) {
 					self->controller_->SetDataFormat(&c_dfDIJoystick2);
 					self->controller_->SetCooperativeLevel(self->hwnd_, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
@@ -81,10 +81,10 @@ Input::Input(HINSTANCE hInstance, HWND hwnd) {
 	hwnd_ = hwnd;
 }
 
-Input::~Input() {
+InputSystem::~InputSystem() {
 }
 
-void Input::Update() {
+void InputSystem::Update() {
 	// 前フレームのキー入力状態
 	memcpy(preKey_, key_, sizeof(key_));
 	// キーボード情報の取得開始
@@ -121,7 +121,7 @@ void Input::Update() {
 		directInput_->EnumDevices(
 			DI8DEVCLASS_GAMECTRL,
 			[](const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) -> BOOL {
-				auto self = reinterpret_cast<Input*>(pContext);
+				auto self = reinterpret_cast<InputSystem*>(pContext);
 				if (SUCCEEDED(self->directInput_->CreateDevice(pdidInstance->guidInstance, &self->controller_, NULL))) {
 					self->controller_->SetDataFormat(&c_dfDIJoystick2);
 					self->controller_->SetCooperativeLevel(self->hwnd_, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
@@ -136,7 +136,7 @@ void Input::Update() {
 	}
 }
 
-void Input::SetRange() {
+void InputSystem::SetRange() {
 	// 軸範囲を設定（-1000～+1000）
 	DIPROPRANGE diprg;
 	diprg.diph.dwSize = sizeof(DIPROPRANGE);

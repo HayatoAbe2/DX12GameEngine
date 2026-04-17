@@ -162,6 +162,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Contexts\AssetContext\AssetContext.cpp" />
+    <ClCompile Include="Engine\Contexts\AudioContext\AudioContext.cpp" />
     <ClCompile Include="Engine\Graphics\BufferManager.cpp" />
     <ClCompile Include="Engine\Graphics\ConstantBufferManager.cpp" />
     <ClCompile Include="Engine\Asset\Manager\AssetManager.cpp" />
@@ -172,7 +174,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\RootSignatureManager.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\AABB.cpp" />
     <ClCompile Include="Engine\App\App.cpp" />
-    <ClCompile Include="Engine\Io\Audio.cpp" />
+    <ClCompile Include="Engine\Io\AudioSystem.cpp" />
     <ClCompile Include="Engine\Math\Sphere.cpp" />
     <ClCompile Include="Engine\Math\Vector2.cpp" />
     <ClCompile Include="Engine\Asset\Material.cpp" />
@@ -181,7 +183,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Scene\DebugCamera.cpp" />
     <ClCompile Include="Engine\Graphics\DescriptorHeapManager.cpp" />
     <ClCompile Include="Engine\Io\DumpExporter.cpp" />
-    <ClCompile Include="Engine\Scene\GameContext.cpp" />
+    <ClCompile Include="Engine\Contexts\GameContext\GameContext.cpp" />
     <ClCompile Include="Externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -205,13 +207,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Engine\Graphics\Renderer.cpp" />
-    <ClCompile Include="Engine\Io\Input.cpp" />
+    <ClCompile Include="Engine\Io\InputSystem.cpp" />
     <ClCompile Include="Engine\Math\Lerp.cpp" />
     <ClCompile Include="Engine\Io\Logger.cpp" />
     <ClCompile Include="Engine\Graphics\FixFPS.cpp" />
     <ClCompile Include="Engine\Asset\Model\InstancedModel.cpp" />
     <ClCompile Include="Engine\Graphics\ImGuiManager.cpp" />
     <ClCompile Include="Engine\Object\LightManager.cpp" />
+    <ClCompile Include="Engine\Contexts\InputContext\InputContext.cpp" />
+    <ClCompile Include="Engine\Contexts\LightContext\LightContext.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Math\Matrix4x4.cpp" />
     <ClCompile Include="Engine\Asset\Model\Model.cpp" />
@@ -228,6 +232,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\CollisionShape\Ray.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ModelManager.cpp" />
     <ClCompile Include="Engine\Asset\Manager\TextureManager.cpp" />
+    <ClCompile Include="Engine\Contexts\RenderContext\RenderContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Grid.PS.hlsl">
@@ -272,6 +277,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Contexts\AssetContext\AssetContext.h" />
+    <ClInclude Include="Engine\Contexts\AudioContext\AudioContext.h" />
     <ClInclude Include="Engine\Graphics\BufferManager.h" />
     <ClInclude Include="Engine\Graphics\ConstantBufferManager.h" />
     <ClInclude Include="Engine\Asset\Manager\AssetManager.h" />
@@ -285,7 +292,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\RootSignatureManager.h" />
     <ClInclude Include="Engine\Math\CollisionShape\AABB.h" />
     <ClInclude Include="Engine\App\App.h" />
-    <ClInclude Include="Engine\Io\Audio.h" />
+    <ClInclude Include="Engine\Io\AudioSystem.h" />
     <ClInclude Include="Engine\Math\Sphere.h" />
     <ClInclude Include="Engine\Graphics\GPUData\LightsForGPU.h" />
     <ClInclude Include="Engine\Object\Lights\SpotLight.h" />
@@ -301,7 +308,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\DescriptorHeapManager.h" />
     <ClInclude Include="Engine\Object\Lights\DirectionalLight.h" />
     <ClInclude Include="Engine\Io\DumpExporter.h" />
-    <ClInclude Include="Engine\Scene\GameContext.h" />
+    <ClInclude Include="Engine\Contexts\GameContext\GameContext.h" />
+    <ClInclude Include="Engine\Scene\GameCommon.h" />
     <ClInclude Include="Externals\imgui\imconfig.h" />
     <ClInclude Include="Externals\imgui\imgui.h" />
     <ClInclude Include="Externals\imgui\imgui_impl_dx12.h" />
@@ -312,7 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
     <ClInclude Include="Engine\Graphics\Renderer.h" />
-    <ClInclude Include="Engine\Io\Input.h" />
+    <ClInclude Include="Engine\Io\InputSystem.h" />
     <ClInclude Include="Engine\Math\Lerp.h" />
     <ClInclude Include="Engine\Io\Logger.h" />
     <ClInclude Include="Engine\Asset\Material.h" />
@@ -343,6 +351,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\CollisionShape\Ray.h" />
     <ClInclude Include="Engine\Asset\Manager\ModelManager.h" />
     <ClInclude Include="Engine\Asset\Manager\TextureManager.h" />
+    <ClInclude Include="Engine\Contexts\RenderContext\RenderContext.h" />
+    <ClInclude Include="Engine\Contexts\InputContext\InputContext.h" />
+    <ClInclude Include="Engine\Contexts\LightContext\LightContext.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
