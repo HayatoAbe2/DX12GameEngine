@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Graphics/Renderer.h"
+#include "Engine/Graphics/Renderer/Renderer.h"
 class RenderContext {
 public:
 	RenderContext(Renderer* renderer, LightManager* lightManager);

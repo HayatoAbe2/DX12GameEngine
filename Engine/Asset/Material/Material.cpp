@@ -1,5 +1,5 @@
 #include "Material.h"
-#include "Graphics/DirectXContext.h"
+#include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 
 void Material::Initialize(BufferManager* bufferManager, bool useTexture, bool enableLighting) {
 	HRESULT hr;

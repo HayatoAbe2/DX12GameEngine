@@ -1,11 +1,10 @@
 #pragma once
-#include "Graphics/GPUData/MaterialData.h"
-#include "Texture.h"
+#include "Engine/Graphics/GPUData/MaterialData.h"
+#include "Engine/Asset/Texture.h"
 #include <wrl.h>
 #include <memory>
 
 class BufferManager;
-class DirectXContext;
 class Material {
 public:
 

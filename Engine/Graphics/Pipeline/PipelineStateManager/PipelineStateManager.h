@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BlendMode.h"
+#include "Engine/Graphics/Pipeline/BlendMode.h"
 
 #include <d3d12.h>
 #include <wrl.h>

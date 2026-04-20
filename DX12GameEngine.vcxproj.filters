@@ -96,16 +96,16 @@
     <ClCompile Include="Engine\Math\CollisionShape\AABB.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\ShaderCompiler.cpp">
+    <ClCompile Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\DescriptorHeapManager.cpp">
+    <ClCompile Include="Engine\Graphics\Core\DescriptorHeapManager\DescriptorHeapManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\Renderer.cpp">
+    <ClCompile Include="Engine\Graphics\Renderer\Renderer.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\RenderTargetManager.cpp">
+    <ClCompile Include="Engine\Graphics\GPUResource\RenderTargetManager\RenderTargetManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Math\Vector4.cpp">
@@ -117,16 +117,16 @@
     <ClCompile Include="Engine\App\Window.cpp">
       <Filter>Engine\App</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\CommandListManager.cpp">
+    <ClCompile Include="Engine\Graphics\Core\CommandListManager\CommandListManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\PipelineStateManager.cpp">
+    <ClCompile Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\RootSignatureManager.cpp">
+    <ClCompile Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\DeviceManager.cpp">
+    <ClCompile Include="Engine\Graphics\Core\DeviceManager\DeviceManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\BaseScene.cpp">
@@ -144,7 +144,7 @@
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Asset\Material.cpp">
+    <ClCompile Include="Engine\Asset\Material\Material.cpp">
       <Filter>Engine\Object</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Asset\Sprite.cpp">
@@ -156,26 +156,26 @@
     <ClCompile Include="Engine\Math\Sphere.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Io\AudioSystem.cpp">
+    <ClCompile Include="Engine\Io\AudioSystem\AudioSystem.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Io\DumpExporter.cpp">
+    <ClCompile Include="Engine\Io\DumpExporter\DumpExporter.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Io\InputSystem.cpp">
+    <ClCompile Include="Engine\Io\InputSystem\InputSystem.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Io\Logger.cpp">
+    <ClCompile Include="Engine\Io\Logger\Logger.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Engine\Graphics\FixFPS.cpp">
+    <ClCompile Include="Engine\Graphics\Utility\FixFPS\FixFPS.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\DirectXContext.cpp">
+    <ClCompile Include="Engine\Graphics\Core\DirectXContext\DirectXContext.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\SRVManager.cpp">
+    <ClCompile Include="Engine\Graphics\GPUResource\SRVManager\SRVManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Asset\Model\InstancedModel.cpp">
@@ -193,18 +193,18 @@
     <ClCompile Include="Engine\Object\ParticleField.cpp">
       <Filter>Engine\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Graphics\ImGuiManager.cpp">
+    <ClCompile Include="Engine\Graphics\Debug\ImGuiManager\ImGuiManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Scene\GameScene.cpp">
+    <ClCompile Include="Application\Scene\GameScene\GameScene.cpp">
       <Filter>Application\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Math\CollisionShape\Ray.cpp" />
-    <ClCompile Include="Engine\Asset\Manager\AssetManager.cpp" />
-    <ClCompile Include="Engine\Asset\Manager\ModelManager.cpp" />
-    <ClCompile Include="Engine\Asset\Manager\TextureManager.cpp" />
-    <ClCompile Include="Engine\Graphics\ConstantBufferManager.cpp" />
-    <ClCompile Include="Engine\Graphics\BufferManager.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\AssetManager\AssetManager.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\ModelManager\ModelManager.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\TextureManager\TextureManager.cpp" />
+    <ClCompile Include="Engine\Graphics\GPUResource\ConstantBufferManager\ConstantBufferManager.cpp" />
+    <ClCompile Include="Engine\Graphics\GPUResource\BufferManager\BufferManager.cpp" />
     <ClCompile Include="Engine\Contexts\RenderContext\RenderContext.cpp" />
     <ClCompile Include="Engine\Contexts\AudioContext\AudioContext.cpp" />
     <ClCompile Include="Engine\Contexts\InputContext\InputContext.cpp" />
@@ -286,16 +286,16 @@
     <ClInclude Include="Engine\Math\CollisionShape\AABB.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\ShaderCompiler.h">
+    <ClInclude Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\DescriptorHeapManager.h">
+    <ClInclude Include="Engine\Graphics\Core\DescriptorHeapManager\DescriptorHeapManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Renderer.h">
+    <ClInclude Include="Engine\Graphics\Renderer\Renderer.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\RenderTargetManager.h">
+    <ClInclude Include="Engine\Graphics\GPUResource\RenderTargetManager\RenderTargetManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\App\App.h">
@@ -310,16 +310,16 @@
     <ClInclude Include="Engine\Scene\SceneManager.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\CommandListManager.h">
+    <ClInclude Include="Engine\Graphics\Core\CommandListManager\CommandListManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\DeviceManager.h">
+    <ClInclude Include="Engine\Graphics\Core\DeviceManager\DeviceManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\RootSignatureManager.h">
+    <ClInclude Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\PipelineStateManager.h">
+    <ClInclude Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\Camera.h">
@@ -334,19 +334,19 @@
     <ClInclude Include="Engine\Asset\Model\Model.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Io\AudioSystem.h">
+    <ClInclude Include="Engine\Io\AudioSystem\AudioSystem.h">
       <Filter>Engine\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Io\DumpExporter.h">
+    <ClInclude Include="Engine\Io\DumpExporter\DumpExporter.h">
       <Filter>Engine\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Io\InputSystem.h">
+    <ClInclude Include="Engine\Io\InputSystem\InputSystem.h">
       <Filter>Engine\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Io\Logger.h">
+    <ClInclude Include="Engine\Io\Logger\Logger.h">
       <Filter>Engine\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Asset\Material.h">
+    <ClInclude Include="Engine\Asset\Material\Material.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\GPUData\MaterialData.h">
@@ -370,16 +370,16 @@
     <ClInclude Include="Engine\Graphics\GPUData\VertexData.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\FixFPS.h">
+    <ClInclude Include="Engine\Graphics\Utility\FixFPS\FixFPS.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\DirectXContext.h">
+    <ClInclude Include="Engine\Graphics\Core\DirectXContext\DirectXContext.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\BlendMode.h">
+    <ClInclude Include="Engine\Graphics\Pipeline\BlendMode.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\SRVManager.h">
+    <ClInclude Include="Engine\Graphics\GPUResource\SRVManager\SRVManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Asset\Model\Mesh.h">
@@ -406,7 +406,7 @@
     <ClInclude Include="Engine\Object\Particle.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\CameraForGPU.h">
+    <ClInclude Include="Engine\Graphics\GPUData\CameraForGPU.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Object\Lights\DirectionalLight.h">
@@ -418,7 +418,7 @@
     <ClInclude Include="Engine\Object\Lights\PointLight.h">
       <Filter>Engine\Graphics\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\ImGuiManager.h">
+    <ClInclude Include="Engine\Graphics\Debug\ImGuiManager\ImGuiManager.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Asset\Model\ModelData.h">
@@ -430,15 +430,15 @@
     <ClInclude Include="Engine\Asset\Model\SubMesh.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Scene\GameScene.h">
+    <ClInclude Include="Application\Scene\GameScene\GameScene.h">
       <Filter>Application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\CollisionShape\Ray.h" />
-    <ClInclude Include="Engine\Asset\Manager\AssetManager.h" />
-    <ClInclude Include="Engine\Asset\Manager\ModelManager.h" />
-    <ClInclude Include="Engine\Asset\Manager\TextureManager.h" />
-    <ClInclude Include="Engine\Graphics\ConstantBufferManager.h" />
-    <ClInclude Include="Engine\Graphics\BufferManager.h" />
+    <ClInclude Include="Engine\Asset\Manager\AssetManager\AssetManager.h" />
+    <ClInclude Include="Engine\Asset\Manager\ModelManager\ModelManager.h" />
+    <ClInclude Include="Engine\Asset\Manager\TextureManager\TextureManager.h" />
+    <ClInclude Include="Engine\Graphics\GPUResource\ConstantBufferManager\ConstantBufferManager.h" />
+    <ClInclude Include="Engine\Graphics\GPUResource\BufferManager\BufferManager.h" />
     <ClInclude Include="Engine\Contexts\RenderContext\RenderContext.h" />
     <ClInclude Include="Engine\Contexts\AudioContext\AudioContext.h" />
     <ClInclude Include="Engine\Contexts\InputContext\InputContext.h" />

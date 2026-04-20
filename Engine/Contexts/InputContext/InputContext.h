@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Io/InputSystem.h"
+#include "Engine/Io/InputSystem/InputSystem.h"
 class InputContext {
 public:
 	InputContext(InputSystem* input);

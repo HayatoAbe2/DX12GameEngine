@@ -1,7 +1,7 @@
 #include "InstancedModel.h"
 #include "Scene/Camera.h"
-#include "Graphics/BufferManager.h"
-#include "Graphics/ConstantBufferManager.h"
+#include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
+#include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
 
 void InstancedModel::CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager, ConstantBufferManager* cBufferManager) {
 	// データ設定

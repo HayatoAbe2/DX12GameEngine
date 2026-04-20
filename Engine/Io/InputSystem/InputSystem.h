@@ -3,7 +3,7 @@
 #include <dinput.h>
 #include <cstdint>
 #include <wrl.h>
-#include "../Math/MathUtils.h"
+#include "Engine/Math/MathUtils.h"
 class InputSystem {
 public:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;

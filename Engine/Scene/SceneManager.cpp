@@ -1,6 +1,6 @@
 #include "SceneManager.h"
-#include "BaseScene.h"
-#include "GameScene.h"
+#include "Engine/Scene/BaseScene.h"
+#include "Scene/GameScene/GameScene.h"
 
 SceneManager::SceneManager(GameContext* context) {
 	gameContext_ = context;

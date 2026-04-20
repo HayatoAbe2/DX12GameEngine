@@ -1,15 +1,15 @@
 #pragma once
 #include "Window.h"
-#include "Io/DumpExporter.h"
-#include "Io/Logger.h"
-#include "Io/AudioSystem.h"
-#include "Io/InputSystem.h"
-#include "Graphics/directXContext.h"
-#include "Graphics/Renderer.h"
-#include "Asset/Manager/AssetManager.h"
-#include "Object/LightManager.h"
-#include "Scene/SceneManager.h"
+#include "Engine/Io/DumpExporter/DumpExporter.h"
+#include "Engine/Io/Logger/Logger.h"
+#include "Engine/Io/AudioSystem/AudioSystem.h"
+#include "Engine/Io/InputSystem/InputSystem.h"
 #include "Engine/Contexts/GameContext/GameContext.h"
+#include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
+#include "Engine/Graphics/Renderer/Renderer.h"
+#include "Engine/Asset/Manager/AssetManager/AssetManager.h"
+#include "Engine/Object/LightManager.h"
+#include "Engine/Scene/SceneManager.h"
 
 #include <memory>
 #include <Windows.h>

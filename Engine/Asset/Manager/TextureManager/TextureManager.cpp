@@ -1,12 +1,12 @@
 #include "TextureManager.h"
-#include "Graphics/DirectXContext.h"
-#include "Io/Logger.h"
-#include "Graphics/GPUData/VertexData.h"
-#include "Graphics/CommandListManager.h"
-#include "Graphics/DescriptorHeapManager.h"
-#include "Graphics/SRVManager.h"
-#include "Graphics/BufferManager.h"
-#include "Graphics/ConstantBufferManager.h"
+#include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
+#include "Engine/Io/Logger/Logger.h"
+#include "Engine/Graphics/GPUData/VertexData.h"
+#include "Engine/Graphics/Core/CommandListManager/CommandListManager.h"
+#include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
+#include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
+#include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
+#include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
 
 TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) {
 	// デバイス

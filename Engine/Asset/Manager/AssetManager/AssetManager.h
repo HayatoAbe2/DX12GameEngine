@@ -3,8 +3,8 @@
 #include <wrl.h>
 #include <memory>
 
-#include "ModelManager.h"
-#include "TextureManager.h"
+#include "Engine/Asset/Manager/ModelManager/ModelManager.h"
+#include "Engine/Asset/Manager/TextureManager/TextureManager.h"
 
 class DirectXContext;
 class Logger;

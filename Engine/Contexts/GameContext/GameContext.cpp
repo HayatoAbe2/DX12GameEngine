@@ -1,8 +1,8 @@
 #include "GameContext.h"
-#include "Engine/Graphics/Renderer.h"
-#include "Engine/Io/AudioSystem.h"
-#include "Engine/Io/InputSystem.h"
-#include "Engine/Asset/Manager/AssetManager.h"
+#include "Engine/Graphics/Renderer/Renderer.h"
+#include "Engine/Io/AudioSystem/AudioSystem.h"
+#include "Engine/Io/InputSystem/InputSystem.h"
+#include "Engine/Asset/Manager/AssetManager/AssetManager.h"
 #include "Engine/Object/LightManager.h"
 
 GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager) {

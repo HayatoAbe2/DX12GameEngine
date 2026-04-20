@@ -6,7 +6,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include "Math.h"
-#include "Graphics/Renderer.h"
+#include "Graphics/Renderer/Renderer.h"
 #include "Scene/Camera.h"
 
 class Sprite {
