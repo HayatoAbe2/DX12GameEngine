@@ -147,7 +147,7 @@
     <ClCompile Include="Engine\Asset\Material\Material.cpp">
       <Filter>Engine\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Asset\Sprite.cpp">
+    <ClCompile Include="Engine\Asset\Sprite\Sprite.cpp">
       <Filter>Engine\Object</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Asset\Model\Model.cpp">
@@ -210,6 +210,7 @@
     <ClCompile Include="Engine\Contexts\InputContext\InputContext.cpp" />
     <ClCompile Include="Engine\Contexts\AssetContext\AssetContext.cpp" />
     <ClCompile Include="Engine\Contexts\LightContext\LightContext.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\SpriteManager\SpriteManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Grid.PS.hlsl">
@@ -361,7 +362,7 @@
     <ClInclude Include="Engine\Asset\Texture.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Asset\Sprite.h">
+    <ClInclude Include="Engine\Asset\Sprite\Sprite.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\GPUData\TransformationMatrix.h">
@@ -445,6 +446,7 @@
     <ClInclude Include="Engine\Contexts\AssetContext\AssetContext.h" />
     <ClInclude Include="Engine\Contexts\LightContext\LightContext.h" />
     <ClInclude Include="Engine\Scene\GameCommon.h" />
+    <ClInclude Include="Engine\Asset\Manager\SpriteManager\SpriteManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

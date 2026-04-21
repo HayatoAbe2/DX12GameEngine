@@ -222,7 +222,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Graphics\GPUResource\RenderTargetManager\RenderTargetManager.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.cpp" />
-    <ClCompile Include="Engine\Asset\Sprite.cpp" />
+    <ClCompile Include="Engine\Asset\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Math\Vector3.cpp" />
     <ClCompile Include="Engine\Math\Vector4.cpp" />
     <ClCompile Include="Engine\App\Window.cpp" />
@@ -233,6 +233,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Asset\Manager\ModelManager\ModelManager.cpp" />
     <ClCompile Include="Engine\Asset\Manager\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\Contexts\RenderContext\RenderContext.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\SpriteManager\SpriteManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Grid.PS.hlsl">
@@ -331,7 +332,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Graphics\GPUResource\RenderTargetManager\RenderTargetManager.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.h" />
-    <ClInclude Include="Engine\Asset\Sprite.h" />
+    <ClInclude Include="Engine\Asset\Sprite\Sprite.h" />
     <ClInclude Include="Engine\Object\Transform.h" />
     <ClInclude Include="Engine\Graphics\GPUData\TransformationMatrix.h" />
     <ClInclude Include="Engine\Math\Vector2.h" />
@@ -354,6 +355,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Contexts\RenderContext\RenderContext.h" />
     <ClInclude Include="Engine\Contexts\InputContext\InputContext.h" />
     <ClInclude Include="Engine\Contexts\LightContext\LightContext.h" />
+    <ClInclude Include="Engine\Asset\Manager\SpriteManager\SpriteManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

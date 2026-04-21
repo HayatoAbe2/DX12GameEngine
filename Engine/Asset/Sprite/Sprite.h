@@ -1,13 +1,13 @@
 #pragma once
 #include "Object/Transform.h"
 #include "Graphics/GPUData/TransformationMatrix.h"
+#include "Engine/Graphics/GPUData/VertexData.h"
+#include "Engine/Asset/Material/Material.h"
 #include "Math/Matrix4x4.h"
 #include <string>
 #include <wrl.h>
 #include <d3d12.h>
-#include "Math.h"
-#include "Graphics/Renderer/Renderer.h"
-#include "Scene/Camera.h"
+#include <memory>
 
 class Sprite {
 public:
@@ -96,12 +96,8 @@ public:
 	const D3D12_INDEX_BUFFER_VIEW& GetIBV()const { return indexBufferView_; };
 	const D3D12_VERTEX_BUFFER_VIEW& GetVBV() const { return vertexBufferView_; };
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSRVHandle() const { return material_->GetTextureSRVHandle(); };
-	const D3D12_GPU_VIRTUAL_ADDRESS GetCBV()const {
-		return transformationResource_->GetGPUVirtualAddress(); 
-	}
-	const D3D12_GPU_VIRTUAL_ADDRESS GetMaterialCBV()const {
-		return material_->GetCBV()->GetGPUVirtualAddress();
-	}
+	const D3D12_GPU_VIRTUAL_ADDRESS GetCBV()const { return transformationResource_->GetGPUVirtualAddress(); };
+	const D3D12_GPU_VIRTUAL_ADDRESS GetMaterialCBV()const { return material_->GetCBV()->GetGPUVirtualAddress(); };
 
 	void UpdateMaterial() { material_->UpdateGPU(); }
 
@@ -128,6 +124,4 @@ private:
 
 	// トランスフォームCBハンドル
 	uint32_t transformCBHandle_ = 0;
-
-	friend class Renderer;
 };

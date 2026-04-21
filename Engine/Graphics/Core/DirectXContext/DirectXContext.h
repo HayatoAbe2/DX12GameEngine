@@ -1,13 +1,6 @@
 #pragma once
 #include "Engine/Io/Logger/Logger.h"
-#include "Engine/Scene/DebugCamera.h"
-#include "Engine/Asset/Material/Material.h"
-#include "Engine/Asset/Model/Model.h"
-#include "Engine/Object/Transform.h"
-#include "Engine/Graphics/GPUData/TransformationMatrix.h"
 #include "Engine/Object/LightManager.h"
-#include "Engine/Graphics/GPUData/VertexData.h"
-#include "Engine/Asset/Sprite.h"
 #include "Engine/Graphics/Core/DeviceManager/DeviceManager.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
 #include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"

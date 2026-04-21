@@ -20,6 +20,9 @@ private:
 	// 3Dモデル
 	std::unique_ptr<Model> suzanne_ = nullptr;
 
+	// スプライト
+	std::unique_ptr<Sprite> sprite_ = nullptr;
+
 	// カメラ
 	std::unique_ptr<Camera> camera_ = nullptr;
 	float cameraDistance_ = 20.0f;

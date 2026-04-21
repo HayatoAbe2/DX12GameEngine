@@ -1,24 +1,11 @@
 #include "DirectXContext.h"
 #include <Windows.h>
-#include "Engine/Graphics/Core/DeviceManager/DeviceManager.h"
-#include "Engine/Graphics/Core/CommandListManager/CommandListManager.h"
-#include "Engine/Graphics/Pipeline/RootSignatureManager/RootSignatureManager.h"
-#include "Engine/Graphics/Pipeline/ShaderCompiler/ShaderCompiler.h"
-#include "Engine/Graphics/GPUResource/RenderTargetManager/RenderTargetManager.h"
-#include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
-#include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
-#include "Engine/Graphics/Pipeline/PipelineStateManager/PipelineStateManager.h"
-#include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
-#include "Engine/Graphics/Debug/ImGuiManager/ImGuiManager.h"
-#include "Engine/Asset/Sprite.h"
-#include "Engine/Asset/Manager/AssetManager/AssetManager.h"
 
 #include <cassert>
 #include <format>
 #include <dxcapi.h>
 #include <mfobjects.h>
 #include <numbers>
-#include <memory>
 
 void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND hwnd, Logger* logger) {
 	HRESULT hr;

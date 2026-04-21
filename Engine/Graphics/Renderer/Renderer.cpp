@@ -9,7 +9,7 @@
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
 #include "Engine/Asset/Model/Model.h"
 #include "Engine/Asset/Model/InstancedModel.h"
-#include "Engine/Asset/Sprite.h"
+#include "Engine/Asset/Sprite/Sprite.h"
 #include "Engine/Object/ParticleSystem.h"
 #include "Engine/Scene/Camera.h"
 
@@ -175,7 +175,7 @@ void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
 	cmdList->SetGraphicsRootConstantBufferView(1, cbAddress);
 	// SRVの設定
 	cmdList->SetGraphicsRootDescriptorTable(2, sprite->GetTextureSRVHandle());
-	// 描画!(DrawCall/ドローコール)
+	// ドローコール
 	cmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 

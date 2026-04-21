@@ -14,6 +14,10 @@ void GameScene::Initialize() {
 
 	suzanne_ = ctx.Asset().LoadModel("Resources/Debug", "suzanne.obj");
 	suzanne_->SetRotate({ 0, float(std::numbers::pi), 0 });
+
+	sprite_ = ctx.Asset().LoadSprite("Resources/Debug/monsterBall.png");
+	sprite_->SetPosition({ 0,0 });
+	sprite_->UpdateTransform(ctx.GetWindowSize());
 }
 
 void GameScene::Update() {
@@ -24,4 +28,5 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	ctx.Render().DrawModel(suzanne_.get(), camera_.get());
+	ctx.Render().DrawSprite(sprite_.get());
 }

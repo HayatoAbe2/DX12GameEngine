@@ -7,7 +7,6 @@
 #include "Engine/Contexts/GameContext/GameContext.h"
 #include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 #include "Engine/Graphics/Renderer/Renderer.h"
-#include "Engine/Asset/Manager/AssetManager/AssetManager.h"
 #include "Engine/Object/LightManager.h"
 #include "Engine/Scene/SceneManager.h"
 
