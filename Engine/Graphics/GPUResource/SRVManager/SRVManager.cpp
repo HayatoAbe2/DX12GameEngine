@@ -1,5 +1,5 @@
 #include "SRVManager.h"
-#include "DescriptorHeapManager.h"
+#include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include <cassert>
 
 void SRVManager::Initialize(DescriptorHeapManager* descHeapManager, ID3D12Device* device) {

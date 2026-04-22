@@ -1,5 +1,5 @@
 #include "CommandListManager.h"
-#include "DeviceManager.h"
+#include "Engine/Graphics/Core/DeviceManager/DeviceManager.h"
 
 #include <cassert>
 

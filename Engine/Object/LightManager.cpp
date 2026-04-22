@@ -1,6 +1,6 @@
 #include "LightManager.h"
-#include "Graphics/BufferManager.h"
-#include "Graphics/ImGuiManager.h"
+#include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
+#include "Engine/Graphics/Debug/ImGuiManager/ImGuiManager.h"
 #include "Math/MathUtils.h"
 
 void LightManager::Initialize(BufferManager* bufferManager) {

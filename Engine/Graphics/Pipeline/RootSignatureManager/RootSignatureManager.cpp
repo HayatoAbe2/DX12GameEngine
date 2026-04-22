@@ -1,5 +1,5 @@
 #include "RootSignatureManager.h"
-#include "DeviceManager.h"
+#include "Engine/Graphics/Core/DeviceManager/DeviceManager.h"
 #include "Engine/Io/Logger/Logger.h"
 
 #include <cassert>

@@ -1,5 +1,5 @@
 #include "RenderTargetManager.h"
-#include "DescriptorHeapManager.h"
+#include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include <cassert>
 
 void RenderTargetManager::InitializeSwapChainBuffers(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager){
