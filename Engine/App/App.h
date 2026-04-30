@@ -7,8 +7,8 @@
 #include "Engine/Contexts/GameContext/GameContext.h"
 #include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 #include "Engine/Graphics/Renderer/Renderer.h"
-#include "Engine/Object/LightManager.h"
-#include "Engine/Scene/SceneManager.h"
+#include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/Scene/SceneManager/SceneManager.h"
 
 #include <memory>
 #include <Windows.h>

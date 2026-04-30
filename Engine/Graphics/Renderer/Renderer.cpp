@@ -10,9 +10,8 @@
 #include "Engine/Asset/Model/Model.h"
 #include "Engine/Asset/Model/InstancedModel.h"
 #include "Engine/Asset/Sprite/Sprite.h"
-#include "Engine/Object/ParticleSystem.h"
-#include "Engine/Scene/Camera.h"
-
+#include "Engine/Object/Particle/ParticleSystem/ParticleSystem.h"
+#include "Engine/Scene/Camera/Camera.h"
 
 #include <cassert>
 #include <format>

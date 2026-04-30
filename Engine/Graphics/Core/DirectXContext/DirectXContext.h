@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/Io/Logger/Logger.h"
-#include "Engine/Object/LightManager.h"
 #include "Engine/Graphics/Core/DeviceManager/DeviceManager.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
 #include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"

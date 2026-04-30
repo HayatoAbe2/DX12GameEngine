@@ -1,5 +1,5 @@
 #include "InstancedModel.h"
-#include "Scene/Camera.h"
+#include "Engine/Scene/Camera/Camera.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
 #include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
 

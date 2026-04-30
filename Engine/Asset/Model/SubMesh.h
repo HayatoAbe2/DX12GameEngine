@@ -3,7 +3,7 @@
 #include <wrl.h>
 #include <cstdint>
 #include <vector>
-#include "Graphics/GPUData/VertexData.h"
+#include "Engine/Graphics/GPUData/VertexData.h"
 
 struct SubMesh {
 	std::vector<VertexData> vertices_{};

@@ -5,8 +5,8 @@
 #include "Engine/Io/AudioSystem/AudioSystem.h"
 #include "Engine/Io/InputSystem/InputSystem.h"
 #include "Engine/Asset/Manager/AssetManager/AssetManager.h"
-#include "Engine/Object/LightManager.h"
-#include "Engine/Scene/SceneManager.h"
+#include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/Scene/SceneManager/SceneManager.h"
 #include "Engine/Contexts/GameContext/GameContext.h"
 
 #include <format>
@@ -73,12 +73,13 @@ void App::Initialize() {
 	lightManager_ = std::make_unique<LightManager>();
 	lightManager_->Initialize(dxContext_->GetBufferManager());
 
-	// コンテキスト
-	gameContext_ = std::make_unique<GameContext>(renderer_.get(), audio_.get(), input_.get(), assetManager_.get(), lightManager_.get());
+	// シーンマネージャー
+	sceneManager_ = std::make_unique<SceneManager>();
+	
+	// コンテキスト(ゲームコードからの関数窓口)
+	gameContext_ = std::make_unique<GameContext>(renderer_.get(), audio_.get(), input_.get(), assetManager_.get(), lightManager_.get(), sceneManager_.get());
 	gameContext_->Set(gameContext_.get());
 
-	// シーンマネージャー
-	sceneManager_ = std::make_unique<SceneManager>(gameContext_.get());
 	sceneManager_->Initialize();
 	logger_->Log(logger_->GetStream(), std::format("[SceneManager] Initialization complete.\n"));
 }
@@ -124,7 +125,6 @@ void App::Run() {
 void App::Finalize() {
 	{
 		// シーンマネージャー
-		sceneManager_->Finalize();
 		sceneManager_.reset();
 
 		// 入力

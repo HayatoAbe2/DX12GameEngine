@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/MathUtils.h"
+#include "Engine/Math/MathUtils.h"
 
 struct SpotLight {
 	Vector4 color = {1.0f,1.0f,1.0f,1.0f};

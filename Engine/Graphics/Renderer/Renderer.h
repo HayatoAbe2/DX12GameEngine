@@ -1,23 +1,13 @@
 #pragma once
-#include "Engine/Io/Logger/Logger.h"
-#include "Engine/Scene/DebugCamera.h"
-#include "Engine/Asset/Material/Material.h"
-#include "Engine/Object/Transform.h"
-#include "Engine/Graphics/GPUData/TransformationMatrix.h"
-#include "Engine/Graphics/GPUData/VertexData.h"
+#include "Engine/Scene/DebugCamera/DebugCamera.h"
 #include "Engine/Graphics/GPUData/LightsForGPU.h"
-#include "Engine/Object/LightManager.h"
-#include "Engine/Graphics/Pipeline/BlendMode.h"
-#include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
+#include "Engine/Object/LightManager/LightManager.h"
 #include "Engine/Graphics/GPUData/CameraForGPU.h"
 #include "Engine/Asset/Model/Node.h"
 #include "Engine/Asset/Model/Mesh.h"
 
 #include <wrl.h>
-#include <dxgi1_6.h>
 #include <d3d12.h>
-#include <dxcapi.h>
-#include <memory>
 
 class Model;
 class InstancedModel;

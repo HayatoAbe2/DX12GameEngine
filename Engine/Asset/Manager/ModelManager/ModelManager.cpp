@@ -17,7 +17,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <Graphics/GPUData/InstanceGPUData.h>
+#include <Engine/Graphics/GPUData/InstanceGPUData.h>
 
 ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager) {
 	// デバイス
@@ -286,7 +286,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryP
 			// テクスチャ設定
 			texture->SetMtlFilePath(directoryPath + "/" + textureFilePath.C_Str());
 		} else {
-			texture->SetMtlFilePath("Resources/white1x1.png");
+			texture->SetMtlFilePath("Resources/Debug/white1x1.png");
 		}
 
 		// SRVを作成

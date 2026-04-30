@@ -1,10 +1,7 @@
 #pragma once
-#include "Object/Transform.h"
-#include "Graphics/GPUData/TransformationMatrix.h"
+#include "Engine/Graphics/GPUData/TransformationMatrix.h"
 #include "Engine/Graphics/GPUData/VertexData.h"
 #include "Engine/Asset/Material/Material.h"
-#include "Math/Matrix4x4.h"
-#include <string>
 #include <wrl.h>
 #include <d3d12.h>
 #include <memory>

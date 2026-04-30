@@ -1,9 +1,7 @@
 #pragma once
-#include "Asset/Texture.h"
+#include "Engine/Asset/Texture.h"
 #include <memory>
 #include <unordered_map>
-
-#include "externals/DirectXTex/d3dx12.h"
 #include "externals/DirectXTex/DirectXTex.h"
 
 class DirectXContext;

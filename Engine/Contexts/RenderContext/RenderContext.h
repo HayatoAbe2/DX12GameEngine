@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Graphics/Renderer/Renderer.h"
+#include "Engine/Graphics/Pipeline/BlendMode.h"
 class RenderContext {
 public:
 	RenderContext(Renderer* renderer, LightManager* lightManager);

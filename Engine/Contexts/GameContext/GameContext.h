@@ -4,6 +4,7 @@
 #include "Engine/Contexts/InputContext/InputContext.h"
 #include "Engine/Contexts/LightContext/LightContext.h"
 #include "Engine/Contexts/RenderContext/RenderContext.h"
+#include "Engine/Contexts/SceneContext/SceneContext.h"
 #include <random>
 #include <memory>
 
@@ -27,7 +28,7 @@ public:
 	}
 
 	// コンストラクタ
-	GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager);
+	GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager);
 
 	// モデルなどの読み込み
 	AssetContext& Asset() { return *asset_; }
@@ -43,6 +44,9 @@ public:
 
 	// 描画
 	RenderContext& Render() { return *render_; }
+
+	// シーン管理
+	SceneContext& Scene() { return *scene_; }
 
 	///
 	/// ウィンドウ情報
@@ -65,6 +69,7 @@ private:
 	std::unique_ptr<InputContext> input_ = nullptr;
 	std::unique_ptr<LightContext> light_ = nullptr;
 	std::unique_ptr<RenderContext> render_ = nullptr;
+	std::unique_ptr<SceneContext> scene_ = nullptr;
 
 	// ランダム関連
 	std::random_device randomDevice_;

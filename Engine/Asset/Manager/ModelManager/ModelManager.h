@@ -1,6 +1,6 @@
 #pragma once
-#include "Asset/Model/Model.h"
-#include "Asset/Model/InstancedModel.h"
+#include "Engine/Asset/Model/Model.h"
+#include "Engine/Asset/Model/InstancedModel.h"
 
 #include <unordered_map>
 #include <string>

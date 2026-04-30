@@ -1,0 +1,49 @@
+#pragma once
+#include "GameCommon.h"
+#include "Weapon/WeaponStatus.h"
+#include <memory>
+
+class MapCheck;
+
+class Bullet {
+public:
+	Bullet(std::unique_ptr<Model> model,const Vector3& direction,const WeaponStatus& status,bool isEnemyBullet);
+	virtual ~Bullet() = default;
+	virtual void Update(MapCheck* mapCheck) = 0;
+	virtual void Draw(Camera* camera) = 0;
+	virtual void Hit() = 0;
+
+	bool IsEnemyBullet() { return isEnemyBullet_; }
+	Transform GetTransform() { return model_->GetTransform(); }
+	float GetDamage() { return status_.damage; }
+	float GetKnockback() { return status_.knockback; }
+	bool IsDead() { return isDead_; }
+	bool CanErase() { return canErase_; }
+	Vector3 GetPrePos() { return prePos_; }
+	
+protected:
+	// 前フレーム場所
+	Vector3 prePos_{};
+
+	// 速度
+	Vector3 velocity_{};
+
+	// モデル
+	std::unique_ptr<Model> model_ = nullptr;
+
+	// 弾ステータス
+	WeaponStatus status_;
+
+	// 生存時間
+	int lifeTime_ = 0;
+
+	// 敵の弾フラグ
+	bool isEnemyBullet_ = false;
+
+	// 死亡フラグ(判定やめる)
+	bool isDead_ = false;
+
+	// 弾リストから削除可能
+	bool canErase_ = false;
+};
+
