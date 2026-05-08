@@ -14,6 +14,7 @@ class InstancedModel;
 class Sprite;
 class ParticleSystem;
 class DirectXContext;
+class ConstantBufferManager;
 class Camera;
 
 class Renderer {
@@ -70,6 +71,9 @@ public:
 
 private:
 	DirectXContext* dxContext_ = nullptr;
+
+	// ConstantBuffer管理
+	ConstantBufferManager* cbManager_ = nullptr;
 
 	// カメラ位置(GPU転送)
 	CameraForGPU* cameraData_;

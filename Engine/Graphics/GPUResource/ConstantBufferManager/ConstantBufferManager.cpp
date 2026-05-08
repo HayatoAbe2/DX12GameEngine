@@ -27,10 +27,17 @@ void ConstantBufferManager::InitializeTransformCB(ID3D12Device* device) {
 	assert(SUCCEEDED(hr));
 }
 
-UINT8* ConstantBufferManager::GetTransformPtr(uint32_t transformCBHandle) {
-	return mappedTransformData_ + transformCBHandle * kCBSize;
+D3D12_GPU_VIRTUAL_ADDRESS ConstantBufferManager::UploadTransform(const TransformationMatrix& data) {
+	// CBVアドレス確保
+	uint32_t index = currentCBOffset_++;
+
+	// GPUメモリ書き込み
+	auto dst = mappedTransformData_ + index * kCBSize;
+	memcpy(dst, &data, sizeof(data));
+
+	return transformBuffer_->GetGPUVirtualAddress() + index * kCBSize;
 }
 
-D3D12_GPU_VIRTUAL_ADDRESS ConstantBufferManager::GetTransformCBAddress(uint32_t transformCBHandle) {
-	return transformBuffer_->GetGPUVirtualAddress() + transformCBHandle * kCBSize;
+void ConstantBufferManager::BeginFrame() {
+	currentCBOffset_ = 0;
 }

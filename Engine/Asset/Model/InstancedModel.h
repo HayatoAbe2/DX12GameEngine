@@ -70,9 +70,6 @@ public:
 	// データの設定
 	void CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager, ConstantBufferManager* cBufferManager);
 
-	// トランスフォームCBハンドルセット
-	void SetTransformCBHandle(uint32_t handle) { transformCBHandle_ = handle; }
-
 	// 根ノードを設定
 	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); }
 
@@ -82,9 +79,6 @@ public:
 
 	// マテリアル
 	Material* GetMaterial(int index) { return material_[index].get(); }
-
-	// トランスフォームCBハンドル取得
-	uint32_t GetTransformCBHandle() { return transformCBHandle_; }
 
 	// rootNode取得
 	ModelNode* GetRootNode() { return rootNode_.get(); }
@@ -96,9 +90,6 @@ private:
 
 	// マテリアル
 	std::vector<std::unique_ptr<Material>> material_{};
-
-	// トランスフォームCBハンドル
-	uint32_t transformCBHandle_ = 0;
 
 	// 根ノード
 	std::unique_ptr<ModelNode> rootNode_{};

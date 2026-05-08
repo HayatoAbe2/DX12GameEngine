@@ -3,7 +3,6 @@
 #include "Engine/Graphics/Core/CommandListManager/CommandListManager.h"
 #include "Engine/Graphics/Pipeline/PipelineStateManager/PipelineStateManager.h"
 #include "Engine/Graphics/Pipeline/RootSignatureManager/RootSignatureManager.h"
-#include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include "Engine/Graphics/Core/DeviceManager/DeviceManager.h"
 #include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
@@ -13,19 +12,14 @@
 #include "Engine/Object/Particle/ParticleSystem/ParticleSystem.h"
 #include "Engine/Scene/Camera/Camera.h"
 
-#include <cassert>
-#include <format>
-#include <dxcapi.h>
-#include <mfobjects.h>
-#include <numbers>
-
-#include "externals/DirectXTex/d3dx12.h"
-
 void Renderer::Initialize(DirectXContext* dxContext) {
 	dxContext_ = dxContext;
 
 	// デバイス
 	auto device = dxContext_->GetDeviceManager()->GetDevice();
+
+	// CB管理クラス
+	cbManager_ = dxContext->GetConstantBufferManager();
 
 	// カメラバッファ作成
 	cameraBuffer_ = dxContext_->GetBufferManager()->CreateUploadBuffer(sizeof(CameraForGPU));
@@ -52,8 +46,11 @@ void Renderer::UpdateSpriteTransform(Sprite* sprite) {
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 100.0f);
 	data.WVP = Multiply(data.World, projectionMatrix);
 	data.WorldInverseTranspose = Transpose(Inverse(data.World));
-	auto ptr = dxContext_->GetConstantBufferManager()->GetTransformPtr(sprite->GetTransformCBHandle());
-	memcpy(ptr, &data, sizeof(data));
+
+	dxContext_->GetConstantBufferManager()->UploadTransform(data);
+	auto cbAddress = dxContext_->GetConstantBufferManager()->UploadTransform(data); // gpu送信
+	// トランスフォームCBV
+	dxContext_->GetCommandListManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, cbAddress);
 }
 
 void Renderer::DrawModel(Model* model, Camera* camera, LightManager* lightManager, int blendMode) {
@@ -169,9 +166,6 @@ void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
 	// Spriteの描画。変更が必要なものだけ変更する
 	cmdList->IASetIndexBuffer(&sprite->GetIBV());	// IBVを設定
 	cmdList->IASetVertexBuffers(0, 1, &sprite->GetVBV());	// VBVを設定
-	// トランスフォームCBV
-	auto cbAddress = dxContext_->GetConstantBufferManager()->GetTransformCBAddress(sprite->GetTransformCBHandle());
-	cmdList->SetGraphicsRootConstantBufferView(1, cbAddress);
 	// SRVの設定
 	cmdList->SetGraphicsRootDescriptorTable(2, sprite->GetTextureSRVHandle());
 	// ドローコール
@@ -189,11 +183,7 @@ void Renderer::DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3
 		* camera->viewMatrix_
 		* camera->projectionMatrix_;
 	data.WorldInverseTranspose = Transpose(Inverse(data.World));
-	auto ptr = dxContext_->GetConstantBufferManager()->GetTransformPtr(model->GetTransformCBHandle());
-	memcpy(ptr, &data, sizeof(data));
-
-	// cbアドレス
-	auto cbAddress = dxContext_->GetConstantBufferManager()->GetTransformCBAddress(model->GetTransformCBHandle());
+	auto cbAddress = dxContext_->GetConstantBufferManager()->UploadTransform(data); // gpu送信
 	cmdList->SetGraphicsRootConstantBufferView(1, cbAddress);
 
 	// メッシュを描画

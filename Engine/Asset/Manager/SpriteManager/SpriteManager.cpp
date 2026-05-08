@@ -31,8 +31,6 @@ SpriteManager::SpriteManager(DirectXContext* dxContext, Logger* logger, TextureM
 std::unique_ptr<Sprite> SpriteManager::Load(std::string texturePath) {
 	std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
 
-	sprite->SetTransformCBHandle(cbManager_->AllocateTransformCB());
-
 	// UVTransform
 	Transform uvTransform_{
 		{1.0f,1.0f,0.0f},

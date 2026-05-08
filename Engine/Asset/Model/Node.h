@@ -9,7 +9,6 @@ struct ModelNode {
 	std::string name;
 	std::vector<std::unique_ptr<ModelNode>> children;
 	std::vector<int> meshIndices;
-	uint32_t transformCBHandle_ = 0; // トランスフォームCBハンドル
 
     ModelNode() = default;
     ~ModelNode() = default;

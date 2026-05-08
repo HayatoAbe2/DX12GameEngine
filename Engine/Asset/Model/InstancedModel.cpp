@@ -15,9 +15,6 @@ void InstancedModel::CopyModelData(std::shared_ptr<ModelData> data, BufferManage
 		newMat->SetTexture(data->defaultMaterials_[i]->GetTexture());
 		material_.push_back(std::move(newMat));
 	}
-
-	// CBハンドル割り当て(まだID)
-	transformCBHandle_ = cBufferManager->AllocateTransformCB();
 }
 
 void InstancedModel::UpdateInstanceTransform(Camera* camera, const std::vector<Transform>& transforms, std::vector<Vector4>& color) {

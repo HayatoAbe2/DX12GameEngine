@@ -30,8 +30,6 @@ ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureMan
 	srvManager_ = dxContext->GetSRVManager();
 	// バッファ管理クラス
 	bufferManager_ = dxContext->GetBufferManager();
-	// CB管理クラス
-	cbManager_ = dxContext->GetConstantBufferManager();
 	// ログ出力クラス
 	logger_ = logger;
 	// テクスチャ管理クラス
@@ -41,9 +39,6 @@ ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureMan
 std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, const std::string& filename, bool enableLighting) {
 	std::unique_ptr<Model> model = std::make_unique<Model>(); // 構築するModel
 	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>(); // データ
-
-	// トランスフォームCB割り当て
-	model->SetTransformCBHandle(cbManager_->AllocateTransformCB());
 
 	// assimpでモデル作成
 	Assimp::Importer importer;
@@ -145,8 +140,6 @@ std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryP
 
 	std::unique_ptr<InstancedModel> model = std::make_unique<InstancedModel>(); // 構築するModel
 	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>(); // データ
-
-	model->SetTransformCBHandle(cbManager_->AllocateTransformCB());
 
 	// assimpでモデル作成
 	Assimp::Importer importer;
@@ -461,9 +454,6 @@ std::unique_ptr<ModelNode> ModelManager::ReadNode(aiNode* aiNode) {
 
 	// name
 	node->name = aiNode->mName.C_Str();
-
-	// TransformCB
-	node->transformCBHandle_ = cbManager_->AllocateTransformCB();
 
 	return node;
 }

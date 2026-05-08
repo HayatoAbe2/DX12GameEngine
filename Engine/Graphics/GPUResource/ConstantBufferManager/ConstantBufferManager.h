@@ -3,16 +3,16 @@
 #include <cstdint>
 #include <wrl.h>
 #include <d3d12.h>
+#include <vector>
 
 class ConstantBufferManager {
 public:
 	ConstantBufferManager(ID3D12Device* device);
-	uint32_t AllocateTransformCB() { return nextId_++; }
 
-	// トランスフォームCBのポインタ
-	UINT8* GetTransformPtr(uint32_t transformCBHandle);
-	D3D12_GPU_VIRTUAL_ADDRESS GetTransformCBAddress(uint32_t transformCBHandle);
+	// GPU書き込み&CBVアドレスを返す
+	D3D12_GPU_VIRTUAL_ADDRESS UploadTransform(const TransformationMatrix& data);
 
+	void BeginFrame();
 private:
 	// トランスフォームバッファ初期化
 	void InitializeTransformCB(ID3D12Device* device);
@@ -23,9 +23,8 @@ private:
 
 	// CBサイズ
 	static constexpr UINT kCBSize = (sizeof(TransformationMatrix) + 255) & ~255;
-	const UINT kMaxObjects = 4096; // 最大数。もし足りなかったら増やす
+	const UINT kMaxObjects = 4096; // 最大数
 
-	// id(ハンドルにしたい)
-	uint32_t nextId_ = 0;
+	uint32_t currentCBOffset_ = 0;
 };
 

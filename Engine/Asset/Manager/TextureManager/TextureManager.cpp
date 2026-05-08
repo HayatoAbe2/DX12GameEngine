@@ -7,6 +7,7 @@
 #include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
 #include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
+#include <Externals/DirectXTex/d3dx12.h>
 
 TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) {
 	// デバイス

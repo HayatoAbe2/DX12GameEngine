@@ -140,6 +140,9 @@ void DirectXContext::BeginFrame() {
 	// Scissorを設定
 	commandListManager_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
 
+	// CBV書き込み先リセット
+	constantBufferManager_->BeginFrame();
+
 	imGuiManager_->BeginFrame();
 }
 

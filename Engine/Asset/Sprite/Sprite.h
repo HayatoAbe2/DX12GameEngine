@@ -98,12 +98,6 @@ public:
 
 	void UpdateMaterial() { material_->UpdateGPU(); }
 
-	// トランスフォームCBハンドル取得
-	uint32_t GetTransformCBHandle() { return transformCBHandle_; }
-
-	// トランスフォームCBハンドルセット
-	void SetTransformCBHandle(uint32_t handle) { transformCBHandle_ = handle; }
-
 private:
 	Vector2 size_ = { 640.0f,360.0f };
 	Vector2 position_ = {};
@@ -118,7 +112,4 @@ private:
 	VertexData* vertexData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;
 	TransformationMatrix* transformationData_;
-
-	// トランスフォームCBハンドル
-	uint32_t transformCBHandle_ = 0;
 };

@@ -110,7 +110,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)application;$(ProjectDir)application\Weapon;$(ProjectDir)application\Weapon\Weapons;$(ProjectDir)application\Enemy;$(ProjectDir)application\Enemy\Enemies;$(ProjectDir)application\Item;$(ProjectDir)application\Map;$(ProjectDir)application\Scene;$(ProjectDir)application\Effect;$(ProjectDir)application\Bullet</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)Engine\Scene\GameCommon;$(ProjectDir)application</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,7 +143,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)application;$(ProjectDir)application\Weapon;$(ProjectDir)application\Weapon\Weapons;$(ProjectDir)application\Enemy;$(ProjectDir)application\Enemy\Enemies;$(ProjectDir)application\Item;$(ProjectDir)application\Map;$(ProjectDir)application\Scene;$(ProjectDir)application\Effect;$(ProjectDir)application\Bullet</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)Engine\Scene\GameCommon;$(ProjectDir)application</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
