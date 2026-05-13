@@ -26,6 +26,9 @@ public:
 	std::unique_ptr<Sprite> LoadSprite(const std::string& filePath) {
 		return std::move(spriteManager_->Load(filePath));
 	}
+	std::shared_ptr<Texture> LoadTexture(const std::string& filePath) {
+		return textureManager_->Load(filePath);
+	}
 
 
 private:

@@ -14,11 +14,13 @@ class ConstantBufferManager;
 class TextureManager {
 public:
 	TextureManager(DirectXContext* dxContext, Logger* logger);
+	
+	std::shared_ptr<Texture> Load(const std::string& texturePath);
 	void CreateTextureSRV(const std::shared_ptr<Texture>& texture);
 
 private:
 	// 関数内で使う関数
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	DirectX::ScratchImage LoadFile(const std::string& filePath);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metadata);
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
 

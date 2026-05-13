@@ -68,9 +68,8 @@ void GameScene::Initialize() {
 	uiDrawer_ = std::make_unique<UIDrawer>();
 	uiDrawer_->Initialize(player_.get());
 
-	// 天球
-	skydome_ = std::make_unique<Model>();
-	skydome_ = asset.LoadModel("Resources/Skydome", "skydome.obj", false);
+	// Skybox
+	skybox_ = asset.LoadTexture("Resources/Debug/rostock_laage_airport_4k.dds");
 
 	// 雲
 	cloud_ = std::make_unique<Model>();
@@ -283,14 +282,15 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
 
-	render.DrawModel(skydome_.get(), camera_.get());
-	render.DrawModel(cloud_.get(), camera_.get(), BlendMode::Add);
+	//render.DrawModel(cloud_.get(), camera_.get(), BlendMode::Add);
 	mapTile_->Draw(camera_.get());
 	player_->Draw(camera_.get());
 	enemyManager_->Draw(camera_.get());
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
+
+	render.DrawSkybox(skybox_.get(), camera_.get());
 
 	if (currentFloor_ == 0) {
 		// チュートリアル表示

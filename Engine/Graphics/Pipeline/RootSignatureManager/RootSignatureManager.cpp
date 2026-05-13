@@ -12,6 +12,7 @@ void RootSignatureManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateStandardRootSignature();
 	CreateInstancingRootSignature();
 	CreateParticleRootSignature();
+	CreateSkyboxRootSignature();
 }
 
 void RootSignatureManager::CreateStandardRootSignature() {
@@ -230,5 +231,85 @@ void RootSignatureManager::CreateParticleRootSignature() {
 	}
 
 	hr = device_->CreateRootSignature(0, signatureBlobParticle_->GetBufferPointer(), signatureBlobParticle_->GetBufferSize(), IID_PPV_ARGS(&particleRootSignature_));
+	assert(SUCCEEDED(hr));
+}
+
+void RootSignatureManager::CreateSkyboxRootSignature() {
+
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
+
+	// 0 (PS:マテリアルCBV)
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	// 1 (VS:トランスフォームCBV)
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].Descriptor.ShaderRegister = 0;
+
+	// 2 (PS:テクスチャSRV)
+	D3D12_DESCRIPTOR_RANGE textureRange[1] = {};
+	textureRange[0].BaseShaderRegister = 0;
+	textureRange[0].NumDescriptors = 1;
+	textureRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	textureRange[0].OffsetInDescriptorsFromTableStart =
+		D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[2].ParameterType =
+		D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility =
+		D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[2].DescriptorTable.pDescriptorRanges =
+		textureRange;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges =
+		_countof(textureRange);
+
+	// RootSignatureDesc
+	D3D12_ROOT_SIGNATURE_DESC desc{};
+	desc.NumParameters = _countof(rootParameters);
+	desc.pParameters = rootParameters;
+	desc.Flags =
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	// Sampler
+	D3D12_STATIC_SAMPLER_DESC sampler[1]{};
+	sampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+
+	sampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampler[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampler[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+
+	sampler[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampler[0].MaxLOD = D3D12_FLOAT32_MAX;
+
+	sampler[0].ShaderRegister = 0;
+	sampler[0].ShaderVisibility =
+		D3D12_SHADER_VISIBILITY_PIXEL;
+
+	desc.NumStaticSamplers = _countof(sampler);
+	desc.pStaticSamplers = sampler;
+
+	// Serialize
+	HRESULT hr = D3D12SerializeRootSignature(
+		&desc,
+		D3D_ROOT_SIGNATURE_VERSION_1,
+		&signatureBlobSkybox_,
+		&errorBlobSkybox_);
+
+	if (FAILED(hr)) {
+		logger_->Log(
+			logger_->GetStream(),
+			reinterpret_cast<char*>(errorBlobSkybox_->GetBufferPointer()));
+		assert(false);
+	}
+
+
+	hr = device_->CreateRootSignature(
+		0,
+		signatureBlobSkybox_->GetBufferPointer(),
+		signatureBlobSkybox_->GetBufferSize(),
+		IID_PPV_ARGS(&skyboxRootSignature_));
+
 	assert(SUCCEEDED(hr));
 }

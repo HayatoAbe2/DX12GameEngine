@@ -8,7 +8,7 @@ class DescriptorHeapManager;
 class SRVManager {
 public:
 	// 初期化
-	void Initialize(DescriptorHeapManager* descHeapManager,ID3D12Device* device);
+	void Initialize(DescriptorHeapManager* descHeapManager, ID3D12Device* device);
 
 	// 描画前
 	void PreDraw(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList);
@@ -19,7 +19,7 @@ public:
 	uint32_t Allocate();
 
 	// SRV生成
-	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT mipLevels);
+	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT mipLevels, bool isCubemap);
 	void CreateStructuredBufferSRV(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structuredByteStride);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t index);
@@ -41,7 +41,7 @@ private:
 
 	// SRVディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
-	
+
 	// DescriptorHeapのサイズ
 	uint32_t descriptorSize_;
 

@@ -15,8 +15,8 @@ void TitleScene::Initialize() {
 	camera_ = std::make_unique<Camera>();
 	camera_->transform_.rotate = { 0,0,0 };
 
-	// 天球
-	skydome_ = asset.LoadModel("Resources/Skydome", "skydome.obj", false);
+	// Skybox
+	skybox_ = asset.LoadTexture("Resources/Debug/rostock_laage_airport_4k.dds");
 	
 	// フェード
 	fade_ = asset.LoadSprite("resources/Debug/white1x1.png");
@@ -37,9 +37,6 @@ void TitleScene::Update() {
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
 	auto& scene = ctx.Scene();
-
-	Vector3 rotate = skydome_->GetTransform().rotate;
-	skydome_->SetRotate(rotate);
 
 	camera_->Update(debugCamera_.get());
 
@@ -73,8 +70,9 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
 
-	render.DrawModel(skydome_.get(), camera_.get());
-	render.DrawSprite(control_.get());
-	render.DrawSprite(logo_.get());
+	//render.DrawSprite(control_.get());
+	//render.DrawSprite(logo_.get());
 	render.DrawSprite(fade_.get());
+
+	render.DrawSkybox(skybox_.get(), camera_.get());
 }

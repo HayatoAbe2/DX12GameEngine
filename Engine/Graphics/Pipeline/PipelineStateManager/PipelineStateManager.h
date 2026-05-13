@@ -8,22 +8,22 @@
 class PipelineStateManager {
 public:
 
-	void Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& rootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& instancingRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& particleRootSignature);
+	void Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& rootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& instancingRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& particleRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature);
 
 	void CreateStandardPSO();
 	void CreateInstancingPSO();
 	void CreateParticlePSO();
+	void CreateSkyboxPSO();
 
-	ID3D12PipelineState* GetStandardPSO(int index) { return pso_[index].Get(); }
-	ID3D12PipelineState* GetInstancingPSO(int index) { return instancingPso_[index].Get(); }
-	ID3D12PipelineState* GetParticlePSO(int index) { return particlePso_[index].Get(); }
+	ID3D12PipelineState* GetStandardPSO(int index) { return standardPSO[index].Get(); }
+	ID3D12PipelineState* GetInstancingPSO(int index) { return instancingPSO_[index].Get(); }
+	ID3D12PipelineState* GetParticlePSO(int index) { return particlePSO_[index].Get(); }
+	ID3D12PipelineState* GetSkyboxPSO(int index) { return skyboxPSO_[index].Get(); }
 
-	void SetVSBlob(Microsoft::WRL::ComPtr<IDxcBlob> blob) { vertexShaderBlob_ = blob; }
-	void SetPSBlob(Microsoft::WRL::ComPtr<IDxcBlob> blob) { pixelShaderBlob_ = blob; }
-	void SetInstancingVSBlob(Microsoft::WRL::ComPtr<IDxcBlob> blob) { instancingVertexShaderBlob_ = blob; }
-	void SetInstancingPSBlob(Microsoft::WRL::ComPtr<IDxcBlob> blob) { instancingPixelShaderBlob_ = blob; }
-	void SetParticleVSBlob(Microsoft::WRL::ComPtr<IDxcBlob> blob) { particleVertexShaderBlob_ = blob; }
-	void SetParticlePSBlob(Microsoft::WRL::ComPtr<IDxcBlob> blob) { particlePixelShaderBlob_ = blob; }
+	void SetStandardBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { standardPSOData.vertexShaderBlob = vsBlob; standardPSOData.pixelShaderBlob = psBlob; }
+	void SetInstancingBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { instancingPSOData.vertexShaderBlob = vsBlob; instancingPSOData.pixelShaderBlob = psBlob; }
+	void SetParticleBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { particlePSOData.vertexShaderBlob = vsBlob; particlePSOData.pixelShaderBlob = psBlob; }
+	void SetSkyboxBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { skyboxPSOData.vertexShaderBlob = vsBlob; skyboxPSOData.pixelShaderBlob = psBlob; }
 
 private:
 
@@ -41,9 +41,10 @@ private:
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
 	// PSO
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pso_[6]{};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> instancingPso_[6]{};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> particlePso_[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> standardPSO[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> instancingPSO_[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> particlePSO_[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> skyboxPSO_[6]{};
 
 	//
 	// 参照
@@ -52,18 +53,15 @@ private:
 	// デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
 
-	// ルートシグネチャ
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> instancingRootSignature_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> particleRootSignature_ = nullptr;
-
-	// シェーダー
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_ = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_ = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> instancingVertexShaderBlob_ = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> instancingPixelShaderBlob_ = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> particleVertexShaderBlob_ = nullptr;
-	Microsoft::WRL::ComPtr<IDxcBlob> particlePixelShaderBlob_ = nullptr;
+	struct PSOData {
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	};
+	PSOData standardPSOData;
+	PSOData instancingPSOData;
+	PSOData particlePSOData;
+	PSOData skyboxPSOData;
 
 	D3D12_BLEND_DESC CreateNoneBlendDesc();
 	D3D12_BLEND_DESC CreateAlphaBlendDesc();

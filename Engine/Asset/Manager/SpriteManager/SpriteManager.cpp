@@ -28,7 +28,7 @@ SpriteManager::SpriteManager(DirectXContext* dxContext, Logger* logger, TextureM
 	textureManager_ = textureManager;
 }
 
-std::unique_ptr<Sprite> SpriteManager::Load(std::string texturePath) {
+std::unique_ptr<Sprite> SpriteManager::Load(const std::string& texturePath) {
 	std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
 
 	// UVTransform

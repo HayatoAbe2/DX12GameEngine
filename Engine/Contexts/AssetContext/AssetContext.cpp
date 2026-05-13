@@ -12,6 +12,10 @@ std::unique_ptr<InstancedModel> AssetContext::LoadInstancedModel(const std::stri
 	return std::move(assetManager_->LoadModelFile(directoryPath, filename, num));
 }
 
-std::unique_ptr<Sprite> AssetContext::LoadSprite(std::string texturePath) {
+std::unique_ptr<Sprite> AssetContext::LoadSprite(const std::string& texturePath) {
 	return std::move(assetManager_->LoadSprite(texturePath));
+}
+
+std::shared_ptr<Texture> AssetContext::LoadTexture(const std::string& filePath) {
+	return assetManager_->LoadTexture(filePath);
 }

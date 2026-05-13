@@ -16,7 +16,9 @@ public:
 
 	// パーティクルシステムで管理してるパーティクルの描画
 	void DrawParticle(ParticleSystem* particleSystem, Camera* camera, BlendMode blendMode = BlendMode::Normal);
-
+	
+	// Skybox描画
+	void DrawSkybox(Texture* skybox, Camera* camera);
 private:
 	Renderer* renderer_ = nullptr;
 	LightManager* lightManager_ = nullptr;

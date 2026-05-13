@@ -6,12 +6,16 @@
 #include "Engine/Asset/Model/Node.h"
 #include "Engine/Asset/Model/Mesh.h"
 
+#include "Engine/Graphics/GPUData/TransformationMatrix.h"
+
 #include <wrl.h>
 #include <d3d12.h>
 
 class Model;
 class InstancedModel;
 class Sprite;
+class Texture;
+class Material;
 class ParticleSystem;
 class DirectXContext;
 class ConstantBufferManager;
@@ -59,6 +63,9 @@ public:
 	void DrawNodeInstance(InstancedModel* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld);
 	void DrawMeshInstance(InstancedModel* model, Mesh* mesh);
 
+	// Skybox描画
+	void DrawSkybox(Texture* texture, Camera* camera);
+
 	/// <summary>
 	/// フレーム開始時の処理(描画開始時に行う)
 	/// </summary>
@@ -70,6 +77,9 @@ public:
 	void EndFrame();
 
 private:
+	void InitializeAABB(AABB aabb);
+	void InitializeSkybox();
+
 	DirectXContext* dxContext_ = nullptr;
 
 	// ConstantBuffer管理
@@ -81,4 +91,20 @@ private:
 
 	LightsForGPU* dummyLight_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> dummyLightBuffer_;
+
+	// Skybox用データ
+	struct SkyboxData {
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
+		D3D12_VERTEX_BUFFER_VIEW vbv;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
+		D3D12_INDEX_BUFFER_VIEW ibv;
+
+		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource> transformResource;
+
+		Material* materialData = nullptr;
+		TransformationMatrix* transformData = nullptr;
+	};
+	SkyboxData skybox;
 };

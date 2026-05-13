@@ -22,3 +22,7 @@ void RenderContext::DrawInstancedModel(InstancedModel* instancedModel, Camera* c
 void RenderContext::DrawParticle(ParticleSystem* particleSystem, Camera* camera, BlendMode blendMode) {
 	renderer_->DrawParticles(particleSystem, camera, static_cast<int>(blendMode));
 }
+
+void RenderContext::DrawSkybox(Texture* skybox, Camera* camera) {
+	renderer_->DrawSkybox(skybox, camera);
+}

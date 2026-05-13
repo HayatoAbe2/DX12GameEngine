@@ -21,8 +21,7 @@ public:
 	void Draw() override;
 
 private:
-	// モデル
-	std::unique_ptr<Model> skydome_ = nullptr;
+	std::shared_ptr<Texture> skybox_ = nullptr;
 
 	// スプライト
 	std::unique_ptr<Sprite> fade_ = nullptr;

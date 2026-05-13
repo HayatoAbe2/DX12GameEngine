@@ -13,7 +13,10 @@ public:
 	std::unique_ptr<InstancedModel> LoadInstancedModel(const std::string& directoryPath, const std::string& filename, const int num);
 
 	// スプライト読み込み
-	std::unique_ptr<Sprite> LoadSprite(std::string texturePath);
+	std::unique_ptr<Sprite> LoadSprite(const std::string& texturePath);
+
+	// テクスチャ読み込み
+	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
 
 	//void SoundLoad(const wchar_t* filename);
 

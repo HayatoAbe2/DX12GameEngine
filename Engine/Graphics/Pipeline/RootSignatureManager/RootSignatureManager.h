@@ -19,6 +19,7 @@ public:
 	void CreateStandardRootSignature();
 	void CreateInstancingRootSignature();
 	void CreateParticleRootSignature();
+	void CreateSkyboxRootSignature();
 
 	/// <summary>
 	/// RootSignatureを取得
@@ -27,6 +28,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetStandardRootSignature() { return standardRootSignature_.Get(); }
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetInstancingRootSignature() { return instancingRootSignature_.Get(); }
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetParticleRootSignature() { return particleRootSignature_.Get(); }
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetSkyboxRootSignature() { return skyboxRootSignature_.Get(); }
 
 	/// <summary>
 	/// errorBlobを取得
@@ -39,12 +41,15 @@ private:
 	ID3DBlob* signatureBlob_ = nullptr;
 	ID3DBlob* signatureBlobInstancing_ = nullptr;
 	ID3DBlob* signatureBlobParticle_ = nullptr;
+	ID3DBlob* signatureBlobSkybox_ = nullptr;
 	ID3DBlob* errorBlob_ = nullptr;
 	ID3DBlob* errorBlobInstancing_ = nullptr;
 	ID3DBlob* errorBlobParticle_ = nullptr;
+	ID3DBlob* errorBlobSkybox_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> standardRootSignature_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> instancingRootSignature_ = nullptr; // インスタンス描画用
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> particleRootSignature_ = nullptr; // パーティクル用
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> skyboxRootSignature_ = nullptr; // skybox
 
 	// ログ出力
 	Logger* logger_ = nullptr;

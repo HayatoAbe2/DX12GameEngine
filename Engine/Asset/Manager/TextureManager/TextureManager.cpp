@@ -7,7 +7,6 @@
 #include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
 #include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
-#include <Externals/DirectXTex/d3dx12.h>
 
 TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) {
 	// デバイス
@@ -26,6 +25,14 @@ TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) {
 	logger_ = logger;
 }
 
+std::shared_ptr<Texture> TextureManager::Load(const std::string& texturePath) {
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+	texture->SetMtlFilePath(texturePath);
+	CreateTextureSRV(texture);
+
+	return texture;
+}
+
 void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
 	if (!texture->GetMtlPath().empty()) {
 
@@ -38,7 +45,7 @@ void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
 		}
 
 		// Textureリソース作成
-		DirectX::ScratchImage mipImages = LoadTexture(texture->GetMtlPath());
+		DirectX::ScratchImage mipImages = LoadFile(texture->GetMtlPath());
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = CreateTextureResource(device_, metadata);
 
@@ -52,7 +59,7 @@ void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
 		// SRVIndexを進める
 		auto index = srvManager_->Allocate();
 		// SRV作成
-		srvManager_->CreateTextureSRV(index, textureResource.Get(), metadata.format, UINT(metadata.mipLevels));
+		srvManager_->CreateTextureSRV(index, textureResource.Get(), metadata.format, UINT(metadata.mipLevels), metadata.IsCubemap());
 
 		// textureResourceをセット
 		texture->SetResource(textureResource);
@@ -67,18 +74,30 @@ void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
 	}
 }
 
-DirectX::ScratchImage TextureManager::LoadTexture(const std::string& filePath) {
-	// テクスチャファイルを読んでプログラムで扱えるようにする
+DirectX::ScratchImage TextureManager::LoadFile(const std::string& filePath) {
+	// ファイル読み込み
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = logger_->ConvertString(filePath);
-	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	HRESULT hr;
+	if (filePathW.ends_with(L".dds")) {
+		// ddsファイル
+		hr = DirectX::LoadFromDDSFile(filePathW.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
+	} else {
+		// その他
+		hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	}
 	assert(SUCCEEDED(hr));
 
-	// ミップマップの作成
+	// MipMap作成
 	DirectX::ScratchImage mipImages{};
-	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
-	if (FAILED(hr)) {
-		return image; // 元画像を返す
+	if (DirectX::IsCompressed(image.GetMetadata().format)) {
+		mipImages = std::move(image);
+	} else {
+		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+
+		if (FAILED(hr)) {
+			return image; // 元画像を返す
+		}
 	}
 
 	// ミップマップ付きのデータを返す
