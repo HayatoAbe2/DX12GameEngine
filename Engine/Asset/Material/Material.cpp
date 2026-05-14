@@ -9,6 +9,8 @@ void Material::Initialize(BufferManager* bufferManager, bool useTexture, bool en
 	data_.color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	data_.useTexture = useTexture;
 	data_.enableLighting = enableLighting;
+	data_.useEnvironmentMap = false;
+	data_.environmentIntensity = 1.0f;
 	data_.uvTransform = MakeIdentity4x4();
 }
 

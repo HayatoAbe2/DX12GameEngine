@@ -8,7 +8,8 @@ struct MaterialData {
 	int32_t enableLighting;
 	float padding[3];
 	Matrix4x4 uvTransform;
-	float shininess = 32;
 	UINT useTexture;
-	float padding2[2];
+	float shininess = 32;
+	UINT useEnvironmentMap;
+	float environmentIntensity;
 };

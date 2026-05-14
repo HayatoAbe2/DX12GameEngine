@@ -3,9 +3,12 @@
 struct Material
 {
     float32_t4 color;
-    int32_t padding;
+    int32_t enableLighting;
     float32_t4x4 uvTransform;
-    int useTexture;
+    int32_t useTexture;
+    float32_t shininess;
+    int32_t useEnvironmentMap;
+    float32_t environmentIntensity;
 };
 
 Texture2D<float32_t4> gTexture : register(t0);

@@ -103,11 +103,17 @@ std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, cons
 			// SRVを作成
 			textureManager_->CreateTextureSRV(texture);
 
+			// デフォルト環境テクスチャ
+			auto environmentTexture = std::make_shared<Texture>();
+			environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
+			textureManager_->CreateTextureSRV(environmentTexture);
+
 			// マテリアル初期化
 			std::unique_ptr<Material> material = std::make_unique<Material>();
 			bool useTexture = !texture->GetMtlPath().empty();
 			material->Initialize(bufferManager_, useTexture, enableLighting); // テクスチャ座標情報がなければテクスチャ不使用
 			material->SetTexture(texture);	// テクスチャ
+			material->SetEnvironmentTexture(environmentTexture);
 
 			aiColor4D baseColor(1, 1, 1, 1);
 			aiGetMaterialColor(aiMaterial, AI_MATKEY_BASE_COLOR, &baseColor);
@@ -285,12 +291,18 @@ std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryP
 		// SRVを作成
 		textureManager_->CreateTextureSRV(texture);
 
+		// デフォルト環境テクスチャ
+		auto environmentTexture = std::make_shared<Texture>();
+		environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
+		textureManager_->CreateTextureSRV(environmentTexture);
+
 		// マテリアル初期化
 		std::unique_ptr<Material> material = std::make_unique<Material>();
 		bool useTexture = false;
 		if (texture->GetMtlPath() != "") { useTexture = true; }
 		material->Initialize(bufferManager_, useTexture, enableLighting); // テクスチャ座標情報がなければテクスチャ不使用
 		material->SetTexture(texture);	// テクスチャ
+		material->SetEnvironmentTexture(environmentTexture);
 
 		aiColor4D baseColor(1, 1, 1, 1);
 		aiGetMaterialColor(aiMaterial, AI_MATKEY_BASE_COLOR, &baseColor);

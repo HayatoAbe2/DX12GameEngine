@@ -20,15 +20,6 @@ void MapTile::Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<I
 	wall_ = std::move(wall);
 	floor_ = std::move(floor);
 	goal_ = std::move(goal);
-	
-	auto matData = wall_->GetMaterial(0)->GetData();
-	matData.color = { 0.3f,0.3f,0.3f,1 };
-	wall_->GetMaterial(0)->SetData(matData);
-
-	matData = floor_->GetMaterial(0)->GetData();
-	matData.color = { 0.5f,0.5f,0.5f,1 };
-	wall_->GetMaterial(0)->SetData(matData);
-
 
 	particle_ = std::make_unique<ParticleSystem>();
 	particle_->Initialize(asset.LoadInstancedModel("Resources/Particle/Goal", "goalEffect.obj", particleNum_));
@@ -205,5 +196,5 @@ void MapTile::Draw(Camera* camera) {
 	render.DrawInstancedModel(wall_.get(), camera);
 	render.DrawInstancedModel(floor_.get(), camera);
 	render.DrawModel(goal_.get(), camera);
-	render.DrawInstancedModel(particle_->GetInstancedModel(), camera, BlendMode::Add);
+	render.DrawParticle(particle_.get(), camera, BlendMode::Add);
 }

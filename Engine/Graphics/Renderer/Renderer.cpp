@@ -71,9 +71,9 @@ void Renderer::DrawModel(Model* model, Camera* camera, LightManager* lightManage
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// カメラ
-	cmdList->SetGraphicsRootConstantBufferView(3, cameraBuffer_->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(4, cameraBuffer_->GetGPUVirtualAddress());
 	// ライト
-	cmdList->SetGraphicsRootConstantBufferView(4, lightManager->GetLightResource()->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(5, lightManager->GetLightResource()->GetGPUVirtualAddress());
 
 	DrawNode(model, camera, cmdList, model->GetRootNode(), MakeIdentity4x4());
 }
@@ -97,14 +97,14 @@ void Renderer::DrawModelInstance(InstancedModel* model, Camera* camera, LightMan
 	// wvp用のCBufferの場所を設定
 	cmdList->SetGraphicsRootConstantBufferView(1, model->GetInstanceCBV());
 	// インスタンス用SRVの設定
-	cmdList->SetGraphicsRootDescriptorTable(3, model->GetInstanceSRVHandle());
+	cmdList->SetGraphicsRootDescriptorTable(4, model->GetInstanceSRVHandle());
 	// カメラ
-	cmdList->SetGraphicsRootConstantBufferView(4, cameraBuffer_->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(5, cameraBuffer_->GetGPUVirtualAddress());
 	if (lightManager) {
 		// ライト
-		cmdList->SetGraphicsRootConstantBufferView(5, lightManager->GetLightResource()->GetGPUVirtualAddress());
+		cmdList->SetGraphicsRootConstantBufferView(6, lightManager->GetLightResource()->GetGPUVirtualAddress());
 	} else {
-		cmdList->SetGraphicsRootConstantBufferView(5, dummyLightBuffer_->GetGPUVirtualAddress());
+		cmdList->SetGraphicsRootConstantBufferView(6, dummyLightBuffer_->GetGPUVirtualAddress());
 	}
 
 	DrawNodeInstance(model, camera, cmdList, model->GetRootNode(), MakeIdentity4x4());
@@ -215,6 +215,7 @@ void Renderer::DrawMesh(Model* model, Mesh* mesh) {
 		cmdList->IASetIndexBuffer(&subMesh.ibv_);
 		// SRVの設定
 		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
+		cmdList->SetGraphicsRootDescriptorTable(3, material->GetEnvironmentTextureSRVHandle());
 		// ドローコール
 		cmdList->DrawIndexedInstanced(UINT(subMesh.indices_.size()), 1, 0, 0, 0);
 	}
@@ -258,9 +259,11 @@ void Renderer::DrawMeshInstance(InstancedModel* model, Mesh* mesh) {
 		cmdList->IASetVertexBuffers(0, 1, &subMesh.vertexBufferView_);	// VBVを設定
 		// SRVの設定
 		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
+		cmdList->SetGraphicsRootDescriptorTable(3, material->GetEnvironmentTextureSRVHandle());
 		// ドローコール
 		cmdList->DrawInstanced(UINT(subMesh.vertices_.size()), model->GetNumInstance(), 0, 0);
 	}
+
 }
 
 void Renderer::InitializeSkybox() {

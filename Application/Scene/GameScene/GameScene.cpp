@@ -25,7 +25,7 @@ void GameScene::Initialize() {
 	playerModel_ = asset.LoadModel("Resources/Player", "player.obj");
 	playerShadowModel_ = asset.LoadModel("Resources/Player", "player.obj");
 	MaterialData data = playerModel_->GetMaterial(0)->GetData();
-	data.color = { 1,1,1,0.7f };
+	data.color = { 0.8f,0.8f,0.8f,0.7f };
 	playerModel_->GetMaterial(0)->SetData(data);
 
 	// マップ
@@ -33,6 +33,12 @@ void GameScene::Initialize() {
 	wallShadow_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	floor_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	goal_ = asset.LoadModel("Resources/Tiles", "sphere.obj");
+	
+	auto matData = wall_->GetMaterial(0)->GetData();
+	matData.useEnvironmentMap = true;
+	matData.environmentIntensity = 0.3f;
+	wall_->GetMaterial(0)->SetData(matData);
+	wall_->GetMaterial(1)->SetData(matData);
 
 	mapTile_ = std::make_unique<MapTile>();
 	mapTile_->Initialize(std::move(wall_), std::move(floor_), std::move(goal_));

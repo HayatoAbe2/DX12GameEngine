@@ -21,6 +21,11 @@ public:
 	}
 	std::shared_ptr<Texture> GetTexture() { return texture_; }
 
+	void SetEnvironmentTexture(std::shared_ptr<Texture> texture) {
+		environmentTexture_ = texture;
+	}
+	std::shared_ptr<Texture> GetEnvironmentTexture() { return environmentTexture_; }
+
 	void SwitchLighting(bool enableLighting) {
 		data_.enableLighting = enableLighting;
 	}
@@ -31,10 +36,18 @@ public:
 		}
 		return { 0 };
 	}
+	const D3D12_GPU_DESCRIPTOR_HANDLE GetEnvironmentTextureSRVHandle() const {
+		if (environmentTexture_) {
+			return environmentTexture_->GetSRVHandle();
+		}
+		return { 0 };
+	}
 
 private:
     MaterialData data_;  // CPU側のデータ
     MaterialData* mappedPtr_ = nullptr; // GPUメモリに直接アクセスするためのポインタ
     Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_ = nullptr; // GPU側リソース
 	std::shared_ptr<Texture> texture_ = nullptr; // テクスチャ
+	std::shared_ptr<Texture> environmentTexture_ = nullptr; // テクスチャ
+	D3D12_GPU_DESCRIPTOR_HANDLE textureTableHandle_;
 };
