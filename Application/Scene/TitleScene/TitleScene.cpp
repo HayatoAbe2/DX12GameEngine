@@ -16,7 +16,7 @@ void TitleScene::Initialize() {
 	camera_->transform_.rotate = { 0,0,0 };
 
 	// Skybox
-	skybox_ = asset.LoadTexture("Resources/Debug/rostock_laage_airport_4k.dds");
+	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
 	
 	// フェード
 	fade_ = asset.LoadSprite("resources/Debug/white1x1.png");

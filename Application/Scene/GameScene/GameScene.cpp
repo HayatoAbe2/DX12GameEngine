@@ -22,11 +22,20 @@ void GameScene::Initialize() {
 	audio.SoundLoad(L"Resources/Sounds/SE/warp.mp3");
 	audio.SoundLoad(L"Resources/Sounds/SE/hit.mp3");
 
+	// Skybox
+	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
+
 	playerModel_ = asset.LoadModel("Resources/Player", "player.obj");
 	playerShadowModel_ = asset.LoadModel("Resources/Player", "player.obj");
 	MaterialData data = playerModel_->GetMaterial(0)->GetData();
-	data.color = { 0.8f,0.8f,0.8f,0.7f };
-	playerModel_->GetMaterial(0)->SetData(data);
+	data.color = { 0.0f,0.0f,0.0f,1.0f };
+	data.useEnvironmentMap = true;
+	data.environmentIntensity = 1.0f;
+	for (int i = 0; i < 10; ++i) {
+		playerModel_->GetMaterial(i)->SetData(data);
+		playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
+	}
+
 
 	// マップ
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
@@ -36,8 +45,10 @@ void GameScene::Initialize() {
 	
 	auto matData = wall_->GetMaterial(0)->GetData();
 	matData.useEnvironmentMap = true;
-	matData.environmentIntensity = 0.3f;
+	matData.environmentIntensity = 0.6f;
+	wall_->GetMaterial(0)->SetEnvironmentTexture(skybox_);
 	wall_->GetMaterial(0)->SetData(matData);
+	wall_->GetMaterial(1)->SetEnvironmentTexture(skybox_);
 	wall_->GetMaterial(1)->SetData(matData);
 
 	mapTile_ = std::make_unique<MapTile>();
@@ -73,9 +84,6 @@ void GameScene::Initialize() {
 	// UI描画システム
 	uiDrawer_ = std::make_unique<UIDrawer>();
 	uiDrawer_->Initialize(player_.get());
-
-	// Skybox
-	skybox_ = asset.LoadTexture("Resources/Debug/rostock_laage_airport_4k.dds");
 
 	// 雲
 	cloud_ = std::make_unique<Model>();
