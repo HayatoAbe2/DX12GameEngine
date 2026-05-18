@@ -66,6 +66,16 @@ void SRVManager::CreateStructuredBufferSRV(uint32_t srvIndex, ID3D12Resource* pR
 	device_->CreateShaderResourceView(pResource, &instancingSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
 }
 
+void SRVManager::CreateRenderTextureSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource) {
+	D3D12_SHADER_RESOURCE_VIEW_DESC renderTextureSrvDesc{};
+	renderTextureSrvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // Resourceと同じ
+	renderTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	renderTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	renderTextureSrvDesc.Texture2D.MipLevels = 1;
+
+	device_->CreateShaderResourceView(renderTextureResource.Get(), &renderTextureSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUHandle(uint32_t index) {
 	return descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, index);
 }

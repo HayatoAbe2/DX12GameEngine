@@ -66,6 +66,9 @@ public:
 	// Skybox描画
 	void DrawSkybox(Texture* texture, Camera* camera);
 
+	// コピー
+	void CopyImage(D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle);
+
 	/// <summary>
 	/// フレーム開始時の処理(描画開始時に行う)
 	/// </summary>

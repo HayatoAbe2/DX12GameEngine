@@ -65,6 +65,11 @@ private:
 	void InitializeSwapChain(HWND hwnd);
 
 	/// <summary>
+	/// RenderTextureの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource();
+
+	/// <summary>
 	/// Viewport,Scissor設定
 	/// </summary>
 	void SetViewportAndScissor();
@@ -94,8 +99,13 @@ private:
 	// 深度ステンシルリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 
+	// RenderTextureリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_ = nullptr;
+	uint32_t renderTextureSRVIndex_;
+
 	// 遷移バリア
-	D3D12_RESOURCE_BARRIER barrier_ = {};
+	D3D12_RESOURCE_BARRIER swapChainBarrier_ = {};
+	D3D12_RESOURCE_BARRIER renderTextureBarrier_ = {};
 
 	// ビューポート
 	D3D12_VIEWPORT viewport_ = {};
