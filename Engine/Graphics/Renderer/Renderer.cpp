@@ -373,6 +373,10 @@ void Renderer::DrawSkybox(Texture* texture, Camera* camera) {
 	cmdList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 }
 
+void Renderer::SetPostEffectType(PostEffectType type) {
+	dxContext_->SetPostEffectType(type);
+}
+
 void Renderer::BeginFrame() {
 	dxContext_->BeginFrame();
 }

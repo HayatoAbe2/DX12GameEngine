@@ -1,4 +1,4 @@
-#include "CopyImage.hlsli"
+#include "Fullscreen.hlsli"
 
 // 三角形一つに全画面を入れるようにする
 static const uint32_t kNumVertex = 3;

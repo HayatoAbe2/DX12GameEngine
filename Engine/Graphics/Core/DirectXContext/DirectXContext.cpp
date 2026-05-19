@@ -93,9 +93,10 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.PS.hlsl", L"ps_6_0", logger_)
 	);
 	pipelineStateManager_->SetCopyImageBlob(
-		shaderCompiler_->Compile(L"Resources/Shaders/CopyImage.VS.hlsl", L"vs_6_0", logger_),
-		shaderCompiler_->Compile(L"Resources/Shaders/CopyImage.PS.hlsl", L"ps_6_0", logger_)
+		shaderCompiler_->Compile(L"Resources/Shaders/Fullscreen.VS.hlsl", L"vs_6_0", logger_),
+		shaderCompiler_->Compile(L"Resources/Shaders/Fullscreen.PS.hlsl", L"ps_6_0", logger_)
 	);
+	pipelineStateManager_->SetGrayScalePSBlob(shaderCompiler_->Compile(L"Resources/Shaders/Grayscale.PS.hlsl", L"ps_6_0", logger_));
 
 	// PSOマネージャー
 	pipelineStateManager_->Initialize(
@@ -199,7 +200,15 @@ void DirectXContext::EndFrame() {
 	// コピー
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetCopyImageRootSignature().Get());
-	cmdList->SetPipelineState(pipelineStateManager_->GetCopyImagePSO(int(BlendMode::None)));
+	switch (postEffectType_) {
+	case PostEffectType::GrayScale:
+		cmdList->SetPipelineState(pipelineStateManager_->GetGrayscalePSO(int(BlendMode::None)));
+		break;
+
+	default:
+		cmdList->SetPipelineState(pipelineStateManager_->GetCopyImagePSO(int(BlendMode::None)));
+		break;
+	}
 	cmdList->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderTextureSRVIndex_));
 	cmdList->DrawInstanced(3, 1, 0, 0);
 

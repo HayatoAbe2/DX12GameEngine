@@ -13,6 +13,7 @@
 #include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
 #include "Engine/Graphics/Debug/ImGuiManager/ImGuiManager.h"
 #include "Engine/Graphics/Pipeline/BlendMode.h"
+#include "Engine/Graphics/Renderer/PostEffectType.h"
 
 #include <wrl.h>
 #include <dxgi1_6.h>
@@ -56,7 +57,7 @@ public:
 	BufferManager* GetBufferManager() { return bufferManager_.get(); }
 	ConstantBufferManager* GetConstantBufferManager() { return constantBufferManager_.get(); }
 
-
+	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
 private:
 
 	/// <summary>
@@ -146,5 +147,7 @@ private:
 	// バッファ管理クラス
 	std::unique_ptr<BufferManager> bufferManager_ = nullptr;
 	std::unique_ptr<ConstantBufferManager> constantBufferManager_ = nullptr;
+
+	PostEffectType postEffectType_ = PostEffectType::None;
 };
 

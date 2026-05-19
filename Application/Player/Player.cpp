@@ -436,7 +436,7 @@ void Player::Fall() {
 	// 落下
 	transform_.translate.y -= 1.0f;
 	if (transform_.translate.y < -20.0f) {
-		hp_ -= maxHp_ / 12.0f;
+		hp_ -= maxHp_ / 8.0f;
 		invincibleTimer_ = invincibleTime_;
 
 		// その前にいた位置に戻す

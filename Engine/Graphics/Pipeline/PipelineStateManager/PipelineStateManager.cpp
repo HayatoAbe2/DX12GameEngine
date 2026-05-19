@@ -9,7 +9,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	instancingPSOData.rootSignature = instancingRootSignature;
 	particlePSOData.rootSignature = particleRootSignature;
 	skyboxPSOData.rootSignature = skyboxRootSignature;
-	copyImagePSOData.rootSignature = copyImageRootSignature;
+	fullscreenPSOData.rootSignature = copyImageRootSignature;
 
 	// InputLayout
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -36,7 +36,8 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateInstancingPSO();
 	CreateParticlePSO();
 	CreateSkyboxPSO();
-	CreateCopyPSO();
+	CreateFullscreenPSO();
+	CreateGrayscalePSO();
 }
 
 void PipelineStateManager::CreateStandardPSO() {
@@ -199,42 +200,45 @@ void PipelineStateManager::CreateSkyboxPSO() {
 	CreatePSO(baseDesc, CreateScreenBlendDesc(), &skyboxPSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
 }
 
-void PipelineStateManager::CreateCopyPSO() {
-	assert(copyImagePSOData.rootSignature);
-	assert(copyImagePSOData.vertexShaderBlob);
-	assert(copyImagePSOData.pixelShaderBlob);
+void PipelineStateManager::CreateFullscreenPSO() {
+	assert(fullscreenPSOData.rootSignature);
+	assert(fullscreenPSOData.vertexShaderBlob);
+	assert(fullscreenPSOData.pixelShaderBlob);
 
 	// 共通部分作成
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
-	baseDesc.pRootSignature = copyImagePSOData.rootSignature.Get();
-	baseDesc.InputLayout = {nullptr, 0}; // 使用しない
-	baseDesc.VS = { copyImagePSOData.vertexShaderBlob->GetBufferPointer(), copyImagePSOData.vertexShaderBlob->GetBufferSize() };
-	baseDesc.PS = { copyImagePSOData.pixelShaderBlob->GetBufferPointer(), copyImagePSOData.pixelShaderBlob->GetBufferSize() };
+	fullscreenBaseDesc_.pRootSignature = fullscreenPSOData.rootSignature.Get();
+	fullscreenBaseDesc_.InputLayout = {nullptr, 0}; // 使用しない
+	fullscreenBaseDesc_.VS = { fullscreenPSOData.vertexShaderBlob->GetBufferPointer(), fullscreenPSOData.vertexShaderBlob->GetBufferSize() };
+	fullscreenBaseDesc_.PS = { fullscreenPSOData.pixelShaderBlob->GetBufferPointer(), fullscreenPSOData.pixelShaderBlob->GetBufferSize() };
 
 	// ブレンド
-	baseDesc.BlendState = CreateNoneBlendDesc();
+	fullscreenBaseDesc_.BlendState = CreateNoneBlendDesc();
 
 	// ラスタライザ
-	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+	fullscreenBaseDesc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	fullscreenBaseDesc_.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 
 	// DepthStencil
-	baseDesc.DepthStencilState.DepthEnable = FALSE;
+	fullscreenBaseDesc_.DepthStencilState.DepthEnable = FALSE;
 
-	baseDesc.DSVFormat = DXGI_FORMAT_UNKNOWN;
-	baseDesc.NumRenderTargets = 1;
-	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	baseDesc.SampleDesc.Count = 1;
-	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	fullscreenBaseDesc_.DSVFormat = DXGI_FORMAT_UNKNOWN;
+	fullscreenBaseDesc_.NumRenderTargets = 1;
+	fullscreenBaseDesc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	fullscreenBaseDesc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	fullscreenBaseDesc_.SampleDesc.Count = 1;
+	fullscreenBaseDesc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	// --- 各ブレンドモードごとのPSO生成 ---
-	CreatePSO(baseDesc, CreateNoneBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::None)]);			// ブレンドなし
-	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::Normal)]);		// αブレンド
-	CreatePSO(baseDesc, CreateAddBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::Add)]);				// 加算
-	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
-	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
-	CreatePSO(baseDesc, CreateScreenBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+	CreatePSO(fullscreenBaseDesc_, CreateNoneBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::None)]); // ブレンドなし
+}
+
+void PipelineStateManager::CreateGrayscalePSO() {
+	assert(fullscreenPSOData.rootSignature);
+	assert(fullscreenPSOData.vertexShaderBlob);
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = fullscreenBaseDesc_;
+	desc.PS = { grayscalePSBlob_->GetBufferPointer(), grayscalePSBlob_->GetBufferSize() };
+
+	CreatePSO(desc, CreateNoneBlendDesc(), &grayscalePSO_[static_cast<int>(BlendMode::None)]); // ブレンドなし
 }
 
 // ----------------------------------------------------
