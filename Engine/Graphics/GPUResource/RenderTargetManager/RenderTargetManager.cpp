@@ -2,7 +2,11 @@
 #include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include <cassert>
 
-void RenderTargetManager::InitializeSwapChainBuffers(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager){
+void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource) {
+	// ---------------------
+	// SwapChain
+	// ---------------------
+
 	for (int i = 0; i < 2; ++i) {
 		HRESULT hr = swapChain->GetBuffer(i, IID_PPV_ARGS(&swapChainResources_[i]));
 		assert(SUCCEEDED(hr));
@@ -18,4 +22,11 @@ void RenderTargetManager::InitializeSwapChainBuffers(IDXGISwapChain4* swapChain,
 	device->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc_, rtvHandles_[0]);
 	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
+
+	// ---------------------
+	// RenderTexture
+	// ---------------------
+
+	renderTextureRTVHandle_.ptr = rtvHandles_[1].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	device->CreateRenderTargetView(renderTextureResource.Get(), &rtvDesc_, renderTextureRTVHandle_);
 }

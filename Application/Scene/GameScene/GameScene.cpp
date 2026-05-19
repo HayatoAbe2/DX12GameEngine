@@ -315,8 +315,11 @@ void GameScene::Draw() {
 
 	// 結果(プレイ画面の上から)
 	if (isShowResult_) {
+		render.SetPostEffectType(PostEffectType::GrayScale);
 		render.DrawSprite(resultBG_.get());
 		render.DrawSprite(resultCursor_.get());
+	} else {
+		render.SetPostEffectType(PostEffectType::None);
 	}
 
 	render.DrawSprite(fade_.get());

@@ -13,6 +13,7 @@
 #include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
 #include "Engine/Graphics/Debug/ImGuiManager/ImGuiManager.h"
 #include "Engine/Graphics/Pipeline/BlendMode.h"
+#include "Engine/Graphics/Renderer/PostEffectType.h"
 
 #include <wrl.h>
 #include <dxgi1_6.h>
@@ -56,13 +57,18 @@ public:
 	BufferManager* GetBufferManager() { return bufferManager_.get(); }
 	ConstantBufferManager* GetConstantBufferManager() { return constantBufferManager_.get(); }
 
-
+	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
 private:
 
 	/// <summary>
 	/// SwapChain初期化
 	/// </summary>
 	void InitializeSwapChain(HWND hwnd);
+
+	/// <summary>
+	/// RenderTextureの生成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource();
 
 	/// <summary>
 	/// Viewport,Scissor設定
@@ -94,8 +100,13 @@ private:
 	// 深度ステンシルリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 
+	// RenderTextureリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_ = nullptr;
+	uint32_t renderTextureSRVIndex_;
+
 	// 遷移バリア
-	D3D12_RESOURCE_BARRIER barrier_ = {};
+	D3D12_RESOURCE_BARRIER swapChainBarrier_ = {};
+	D3D12_RESOURCE_BARRIER renderTextureBarrier_ = {};
 
 	// ビューポート
 	D3D12_VIEWPORT viewport_ = {};
@@ -136,5 +147,7 @@ private:
 	// バッファ管理クラス
 	std::unique_ptr<BufferManager> bufferManager_ = nullptr;
 	std::unique_ptr<ConstantBufferManager> constantBufferManager_ = nullptr;
+
+	PostEffectType postEffectType_ = PostEffectType::None;
 };
 

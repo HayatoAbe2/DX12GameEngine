@@ -13,10 +13,12 @@ public:
 	/// </summary>
 	/// <param name="swapChain">スワップチェーン</param>
 	/// <param name="device">デバイス</param>
-	/// <param name="heapManager">ヒープ管理クラスのインスタンス</param>
-	void InitializeSwapChainBuffers(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager);
+	/// <param name="heapManager">ヒープ管理クラスのインスタンス</param>x]
+	/// <param name="renderTextureResource">RenderTextureのリソース</param>
+	void Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(size_t index) const { return rtvHandles_[index]; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetRenderTextureRTVHandle() const { return renderTextureRTVHandle_; }
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetSwapChainResource(size_t index) { return swapChainResources_[index]; }
 
@@ -28,6 +30,7 @@ private:
 
 	// RTVハンドル
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE renderTextureRTVHandle_;
 
 	// バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];

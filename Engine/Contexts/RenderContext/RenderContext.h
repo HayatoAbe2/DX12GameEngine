@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Graphics/Renderer/Renderer.h"
 #include "Engine/Graphics/Pipeline/BlendMode.h"
+
 class RenderContext {
 public:
 	RenderContext(Renderer* renderer, LightManager* lightManager);
@@ -19,6 +20,9 @@ public:
 	
 	// Skybox描画
 	void DrawSkybox(Texture* skybox, Camera* camera);
+
+	// ポストエフェクト設定
+	void SetPostEffectType(PostEffectType type) { renderer_->SetPostEffectType(type); }
 private:
 	Renderer* renderer_ = nullptr;
 	LightManager* lightManager_ = nullptr;

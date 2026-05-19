@@ -6,6 +6,7 @@
 #include "Engine/Asset/Model/Node.h"
 #include "Engine/Asset/Model/Mesh.h"
 
+#include "Engine/Graphics/Renderer/PostEffectType.h"
 #include "Engine/Graphics/GPUData/TransformationMatrix.h"
 
 #include <wrl.h>
@@ -65,6 +66,9 @@ public:
 
 	// Skybox描画
 	void DrawSkybox(Texture* texture, Camera* camera);
+
+	// ポストエフェクト設定
+	void SetPostEffectType(PostEffectType type);
 
 	/// <summary>
 	/// フレーム開始時の処理(描画開始時に行う)

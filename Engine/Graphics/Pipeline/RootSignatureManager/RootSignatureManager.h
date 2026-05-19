@@ -20,6 +20,7 @@ public:
 	void CreateInstancingRootSignature();
 	void CreateParticleRootSignature();
 	void CreateSkyboxRootSignature();
+	void CreateCopyRootSignature();
 
 	/// <summary>
 	/// RootSignatureを取得
@@ -29,6 +30,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetInstancingRootSignature() { return instancingRootSignature_.Get(); }
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetParticleRootSignature() { return particleRootSignature_.Get(); }
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetSkyboxRootSignature() { return skyboxRootSignature_.Get(); }
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> GetCopyImageRootSignature() { return copyRootSignature_.Get(); }
 
 	/// <summary>
 	/// errorBlobを取得
@@ -50,6 +52,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> instancingRootSignature_ = nullptr; // インスタンス描画用
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> particleRootSignature_ = nullptr; // パーティクル用
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> skyboxRootSignature_ = nullptr; // skybox
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> copyRootSignature_ = nullptr; // オフスクリーンコピー用
 
 	// ログ出力
 	Logger* logger_ = nullptr;

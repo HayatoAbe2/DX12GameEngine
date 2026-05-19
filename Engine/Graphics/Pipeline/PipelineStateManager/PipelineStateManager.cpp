@@ -3,12 +3,13 @@
 
 void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& rootSignature,
 	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& instancingRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& particleRootSignature,
-	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature){
+	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& copyImageRootSignature) {
 	device_ = device;
 	standardPSOData.rootSignature = rootSignature;
 	instancingPSOData.rootSignature = instancingRootSignature;
 	particlePSOData.rootSignature = particleRootSignature;
 	skyboxPSOData.rootSignature = skyboxRootSignature;
+	fullscreenPSOData.rootSignature = copyImageRootSignature;
 
 	// InputLayout
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -35,6 +36,8 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateInstancingPSO();
 	CreateParticlePSO();
 	CreateSkyboxPSO();
+	CreateFullscreenPSO();
+	CreateGrayscalePSO();
 }
 
 void PipelineStateManager::CreateStandardPSO() {
@@ -88,7 +91,7 @@ void PipelineStateManager::CreateInstancingPSO() {
 	baseDesc.pRootSignature = instancingPSOData.rootSignature.Get();
 	baseDesc.InputLayout = inputLayoutDesc_;
 	baseDesc.VS = { instancingPSOData.vertexShaderBlob->GetBufferPointer(), instancingPSOData.vertexShaderBlob->GetBufferSize() };
-	baseDesc.PS = { instancingPSOData.pixelShaderBlob->GetBufferPointer(),	instancingPSOData.pixelShaderBlob->GetBufferSize()	};
+	baseDesc.PS = { instancingPSOData.pixelShaderBlob->GetBufferPointer(),	instancingPSOData.pixelShaderBlob->GetBufferSize() };
 	baseDesc.BlendState = CreateNoneBlendDesc();
 	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
@@ -195,6 +198,47 @@ void PipelineStateManager::CreateSkyboxPSO() {
 	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &skyboxPSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
 	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &skyboxPSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
 	CreatePSO(baseDesc, CreateScreenBlendDesc(), &skyboxPSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+}
+
+void PipelineStateManager::CreateFullscreenPSO() {
+	assert(fullscreenPSOData.rootSignature);
+	assert(fullscreenPSOData.vertexShaderBlob);
+	assert(fullscreenPSOData.pixelShaderBlob);
+
+	// 共通部分作成
+	fullscreenBaseDesc_.pRootSignature = fullscreenPSOData.rootSignature.Get();
+	fullscreenBaseDesc_.InputLayout = {nullptr, 0}; // 使用しない
+	fullscreenBaseDesc_.VS = { fullscreenPSOData.vertexShaderBlob->GetBufferPointer(), fullscreenPSOData.vertexShaderBlob->GetBufferSize() };
+	fullscreenBaseDesc_.PS = { fullscreenPSOData.pixelShaderBlob->GetBufferPointer(), fullscreenPSOData.pixelShaderBlob->GetBufferSize() };
+
+	// ブレンド
+	fullscreenBaseDesc_.BlendState = CreateNoneBlendDesc();
+
+	// ラスタライザ
+	fullscreenBaseDesc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	fullscreenBaseDesc_.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+
+	// DepthStencil
+	fullscreenBaseDesc_.DepthStencilState.DepthEnable = FALSE;
+
+	fullscreenBaseDesc_.DSVFormat = DXGI_FORMAT_UNKNOWN;
+	fullscreenBaseDesc_.NumRenderTargets = 1;
+	fullscreenBaseDesc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	fullscreenBaseDesc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	fullscreenBaseDesc_.SampleDesc.Count = 1;
+	fullscreenBaseDesc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	CreatePSO(fullscreenBaseDesc_, CreateNoneBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::None)]); // ブレンドなし
+}
+
+void PipelineStateManager::CreateGrayscalePSO() {
+	assert(fullscreenPSOData.rootSignature);
+	assert(fullscreenPSOData.vertexShaderBlob);
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = fullscreenBaseDesc_;
+	desc.PS = { grayscalePSBlob_->GetBufferPointer(), grayscalePSBlob_->GetBufferSize() };
+
+	CreatePSO(desc, CreateNoneBlendDesc(), &grayscalePSO_[static_cast<int>(BlendMode::None)]); // ブレンドなし
 }
 
 // ----------------------------------------------------
