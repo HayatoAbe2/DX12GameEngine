@@ -78,12 +78,14 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
 	);
-
 	pipelineStateManager_->SetInstancingBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Instance.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Instance.PS.hlsl", L"ps_6_0", logger_)
 	);
-
+	pipelineStateManager_->SetSpriteBlob(
+		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.VS.hlsl", L"vs_6_0", logger_),
+		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
+	);
 	pipelineStateManager_->SetParticleBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle.PS.hlsl", L"ps_6_0", logger_)
@@ -92,6 +94,7 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.PS.hlsl", L"ps_6_0", logger_)
 	);
+
 	pipelineStateManager_->SetCopyImageBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Fullscreen.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Fullscreen.PS.hlsl", L"ps_6_0", logger_)

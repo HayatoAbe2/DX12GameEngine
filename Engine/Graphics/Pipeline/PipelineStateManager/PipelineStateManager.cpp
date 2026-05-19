@@ -7,6 +7,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	device_ = device;
 	standardPSOData.rootSignature = rootSignature;
 	instancingPSOData.rootSignature = instancingRootSignature;
+	spritePSOData.rootSignature = rootSignature;
 	particlePSOData.rootSignature = particleRootSignature;
 	skyboxPSOData.rootSignature = skyboxRootSignature;
 	fullscreenPSOData.rootSignature = copyImageRootSignature;
@@ -34,6 +35,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 
 	CreateStandardPSO();
 	CreateInstancingPSO();
+	CreateSpritePSO();
 	CreateParticlePSO();
 	CreateSkyboxPSO();
 	CreateFullscreenPSO();
@@ -74,7 +76,7 @@ void PipelineStateManager::CreateStandardPSO() {
 
 	// --- 各ブレンドモードごとのPSO生成 ---
 	CreatePSO(baseDesc, CreateNoneBlendDesc(), &standardPSO[static_cast<int>(BlendMode::None)]);			// ブレンドなし
-	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &standardPSO[static_cast<int>(BlendMode::Normal)]);		// αブレンド
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &standardPSO[static_cast<int>(BlendMode::Normal)]);			// αブレンド
 	CreatePSO(baseDesc, CreateAddBlendDesc(), &standardPSO[static_cast<int>(BlendMode::Add)]);				// 加算
 	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &standardPSO[static_cast<int>(BlendMode::Subtract)]);	// 減算
 	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &standardPSO[static_cast<int>(BlendMode::Multiply)]);	// 乗算
@@ -113,6 +115,47 @@ void PipelineStateManager::CreateInstancingPSO() {
 	CreatePSO(baseDesc, CreateScreenBlendDesc(), &instancingPSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
 }
 
+void PipelineStateManager::CreateSpritePSO() {
+	assert(spritePSOData.rootSignature);
+	assert(spritePSOData.vertexShaderBlob);
+	assert(spritePSOData.pixelShaderBlob);
+	assert(inputLayoutDesc_.pInputElementDescs != nullptr);
+
+	// 共通部分作成
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
+	baseDesc.pRootSignature = spritePSOData.rootSignature.Get();
+	baseDesc.InputLayout = inputLayoutDesc_;
+	baseDesc.VS = { spritePSOData.vertexShaderBlob->GetBufferPointer(), spritePSOData.vertexShaderBlob->GetBufferSize() };
+	baseDesc.PS = { spritePSOData.pixelShaderBlob->GetBufferPointer(), spritePSOData.pixelShaderBlob->GetBufferSize() };
+
+	// ブレンド
+	baseDesc.BlendState = CreateNoneBlendDesc();
+
+	// ラスタライザ
+	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+
+	// DepthStencil
+	baseDesc.DepthStencilState.DepthEnable = FALSE;
+	baseDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	baseDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	baseDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	baseDesc.NumRenderTargets = 1;
+	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	baseDesc.SampleDesc.Count = 1;
+	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	// --- 各ブレンドモードごとのPSO生成 ---
+	CreatePSO(baseDesc, CreateNoneBlendDesc(), &spritePSO[static_cast<int>(BlendMode::None)]);			// ブレンドなし
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Normal)]);			// αブレンド
+	CreatePSO(baseDesc, CreateAddBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Add)]);				// 加算
+	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Subtract)]);	// 減算
+	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Multiply)]);	// 乗算
+	CreatePSO(baseDesc, CreateScreenBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+}
+
 void PipelineStateManager::CreateParticlePSO() {
 	assert(particlePSOData.rootSignature);
 	assert(particlePSOData.vertexShaderBlob);
@@ -149,7 +192,6 @@ void PipelineStateManager::CreateSkyboxPSO() {
 	assert(skyboxPSOData.rootSignature);
 	assert(skyboxPSOData.vertexShaderBlob);
 	assert(skyboxPSOData.pixelShaderBlob);
-	assert(inputLayoutDesc_.pInputElementDescs != nullptr);
 
 	// Skybox InputLayout
 	D3D12_INPUT_ELEMENT_DESC skyboxInputElements[2]{};

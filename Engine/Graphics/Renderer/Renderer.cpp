@@ -150,7 +150,7 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, Camera* camera, int bl
 
 void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
+	auto pso = dxContext_->GetPipelineStateManager()->GetSpritePSO(blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetStandardRootSignature().Get();
 
 	sprite->UpdateMaterial();

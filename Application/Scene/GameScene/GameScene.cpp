@@ -99,7 +99,7 @@ void GameScene::Initialize() {
 	fade_ = std::make_unique<Sprite>();
 	fade_ = asset.LoadSprite("resources/Debug/white1x1.png");
 	fade_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
-	fade_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
+	fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	resultBG_ = std::make_unique<Sprite>();
 	resultBG_ = asset.LoadSprite("resources/Result/result.png");
@@ -296,6 +296,8 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
 
+	render.DrawSkybox(skybox_.get(), camera_.get()); // パーティクルを後に描画したい
+
 	//render.DrawModel(cloud_.get(), camera_.get(), BlendMode::Add);
 	mapTile_->Draw(camera_.get());
 	player_->Draw(camera_.get());
@@ -303,8 +305,6 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
-
-	render.DrawSkybox(skybox_.get(), camera_.get());
 
 	if (currentFloor_ == 0) {
 		// チュートリアル表示
