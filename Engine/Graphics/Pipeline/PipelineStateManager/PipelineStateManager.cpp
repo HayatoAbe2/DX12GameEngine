@@ -51,6 +51,14 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	// vignette
 	postEffect[int(PostEffectType::Vignette)].desc = fullscreenBaseDesc_;
 	CreatePostEffectPSO(postEffect[int(PostEffectType::Vignette)]);
+
+	// boxFilter3x3
+	postEffect[int(PostEffectType::BoxFilter3x3)].desc = fullscreenBaseDesc_;
+	CreatePostEffectPSO(postEffect[int(PostEffectType::BoxFilter3x3)]);
+
+	// boxFilter5x5
+	postEffect[int(PostEffectType::BoxFilter5x5)].desc = fullscreenBaseDesc_;
+	CreatePostEffectPSO(postEffect[int(PostEffectType::BoxFilter5x5)]);
 }
 
 void PipelineStateManager::CreateStandardPSO() {

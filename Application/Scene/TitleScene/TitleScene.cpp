@@ -69,7 +69,8 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
-	
+	render.SetPostEffectType(PostEffectType::BoxFilter5x5);
+
 	//render.DrawSprite(control_.get());
 	//render.DrawSprite(logo_.get());
 	

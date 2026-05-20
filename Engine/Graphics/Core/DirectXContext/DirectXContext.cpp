@@ -101,6 +101,8 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 	);
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Grayscale), shaderCompiler_->Compile(L"Resources/Shaders/Grayscale.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Vignette), shaderCompiler_->Compile(L"Resources/Shaders/Vignette.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::BoxFilter3x3), shaderCompiler_->Compile(L"Resources/Shaders/BoxFilter3x3.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::BoxFilter5x5), shaderCompiler_->Compile(L"Resources/Shaders/BoxFilter5x5.PS.hlsl", L"ps_6_0", logger_));
 
 	// PSOマネージャー
 	pipelineStateManager_->Initialize(
@@ -213,6 +215,14 @@ void DirectXContext::EndFrame() {
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
 		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Vignette)));
 		
+		break;
+	case PostEffectType::BoxFilter3x3:
+		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
+		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::BoxFilter3x3)));
+		break;
+	case PostEffectType::BoxFilter5x5:
+		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
+		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::BoxFilter5x5)));
 		break;
 	default:
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());

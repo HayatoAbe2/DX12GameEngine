@@ -186,6 +186,7 @@ void Player::Draw(Camera* camera) {
 
 	if (isUsingBoost_) {
 		render.DrawInstancedModel(instancing_.get(), camera, BlendMode::Add);
+		render.SetPostEffectType(PostEffectType::BoxFilter3x3);
 	}
 
 	// 影描画
@@ -196,6 +197,8 @@ void Player::Draw(Camera* camera) {
 		shadowTransform.translate.y = 0.01f;
 		shadowModel_->SetTransform(shadowTransform);
 		render.DrawModel(shadowModel_.get(), camera);
+	} else {
+		render.SetPostEffectType(PostEffectType::BoxFilter5x5);
 	}
 
 	model_->SetTransform(transform_);

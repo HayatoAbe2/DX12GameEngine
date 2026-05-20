@@ -6,7 +6,7 @@ SceneManager::SceneManager() {
 }
 
 void SceneManager::Initialize() {
-	currentScene_ = sceneFactory_->CreateScene("Game");
+	currentScene_ = sceneFactory_->CreateScene("Title");
 	currentScene_->Initialize();
 }
 
