@@ -39,7 +39,18 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateParticlePSO();
 	CreateSkyboxPSO();
 	CreateFullscreenPSO();
-	CreateGrayscalePSO();
+
+	//
+	// ポストエフェクト
+	//
+
+	// grayscale
+	postEffect[int(PostEffectType::Grayscale)].desc = fullscreenBaseDesc_;
+	CreatePostEffectPSO(postEffect[int(PostEffectType::Grayscale)]);
+
+	// vignette
+	postEffect[int(PostEffectType::Vignette)].desc = fullscreenBaseDesc_;
+	CreatePostEffectPSO(postEffect[int(PostEffectType::Vignette)]);
 }
 
 void PipelineStateManager::CreateStandardPSO() {
@@ -270,17 +281,16 @@ void PipelineStateManager::CreateFullscreenPSO() {
 	fullscreenBaseDesc_.SampleDesc.Count = 1;
 	fullscreenBaseDesc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
-	CreatePSO(fullscreenBaseDesc_, CreateNoneBlendDesc(), &copyImagePSO_[static_cast<int>(BlendMode::None)]); // ブレンドなし
+	CreatePSO(fullscreenBaseDesc_, CreateNoneBlendDesc(), &copyImagePSO_); // ブレンドなし
 }
 
-void PipelineStateManager::CreateGrayscalePSO() {
+void PipelineStateManager::CreatePostEffectPSO(PostEffectData& postEffect) {
 	assert(fullscreenPSOData.rootSignature);
 	assert(fullscreenPSOData.vertexShaderBlob);
 
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = fullscreenBaseDesc_;
-	desc.PS = { grayscalePSBlob_->GetBufferPointer(), grayscalePSBlob_->GetBufferSize() };
+	postEffect.desc.PS = { postEffect.psBlob->GetBufferPointer(), postEffect.psBlob->GetBufferSize() };
 
-	CreatePSO(desc, CreateNoneBlendDesc(), &grayscalePSO_[static_cast<int>(BlendMode::None)]); // ブレンドなし
+	CreatePSO(postEffect.desc, CreateNoneBlendDesc(), &postEffect.pso); // ブレンドなし
 }
 
 // ----------------------------------------------------

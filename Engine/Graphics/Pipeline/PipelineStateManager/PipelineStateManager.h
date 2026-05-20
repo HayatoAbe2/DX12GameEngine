@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Graphics/Pipeline/BlendMode.h"
+#include "Engine/Graphics/Renderer/PostEffectType.h"
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -10,21 +11,13 @@ public:
 
 	void Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& rootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& instancingRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& particleRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& copyImageRootSignature);
 
-	void CreateStandardPSO();
-	void CreateInstancingPSO();
-	void CreateSpritePSO();
-	void CreateParticlePSO();
-	void CreateSkyboxPSO();
-	void CreateFullscreenPSO();
-	void CreateGrayscalePSO();
-
 	ID3D12PipelineState* GetStandardPSO(int index) { return standardPSO[index].Get(); }
 	ID3D12PipelineState* GetInstancingPSO(int index) { return instancingPSO_[index].Get(); }
 	ID3D12PipelineState* GetSpritePSO(int index) { return spritePSO[index].Get(); }
 	ID3D12PipelineState* GetParticlePSO(int index) { return particlePSO_[index].Get(); }
 	ID3D12PipelineState* GetSkyboxPSO(int index) { return skyboxPSO_[index].Get(); }
-	ID3D12PipelineState* GetCopyImagePSO(int index) { return copyImagePSO_[index].Get(); }
-	ID3D12PipelineState* GetGrayscalePSO(int index) { return grayscalePSO_[index].Get(); }
+	ID3D12PipelineState* GetCopyImagePSO() { return copyImagePSO_.Get(); }
+	ID3D12PipelineState* GetPostEffectPSO(int effectType) { return postEffect[effectType].pso.Get(); }
 
 	void SetStandardBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { standardPSOData.vertexShaderBlob = vsBlob; standardPSOData.pixelShaderBlob = psBlob; }
 	void SetInstancingBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { instancingPSOData.vertexShaderBlob = vsBlob; instancingPSOData.pixelShaderBlob = psBlob; }
@@ -33,9 +26,36 @@ public:
 	void SetSkyboxBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { skyboxPSOData.vertexShaderBlob = vsBlob; skyboxPSOData.pixelShaderBlob = psBlob; }
 	
 	void SetCopyImageBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { fullscreenPSOData.vertexShaderBlob = vsBlob; fullscreenPSOData.pixelShaderBlob = psBlob; }
-	void SetGrayScalePSBlob(Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { grayscalePSBlob_ = psBlob; }
+	void SetPostEffectPSBlob(int effectType, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { postEffect[effectType].psBlob = psBlob; }
 
 private:
+	struct PSOData {
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	};
+
+	struct PostEffectData {
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc;
+		Microsoft::WRL::ComPtr<IDxcBlob> psBlob = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> pso;
+	};
+
+	PSOData standardPSOData;
+	PSOData instancingPSOData;
+	PSOData spritePSOData;
+	PSOData particlePSOData;
+	PSOData skyboxPSOData;
+	PSOData fullscreenPSOData;
+	PostEffectData postEffect[int(PostEffectType::Count)];
+
+	void CreateStandardPSO();
+	void CreateInstancingPSO();
+	void CreateSpritePSO();
+	void CreateParticlePSO();
+	void CreateSkyboxPSO();
+	void CreateFullscreenPSO();
+	void CreatePostEffectPSO(PostEffectData& postEffect);
 
 	// inputLayout
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[4] = {};
@@ -56,8 +76,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> spritePSO[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> particlePSO_[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> skyboxPSO_[6]{};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> copyImagePSO_[6]{};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> grayscalePSO_[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> copyImagePSO_ = nullptr;
 
 	//
 	// 参照
@@ -65,19 +84,6 @@ private:
 	
 	// デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
-
-	struct PSOData {
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-		Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
-		Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
-	};
-	PSOData standardPSOData;
-	PSOData instancingPSOData;
-	PSOData spritePSOData;
-	PSOData particlePSOData;
-	PSOData skyboxPSOData;
-	PSOData fullscreenPSOData;
-	PSOData grayscalePSOData;
 
 	D3D12_BLEND_DESC CreateNoneBlendDesc();
 	D3D12_BLEND_DESC CreateAlphaBlendDesc();
@@ -90,6 +96,5 @@ private:
 
 	// フルスクリーンDesc
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC fullscreenBaseDesc_;
-	Microsoft::WRL::ComPtr<IDxcBlob> grayscalePSBlob_ = nullptr;
 };
 
