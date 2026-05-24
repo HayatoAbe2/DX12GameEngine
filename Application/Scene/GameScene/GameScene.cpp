@@ -115,6 +115,9 @@ void GameScene::Initialize() {
 	mapCheck_ = std::make_unique<MapCheck>();
 
 	Reset();
+
+	box_ = asset.LoadModel("Resources/Debug/AnimatedCube","AnimatedCube.gltf");
+	box_->SetAnimation(std::move(asset.LoadAnimation("Resources/Debug/AnimatedCube", "AnimatedCube.gltf")));
 }
 
 void GameScene::Update() {
@@ -122,6 +125,8 @@ void GameScene::Update() {
 	auto& input = ctx.Input();
 	auto& audio = ctx.Audio();
 	auto& scene = ctx.Scene();
+
+	box_->Update();
 
 	if (!isShowResult_) {
 		if (isPause_) {
@@ -307,6 +312,8 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
+
+	render.DrawModel(box_.get(), camera_.get());
 
 	if (currentFloor_ == 0) {
 		// チュートリアル表示

@@ -159,7 +159,7 @@ void MapTile::Update(bool canGoal) {
 		emitTimer_++;
 		if (emitTimer_ >= emitTime_) {
 			// パーティクル
-			Vector3 randomVector = Normalize({
+			Vector3 randomVector = Normalize(Vector3{
 			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
 			0.0f,
 			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f)

@@ -5,6 +5,7 @@
 #include "Vector4/Vector4.h"
 #include "Matrix3x3/Matrix3x3.h"
 #include "Matrix4x4/Matrix4x4.h"
+#include "Quaternion/Quaternion.h"
 #include "Lerp/Lerp.h"
 #include "CollisionShape/AABB/AABB.h"
 #include "CollisionShape/Ray/Ray.h"

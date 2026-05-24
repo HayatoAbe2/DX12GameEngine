@@ -2,6 +2,7 @@
 #include "ModelData.h"
 #include "Engine/Object/Transform.h"
 #include "Engine/Asset/Model/Node.h"
+#include "Engine/Asset/Model/AnimationPlayer/AnimationPlayer.h"
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -14,6 +15,8 @@ class BufferManager;
 class Model {
 public:
 
+	void Update();
+
 	///
 	/// Setter
 	///
@@ -22,7 +25,8 @@ public:
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
-
+	void SetAnimation(std::unique_ptr<Animation> animation) { animationPlayer_ = std::make_unique<AnimationPlayer>(std::move(animation), rootNode_->name); }
+	
 	// データの設定
 	void CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager);
 
@@ -46,6 +50,9 @@ public:
 	ModelNode* GetRootNode() { return rootNode_.get(); }
 
 private:
+	// アニメーション再生
+	std::unique_ptr<AnimationPlayer> animationPlayer_ = nullptr;
+
 	// トランスフォーム
 	Transform transform_ = { { 1,1,1 },{}, {} };
 

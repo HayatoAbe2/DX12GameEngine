@@ -6,6 +6,7 @@
 #include "Engine/Asset/Manager/ModelManager/ModelManager.h"
 #include "Engine/Asset/Manager/TextureManager/TextureManager.h"
 #include "Engine/Asset/Manager/SpriteManager/SpriteManager.h"
+#include "Engine/Asset/Manager/AnimationManager/AnimationManager.h"
 
 class DirectXContext;
 class Logger;
@@ -29,7 +30,9 @@ public:
 	std::shared_ptr<Texture> LoadTexture(const std::string& filePath) {
 		return textureManager_->Load(filePath);
 	}
-
+	std::unique_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
+		return std::move(animationManager_->Load(directoryPath, filePath));
+	}
 
 private:
 	// テクスチャマネージャー
@@ -40,5 +43,8 @@ private:
 
 	// スプライトマネージャー
 	std::unique_ptr<SpriteManager> spriteManager_ = nullptr;
+
+	// アニメーション
+	std::unique_ptr<AnimationManager> animationManager_ = nullptr;
 };
 

@@ -50,11 +50,11 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 		break;
 
 	case static_cast<int>(WEAPON::AssaultRifle):
-		status.damage = 2.0f;
+		status.damage = 1.2f;
 		status.weight = 0.4f;
 		status.bulletSize = 0.3f;
-		status.bulletSpeed = 1.0f;
-		status.shootCoolTime = 6;
+		status.bulletSpeed = 1.2f;
+		status.shootCoolTime = 5;
 		status.bulletLifeTime = 60;
 		status.knockback = 0.1f;
 		status.magazineSize = 16;

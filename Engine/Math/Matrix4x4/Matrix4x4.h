@@ -4,6 +4,8 @@
 #include "Engine/Object/Transform.h"
 #include <DirectXMath.h>
 
+struct Quaternion;
+
 struct Matrix4x4 {
 	float m[4][4];
 };
@@ -77,10 +79,8 @@ Matrix4x4 MakeRotateZMatrix(float radian);
 /// <summary>
 /// 4x4アフィン変換行列作成
 /// </summary>
-/// <param name="scale">拡大縮小</param>
-/// <param name="rotate">回転</param>
-/// <param name="translate">平行移動</param>
 Matrix4x4 MakeAffineMatrix(const Transform& transform);
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate);
 
 /// <summary>
 /// 透視投影行列作成

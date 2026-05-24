@@ -15,8 +15,9 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel,
 	matData.color = { 0,0,0,1 };
 	shadowModel_->GetMaterial(0)->SetData(matData);
 	status_ = status;
-
 	weapon_ = std::move(rWeapon);
+
+	invinsibleTimer_ = std::make_unique<Timer>();
 }
 
 Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) {
@@ -30,6 +31,8 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 
 	bossWeapons_ = std::move(rWeapons);
 	weapon_ = std::move(bossWeapons_[0]);
+
+	invinsibleTimer_ = std::make_unique<Timer>();
 }
 
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera) {
@@ -46,6 +49,7 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 			}
 		}
 	}
+	invinsibleTimer_->Update(1.0f / 60.0f);
 
 	if (!isFall_) {
 
@@ -221,6 +225,7 @@ void Enemy::Draw(Camera* camera) {
 void Enemy::Hit(float damage, Vector3 from, const float knockback) {
 
 	status_.hp -= damage;
+	invinsibleTimer_->Start(invinsibleTime_);
 	if (status_.hp <= 0) { isDead_ = true; }
 
 	if (status_.stunResist < 10) {
