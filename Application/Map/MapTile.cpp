@@ -21,8 +21,7 @@ void MapTile::Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<I
 	floor_ = std::move(floor);
 	goal_ = std::move(goal);
 
-	particle_ = std::make_unique<ParticleSystem>();
-	particle_->Initialize(asset.LoadInstancedModel("Resources/Particle/Goal", "goalEffect.obj", particleNum_));
+	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Goal/circle.png")), particleNum_);
 	particle_->SetLifeTime(40);
 	particle_->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
 }

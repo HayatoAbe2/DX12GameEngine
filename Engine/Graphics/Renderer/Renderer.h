@@ -64,6 +64,8 @@ public:
 	void DrawNodeInstance(InstancedModel* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld);
 	void DrawMeshInstance(InstancedModel* model, Mesh* mesh);
 
+	// 図形描画
+	void DrawPlane(ParticleSystem* particleSys, int blendMode);
 	// Skybox描画
 	void DrawSkybox(Texture* texture, Camera* camera);
 
@@ -81,7 +83,7 @@ public:
 	void EndFrame();
 
 private:
-	void InitializeAABB(AABB aabb);
+	void InitializePlane();
 	void InitializeSkybox();
 
 	DirectXContext* dxContext_ = nullptr;
@@ -96,13 +98,18 @@ private:
 	LightsForGPU* dummyLight_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> dummyLightBuffer_;
 
-	// Skybox用データ
-	struct SkyboxData {
+	struct ShapeData {
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 		D3D12_VERTEX_BUFFER_VIEW vbv;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
 		D3D12_INDEX_BUFFER_VIEW ibv;
+	};
+	ShapeData plane_;
+
+	// Skybox用データ
+	struct SkyboxData {
+		ShapeData shapeData;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
 		Microsoft::WRL::ComPtr<ID3D12Resource> transformResource;

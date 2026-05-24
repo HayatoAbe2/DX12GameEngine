@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Asset/Model/Model.h"
 #include "Engine/Asset/Model/InstancedModel.h"
+#include "Engine/Object/Particle/ParticleSystem/ParticleSystem.h"
 
 #include <unordered_map>
 #include <string>
@@ -26,6 +27,8 @@ public:
 	ModelManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager);
 	std::unique_ptr<Model> Load(const std::string& directoryPath, const std::string& filename, bool enableLighting = true);
 	std::unique_ptr<InstancedModel> Load(const std::string& directoryPath, const std::string& filename, const int numInstance_, bool enableLighting = true);
+	std::unique_ptr<ParticleSystem> CreateParticleInstanceResource(int numInstance);
+	std::unique_ptr<Material> LoadMaterial(std::shared_ptr<Texture> texture);
 
 private:
 	// 関数内で使う関数

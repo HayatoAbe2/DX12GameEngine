@@ -2,9 +2,10 @@
 #include "Engine/Scene/Camera/Camera.h"
 #include "Engine/Asset/Model/InstancedModel.h"
 
-void ParticleSystem::Initialize(std::unique_ptr<InstancedModel> model) {
-	instancedModel_ = std::move(model);
-	particles_.resize(instancedModel_->GetNumInstance());
+void ParticleSystem::Initialize(const ParticleShape& shape, std::unique_ptr<Material> material, int numInstance) {
+	particleShape_ = shape;
+	material_ = std::move(material);
+	particles_.resize(numInstance);
 }
 
 void ParticleSystem::Update() {
@@ -38,12 +39,24 @@ void ParticleSystem::PreDraw(Camera* camera) {
 		particle.color.w = float(particle.lifeTime) / float(maxLifeTime_);
 		colors.push_back(particle.color);
 	}
-	instancedModel_->UpdateInstanceTransform(camera, transforms, colors);
+
+	// WVPMatrixを作る
+	for (int i = 0; i < particles_.size(); ++i) {
+		Matrix4x4 worldMatrix = MakeAffineMatrix(transforms[i]);
+		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(camera->viewMatrix_, camera->projectionMatrix_));
+		instanceTransformationData_[i].WVP = worldViewProjectionMatrix;
+		instanceTransformationData_[i].World = worldMatrix;
+		instanceTransformationData_[i].WorldInverseTranspose = Transpose(Inverse(worldMatrix));
+		instanceTransformationData_[i].Color = colors[i];
+	}
 }
 
 void ParticleSystem::SetColor(const Vector4& color) {
 	for (auto& particle : particles_) {
 		particle.color = color;
+		auto data = material_->GetData();
+		data.color = color;
+		material_->SetData(data);
 	}
 }
 

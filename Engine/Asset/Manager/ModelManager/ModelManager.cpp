@@ -298,8 +298,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryP
 
 		// マテリアル初期化
 		std::unique_ptr<Material> material = std::make_unique<Material>();
-		bool useTexture = false;
-		if (texture->GetMtlPath() != "") { useTexture = true; }
+		bool useTexture = !texture->GetMtlPath().empty();
 		material->Initialize(bufferManager_, useTexture, enableLighting); // テクスチャ座標情報がなければテクスチャ不使用
 		material->SetTexture(texture);	// テクスチャ
 		material->SetEnvironmentTexture(environmentTexture);
@@ -480,4 +479,46 @@ Matrix4x4 ModelManager::ConvertAssimpMatrixToLHRow(const aiMatrix4x4& m) {
 	out.m[3][0] = m.a4; out.m[3][1] = m.b4; out.m[3][2] = -m.c4; out.m[3][3] = m.d4;
 
 	return out;
+}
+
+std::unique_ptr<ParticleSystem> ModelManager::CreateParticleInstanceResource(int numInstance) {
+	std::unique_ptr<ParticleSystem> particleSystem = std::make_unique<ParticleSystem>();
+
+	// インスタンス数分のtransformリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformResource = bufferManager_->CreateUploadBuffer(sizeof(InstanceGPUData) * numInstance);
+	InstanceGPUData* transformData = nullptr;
+	instanceTransformResource->Map(0, nullptr, reinterpret_cast<void**>(&transformData));
+	// 単位行列を書き込んでおく
+	for (int i = 0; i < numInstance; ++i) {
+		transformData[i].World = MakeIdentity4x4();
+		transformData[i].WVP = MakeIdentity4x4();
+		transformData[i].WorldInverseTranspose = MakeIdentity4x4();
+		particleSystem->AddInstanceTransform();
+	}
+
+	particleSystem->SetInstanceResource(instanceTransformResource);
+	particleSystem->SetInstanceTransformData(transformData);
+
+	auto index = srvManager_->Allocate();
+	srvManager_->CreateStructuredBufferSRV(index, particleSystem->GetInstanceResource().Get(), numInstance, sizeof(InstanceGPUData));
+	// SRVハンドル
+	particleSystem->SetSRVHandle(srvManager_->GetGPUHandle(index));
+
+	return std::move(particleSystem);
+}
+
+std::unique_ptr<Material> ModelManager::LoadMaterial(std::shared_ptr<Texture> texture) {
+	// マテリアル初期化
+	std::unique_ptr<Material> material = std::make_unique<Material>();
+	bool useTexture = !texture->GetMtlPath().empty();
+	material->Initialize(bufferManager_, useTexture, true); // テクスチャ座標情報がなければテクスチャ不使用
+	material->SetTexture(texture);	// テクスチャ
+
+	// デフォルト環境テクスチャ
+	auto environmentTexture = std::make_shared<Texture>();
+	environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
+	textureManager_->CreateTextureSRV(environmentTexture);
+	material->SetEnvironmentTexture(environmentTexture);
+
+	return std::move(material);
 }

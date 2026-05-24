@@ -7,13 +7,11 @@ void FireBullet::Initialize() {
 	auto& asset = ctx.Asset();
 	auto& light = ctx.Light();
 
-	particle_ = std::make_unique<ParticleSystem>();
-	particle_->Initialize(asset.LoadInstancedModel("Resources/Particle/Fire", "fireEffect.obj", particleNum_));
+	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(10);
 	particle_->SetColor({ 0.3f, 0.03f, 0.0f, 1.0f });
 
-	explosionParticle_ = std::make_unique<ParticleSystem>();
-	explosionParticle_->Initialize(asset.LoadInstancedModel("Resources/Particle/Fire", "fireEffect.obj", particleNum_));
+	explosionParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	explosionParticle_->SetLifeTime(10);
 	explosionParticle_->SetColor({ 0.7f, 0.03f, 0.0f, 1.0f });
 

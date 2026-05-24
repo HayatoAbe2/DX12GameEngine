@@ -7,8 +7,7 @@ void SoulEffect::Initialize(Vector3 pos, Vector3 goal) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	particle_ = std::make_unique<ParticleSystem>();
-	particle_->Initialize(asset.LoadInstancedModel("Resources/Particle/Fire", "fireEffect.obj", particleNum_));
+	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(10);
 	particle_->SetColor({ 0.8f, 0.0f, 0.8f, 1.0f });
 }

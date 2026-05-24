@@ -5,13 +5,11 @@ void NormalBullet::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	particle_ = std::make_unique<ParticleSystem>();
-	particle_->Initialize(asset.LoadInstancedModel("Resources/Particle/Fire", "fireEffect.obj", particleNum_));
+	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(2);
 	particle_->SetColor({ 0.5f, 0.7f, 0.0f, 1.0f });
 
-	hitParticle_ = std::make_unique<ParticleSystem>();
-	hitParticle_->Initialize(asset.LoadInstancedModel("Resources/Particle/Fire", "fireEffect.obj", hitParticleNum_));
+	hitParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	hitParticle_->SetLifeTime(hitParticleLifeTime);
 	hitParticle_->SetColor({ 0.5f, 0.7f, 0.0f, 1.0f });
 	particleField_ = std::make_unique<ParticleField>();

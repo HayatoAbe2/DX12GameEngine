@@ -29,6 +29,7 @@ void Renderer::Initialize(DirectXContext* dxContext) {
 	dummyLightBuffer_ = dxContext_->GetBufferManager()->CreateUploadBuffer(sizeof(LightsForGPU));
 	dummyLightBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dummyLight_));
 
+	InitializePlane();
 	InitializeSkybox();
 }
 
@@ -113,38 +114,34 @@ void Renderer::DrawModelInstance(InstancedModel* model, Camera* camera, LightMan
 void Renderer::DrawParticles(ParticleSystem* particleSys, Camera* camera, int blendMode) {
 	particleSys->PreDraw(camera);
 
+	Material* material = particleSys->GetMaterial();
+	// マテリアル更新
+	material->UpdateGPU();
+
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetParticlePSO(blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetParticleRootSignature().Get();
 
-	// PSO設定
 	cmdList->SetPipelineState(pso);
-	// RootSignatureを設定
 	cmdList->SetGraphicsRootSignature(rootSig);
-	// トポロジを三角形に設定
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// 各メッシュを描画
-	for (auto& mesh : particleSys->GetInstancedModel()->GetData()->meshes) {
-		for (const auto& subMesh : mesh->GetPrimitives()) {
+	switch (particleSys->GetShape()) {
+	case ParticleShape::Plane:
+		cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
+		cmdList->IASetIndexBuffer(&plane_.ibv);
 
-			Material* material = particleSys->GetInstancedModel()->GetMaterial(subMesh.materialIndex_);
-			// マテリアル更新
-			material->UpdateGPU();
-
-			// マテリアルCBufferの場所を設定
-			cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
-			// モデル描画
-			cmdList->IASetVertexBuffers(0, 1, &subMesh.vertexBufferView_);	// VBVを設定
-			// wvp用のCBufferの場所を設定
-			cmdList->SetGraphicsRootConstantBufferView(1, particleSys->GetInstancedModel()->GetInstanceCBV());
-			// SRVの設定
-			cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
-			// インスタンス用SRVの設定
-			cmdList->SetGraphicsRootDescriptorTable(3, particleSys->GetInstancedModel()->GetInstanceSRVHandle());
-			// ドローコール
-			cmdList->DrawInstanced(UINT(subMesh.vertices_.size()), particleSys->GetInstancedModel()->GetNumInstance(), 0, 0);
-		}
+		// マテリアルCBufferの場所を設定
+		cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
+		// wvp用のCBufferの場所を設定
+		cmdList->SetGraphicsRootConstantBufferView(1, particleSys->GetInstanceCBV());
+		// SRVの設定
+		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
+		// インスタンス用SRVの設定
+		cmdList->SetGraphicsRootDescriptorTable(3, particleSys->GetInstanceSRVHandle());
+		// ドローコール
+		cmdList->DrawIndexedInstanced(6, particleSys->GetNumInstance(), 0, 0, 0);
+		break;
 	}
 }
 
@@ -266,20 +263,81 @@ void Renderer::DrawMeshInstance(InstancedModel* model, Mesh* mesh) {
 
 }
 
+
+
+void Renderer::InitializePlane() {
+	auto bufferManager = dxContext_->GetBufferManager();
+	UINT sizeInBytes = sizeof(VertexData) * 4;
+
+	// 頂点リソース
+	plane_.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
+	// VBV
+	plane_.vbv.BufferLocation = plane_.vertexResource->GetGPUVirtualAddress();
+	plane_.vbv.SizeInBytes = sizeInBytes;
+	plane_.vbv.StrideInBytes = sizeof(VertexData);
+
+	// 頂点を設定
+	VertexData* vertices = nullptr;
+	plane_.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
+	// 右(0,1,2),(2,1,3)
+	vertices[0] = { {-0.5f, -0.5f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f} };
+	vertices[1] = { {-0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f} };
+	vertices[2] = { {0.5f, -0.5f, 0.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f} };
+	vertices[3] = { {0.5f, 0.5f, 0.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f, 1.0f} };
+
+	// indexリソース
+	plane_.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * 6);
+	// IBV
+	plane_.ibv.BufferLocation = plane_.indexResource->GetGPUVirtualAddress();
+	plane_.ibv.SizeInBytes = sizeof(uint32_t) * 6;
+	plane_.ibv.Format = DXGI_FORMAT_R32_UINT;
+	// データ
+	uint32_t* indexData = nullptr;
+	plane_.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	indexData[0] = 0;	indexData[1] = 1;	indexData[2] = 2; indexData[3] = 1;	indexData[4] = 3;	indexData[5] = 2;
+}
+
+void Renderer::DrawPlane(ParticleSystem* particleSys, int blendMode) {
+	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
+	auto pso = dxContext_->GetPipelineStateManager()->GetParticlePSO(blendMode);
+	auto rootSig = dxContext_->GetRootSignatureManager()->GetParticleRootSignature().Get();
+
+	cmdList->SetPipelineState(pso);
+	cmdList->SetGraphicsRootSignature(rootSig);
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
+	cmdList->IASetIndexBuffer(&plane_.ibv);
+
+	Material* material = particleSys->GetMaterial();
+	// マテリアル更新
+	material->UpdateGPU();
+
+	// マテリアルCBufferの場所を設定
+	cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
+	// wvp用のCBufferの場所を設定
+	cmdList->SetGraphicsRootConstantBufferView(1, particleSys->GetInstanceCBV());
+	// SRVの設定
+	cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
+	// インスタンス用SRVの設定
+	cmdList->SetGraphicsRootDescriptorTable(3, particleSys->GetInstanceSRVHandle());
+	// ドローコール
+	cmdList->DrawInstanced(6, particleSys->GetNumInstance(), 0, 0);
+}
+
 void Renderer::InitializeSkybox() {
 	auto bufferManager = dxContext_->GetBufferManager();
 	UINT sizeInBytes = sizeof(VertexData) * 24;
 
 	// 頂点リソース
-	skybox.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
+	skybox.shapeData.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
 	// VBV
-	skybox.vbv.BufferLocation = skybox.vertexResource->GetGPUVirtualAddress();
-	skybox.vbv.SizeInBytes = sizeInBytes;
-	skybox.vbv.StrideInBytes = sizeof(VertexData);
+	skybox.shapeData.vbv.BufferLocation = skybox.shapeData.vertexResource->GetGPUVirtualAddress();
+	skybox.shapeData.vbv.SizeInBytes = sizeInBytes;
+	skybox.shapeData.vbv.StrideInBytes = sizeof(VertexData);
 
 	// 頂点を設定
 	VertexData* vertices = nullptr;
-	skybox.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
+	skybox.shapeData.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
 	// 右(0,1,2),(2,1,3)
 	vertices[0] = { {1.0f, 1.0f, 1.0f, 1.0f}, {}, {}, {1.0f, 1.0f, 1.0f, 1.0f} };
 	vertices[1] = { {1.0f, 1.0f, -1.0f, 1.0f}, {}, {}, {1.0f, 1.0f, 1.0f, 1.0f} };
@@ -312,14 +370,14 @@ void Renderer::InitializeSkybox() {
 	vertices[23] = { {1.0f, -1.0f, -1.0f, 1.0f}, {}, {}, {1.0f, 1.0f, 1.0f, 1.0f} };
 
 	// indexリソース
-	skybox.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * 36);
+	skybox.shapeData.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * 36);
 	// IBV
-	skybox.ibv.BufferLocation = skybox.indexResource->GetGPUVirtualAddress();
-	skybox.ibv.SizeInBytes = sizeof(uint32_t) * 36;
-	skybox.ibv.Format = DXGI_FORMAT_R32_UINT;
+	skybox.shapeData.ibv.BufferLocation = skybox.shapeData.indexResource->GetGPUVirtualAddress();
+	skybox.shapeData.ibv.SizeInBytes = sizeof(uint32_t) * 36;
+	skybox.shapeData.ibv.Format = DXGI_FORMAT_R32_UINT;
 	// データ
 	uint32_t* indexData = nullptr;
-	skybox.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	skybox.shapeData.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	indexData[0] = 0;	indexData[1] = 1;	indexData[2] = 2; indexData[3] = 1;	indexData[4] = 3;	indexData[5] = 2;
 	indexData[6] = 4;	indexData[7] = 5;	indexData[8] = 6; indexData[9] = 6;	indexData[10] = 5;	indexData[11] = 7;
 	indexData[12] = 8;	indexData[13] = 9;	indexData[14] = 10; indexData[15] = 10;	indexData[16] = 9;	indexData[17] = 11;
@@ -367,9 +425,9 @@ void Renderer::DrawSkybox(Texture* texture, Camera* camera) {
 
 	cmdList->SetPipelineState(pso);
 	cmdList->SetGraphicsRootSignature(rootSig);
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); 
-	cmdList->IASetVertexBuffers(0, 1, &skybox.vbv);
-	cmdList->IASetIndexBuffer(&skybox.ibv);
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cmdList->IASetVertexBuffers(0, 1, &skybox.shapeData.vbv);
+	cmdList->IASetIndexBuffer(&skybox.shapeData.ibv);
 	cmdList->SetGraphicsRootConstantBufferView(0, skybox.materialResource->GetGPUVirtualAddress());
 	cmdList->SetGraphicsRootConstantBufferView(1, skybox.transformResource->GetGPUVirtualAddress());
 	cmdList->SetGraphicsRootDescriptorTable(2, texture->GetSRVHandle());
