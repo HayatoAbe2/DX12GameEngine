@@ -13,7 +13,7 @@ void RootSignatureManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateInstancingRootSignature();
 	CreateParticleRootSignature();
 	CreateSkyboxRootSignature();
-	CreateCopyRootSignature();
+	CreateFullscreenRootSignature();
 }
 
 void RootSignatureManager::CreateStandardRootSignature() {
@@ -336,7 +336,7 @@ void RootSignatureManager::CreateSkyboxRootSignature() {
 	assert(SUCCEEDED(hr));
 }
 
-void RootSignatureManager::CreateCopyRootSignature() {
+void RootSignatureManager::CreateFullscreenRootSignature() {
 	HRESULT hr;
 	// RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -384,9 +384,9 @@ void RootSignatureManager::CreateCopyRootSignature() {
 		assert(false);
 	}
 	// バイナリを元に生成
-	copyRootSignature_ = nullptr;
+	fullscreenRootSignature_ = nullptr;
 	hr = device_->CreateRootSignature(0,
 		signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(),
-		IID_PPV_ARGS(&copyRootSignature_));
+		IID_PPV_ARGS(&fullscreenRootSignature_));
 	assert(SUCCEEDED(hr));
 }

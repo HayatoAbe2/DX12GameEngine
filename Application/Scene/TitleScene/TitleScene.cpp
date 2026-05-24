@@ -69,8 +69,9 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
-	
-	render.DrawSprite(control_.get());
+	render.SetPostEffectType(PostEffectType::BoxFilter5x5);
+
+	//render.DrawSprite(control_.get());
 	//render.DrawSprite(logo_.get());
 	
 	render.DrawSkybox(skybox_.get(), camera_.get());

@@ -300,6 +300,8 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
+	render.SetPostEffectType(PostEffectType::None);
+	if (isFadeOut_)render.SetPostEffectType(PostEffectType::Vignette);
 
 	render.DrawSkybox(skybox_.get(), camera_.get()); // パーティクルを後に描画したい
 
@@ -322,11 +324,9 @@ void GameScene::Draw() {
 
 	// 結果(プレイ画面の上から)
 	if (isShowResult_) {
-		render.SetPostEffectType(PostEffectType::GrayScale);
+		render.SetPostEffectType(PostEffectType::Grayscale);
 		render.DrawSprite(resultBG_.get());
 		render.DrawSprite(resultCursor_.get());
-	} else {
-		render.SetPostEffectType(PostEffectType::None);
 	}
 
 	render.DrawSprite(fade_.get());

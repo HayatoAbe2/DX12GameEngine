@@ -2,5 +2,10 @@
 
 enum class PostEffectType {
 	None,
-	GrayScale,
+	Grayscale,
+	Vignette,
+	BoxFilter3x3,
+	BoxFilter5x5,
+
+	Count
 };
