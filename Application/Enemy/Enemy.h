@@ -2,6 +2,7 @@
 #include "Weapon/Weapon.h"
 #include "EnemyStatus.h"
 #include "Bullet/BulletManager.h"
+#include "Timer/Timer.h"
 #include "GameCommon.h"
 
 class MapCheck;
@@ -39,6 +40,7 @@ public:
 	virtual void Attack(Weapon* weapon, BulletManager* bulletManager, Camera* camera) = 0;
 
 	Transform GetTransform() const { return model_->GetTransform(); }
+	Timer* GetInvinsibleTimer() const { return invinsibleTimer_.get(); }
 	float GetRadius() const { return status_.radius; }
 	bool IsDead() { return isDead_; }
 
@@ -108,5 +110,9 @@ protected:
 
 	// 自動発見
 	bool targetAutoFound_ = false;
+
+	// 無敵時間
+	std::unique_ptr<Timer> invinsibleTimer_;
+	float invinsibleTime_ = 0.3f;
 };
 

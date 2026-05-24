@@ -1,5 +1,10 @@
 #include "Model.h"
 
+void Model::Update() {
+	// アニメーション更新
+	animationPlayer_->Update(*rootNode_.get());
+}
+
 void Model::CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager) {
 	// データ設定
 	data_ = data;

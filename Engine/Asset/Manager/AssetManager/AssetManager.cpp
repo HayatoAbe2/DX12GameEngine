@@ -4,4 +4,5 @@ AssetManager::AssetManager(DirectXContext* dxContext, Logger* logger) {
 	textureManager_ = std::make_unique<TextureManager>(dxContext, logger);
 	modelManager_ = std::make_unique<ModelManager>(dxContext, logger, textureManager_.get());
 	spriteManager_ = std::make_unique<SpriteManager>(dxContext, logger, textureManager_.get());
+	animationManager_ = std::make_unique<AnimationManager>();
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Matrix4x4.h"
+#include "Engine/Math/Quaternion/Quaternion.h"
 #include <cassert>
 #include <cmath>
 using namespace DirectX;
@@ -259,7 +260,7 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 /// <param name="rotate">回転</param>
 /// <param name="translate">平行移動</param>
 Matrix4x4 MakeAffineMatrix(const Transform& transform) {
-	Matrix4x4 result = { 0 };
+	Matrix4x4 result = {};
 	Matrix4x4 rotateXYZMatrix = Multiply(MakeRotateXMatrix(transform.rotate.x), Multiply(MakeRotateYMatrix(transform.rotate.y), MakeRotateZMatrix(transform.rotate.z)));
 	result.m[0][0] = transform.scale.x * rotateXYZMatrix.m[0][0];
 	result.m[0][1] = transform.scale.x * rotateXYZMatrix.m[0][1];
@@ -273,6 +274,46 @@ Matrix4x4 MakeAffineMatrix(const Transform& transform) {
 	result.m[3][0] = transform.translate.x;
 	result.m[3][1] = transform.translate.y;
 	result.m[3][2] = transform.translate.z;
+	result.m[3][3] = 1.0f;
+	return result;
+}
+Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
+	Matrix4x4 result = {};
+	Matrix4x4 rotateMatrix = {
+		{	
+			{
+				1.0f - 2.0f * (rotate.y * rotate.y + rotate.z * rotate.z),
+				2.0f * (rotate.x * rotate.y + rotate.w * rotate.z),
+				2.0f * (rotate.x * rotate.z - rotate.w * rotate.y),
+				0.0f
+			},
+			{
+				2.0f * (rotate.x * rotate.y - rotate.w * rotate.z),
+				1.0f - 2.0f * (rotate.x * rotate.x + rotate.z * rotate.z),
+				2.0f * (rotate.y * rotate.z + rotate.w * rotate.x),
+				0.0f
+			},
+			{
+				2.0f * (rotate.x * rotate.z + rotate.w * rotate.y),
+				2.0f * (rotate.y * rotate.z - rotate.w * rotate.x),
+				1.0f - 2.0f * (rotate.x * rotate.x + rotate.y * rotate.y),
+				0.0f
+			},
+			{0.0f, 0.0f, 0.0f, 1.0f}
+	}
+	};
+	result.m[0][0] = scale.x * rotateMatrix.m[0][0];
+	result.m[0][1] = scale.x * rotateMatrix.m[0][1];
+	result.m[0][2] = scale.x * rotateMatrix.m[0][2];
+	result.m[1][0] = scale.y * rotateMatrix.m[1][0];
+	result.m[1][1] = scale.y * rotateMatrix.m[1][1];
+	result.m[1][2] = scale.y * rotateMatrix.m[1][2];
+	result.m[2][0] = scale.z * rotateMatrix.m[2][0];
+	result.m[2][1] = scale.z * rotateMatrix.m[2][1];
+	result.m[2][2] = scale.z * rotateMatrix.m[2][2];
+	result.m[3][0] = translate.x;
+	result.m[3][1] = translate.y;
+	result.m[3][2] = translate.z;
 	result.m[3][3] = 1.0f;
 	return result;
 };

@@ -31,7 +31,7 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 	auto& audio = ctx.Audio();
 
 	// 敵の弾だったら判定しない
-	if (bullet->IsEnemyBullet() || bullet->IsDead()) { return; }
+	if (bullet->IsEnemyBullet() || bullet->IsDead() || enemy->GetInvinsibleTimer()->IsActive()) { return; }
 
 	if (Length(enemy->GetTransform().translate - bullet->GetTransform().translate) <=
 		enemy->GetRadius() + bullet->GetTransform().scale.x / 2.0f) {

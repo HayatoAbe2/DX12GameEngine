@@ -19,3 +19,7 @@ std::unique_ptr<Sprite> AssetContext::LoadSprite(const std::string& texturePath)
 std::shared_ptr<Texture> AssetContext::LoadTexture(const std::string& filePath) {
 	return assetManager_->LoadTexture(filePath);
 }
+
+std::unique_ptr<Animation> AssetContext::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
+	return std::move(assetManager_->LoadAnimation(directoryPath, filePath));
+}

@@ -74,7 +74,6 @@ void RapidBullet::Hit() {
 	auto& ctx = GameContext::GetInstance();
 
 	if (particleField_) {
-		isDead_ = true;
 
 		// 飛散パーティクル
 		particleField_->SetGravity(-0.4f, model_->GetTransform().translate);

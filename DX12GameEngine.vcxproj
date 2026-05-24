@@ -162,6 +162,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\Bullet\BulletManager.cpp" />
     <ClCompile Include="Application\Bullet\FireBullet.cpp" />
@@ -169,7 +171,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Bullet\RapidBullet.cpp" />
     <ClCompile Include="Application\Bullet\SpreadBullet.cpp" />
     <ClCompile Include="Application\Bullet\WaveBullet.cpp" />
-    <ClCompile Include="Application\CollisionChecker.cpp" />
+    <ClCompile Include="Application\CollisionChecker\CollisionChecker.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
     <ClCompile Include="Application\Effect\SoulEffect.cpp" />
     <ClCompile Include="Application\Enemy\Enemies\Bat.cpp" />
@@ -184,7 +186,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Map\MapTile.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Scene\TitleScene\TitleScene.cpp" />
-    <ClCompile Include="Application\UIDrawer.cpp" />
+    <ClCompile Include="Application\UIDrawer\UIDrawer.cpp" />
     <ClCompile Include="Application\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\Weapon\WeaponManager.cpp" />
     <ClCompile Include="Application\Weapon\Weapons\AssaultRifle.cpp" />
@@ -267,6 +269,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="Engine\Scene\SceneFactoryBase\SceneFactoryBase.cpp" />
     <ClCompile Include="Engine\Contexts\SceneContext\SceneContext.cpp" />
+    <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp" />
+    <ClCompile Include="Application\Timer\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Fullscreen.PS.hlsl">
@@ -339,6 +343,9 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.h" />
+    <ClInclude Include="Engine\Asset\Manager\AnimationManager\AnimationManager.h" />
+    <ClInclude Include="Engine\Asset\Animation.h" />
     <ClInclude Include="Application\Bullet\Bullet.h" />
     <ClInclude Include="Application\Bullet\BulletManager.h" />
     <ClInclude Include="Application\Bullet\FireBullet.h" />
@@ -346,7 +353,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Bullet\RapidBullet.h" />
     <ClInclude Include="Application\Bullet\SpreadBullet.h" />
     <ClInclude Include="Application\Bullet\WaveBullet.h" />
-    <ClInclude Include="Application\CollisionChecker.h" />
+    <ClInclude Include="Application\CollisionChecker\CollisionChecker.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
     <ClInclude Include="Application\Effect\SoulEffect.h" />
     <ClInclude Include="Application\Enemy\Enemies\Bat.h" />
@@ -363,7 +370,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Rarity.h" />
     <ClInclude Include="Application\Scene\TitleScene\TitleScene.h" />
-    <ClInclude Include="Application\UIDrawer.h" />
+    <ClInclude Include="Application\UIDrawer\UIDrawer.h" />
     <ClInclude Include="Application\Weapon\Weapon.h" />
     <ClInclude Include="Application\Weapon\WeaponManager.h" />
     <ClInclude Include="Application\Weapon\WeaponStatus.h" />
@@ -454,6 +461,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="Engine\Scene\SceneFactoryBase\SceneFactoryBase.h" />
     <ClInclude Include="Engine\Contexts\SceneContext\SceneContext.h" />
+    <ClInclude Include="Engine\Math\Quaternion\Quaternion.h" />
+    <ClInclude Include="Application\Timer\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

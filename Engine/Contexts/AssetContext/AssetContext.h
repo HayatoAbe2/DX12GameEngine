@@ -18,6 +18,9 @@ public:
 	// テクスチャ読み込み
 	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
 
+	// アニメーション読み込み
+	std::unique_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
+
 	//void SoundLoad(const wchar_t* filename);
 
 private:

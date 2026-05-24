@@ -237,13 +237,17 @@
     <ClCompile Include="Application\Weapon\Weapons\Wavegun.cpp" />
     <ClCompile Include="Application\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\Weapon\WeaponManager.cpp" />
-    <ClCompile Include="Application\CollisionChecker.cpp" />
+    <ClCompile Include="Application\CollisionChecker\CollisionChecker.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
-    <ClCompile Include="Application\UIDrawer.cpp" />
+    <ClCompile Include="Application\UIDrawer\UIDrawer.cpp" />
     <ClCompile Include="Application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="Engine\Scene\SceneFactoryBase\SceneFactoryBase.cpp" />
     <ClCompile Include="Engine\Contexts\SceneContext\SceneContext.cpp" />
     <ClCompile Include="Application\Scene\TitleScene\TitleScene.cpp" />
+    <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
+    <ClCompile Include="Application\Timer\Timer.cpp" />
+    <ClCompile Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Grid.PS.hlsl">
@@ -513,15 +517,20 @@
     <ClInclude Include="Application\Weapon\Weapon.h" />
     <ClInclude Include="Application\Weapon\WeaponManager.h" />
     <ClInclude Include="Application\Weapon\WeaponStatus.h" />
-    <ClInclude Include="Application\CollisionChecker.h" />
+    <ClInclude Include="Application\CollisionChecker\CollisionChecker.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Rarity.h" />
-    <ClInclude Include="Application\UIDrawer.h" />
+    <ClInclude Include="Application\UIDrawer\UIDrawer.h" />
     <ClInclude Include="Application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="Engine\Scene\SceneFactoryBase\SceneFactoryBase.h" />
     <ClInclude Include="Engine\Contexts\SceneContext\SceneContext.h" />
     <ClInclude Include="Application\Scene\TitleScene\TitleScene.h" />
     <ClInclude Include="Engine\Graphics\Renderer\PostEffectType.h" />
+    <ClInclude Include="Engine\Asset\Animation.h" />
+    <ClInclude Include="Engine\Math\Quaternion\Quaternion.h" />
+    <ClInclude Include="Engine\Asset\Manager\AnimationManager\AnimationManager.h" />
+    <ClInclude Include="Application\Timer\Timer.h" />
+    <ClInclude Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
