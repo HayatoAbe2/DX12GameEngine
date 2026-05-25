@@ -40,7 +40,6 @@ private:
 	std::unique_ptr<InstancedModel> floor_ = nullptr;
 	std::unique_ptr<Model> goal_ = nullptr;
 	std::unique_ptr<Model> cloud_ = nullptr;
-	std::unique_ptr<Model> box_ = nullptr;
 
 	std::shared_ptr<Texture> skybox_ = nullptr;
 	std::unique_ptr<Sprite> fade_ = nullptr;

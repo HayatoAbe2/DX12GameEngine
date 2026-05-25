@@ -50,12 +50,10 @@ void NormalBullet::Update(MapCheck* mapCheck) {
 	}
 	particle_->Update();
 
-	if (isDead_) {
-		hitParticle_->Update();
-		hitParticleLifeTime--;
-		if (hitParticleLifeTime <= 0) {
-			canErase_ = true;
-		}
+	hitParticle_->Update();
+	hitParticleLifeTime--;
+	if (hitParticleLifeTime <= 0) {
+		canErase_ = true;
 	}
 }
 
@@ -78,14 +76,9 @@ void NormalBullet::Hit() {
 		particleField_->SetGravity(-0.4f, model_->GetTransform().translate);
 		hitParticle_->AddField(std::move(particleField_));
 		for (int i = 0; i < hitParticleNum_; ++i) {
-			Vector3 randomVector = {
-			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
-			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
-			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
-			};
 			Transform transform = model_->GetTransform();
-			transform.translate += randomVector;
-			transform.scale = model_->GetTransform().scale * 3.0f;
+			transform.scale = Vector3{ 0.05f, 1.0f, 1.0f } * 5;
+			transform.rotate = { 0,0,ctx.RandomFloat(0, float(std::numbers::pi) * 2.0f) };
 			hitParticle_->Emit(transform, {});
 		}
 	}

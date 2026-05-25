@@ -175,6 +175,7 @@ void MapTile::Update(bool canGoal) {
 		MaterialData materialData = goal_->GetData()->defaultMaterials_[0]->GetData();
 		materialData.color = { 1,1,1,1 };
 		goal_->GetData()->defaultMaterials_[0]->SetData(materialData);
+		goal_->Update();
 
 		light.GetSpotLight(lightIndex_).intensity = 1.0f;
 	} else {

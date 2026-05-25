@@ -36,12 +36,12 @@ void GameScene::Initialize() {
 		playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
 	}
 
-
 	// マップ
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	wallShadow_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	floor_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	goal_ = asset.LoadModel("Resources/Tiles", "sphere.obj");
+	goal_ = asset.LoadModel("Resources/Debug/AnimatedCube", "AnimatedCube.gltf");
+	goal_->SetAnimation(std::move(asset.LoadAnimation("Resources/Debug/AnimatedCube", "AnimatedCube.gltf")));
 	
 	auto matData = wall_->GetMaterial(0)->GetData();
 	matData.useEnvironmentMap = true;
@@ -115,9 +115,6 @@ void GameScene::Initialize() {
 	mapCheck_ = std::make_unique<MapCheck>();
 
 	Reset();
-
-	box_ = asset.LoadModel("Resources/Debug/AnimatedCube","AnimatedCube.gltf");
-	box_->SetAnimation(std::move(asset.LoadAnimation("Resources/Debug/AnimatedCube", "AnimatedCube.gltf")));
 }
 
 void GameScene::Update() {
@@ -125,8 +122,6 @@ void GameScene::Update() {
 	auto& input = ctx.Input();
 	auto& audio = ctx.Audio();
 	auto& scene = ctx.Scene();
-
-	box_->Update();
 
 	if (!isShowResult_) {
 		if (isPause_) {
@@ -312,8 +307,6 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
-
-	render.DrawModel(box_.get(), camera_.get());
 
 	if (currentFloor_ == 0) {
 		// チュートリアル表示

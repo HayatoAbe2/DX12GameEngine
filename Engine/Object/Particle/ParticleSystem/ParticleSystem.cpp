@@ -39,6 +39,8 @@ void ParticleSystem::PreDraw(Camera* camera) {
 		particle.color.w = float(particle.lifeTime) / float(maxLifeTime_);
 		colors.push_back(particle.color);
 	}
+	auto data = material_->GetData();
+	data.color = colors[0];
 
 	// WVPMatrixを作る
 	for (int i = 0; i < particles_.size(); ++i) {

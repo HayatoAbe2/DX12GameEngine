@@ -127,7 +127,7 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, Camera* camera, int bl
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	switch (particleSys->GetShape()) {
-	case ParticleShape::Plane:
+	case ParticleShape::Plane: // 平面
 		cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
 		cmdList->IASetIndexBuffer(&plane_.ibv);
 

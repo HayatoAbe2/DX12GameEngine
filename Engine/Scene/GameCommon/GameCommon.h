@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <numbers>
 
 // 配置物
 #include "Engine/Scene/Camera/Camera.h"
