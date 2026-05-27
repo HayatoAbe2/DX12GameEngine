@@ -15,6 +15,30 @@ enum Enchants {
 };
 constexpr int enchantsCount = int(Enchants::resist) + 1;
 
+struct WeaponData {
+	std::string name;
+	std::string modelName;
+
+	// ダメージ
+	float damage;
+	// 射撃中減速率
+	float weight;
+	// 弾の大きさ
+	float bulletSize;
+	// 弾速
+	float bulletSpeed;
+	// 射撃クールダウン
+	int shootCoolTime;
+	// 弾の生存時間
+	int bulletLifeTime;
+	// ノックバック
+	float knockback;
+	// 弾数
+	int magazineSize;
+	// リロード時間
+	int reloadTime;
+};
+
 struct WeaponStatus {
 	// ダメージ
 	float damage;

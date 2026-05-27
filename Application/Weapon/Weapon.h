@@ -13,6 +13,7 @@ public:
 	Model* GetWeaponModel() { return model_.get(); }
 	Model* GetWeaponShadowModel() { return shadowModel_.get(); }
 	const WeaponStatus& GetStatus() const { return status_; }
+	const WeaponData& GetData() const { return data_; }
 	bool CanShoot() { return reloadTimer_ <= 0; }
 	int GetReloadTimer() { return reloadTimer_; }
 	int GetAmmoLeft() { return ammoLeft_; }
@@ -21,6 +22,7 @@ public:
 	void StartReload() { isReloading_ = true; }
 	
 protected:
+	WeaponData data_;
 	WeaponStatus status_;
 	std::unique_ptr<Model> model_;
 	std::unique_ptr<Model> shadowModel_;

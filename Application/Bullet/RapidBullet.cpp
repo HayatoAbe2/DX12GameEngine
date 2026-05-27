@@ -49,9 +49,9 @@ void RapidBullet::Update(MapCheck* mapCheck) {
 		}
 	}
 	particle_->Update();
+	hitParticle_->Update();
 
 	if (isDead_) {
-		hitParticle_->Update();
 		hitParticleLifeTime--;
 		if (hitParticleLifeTime <= 0) {
 			canErase_ = true;

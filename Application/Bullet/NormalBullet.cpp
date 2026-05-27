@@ -12,6 +12,10 @@ void NormalBullet::Initialize() {
 	hitParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	hitParticle_->SetLifeTime(hitParticleLifeTime);
 	hitParticle_->SetColor({ 0.5f, 0.7f, 0.0f, 1.0f });
+	hitParticle2_ = asset.CreateParticleSystem(ParticleShape::Ring, asset.CreateMaterial(asset.LoadTexture("Resources/Debug/gradationLine.png")), 1);
+	hitParticle2_->SetLifeTime(hitParticleLifeTime);
+	hitParticle2_->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
 	particleField_ = std::make_unique<ParticleField>();
 	particleField_->SetCheckArea(false);
 }
@@ -51,6 +55,7 @@ void NormalBullet::Update(MapCheck* mapCheck) {
 	particle_->Update();
 
 	hitParticle_->Update();
+	hitParticle2_->Update();
 	hitParticleLifeTime--;
 	if (hitParticleLifeTime <= 0) {
 		canErase_ = true;
@@ -64,6 +69,7 @@ void NormalBullet::Draw(Camera* camera) {
 	// パーティクル
 	render.DrawParticle(particle_.get(), camera, BlendMode::Add);
 	render.DrawParticle(hitParticle_.get(), camera, BlendMode::Add);
+	render.DrawParticle(hitParticle2_.get(), camera, BlendMode::Add);
 }
 
 void NormalBullet::Hit() {
@@ -80,6 +86,9 @@ void NormalBullet::Hit() {
 			transform.scale = Vector3{ 0.05f, 1.0f, 1.0f } * 5;
 			transform.rotate = { 0,0,ctx.RandomFloat(0, float(std::numbers::pi) * 2.0f) };
 			hitParticle_->Emit(transform, {});
+
+			transform.scale = Vector3{ 1.0f,1.0f,1.0f };
+			hitParticle2_->Emit(transform, {});
 		}
 	}
 }

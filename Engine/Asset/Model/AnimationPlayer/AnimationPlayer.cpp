@@ -13,7 +13,6 @@ void AnimationPlayer::Update(ModelNode& rootNode) {
 	Vector3 translate = CalculateValue(nodeAnim_.translate, animationTime_);
 	Quaternion rotate = Normalize(CalculateValue(nodeAnim_.rotate, animationTime_));
 	Vector3 scale = CalculateValue(nodeAnim_.scale, animationTime_);
-	Matrix4x4 localMatrix = MakeAffineMatrix(scale, rotate, translate);
 
 	rootNode.localMatrix = MakeAffineMatrix(scale, rotate, translate);
 }

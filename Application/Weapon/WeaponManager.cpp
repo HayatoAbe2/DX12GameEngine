@@ -1,13 +1,17 @@
 #include "WeaponManager.h"
-#include "WeaponStatus.h"
 #include "Weapon.h"
 #include "Weapon/Weapons/Pistol.h"
 #include "Weapon/Weapons/AssaultRifle.h"
 #include "Weapon/Weapons/Shotgun.h"
 #include "Weapon/Weapons/FireBall.h"
 #include "Weapon/Weapons/Wavegun.h"
+#include <fstream>
+#include <Externals/nlohmann/json.hpp>
 
 void WeaponManager::Initialize() {
+	// json読み込み
+	LoadJson("Resources/Weapons/Data/pistol.json"); 
+	// まだ反映はしてない
 }
 
 std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
@@ -19,7 +23,8 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 	/*auto matData = shadowModel->GetMaterial(0)->GetData();
 	matData.color = { 0,0,0,1 };
 	shadowModel->GetMaterial(0)->SetData(matData);
-	*/WeaponStatus status;
+	*/
+	WeaponStatus status;
 
 	// エンチャント付与
 	status.rarity = rarity;
@@ -141,5 +146,36 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 		shadowModel = asset.LoadModel("Resources/Weapons", "Pistol.obj");
 		return std::make_unique<Pistol>(status, std::move(model), std::move(shadowModel));
 		break;
+	}
+}
+
+void WeaponManager::LoadJson(const std::string& path) {
+	std::ifstream file(path);
+	assert(file.is_open());
+
+	nlohmann::json j;
+	file >> j;
+
+	for (auto& [name, data] : j.items()) {
+		WeaponData wd{};
+
+		wd.name = name;
+		wd.modelName = data["modelName"];
+
+		wd.damage = data["damage"];
+		wd.weight = data["weight"];
+
+		wd.bulletSize = data["bulletSize"];
+		wd.bulletSpeed = data["bulletSpeed"];
+
+		wd.shootCoolTime = data["shootCoolTime"];
+		wd.bulletLifeTime = data["bulletLifeTime"];
+
+		wd.knockback = data["knockback"];
+
+		wd.magazineSize = data["magazineSize"];
+		wd.reloadTime = data["reloadTime"];
+
+		weaponDataMap[name] = wd;
 	}
 }

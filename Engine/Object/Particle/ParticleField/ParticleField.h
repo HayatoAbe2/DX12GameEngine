@@ -12,8 +12,7 @@ public:
 	void SetArea(const AABB& area) { area_ = area; }
 	void SetCheckArea(bool useArea) { useArea_ = useArea; }
 
-	void SetRotateXZ(float rotateSpeed, const Vector3& center) { rotateXZ_ = rotateSpeed; rotateCenter_ = center;
-	}
+	void SetRotateXZ(float rotateSpeed, const Vector3& center) { rotateXZ_ = rotateSpeed; rotateCenter_ = center; }
 private:
 	Vector3 acceleration_{};
 

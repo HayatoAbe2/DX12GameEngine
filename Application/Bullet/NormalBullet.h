@@ -18,6 +18,7 @@ private:
 	float particleRange_ = 0.7f;
 
 	std::unique_ptr<ParticleSystem> hitParticle_;
+	std::unique_ptr<ParticleSystem> hitParticle2_;
 	const int hitParticleNum_ = 5;
 	float hitParticleRange_ = 1.0f;
 	int hitParticleLifeTime = 30;

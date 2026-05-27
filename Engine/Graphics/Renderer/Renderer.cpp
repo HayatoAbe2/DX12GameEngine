@@ -11,6 +11,7 @@
 #include "Engine/Asset/Sprite/Sprite.h"
 #include "Engine/Object/Particle/ParticleSystem/ParticleSystem.h"
 #include "Engine/Scene/Camera/Camera.h"
+#include <numbers>
 
 void Renderer::Initialize(DirectXContext* dxContext) {
 	dxContext_ = dxContext;
@@ -30,6 +31,7 @@ void Renderer::Initialize(DirectXContext* dxContext) {
 	dummyLightBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dummyLight_));
 
 	InitializePlane();
+	InitializeRing();
 	InitializeSkybox();
 }
 
@@ -126,23 +128,31 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, Camera* camera, int bl
 	cmdList->SetGraphicsRootSignature(rootSig);
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	UINT indexCountPerInstance = 0;
+	// 各図形のVB・IB
 	switch (particleSys->GetShape()) {
-	case ParticleShape::Plane: // 平面
+	case ParticleShape::Plane:
 		cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
 		cmdList->IASetIndexBuffer(&plane_.ibv);
-
-		// マテリアルCBufferの場所を設定
-		cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
-		// wvp用のCBufferの場所を設定
-		cmdList->SetGraphicsRootConstantBufferView(1, particleSys->GetInstanceCBV());
-		// SRVの設定
-		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
-		// インスタンス用SRVの設定
-		cmdList->SetGraphicsRootDescriptorTable(3, particleSys->GetInstanceSRVHandle());
-		// ドローコール
-		cmdList->DrawIndexedInstanced(6, particleSys->GetNumInstance(), 0, 0, 0);
+		indexCountPerInstance = 6;
+		break;
+	case ParticleShape::Ring:
+		cmdList->IASetVertexBuffers(0, 1, &ring_.vbv);
+		cmdList->IASetIndexBuffer(&ring_.ibv);
+		indexCountPerInstance = 6 * 32;
 		break;
 	}
+
+	// マテリアルCBufferの場所を設定
+	cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
+	// wvp用のCBufferの場所を設定
+	cmdList->SetGraphicsRootConstantBufferView(1, particleSys->GetInstanceCBV());
+	// SRVの設定
+	cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
+	// インスタンス用SRVの設定
+	cmdList->SetGraphicsRootDescriptorTable(3, particleSys->GetInstanceSRVHandle());
+	// ドローコール
+	cmdList->DrawIndexedInstanced(indexCountPerInstance, particleSys->GetNumInstance(), 0, 0, 0);
 }
 
 void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
@@ -172,11 +182,11 @@ void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
 
 void Renderer::DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {
 	Matrix4x4 modelWorld = MakeAffineMatrix(model->GetTransform());
-	Matrix4x4 nodeWorld = parentWorld * node->localMatrix;
+	Matrix4x4 nodeWorld = node->localMatrix * parentWorld;
 
 	// トランスフォーム更新
 	TransformationMatrix data;
-	data.World = modelWorld * nodeWorld;
+	data.World = nodeWorld * modelWorld;
 	data.WVP = data.World
 		* camera->viewMatrix_
 		* camera->projectionMatrix_;
@@ -297,31 +307,58 @@ void Renderer::InitializePlane() {
 	indexData[0] = 0;	indexData[1] = 1;	indexData[2] = 2; indexData[3] = 1;	indexData[4] = 3;	indexData[5] = 2;
 }
 
-void Renderer::DrawPlane(ParticleSystem* particleSys, int blendMode) {
-	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetParticlePSO(blendMode);
-	auto rootSig = dxContext_->GetRootSignatureManager()->GetParticleRootSignature().Get();
+void Renderer::InitializeRing() {
+	auto bufferManager = dxContext_->GetBufferManager();
 
-	cmdList->SetPipelineState(pso);
-	cmdList->SetGraphicsRootSignature(rootSig);
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
-	cmdList->IASetIndexBuffer(&plane_.ibv);
+	const uint32_t kRingDivide = 32;
+	const float kOuterRadius = 1.0f; // 外側
+	const float kInnerRadius = 0.2f; // 内側
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
 
-	Material* material = particleSys->GetMaterial();
-	// マテリアル更新
-	material->UpdateGPU();
+	UINT sizeInBytes = sizeof(VertexData) * kRingDivide * 4;
+	// 頂点リソース
+	ring_.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
+	// VBV
+	ring_.vbv.BufferLocation = ring_.vertexResource->GetGPUVirtualAddress();
+	ring_.vbv.SizeInBytes = sizeInBytes;
+	ring_.vbv.StrideInBytes = sizeof(VertexData);
 
-	// マテリアルCBufferの場所を設定
-	cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
-	// wvp用のCBufferの場所を設定
-	cmdList->SetGraphicsRootConstantBufferView(1, particleSys->GetInstanceCBV());
-	// SRVの設定
-	cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
-	// インスタンス用SRVの設定
-	cmdList->SetGraphicsRootDescriptorTable(3, particleSys->GetInstanceSRVHandle());
-	// ドローコール
-	cmdList->DrawInstanced(6, particleSys->GetNumInstance(), 0, 0);
+	VertexData* vertices = nullptr;
+	ring_.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
+
+	for (uint32_t index = 0; index < kRingDivide; ++index) {
+		float sin = std::sin(index * radianPerDivide);
+		float cos = std::cos(index * radianPerDivide);
+		float sinNext = std::sin((index + 1) * radianPerDivide);
+		float cosNext = std::cos((index + 1) * radianPerDivide);
+		float u = float(index) / float(kRingDivide);
+		float uNext = float(index + 1) / float(kRingDivide);
+
+		vertices[index * 4 + 0] = { { -sin * kOuterRadius, cos * kOuterRadius, 0, 1}, {u, 0}, {0,0,-1},{1,1,1,1} };
+		vertices[index * 4 + 1] = { { -sinNext * kOuterRadius, cosNext * kOuterRadius, 0, 1}, {uNext, 0}, {0,0,-1},{1,1,1,1} };
+		vertices[index * 4 + 2] = { { -sin * kInnerRadius, cos * kInnerRadius, 0, 1}, {u, 1}, {0,0,-1},{1,1,1,1} };
+		vertices[index * 4 + 3] = { { -sinNext * kInnerRadius, cosNext * kInnerRadius, 0, 1}, {uNext, 1}, {0,0,-1},{1,1,1,1} };
+	}
+
+	// indexリソース
+	ring_.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * 6 * kRingDivide);
+	// IBV
+	ring_.ibv.BufferLocation = ring_.indexResource->GetGPUVirtualAddress();
+	ring_.ibv.SizeInBytes = sizeof(uint32_t) * 6 * kRingDivide;
+	ring_.ibv.Format = DXGI_FORMAT_R32_UINT;
+	// データ
+	uint32_t* indexData = nullptr;
+	ring_.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	for (uint32_t index = 0; index < kRingDivide; ++index) {
+		uint32_t start = index * 4;
+		uint32_t i = index * 6;
+		indexData[i + 0] = start + 0;
+		indexData[i + 1] = start + 1;
+		indexData[i + 2] = start + 2;
+		indexData[i + 3] = start + 1;
+		indexData[i + 4] = start + 3;
+		indexData[i + 5] = start + 2;
+	}
 }
 
 void Renderer::InitializeSkybox() {

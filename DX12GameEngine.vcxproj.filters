@@ -250,12 +250,6 @@
     <ClCompile Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\shaders\Grid.PS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\shaders\Grid.VS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
@@ -534,6 +528,7 @@
     <ClInclude Include="Engine\Asset\Manager\AnimationManager\AnimationManager.h" />
     <ClInclude Include="Application\Timer\Timer.h" />
     <ClInclude Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.h" />
+    <ClInclude Include="Externals\nlohmann\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

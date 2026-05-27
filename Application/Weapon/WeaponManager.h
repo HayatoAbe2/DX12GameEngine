@@ -1,8 +1,6 @@
 #pragma once
-
-#include "Rarity.h"
-#include <vector>
-#include <memory>
+#include "GameCommon.h"
+#include "WeaponStatus.h"
 
 class Weapon;
 
@@ -20,5 +18,11 @@ public:
 		Wavegun,
 		//SMG,
 	};
+
+private:
+	// json読み込み
+	void LoadJson(const std::string& path);
+	// 読み込んだデータ
+	std::unordered_map<std::string, WeaponData> weaponDataMap;
 };
 

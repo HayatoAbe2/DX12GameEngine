@@ -12,4 +12,5 @@ struct Particle {
 
 enum class ParticleShape {
     Plane,
+    Ring,
 };

@@ -17,9 +17,12 @@ struct Quaternion {
 };
 
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs);
-Quaternion IdentityQuaternion(); // 単位Quaternion
-Quaternion Conjugate(const Quaternion& quaternion); // 共役
-float Norm(const Quaternion& quaternion); // ノーム
+// 単位Quaternion
+Quaternion IdentityQuaternion();
+// 共役
+Quaternion Conjugate(const Quaternion& quaternion);
+// ノーム
+float Norm(const Quaternion& quaternion);
 Quaternion Normalize(const Quaternion& quaternion);
 Quaternion Inverse(const Quaternion& quaternion);
 

@@ -279,29 +279,7 @@ Matrix4x4 MakeAffineMatrix(const Transform& transform) {
 }
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
 	Matrix4x4 result = {};
-	Matrix4x4 rotateMatrix = {
-		{	
-			{
-				1.0f - 2.0f * (rotate.y * rotate.y + rotate.z * rotate.z),
-				2.0f * (rotate.x * rotate.y + rotate.w * rotate.z),
-				2.0f * (rotate.x * rotate.z - rotate.w * rotate.y),
-				0.0f
-			},
-			{
-				2.0f * (rotate.x * rotate.y - rotate.w * rotate.z),
-				1.0f - 2.0f * (rotate.x * rotate.x + rotate.z * rotate.z),
-				2.0f * (rotate.y * rotate.z + rotate.w * rotate.x),
-				0.0f
-			},
-			{
-				2.0f * (rotate.x * rotate.z + rotate.w * rotate.y),
-				2.0f * (rotate.y * rotate.z - rotate.w * rotate.x),
-				1.0f - 2.0f * (rotate.x * rotate.x + rotate.y * rotate.y),
-				0.0f
-			},
-			{0.0f, 0.0f, 0.0f, 1.0f}
-	}
-	};
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(rotate);
 	result.m[0][0] = scale.x * rotateMatrix.m[0][0];
 	result.m[0][1] = scale.x * rotateMatrix.m[0][1];
 	result.m[0][2] = scale.x * rotateMatrix.m[0][2];

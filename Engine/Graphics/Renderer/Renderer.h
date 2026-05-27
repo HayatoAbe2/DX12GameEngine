@@ -84,6 +84,7 @@ public:
 
 private:
 	void InitializePlane();
+	void InitializeRing();
 	void InitializeSkybox();
 
 	DirectXContext* dxContext_ = nullptr;
@@ -106,6 +107,7 @@ private:
 		D3D12_INDEX_BUFFER_VIEW ibv;
 	};
 	ShapeData plane_;
+	ShapeData ring_;
 
 	// Skybox用データ
 	struct SkyboxData {
