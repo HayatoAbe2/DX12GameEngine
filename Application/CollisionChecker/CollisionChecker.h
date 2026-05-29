@@ -8,7 +8,7 @@ class EffectManager;
 
 class CollisionChecker {
 public:
-	void Inititalize(EffectManager* effectManager);
+	void Initialize(EffectManager* effectManager);
 	void Check(Player* player, Bullet* bullet, Camera* camera);
 	void Check(Enemy* enemy, Bullet* bullet, Camera* camera);
 

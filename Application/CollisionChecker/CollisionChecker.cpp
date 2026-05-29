@@ -5,7 +5,7 @@
 #include "Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
 
-void CollisionChecker::Inititalize(EffectManager* effectManager) {
+void CollisionChecker::Initialize(EffectManager* effectManager) {
 	effectManager_ = effectManager;
 }
 

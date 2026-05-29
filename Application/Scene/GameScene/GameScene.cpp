@@ -68,7 +68,7 @@ void GameScene::Initialize() {
 
 	// 当たり判定
 	collisionChecker_ = std::make_unique<CollisionChecker>();
-	collisionChecker_->Inititalize(effectManager_.get());
+	collisionChecker_->Initialize(effectManager_.get());
 
 	// プレイヤー
 	player_ = std::make_unique<Player>();
