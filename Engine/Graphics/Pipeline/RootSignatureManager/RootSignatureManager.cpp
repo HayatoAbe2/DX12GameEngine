@@ -13,6 +13,7 @@ void RootSignatureManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateInstancingRootSignature();
 	CreateParticleRootSignature();
 	CreateSkyboxRootSignature();
+	CreateGridRootSignature();
 	CreateFullscreenRootSignature();
 }
 
@@ -333,6 +334,46 @@ void RootSignatureManager::CreateSkyboxRootSignature() {
 		signatureBlobSkybox_->GetBufferSize(),
 		IID_PPV_ARGS(&skyboxRootSignature_));
 
+	assert(SUCCEEDED(hr));
+}
+
+void RootSignatureManager::CreateGridRootSignature() {
+	HRESULT hr;
+	// RootSignature作成
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	descriptionRootSignature.Flags =
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	// RootParameter作成
+	D3D12_ROOT_PARAMETER rootParameters[1] = {};
+
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0;	// 0から始まる
+	descriptorRange[0].NumDescriptors = 1;		// 数は1つ
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// SRVを使う
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;	// Offsetを自動計算
+
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].Descriptor.ShaderRegister = 0; // b0
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
+	// -------------------------
+
+	descriptionRootSignature.pParameters = rootParameters;				// ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters);		// 配列の長さ
+
+	// シリアライズしてバイナリにする
+	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
+	if (FAILED(hr)) {
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		assert(false);
+	}
+	// バイナリを元に生成
+	gridRootSignature_ = nullptr;
+	hr = device_->CreateRootSignature(0,
+		signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(),
+		IID_PPV_ARGS(&gridRootSignature_));
 	assert(SUCCEEDED(hr));
 }
 

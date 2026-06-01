@@ -1,8 +1,8 @@
 #include "AnimationPlayer.h"
 #include <cmath>
 
-AnimationPlayer::AnimationPlayer(std::unique_ptr<Animation> animation, const std::string& rootNodeName) {
-	animation_ = std::move(animation);
+AnimationPlayer::AnimationPlayer(std::shared_ptr<Animation> animation, const std::string& rootNodeName) {
+	animation_ = animation;
 	nodeAnim_ = animation_->nodeAnimations[rootNodeName];
 }
 
@@ -15,6 +15,17 @@ void AnimationPlayer::Update(ModelNode& rootNode) {
 	Vector3 scale = CalculateValue(nodeAnim_.scale, animationTime_);
 
 	rootNode.localMatrix = MakeAffineMatrix(scale, rotate, translate);
+}
+
+void AnimationPlayer::Update(Skeleton& skeleton) {
+	for (Joint& joint : skeleton.joints) {
+		if (auto it = animation_->nodeAnimations.find(joint.name); it != animation_->nodeAnimations.end()) {
+			const NodeAnimation& rootNodeAnimation = (*it).second;
+			joint.transform.translate = CalculateValue(rootNodeAnimation.translate, animationTime_);
+			joint.transform.rotate = Normalize(CalculateValue(rootNodeAnimation.rotate, animationTime_));
+			joint.transform.scale = CalculateValue(rootNodeAnimation.scale, animationTime_);
+		}
+	}
 }
 
 Vector3 AnimationPlayer::CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {

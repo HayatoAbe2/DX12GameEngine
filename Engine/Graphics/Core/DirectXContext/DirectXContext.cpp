@@ -94,6 +94,10 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.PS.hlsl", L"ps_6_0", logger_)
 	);
+	pipelineStateManager_->SetGridBlob(
+		shaderCompiler_->Compile(L"Resources/Shaders/Grid.VS.hlsl", L"vs_6_0", logger_),
+		shaderCompiler_->Compile(L"Resources/Shaders/Grid.PS.hlsl", L"ps_6_0", logger_)
+	);
 
 	pipelineStateManager_->SetCopyImageBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Fullscreen.VS.hlsl", L"vs_6_0", logger_),
@@ -108,7 +112,7 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 	pipelineStateManager_->Initialize(
 		deviceManager_->GetDevice(), rootSignatureManager_->GetStandardRootSignature(),
 		rootSignatureManager_->GetInstancingRootSignature(), rootSignatureManager_->GetParticleRootSignature(),
-		rootSignatureManager_->GetSkyboxRootSignature(), rootSignatureManager_->GetFullscreenRootSignature()
+		rootSignatureManager_->GetSkyboxRootSignature(),rootSignatureManager_->GetGridRootSignature(), rootSignatureManager_->GetFullscreenRootSignature()
 	);
 
 	SetViewportAndScissor();

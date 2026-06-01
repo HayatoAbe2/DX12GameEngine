@@ -5,6 +5,6 @@
 
 class AnimationManager {
 public:
-	std::unique_ptr<Animation> Load(const std::string& directoryPath, const std::string& filename);
+	std::shared_ptr<Animation> Load(const std::string& directoryPath, const std::string& filename);
 };
 

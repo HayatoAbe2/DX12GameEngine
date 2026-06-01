@@ -54,7 +54,9 @@ std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, cons
 	}
 
 	// rootNode
-	model->SetRootNode(std::move(ReadNode(scene->mRootNode)));
+	std::unique_ptr<ModelNode> rootNode = std::move(ReadNode(scene->mRootNode));
+	CreateSkeleton(*rootNode.get());
+	model->SetRootNode(std::move(rootNode));
 
 	// キャッシュにあるか確認
 	std::string fullPath = directoryPath + "/" + filename;
@@ -155,7 +157,9 @@ std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryP
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 
 	// rootNode
-	model->SetRootNode(ReadNode(scene->mRootNode));
+	std::unique_ptr<ModelNode> rootNode = std::move(ReadNode(scene->mRootNode));
+	CreateSkeleton(*rootNode.get());
+	model->SetRootNode(std::move(rootNode));
 
 	// キャッシュにあるか確認
 	std::string fullPath = directoryPath + "/" + filename;
@@ -446,9 +450,16 @@ void ModelManager::CreateInstancingSRV(InstancedModel* model, const int numInsta
 
 std::unique_ptr<ModelNode> ModelManager::ReadNode(aiNode* aiNode) {
 	std::unique_ptr<ModelNode> node = std::make_unique<ModelNode>();
-	aiMatrix4x4 aiLocalMatrix = aiNode->mTransformation;
-	aiLocalMatrix.Transpose(); // 行ベクトルにする
-	node->localMatrix = ConvertAssimpMatrixToLHRow(aiLocalMatrix);
+
+	aiVector3D scale, translate;
+	aiQuaternion rotate;
+	// SRT
+	aiNode->mTransformation.Decompose(scale, rotate, translate);
+	// 左手系に変換して使用
+	node->transform.scale = { scale.x, scale.y, scale.z };
+	node->transform.rotate = { rotate.x, -rotate.y, -rotate.z, rotate.w };
+	node->transform.translate = { -translate.x, translate.y, translate.z };
+	node->localMatrix = MakeAffineMatrix(node->transform.scale, node->transform.rotate, node->transform.translate);
 
 	// meshのindex
 	node->meshIndices.reserve(aiNode->mNumMeshes);
@@ -521,4 +532,39 @@ std::unique_ptr<Material> ModelManager::LoadMaterial(std::shared_ptr<Texture> te
 	material->SetEnvironmentTexture(environmentTexture);
 
 	return std::move(material);
+}
+
+Skeleton ModelManager::CreateSkeleton(const ModelNode& rootNode) {
+	Skeleton skeleton;
+	skeleton.root = CreateJoint(rootNode, {}, skeleton.joints);
+
+	// 名前とindexをマッピング
+	for (const Joint& joint : skeleton.joints) {
+		skeleton.jointMap.emplace(joint.name, joint.index);
+	}
+
+	return skeleton;
+}
+
+int32_t ModelManager::CreateJoint(const ModelNode& node,
+	const std::optional<int32_t>& parent,
+	std::vector<Joint>& joints) {
+	// Jointを作成して追加
+	Joint joint;
+	joint.name = node.name;
+	joint.localMatrix = node.localMatrix;
+	joint.skeletonSpaceMatrix = MakeIdentity4x4();
+	joint.transform = node.transform;
+	joint.index = int32_t(joints.size());
+	joint.parent = parent;
+	joints.push_back(joint);
+
+	// 再帰呼び出しで子のjointを作成、登録
+	for (auto& child : node.children) {
+		int32_t childIndex = CreateJoint(*child.get(), joint.index, joints);
+		joints[joint.index].children.push_back(childIndex);
+	}
+
+	// 自身のindex
+	return joint.index;
 }

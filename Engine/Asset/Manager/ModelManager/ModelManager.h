@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <assimp/scene.h>
+#include <assimp/matrix4x4.h>
 
 class ModelData;
 struct ModelNode;
@@ -36,7 +37,8 @@ private:
 	SubMesh CreateSubMesh(aiMesh* aiMesh);
 	void CreateInstancingSRV(InstancedModel* model, const int numInstance_);
 	Matrix4x4 ConvertAssimpMatrixToLHRow(const aiMatrix4x4& m);
-
+	Skeleton CreateSkeleton(const ModelNode& rootNode);
+	int32_t CreateJoint(const ModelNode & node, const std::optional<int32_t>&parent, std::vector<Joint>&joints);
 
 	// デバイス
 	ID3D12Device* device_ = nullptr;

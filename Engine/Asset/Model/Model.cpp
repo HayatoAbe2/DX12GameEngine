@@ -2,7 +2,26 @@
 
 void Model::Update() {
 	// アニメーション更新
-	animationPlayer_->Update(*rootNode_.get());
+	if (skeleton_ &&
+		skeleton_->joints.size() > 1) {
+		animationPlayer_->Update(*skeleton_);
+		UpdateSkeleton();
+	}else {
+		animationPlayer_->Update(*rootNode_.get());
+	}
+}
+
+void Model::UpdateSkeleton() {
+	// スケルトン内ジョイントの行列更新
+	for (Joint& joint : skeleton_->joints) {
+		joint.localMatrix = MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
+		// 親がいる場合親の行列を掛ける
+		if (joint.parent) {
+			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton_->joints[*joint.parent].skeletonSpaceMatrix;
+		} else {
+			joint.skeletonSpaceMatrix = joint.localMatrix;
+		}
+	}
 }
 
 void Model::CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager) {

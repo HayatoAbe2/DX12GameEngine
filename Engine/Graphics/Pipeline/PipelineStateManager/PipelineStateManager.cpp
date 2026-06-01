@@ -3,13 +3,15 @@
 
 void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& rootSignature,
 	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& instancingRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& particleRootSignature,
-	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& copyImageRootSignature) {
+	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& gridRootSignature,
+	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& copyImageRootSignature) {
 	device_ = device;
 	standardPSOData.rootSignature = rootSignature;
 	instancingPSOData.rootSignature = instancingRootSignature;
 	spritePSOData.rootSignature = rootSignature;
 	particlePSOData.rootSignature = particleRootSignature;
 	skyboxPSOData.rootSignature = skyboxRootSignature;
+	gridPSOData.rootSignature = gridRootSignature;
 	fullscreenPSOData.rootSignature = copyImageRootSignature;
 
 	// InputLayout
@@ -38,6 +40,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateSpritePSO();
 	CreateParticlePSO();
 	CreateSkyboxPSO();
+	CreateGridPSO();
 	CreateFullscreenPSO();
 
 	//
@@ -259,6 +262,48 @@ void PipelineStateManager::CreateSkyboxPSO() {
 	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &skyboxPSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
 	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &skyboxPSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
 	CreatePSO(baseDesc, CreateScreenBlendDesc(), &skyboxPSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+}
+
+void PipelineStateManager::CreateGridPSO() {
+	assert(gridPSOData.rootSignature);
+	assert(gridPSOData.vertexShaderBlob);
+	assert(gridPSOData.pixelShaderBlob);
+
+	// grid InputLayout
+	D3D12_INPUT_ELEMENT_DESC gridInputElements[2]{};
+
+	gridInputElements[0].SemanticName = "POSITION";
+	gridInputElements[0].SemanticIndex = 0;
+	gridInputElements[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	gridInputElements[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	gridInputElements[1].SemanticName = "COLOR";
+	gridInputElements[1].SemanticIndex = 0;
+	gridInputElements[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	gridInputElements[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	D3D12_INPUT_LAYOUT_DESC gridInputLayout{};
+	gridInputLayout.pInputElementDescs = gridInputElements;
+	gridInputLayout.NumElements = _countof(gridInputElements);
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
+	baseDesc.pRootSignature = gridPSOData.rootSignature.Get();
+	baseDesc.InputLayout = gridInputLayout;
+	baseDesc.VS = { gridPSOData.vertexShaderBlob->GetBufferPointer(), gridPSOData.vertexShaderBlob->GetBufferSize() };
+	baseDesc.PS = { gridPSOData.pixelShaderBlob->GetBufferPointer(), gridPSOData.pixelShaderBlob->GetBufferSize() };
+	baseDesc.BlendState = CreateNoneBlendDesc();
+	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+	baseDesc.DepthStencilState.DepthEnable = TRUE;
+	baseDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	baseDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	baseDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	baseDesc.NumRenderTargets = 1;
+	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+	baseDesc.SampleDesc.Count = 1;
+	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &gridPSO_);
 }
 
 void PipelineStateManager::CreateFullscreenPSO() {

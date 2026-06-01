@@ -25,16 +25,17 @@ void GameScene::Initialize() {
 	// Skybox
 	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
 
-	playerModel_ = asset.LoadModel("Resources/Player", "player.obj");
+	playerModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
+	playerModel_->SetAnimation(asset.LoadAnimation("Resources/Debug/human", "walk.gltf"));
 	playerShadowModel_ = asset.LoadModel("Resources/Player", "player.obj");
 	MaterialData data = playerModel_->GetMaterial(0)->GetData();
 	data.color = { 0.0f,0.0f,0.0f,1.0f };
 	data.useEnvironmentMap = true;
 	data.environmentIntensity = 1.0f;
-	for (int i = 0; i < 10; ++i) {
-		playerModel_->GetMaterial(i)->SetData(data);
-		playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
-	}
+	//for (int i = 0; i < 10; ++i) {
+	//	playerModel_->GetMaterial(i)->SetData(data);
+	//	playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
+	//}
 
 	// マップ
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);

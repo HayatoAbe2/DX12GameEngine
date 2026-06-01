@@ -2,6 +2,7 @@
 #include "ModelData.h"
 #include "Engine/Object/Transform.h"
 #include "Engine/Asset/Model/Node.h"
+#include "Engine/Asset/Model/Skeleton.h"
 #include "Engine/Asset/Model/AnimationPlayer/AnimationPlayer.h"
 
 #include <d3d12.h>
@@ -25,13 +26,15 @@ public:
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
-	void SetAnimation(std::unique_ptr<Animation> animation) { animationPlayer_ = std::make_unique<AnimationPlayer>(std::move(animation), rootNode_->name); }
+	void SetAnimation(std::shared_ptr<Animation> animation) { animationPlayer_ = std::make_unique<AnimationPlayer>(animation, rootNode_->name); }
 	
 	// データの設定
 	void CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager);
 
 	// 根ノードを設定
 	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); }
+
+	void SetSkeleton(std::shared_ptr<Skeleton> skeleton) { skeleton_ = skeleton; }
 
 	///
 	/// Getter
@@ -50,6 +53,8 @@ public:
 	ModelNode* GetRootNode() { return rootNode_.get(); }
 
 private:
+	void UpdateSkeleton();
+
 	// アニメーション再生
 	std::unique_ptr<AnimationPlayer> animationPlayer_ = nullptr;
 
@@ -64,4 +69,7 @@ private:
 
 	// 根ノード
 	std::unique_ptr<ModelNode> rootNode_{};
+
+	// スケルトン
+	std::shared_ptr<Skeleton> skeleton_ = nullptr;
 };

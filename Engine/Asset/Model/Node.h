@@ -5,6 +5,7 @@
 #include <memory>
 
 struct ModelNode {
+    QuaternionTransform transform;
 	Matrix4x4 localMatrix;
 	std::string name;
 	std::vector<std::unique_ptr<ModelNode>> children;

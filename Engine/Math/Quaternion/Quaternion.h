@@ -1,5 +1,7 @@
 #pragma once
-#include "Engine/Math/Matrix4x4/Matrix4x4.h"
+
+struct Vector3;
+struct Matrix4x4;
 
 struct Quaternion {
 	float x;
