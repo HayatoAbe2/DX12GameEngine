@@ -85,6 +85,8 @@ public:
 private:
 	void InitializePlane();
 	void InitializeRing();
+	void InitializeLine();
+	void InitializeSphere();
 	void InitializeSkybox();
 
 	DirectXContext* dxContext_ = nullptr;
@@ -108,6 +110,8 @@ private:
 	};
 	ShapeData plane_;
 	ShapeData ring_;
+	ShapeData line_;
+	ShapeData sphere_;
 
 	// Skybox用データ
 	struct SkyboxData {

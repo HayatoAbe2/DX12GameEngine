@@ -186,7 +186,7 @@ void Renderer::DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3
 
 	// トランスフォーム更新
 	TransformationMatrix data;
-	data.World = nodeWorld * modelWorld;
+	data.World = modelWorld;
 	data.WVP = data.World
 		* camera->viewMatrix_
 		* camera->projectionMatrix_;
@@ -274,7 +274,6 @@ void Renderer::DrawMeshInstance(InstancedModel* model, Mesh* mesh) {
 }
 
 
-
 void Renderer::InitializePlane() {
 	auto bufferManager = dxContext_->GetBufferManager();
 	UINT sizeInBytes = sizeof(VertexData) * 4;
@@ -358,6 +357,120 @@ void Renderer::InitializeRing() {
 		indexData[i + 3] = start + 1;
 		indexData[i + 4] = start + 3;
 		indexData[i + 5] = start + 2;
+	}
+}
+
+void Renderer::InitializeLine() {
+	auto bufferManager = dxContext_->GetBufferManager();
+	int maxLines = 4096;
+
+	UINT sizeInBytes = sizeof(VertexData) * maxLines * 2;
+	// 頂点リソース
+	line_.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
+	// VBV
+	line_.vbv.BufferLocation = line_.vertexResource->GetGPUVirtualAddress();
+	line_.vbv.SizeInBytes = sizeInBytes;
+	line_.vbv.StrideInBytes = sizeof(VertexData);
+
+	VertexData* vertices = nullptr;
+	line_.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
+
+}
+
+void Renderer::InitializeSphere() {
+	auto bufferManager = dxContext_->GetBufferManager();
+
+	// 分割数
+	const uint32_t kSubdivision = 16;
+	const float kLonEvery = 2.0f * float(std::numbers::pi) / float(kSubdivision);
+	const float kLatEvery = float(std::numbers::pi) / float(kSubdivision);
+
+	UINT sizeInBytes = sizeof(VertexData) * kSubdivision * kSubdivision * 6;
+	// 頂点リソース
+	sphere_.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
+	// VBV
+	sphere_.vbv.BufferLocation = sphere_.vertexResource->GetGPUVirtualAddress();
+	sphere_.vbv.SizeInBytes = sizeInBytes;
+	sphere_.vbv.StrideInBytes = sizeof(VertexData);
+
+	VertexData* vertices = nullptr;
+	sphere_.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
+
+	// 頂点データの書き込み
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		// 各バンドの南端緯度と北端緯度
+		float lat = -0.5f * float(std::numbers::pi) + kLatEvery * float(latIndex);
+		float latN = lat + kLatEvery;
+		// sin/cos を一度だけ計算
+		float cosLat = cos(lat);
+		float sinLat = sin(lat);
+		float cosLatN = cos(latN);
+		float sinLatN = sin(latN);
+
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			float lon = kLonEvery * float(lonIndex);
+			float cosLon = cos(lon);
+			float sinLon = sin(lon);
+			float cosNextLon = cos(lon + kLonEvery);
+			float sinNextLon = sin(lon + kLonEvery);
+
+			// テクスチャ座標
+			float u = float(lonIndex) / float(kSubdivision);
+			float nextU = float(lonIndex + 1) / float(kSubdivision);
+			float v = 1.0f - float(latIndex) / float(kSubdivision);
+			float nextV = 1.0f - float(latIndex + 1) / float(kSubdivision);
+
+			uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
+
+			// 頂点位置
+			// BL
+			vertices[start].position = { cosLat * cosLon,  sinLat,  cosLat * sinLon, 1.0f };
+			vertices[start].texcoord = { u,  v };
+			// BR
+			vertices[start + 1].position = { cosLat * cosNextLon, sinLat,  cosLat * sinNextLon, 1.0f };
+			vertices[start + 1].texcoord = { nextU, v };
+			// TL
+			vertices[start + 2].position = { cosLatN * cosLon,  sinLatN, cosLatN * sinLon, 1.0f };
+			vertices[start + 2].texcoord = { u,  nextV };
+			// TR 
+			vertices[start + 3].position = { cosLatN * cosNextLon, sinLatN, cosLatN * sinNextLon, 1.0f };
+			vertices[start + 3].texcoord = { nextU, nextV };
+
+			// 同じ座標の頂点を代入
+			vertices[start + 4] = vertices[start + 2]; // TL
+			vertices[start + 5] = vertices[start + 1]; // BR
+
+			// 法線
+			for (UINT i = 0; i < 6; ++i) {
+				vertices[start + i].normal = Normalize(Vector3{ vertices[start + i].position.x, vertices[start + i].position.y,vertices[start + i].position.z });
+			}
+		}
+	}
+
+	// indexリソース
+	sphere_.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * kSubdivision * kSubdivision * 6);
+	// IBV
+	sphere_.ibv.BufferLocation = sphere_.indexResource->GetGPUVirtualAddress();
+	sphere_.ibv.SizeInBytes = sizeof(uint32_t) * kSubdivision * kSubdivision * 6;
+	sphere_.ibv.Format = DXGI_FORMAT_R32_UINT;
+	// データ
+	uint32_t* indexData = nullptr;
+	sphere_.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+
+			uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
+			uint32_t i = start;
+
+			// 1枚の四角形（2三角形）
+			indexData[i + 0] = start + 0; // BL
+			indexData[i + 1] = start + 1; // BR
+			indexData[i + 2] = start + 2; // TL
+
+			indexData[i + 3] = start + 1; // BR
+			indexData[i + 4] = start + 3; // TR
+			indexData[i + 5] = start + 2; // TL
+		}
 	}
 }
 
@@ -470,6 +583,10 @@ void Renderer::DrawSkybox(Texture* texture, Camera* camera) {
 	cmdList->SetGraphicsRootDescriptorTable(2, texture->GetSRVHandle());
 	cmdList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 }
+
+//void Renderer::DrawLine(const Vector3& start, const Vector3& end) {
+//
+//}
 
 void Renderer::SetPostEffectType(PostEffectType type) {
 	dxContext_->SetPostEffectType(type);

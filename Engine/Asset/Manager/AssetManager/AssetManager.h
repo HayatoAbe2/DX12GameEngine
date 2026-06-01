@@ -37,8 +37,8 @@ public:
 	std::unique_ptr<Material> CreateMaterial(std::shared_ptr<Texture> texture) {
 		return std::move(modelManager_->LoadMaterial(texture));
 	}
-	std::unique_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
-		return std::move(animationManager_->Load(directoryPath, filePath));
+	std::shared_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
+		return animationManager_->Load(directoryPath, filePath);
 	}
 
 private:

@@ -25,7 +25,7 @@ public:
 	std::unique_ptr<Material> CreateMaterial(std::shared_ptr<Texture> texture);
 
 	// アニメーション読み込み
-	std::unique_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
+	std::shared_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
 
 	//void SoundLoad(const wchar_t* filename);
 

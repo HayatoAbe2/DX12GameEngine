@@ -30,6 +30,6 @@ std::unique_ptr<Material> AssetContext::CreateMaterial(std::shared_ptr<Texture> 
 	return assetManager_->CreateMaterial(texture);
 }
 
-std::unique_ptr<Animation> AssetContext::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
-	return std::move(assetManager_->LoadAnimation(directoryPath, filePath));
+std::shared_ptr<Animation> AssetContext::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
+	return assetManager_->LoadAnimation(directoryPath, filePath);
 }

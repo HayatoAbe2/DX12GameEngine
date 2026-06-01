@@ -4,10 +4,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-std::unique_ptr<Animation> AnimationManager::Load(const std::string& directoryPath, const std::string& filename) {
+std::shared_ptr<Animation> AnimationManager::Load(const std::string& directoryPath, const std::string& filename) {
 	std::string filePath = directoryPath + "/" + filename;
 
-	std::unique_ptr<Animation> animation = std::make_unique<Animation>();
+	std::shared_ptr<Animation> animation = std::make_shared<Animation>();
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
 	assert(scene->mNumAnimations != 0); // アニメーションなし
@@ -50,5 +50,5 @@ std::unique_ptr<Animation> AnimationManager::Load(const std::string& directoryPa
 		}
 	}
 
-	return std::move(animation);
+	return animation;
 }
