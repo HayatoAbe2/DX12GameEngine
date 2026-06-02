@@ -1,10 +1,11 @@
 #pragma once
 #include "Engine/Math/Vector3/Vector3.h"
-class Sphere {
-public:
-	static bool CheckCollision(const Sphere sphere1, const Sphere sphere2);
 
-	float radius;
-	Vector3 center;
+struct Sphere {
+    float radius;
+    Vector3 center;
+
+    static bool CheckCollision(const Sphere& a, const Sphere& b) {
+        return Length(a.center - b.center) <= (a.radius + b.radius);
+    }
 };
-

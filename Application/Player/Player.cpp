@@ -185,7 +185,7 @@ void Player::Draw(Camera* camera) {
 
 	if (isUsingBoost_) {
 		render.DrawInstancedModel(instancing_.get(), camera, BlendMode::Add);
-		render.SetPostEffectType(PostEffectType::BoxFilter3x3);
+		render.SetPostEffectType(PostEffectType::GaussianFilter3x3);
 	}
 
 	// 影描画

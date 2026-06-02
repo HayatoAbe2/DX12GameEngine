@@ -5,6 +5,10 @@ float Length(const Vector2& v) {
 	return sqrtf(powf(v.x,2)+powf(v.y,2));
 }
 
+float Dot(const Vector2& v1, const Vector2& v2) {
+	return v1.x * v2.x + v1.y * v2.y;
+}
+
 Vector2 Normalize(const Vector2& v) {
 	if (Length(v) <= 0.0f) { return { 0,0 }; } // ゼロ除算を回避
 	Vector2 result;

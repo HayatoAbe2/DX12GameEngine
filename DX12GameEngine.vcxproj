@@ -207,7 +207,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Math\CollisionShape\AABB\AABB.cpp" />
     <ClCompile Include="Engine\App\App.cpp" />
     <ClCompile Include="Engine\Io\AudioSystem\AudioSystem.cpp" />
-    <ClCompile Include="Engine\Math\CollisionShape\Sphere\Sphere.cpp" />
     <ClCompile Include="Engine\Math\Vector2\Vector2.cpp" />
     <ClCompile Include="Engine\Asset\Material\Material.cpp" />
     <ClCompile Include="Engine\Scene\BaseScene\BaseScene.cpp" />
@@ -261,7 +260,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Graphics\GPUResource\SRVManager\SRVManager.cpp" />
     <ClCompile Include="Engine\Object\Particle\ParticleSystem\ParticleSystem.cpp" />
     <ClCompile Include="Engine\Object\Particle\ParticleField\ParticleField.cpp" />
-    <ClCompile Include="Engine\Math\CollisionShape\Ray\Ray.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ModelManager\ModelManager.cpp" />
     <ClCompile Include="Engine\Asset\Manager\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\Contexts\RenderContext\RenderContext.cpp" />
@@ -273,7 +271,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Timer\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\Shaders\BoxFilter3x3.PS.hlsl">
+    <FxCompile Include="Resources\Shaders\GaussianFilter3x3.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
@@ -421,6 +419,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Math\CollisionShape\AABB\AABB.h" />
     <ClInclude Include="Engine\App\App.h" />
     <ClInclude Include="Engine\Io\AudioSystem\AudioSystem.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Circle\Circle.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Sphere\Sphere.h" />
     <ClInclude Include="Engine\Graphics\GPUData\LightsForGPU.h" />
     <ClInclude Include="Engine\Object\Lights\SpotLight.h" />

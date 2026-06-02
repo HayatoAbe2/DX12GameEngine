@@ -38,6 +38,8 @@ struct Vector2 {
 /// <returns>ベクトルの長さ(ノルム)</returns>
 float Length(const Vector2& v);
 
+float Dot(const Vector2& v1, const Vector2& v2);
+
 /// <summary>
 /// 2次元ベクトルの正規化
 /// </summary>

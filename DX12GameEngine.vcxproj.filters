@@ -153,9 +153,6 @@
     <ClCompile Include="Engine\Asset\Model\Model.cpp">
       <Filter>Engine\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\CollisionShape\Sphere\Sphere.cpp">
-      <Filter>Engine\Math</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Io\AudioSystem\AudioSystem.cpp">
       <Filter>Engine\IO</Filter>
     </ClCompile>
@@ -199,7 +196,6 @@
     <ClCompile Include="Application\Scene\GameScene\GameScene.cpp">
       <Filter>Application\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\CollisionShape\Ray\Ray.cpp" />
     <ClCompile Include="Engine\Asset\Manager\AssetManager\AssetManager.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ModelManager\ModelManager.cpp" />
     <ClCompile Include="Engine\Asset\Manager\TextureManager\TextureManager.cpp" />
@@ -274,7 +270,7 @@
     <FxCompile Include="Resources\Shaders\Fullscreen.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Grayscale.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Vignette.PS.hlsl" />
-    <FxCompile Include="Resources\Shaders\BoxFilter3x3.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\GaussianFilter3x3.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\BoxFilter5x5.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Grid.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Grid.VS.hlsl" />
@@ -532,6 +528,7 @@
     <ClInclude Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.h" />
     <ClInclude Include="Externals\nlohmann\json.hpp" />
     <ClInclude Include="Engine\Asset\Model\Skeleton.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Circle\Circle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
