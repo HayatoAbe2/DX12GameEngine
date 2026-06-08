@@ -7,6 +7,7 @@
         "bulletSpeed": 0.6,
         "shootCoolTime": 0.33,
         "bulletLifeTime": 60,
-        "knockback": 0.3
+        "knockback": 0.3,
+        "rarity": "Common"
   }
 }

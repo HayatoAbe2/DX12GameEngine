@@ -21,9 +21,10 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	weapons_ = std::move(rWeapons);
 	currentWeapon_ = weapons_[0].get();
 
-	invinsibleTimer_ = std::make_unique<Timer>();
+	invincibleTimer_ = std::make_unique<Timer>();
 	stunTimer_ = std::make_unique<Timer>();
 	attackCoolTimer_ = std::make_unique<Timer>();
+	slowTimer_ = std::make_unique<Timer>();
 
 	// 初期State
 	currentState_ = std::make_unique<EnemyIdle>();
@@ -43,7 +44,8 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 			}
 		}
 	}
-	invinsibleTimer_->Update();
+	invincibleTimer_->Update();
+	slowTimer_->Update();
 
 	// 落下
 	if (isFall_) {
@@ -59,6 +61,9 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	// 現在Stateの行動
 	currentState_->Update(this, player, mapCheck, bulletManager);
 	velocity_ = currentState_->GetVelocity();
+	if (slowTimer_->IsActive()) {
+		velocity_ *= 0.4f;
+	}
 
 	// 速度をもとに移動
 	Vector2 pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
@@ -124,7 +129,7 @@ void Enemy::Draw(Camera* camera) {
 void Enemy::Hit(float damage, Vector3 from, const float knockback) {
 
 	status_.hp -= damage;
-	invinsibleTimer_->Start(invinsibleTime_);
+	invincibleTimer_->Start(invinsibleTime_);
 	if (status_.hp <= 0) { isDead_ = true; }
 
 	if (status_.stunResist < 10) {

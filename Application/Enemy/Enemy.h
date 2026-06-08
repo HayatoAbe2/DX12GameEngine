@@ -38,7 +38,7 @@ public:
 
 	Transform GetTransform() const { return model_->GetTransform(); }
 	void SetTransform(const Transform& transform) const { model_->SetTransform(transform); }
-	Timer* GetInvinsibleTimer() const { return invinsibleTimer_.get(); }
+	Timer* GetInvinsibleTimer() const { return invincibleTimer_.get(); }
 	float GetRadius() const { return status_.radius; }
 	bool IsDead() { return isDead_; }
 
@@ -48,7 +48,7 @@ public:
 	bool IsAttacking() { return isAttacking_; }
 	Weapon* GetCurrentWeapon() { return currentWeapon_; }
 	Timer* GetAttackTimer() { return attackCoolTimer_.get(); }
-  
+	void Slow() { slowTimer_->Start(5.0f); }
 protected:
 
 	// 敵別ステータス
@@ -88,7 +88,7 @@ protected:
 	float minDistance_ = 10.0f;
 
 	// 無敵時間
-	std::unique_ptr<Timer> invinsibleTimer_;
+	std::unique_ptr<Timer> invincibleTimer_;
 	float invinsibleTime_ = 0.15f;
 
 	// 行動状態
@@ -96,4 +96,6 @@ protected:
 
 	// 攻撃中
 	bool isAttacking_ = false;
+
+	std::unique_ptr<Timer> slowTimer_;
 };

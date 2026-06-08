@@ -14,6 +14,7 @@ void WeaponManager::Initialize() {
 	LoadJson("Resources/Weapons/Data/AssaultRifle.json");
 	LoadJson("Resources/Weapons/Data/Shotgun.json");
 	LoadJson("Resources/Weapons/Data/Spellbook.json");
+	LoadJson("Resources/Weapons/Data/Wavegun.json");
 }
 
 std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
@@ -76,14 +77,14 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 		break;
 
 	default:
-		data = weaponDataMap["Pistol"];
+		data = weaponDataMap["Wavegun"];
 		model = asset.LoadModel("Resources/Weapons", data.modelName);
 		matData = model->GetMaterial(0)->GetData();
 		matData.color = { 0.2f,0.2f,0.2f,1 };
 		model->GetMaterial(0)->SetData(matData);
 		model->GetMaterial(1)->SetData(matData);
 		shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<Pistol>(data, std::move(model), std::move(shadowModel));
+		return std::make_unique<Wavegun>(data, std::move(model), std::move(shadowModel));
 		break;
 	}
 }

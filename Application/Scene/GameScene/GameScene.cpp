@@ -338,6 +338,9 @@ void GameScene::Draw() {
 	if (ImGui::Button("Fire")) {
 		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(3)));
 	};
+	if (ImGui::Button("Wave")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(4, Rare)));
+	};
 	ImGui::End();
 #endif
 }
