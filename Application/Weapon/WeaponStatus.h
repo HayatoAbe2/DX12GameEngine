@@ -28,17 +28,16 @@ struct WeaponData {
 	// 弾速
 	float bulletSpeed;
 	// 射撃クールダウン
-	int shootCoolTime;
+	float shootCoolTime;
 	// 弾の生存時間
 	int bulletLifeTime;
 	// ノックバック
 	float knockback;
-	// 弾数
-	int magazineSize;
-	// リロード時間
-	int reloadTime;
+	// レア度
+	Rarity rarity;
 };
 
+// 強化数値(0が標準)
 struct WeaponStatus {
 	// ダメージ
 	float damage;
@@ -49,18 +48,9 @@ struct WeaponStatus {
 	// 弾速
 	float bulletSpeed;
 	// 射撃クールダウン
-	int shootCoolTime;
+	float shootCoolTime;
 	// 弾の生存時間
 	int bulletLifeTime;
 	// ノックバック
 	float knockback;
-	// 弾数
-	int magazineSize;
-	// リロード時間
-	int reloadTime;
-
-	// エンチャント
-	std::vector<Enchants> enchants;
-	// レア度
-	Rarity rarity;
 };

@@ -1,35 +1,37 @@
 #include "RedBat.h"
 
-void RedBat::Attack(Weapon* weapon, BulletManager* bulletManager, Camera* camera) {
-	// 連続攻撃開始
-	if (attackCoolTimer_ <= 0) {
-		comboCount_ = 0;
-	}
-
+void RedBat::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) {
 	// 攻撃中
 	if (comboCount_ < maxCombo_) {
+		isAttacking_ = true;
 		comboInterval_--;
 
 		if (comboInterval_ <= 0) {
 			// 射撃
-			attackCoolTimer_ += weapon_->Shoot(model_->GetTransform().translate, attackDirection_, bulletManager, camera, true);
+			float time = currentWeapon_->Shoot(model_->GetTransform().translate, dir, bulletManager, camera, true);
+
+			if (attackCoolTimer_->IsActive()) {
+				attackCoolTimer_->AddTime(time);
+			} else {
+				attackCoolTimer_->Start(time);
+			}
 
 			comboCount_++;
 			comboInterval_ = maxComboInterval_;
 		}
 	} else {
 		// 終了後
-		attackCoolTimer_ -= 5;
+		comboCount_ = 0;
+		isAttacking_ = false;
 
 		// 武器を交換する
-		bossWeapons_[weaponNum_] = std::move(weapon_);
-		if (bossWeapons_.size() - 1 == weaponNum_) {
+		if (weapons_.size() - 1 == weaponNum_) {
 			// 0番目に戻る
-			weapon_ = std::move(bossWeapons_[0]);
+			currentWeapon_ = weapons_[0].get();
 			weaponNum_ = 0;
 		} else {
 			// 次の武器
-			weapon_ = std::move(bossWeapons_[++weaponNum_]);
+			currentWeapon_ = weapons_[++weaponNum_].get();
 		}
 	}
 }

@@ -108,7 +108,7 @@ void ItemManager::Spawn(Vector3 pos, int index, Rarity rarity) {
 void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
 	// アイテムを落とす
 	if (weapon) {
-		auto newItem = std::make_unique<Item>(std::move(weapon), pos, weapon->GetStatus().rarity);
+		auto newItem = std::make_unique<Item>(std::move(weapon), pos, weapon->GetData().rarity);
 		items_.push_back(std::move(newItem));
 	}
 }

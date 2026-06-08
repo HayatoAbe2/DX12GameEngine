@@ -1,14 +1,12 @@
 { 
-    "pistol": {
+    "Pistol": {
         "modelName": "Pistol.obj",
         "damage": 3.0,
         "weight": 0.1,
         "bulletSize": 0.5,
         "bulletSpeed": 0.6,
-        "shootCoolTime": 20,
+        "shootCoolTime": 0.33,
         "bulletLifeTime": 60,
-        "knockback": 0.3,
-        "magazineSize": 10,
-        "reloadTime": 30
+        "knockback": 0.3
   }
 }

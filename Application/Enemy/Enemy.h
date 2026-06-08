@@ -4,6 +4,7 @@
 #include "Bullet/BulletManager.h"
 #include "Timer/Timer.h"
 #include "GameCommon.h"
+#include "Enemy/EnemyState/EnemyState.h"
 
 class MapCheck;
 class Player;
@@ -11,10 +12,7 @@ class Player;
 class Enemy {
 public:
 	virtual ~Enemy() = default;
-	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status,std::unique_ptr<Weapon> rWeapon);
-	// ボス敵
 	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status,std::vector<std::unique_ptr<Weapon>> rWeapons);
-
 
 	/// <summary>
 	/// 更新
@@ -22,7 +20,6 @@ public:
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera);
 
 	// Update内関数
-	void Wait();
 	void Stun(MapCheck* mapCheck);
 	void Fall();
 
@@ -37,13 +34,21 @@ public:
 	void Hit(float damage,Vector3 from, const float knockback);
 
 	// 敵ごとの関数
-	virtual void Attack(Weapon* weapon, BulletManager* bulletManager, Camera* camera) = 0;
+	virtual void Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) = 0;
 
 	Transform GetTransform() const { return model_->GetTransform(); }
+	void SetTransform(const Transform& transform) const { model_->SetTransform(transform); }
 	Timer* GetInvinsibleTimer() const { return invinsibleTimer_.get(); }
 	float GetRadius() const { return status_.radius; }
 	bool IsDead() { return isDead_; }
 
+	EnemyStatus GetStatus() { return status_; }
+
+	void SetState(std::unique_ptr<EnemyState> state) { currentState_ = std::move(state); }
+	bool IsAttacking() { return isAttacking_; }
+	Weapon* GetCurrentWeapon() { return currentWeapon_; }
+	Timer* GetAttackTimer() { return attackCoolTimer_.get(); }
+  
 protected:
 
 	// 敵別ステータス
@@ -52,19 +57,16 @@ protected:
 	// 移動
 	Vector3 velocity_{};
 
-	// 攻撃の向き
-	Vector3 attackDirection_ = {};
-
 	// モデル
 	std::unique_ptr<Model> model_ = nullptr;
 	std::unique_ptr<Model> shadowModel_ = nullptr;
 
 	// 武器
-	std::unique_ptr<Weapon> weapon_ = nullptr;
-	std::vector<std::unique_ptr<Weapon>> bossWeapons_; // 複数ある場合
+	std::vector<std::unique_ptr<Weapon>> weapons_; // 複数ある場合
+	Weapon* currentWeapon_;
 
 	// 射撃クールダウン
-	int attackCoolTimer_ = 90;
+	std::unique_ptr<Timer> attackCoolTimer_;
 
 	// プレイヤー
 	Player* target_ = nullptr;
@@ -72,47 +74,26 @@ protected:
 	// 発見範囲
 	float searchRadius_ = 8.0f;
 
-	// 未発見移動
-	int randomMoveTime_ = 45; // 動く時間
-	const int minRandomMoveTime_ = 30;
-	const int maxRandomMoveTime_ = 120;
-	int randomStopTime_ = 30; // その後止まる時間
-	const int minRandomStopTime_ = 30;
-	const int maxRandomStopTime_ = 150;
-	int randomTimer_ = 0;
-	bool isMoving_ = false;
-
-	// 見失いカウント
-	int loseSightTimer_ = 0;
-
 	// 死亡フラグ
 	bool isDead_ = false;
 
 	// スタン時間
-	int stunTimer_ = 0;
+	std::unique_ptr<Timer> stunTimer_ = nullptr;
 	int hitColorTime_ = 0;
 
 	// 落下
 	bool isFall_ = false;
 
-	// 行動変更タイマー
-	int rotateTimer_ = 5;
-	int rotateTime_ = 5;
-	const int minRotateTimer_ = 5;
-	const int maxRotateTimer_ = 20;
-
-	// 攻撃モーション
-	int attackMotionStart_ = 30;
-	float EaseIn(float start, float end, float t);
-
 	// プレイヤーに近づく最小距離
 	float minDistance_ = 10.0f;
 
-	// 自動発見
-	bool targetAutoFound_ = false;
-
 	// 無敵時間
 	std::unique_ptr<Timer> invinsibleTimer_;
-	float invinsibleTime_ = 0.3f;
-};
+	float invinsibleTime_ = 0.15f;
 
+	// 行動状態
+	std::unique_ptr<EnemyState> currentState_ = nullptr;
+
+	// 攻撃中
+	bool isAttacking_ = false;
+};

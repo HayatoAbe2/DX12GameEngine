@@ -50,6 +50,8 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	moveParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), moveParticleNum_);
 	moveParticle_->SetLifeTime(10);
 	moveParticle_->SetColor({ 0.6f, 0.6f, 0.6f, 1.0f });
+
+	shootCooldownTimer_ = std::make_unique<Timer>();
 }
 
 void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera, BulletManager* bulletManager) {
@@ -110,30 +112,18 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 			weaponTransform_ = transform_;
 			weaponTransform_.translate += {std::sin(transform_.rotate.y), 0, std::cos(transform_.rotate.y)}; // 前方に配置
 
-			// enchant分の移動速度
-			for (auto enchant : weapon_->GetStatus().enchants) {
-				if (enchant == Enchants::moveSpeed) {
-					moveSpeed_ *= 1.15f;
-				}
-			}
-
-			if (shootCoolTime_ <= 0) {
+			if (shootCooldownTimer_->IsFinished()) {
 				// 射撃
 				if (input.IsClickLeft()) {
 					Shoot(bulletManager, camera);
 				}
-
-				// リロード
-				/*if (input.IsTrigger(DIK_R)) {
-					weapon_->StartReload();
-				}*/
 
 				// 入れ替え
 				/*if (input.IsTrigger(DIK_TAB)) {
 					weapon_.swap(subWeapon_);
 				}*/
 			} else {
-				shootCoolTime_--;
+				shootCooldownTimer_->Update();
 			}
 		}
 
@@ -237,22 +227,6 @@ void Player::Hit(float damage, Vector3 from) {
 	auto& ctx = GameContext::GetInstance();
 
 	if (invincibleTimer_ <= 0) {
-		// 軽減の計算
-		if (weapon_) {
-			// 追加効果
-			for (auto enchant : weapon_->GetStatus().enchants) {
-				switch (enchant) {
-				case static_cast<int>(Enchants::resist):
-					damage *= 0.8f; // 軽減
-					break;
-				case static_cast<int>(Enchants::avoid):
-					if (ctx.RandomInt(1, 10) == 1) {
-						damage = 0; // 回避
-					}
-					break;
-				}
-			}
-		}
 
 		if (damage > 0) {
 			hp_ -= damage;
@@ -375,31 +349,7 @@ void Player::Shoot(BulletManager* bulletManager, Camera* camera) {
 	auto& input = ctx.Input();
 
 	if (weapon_) {
-		shootCoolTime_ = weapon_->Shoot(weaponTransform_.translate, attackDirection_, bulletManager, camera, false);
-
-		// 追加効果
-		for (auto enchant : weapon_->GetStatus().enchants) {
-			switch (enchant) {
-			case static_cast<int>(Enchants::shortCooldown):
-				shootCoolTime_ = shootCoolTime_ * 3 / 4;
-				break;
-			case static_cast<int>(Enchants::extraBullet):
-				if (ctx.RandomInt(1, 20) <= 3) {
-					extraBulletWaitTime_ = 10;
-					canShootExtraBullet_ = true;
-				}
-				break;
-			}
-		}
-
-		if (canShootExtraBullet_) {
-			if (--extraBulletWaitTime_ <= 0) {
-				weapon_->Shoot(weaponTransform_.translate, attackDirection_, bulletManager, camera, false);
-				canShootExtraBullet_ = false;
-			}
-		}
-
-		if (!weapon_->CanShoot() && input.IsTriggerLeftClick()) { weapon_->StartReload(); }
+		shootCooldownTimer_->Start(weapon_->Shoot(weaponTransform_.translate, attackDirection_, bulletManager, camera, false));
 	}
 }
 

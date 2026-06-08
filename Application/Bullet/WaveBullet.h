@@ -4,8 +4,8 @@
 
 class WaveBullet :public Bullet {
 public:
-	WaveBullet(std::unique_ptr<Model> model, const Vector3& direction, const WeaponStatus& status, bool isEnemyBullet) :
-		Bullet(std::move(model), direction, status, isEnemyBullet) {
+	WaveBullet(std::unique_ptr<Model> model, const Vector3& direction, const WeaponData& data, bool isEnemyBullet) :
+		Bullet(std::move(model), direction, data, isEnemyBullet) {
 	};
 	void Initialize();
 	void Update(MapCheck* mapCheck) override;

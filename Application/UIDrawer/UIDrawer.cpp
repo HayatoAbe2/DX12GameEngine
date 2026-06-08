@@ -113,12 +113,6 @@ void UIDrawer::Draw() {
 	auto weapon = player_->GetWeapon();
 	if (weapon != nullptr) {
 		render.DrawSprite(control_.get());
-
-		// エンチャント
-		for (int i = 0; i < static_cast<int>(weapon->GetStatus().rarity); ++i) {
-			render.DrawSprite(enchants_[i]);
-		}
-
 		render.DrawSprite(equipment_);
 	}
 
@@ -139,7 +133,7 @@ void UIDrawer::UpdatePlayerUI() {
 	if (player_->GetWeapon() != nullptr) {
 		// 所持武器レア度
 		auto weapon = player_->GetWeapon();
-		switch (weapon->GetStatus().rarity) {
+		switch (weapon->GetData().rarity) {
 		case static_cast<int>(Rarity::Common):
 			equipment_->SetColor({ 0.5f,0.5f,0.5f,1.0f });
 			break;
@@ -169,65 +163,7 @@ void UIDrawer::UpdatePlayerUI() {
 		equipment_->SetSize({ 120, 120 });
 		equipment_->SetPosition({ 640 - 60, 710 - 160 });
 
-		// 効果
-		for (int i = 0; i < static_cast<int>(weapon->GetStatus().rarity); ++i) {
-			auto enchant = weapon->GetStatus().enchants[i];
-			switch (enchant) {
-			case static_cast<int>(Enchants::increaseDamage):
-				enchants_[i] = enchantDamage_[i].get();
-				break;
-			case static_cast<int>(Enchants::bigBullet):
-				enchants_[i] = enchantBulletSize_[i].get();
-				break;
-			case static_cast<int>(Enchants::fastBullet):
-				enchants_[i] = enchantBulletSpeed_[i].get();
-				break;
-			case static_cast<int>(Enchants::shortCooldown):
-				enchants_[i] = enchantFireRate_[i].get();
-				break;
-			case static_cast<int>(Enchants::hardKnockback):
-				enchants_[i] = enchantKnockback_[i].get();
-				break;
-			case static_cast<int>(Enchants::extraBullet):
-				enchants_[i] = enchantExtraBullet_[i].get();
-				break;
-			case static_cast<int>(Enchants::moveSpeed):
-				enchants_[i] = enchantMoveSpeed_[i].get();
-				break;
-			case static_cast<int>(Enchants::resist):
-				enchants_[i] = enchantResist_[i].get();
-				break;
-			case static_cast<int>(Enchants::avoid):
-				enchants_[i] = enchantDamage_[i].get();
-				break;
-			}
-			enchants_[i]->SetSize({240,40});
-			enchants_[i]->SetPosition({640 + 80,float(710 - 180 + i * 40)});
-		}
-
-		// 再装填ゲージ
-		float reloadRate = float(weapon->GetReloadTimer()) / float(weapon->GetStatus().reloadTime);
-		reloadBar_->SetSize({ reloadBarData_.size.x * reloadRate,reloadBarData_.size.y });
-
 		// 二個目
-
-		//if (player_->GetSubWeapon() != nullptr) {
-		//	auto subWeapon = player_->GetSubWeapon();
-		//	// 所持武器レア度
-		//	switch (subWeapon->GetStatus().rarity) {
-		//	case static_cast<int>(Rarity::Common):
-		//		equipment2_->SetColor({ 0.5f,0.5f,0.5f,1.0f });
-		//		break;
-		//	case static_cast<int>(Rarity::Rare):
-		//		equipment2_->SetColor({ 0.1f,0.1f,0.7f,1.0f });
-		//		break;
-		//	case static_cast<int>(Rarity::Epic):
-		//		equipment2_->SetColor({ 0.8f,0.1f,0.8f,1.0f });
-		//		break;
-		//	case static_cast<int>(Rarity::Legendary):
-		//		equipment2_->SetColor({ 1.0f,0.8f,0.0f,1.0f });
-		//		break;
-		//	}
 
 		//	// 武器アイコン
 		//	if (dynamic_cast<AssaultRifle*>(subWeapon)) {

@@ -7,7 +7,7 @@ class MapCheck;
 
 class Bullet {
 public:
-	Bullet(std::unique_ptr<Model> model,const Vector3& direction,const WeaponStatus& status,bool isEnemyBullet);
+	Bullet(std::unique_ptr<Model> model,const Vector3& direction,const WeaponData& data,bool isEnemyBullet);
 	virtual ~Bullet() = default;
 	virtual void Update(MapCheck* mapCheck) = 0;
 	virtual void Draw(Camera* camera) = 0;
@@ -15,8 +15,8 @@ public:
 
 	bool IsEnemyBullet() { return isEnemyBullet_; }
 	Transform GetTransform() { return model_->GetTransform(); }
-	float GetDamage() { return status_.damage; }
-	float GetKnockback() { return status_.knockback; }
+	float GetDamage() { return data_.damage; }
+	float GetKnockback() { return data_.knockback; }
 	bool IsDead() { return isDead_; }
 	bool CanErase() { return canErase_; }
 	Vector3 GetPrePos() { return prePos_; }
@@ -32,7 +32,7 @@ protected:
 	std::unique_ptr<Model> model_ = nullptr;
 
 	// 弾ステータス
-	WeaponStatus status_;
+	WeaponData data_;
 
 	// 生存時間
 	int lifeTime_ = 0;

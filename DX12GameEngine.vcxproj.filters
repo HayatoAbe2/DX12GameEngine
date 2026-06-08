@@ -244,6 +244,9 @@
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Timer\Timer.cpp" />
     <ClCompile Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.cpp" />
+    <ClCompile Include="Application\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
+    <ClCompile Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
+    <ClCompile Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -529,6 +532,10 @@
     <ClInclude Include="Externals\nlohmann\json.hpp" />
     <ClInclude Include="Engine\Asset\Model\Skeleton.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Circle\Circle.h" />
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyState.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

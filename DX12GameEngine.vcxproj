@@ -162,6 +162,9 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
+    <ClCompile Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
+    <ClCompile Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
     <ClCompile Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.cpp" />
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Bullet\Bullet.cpp" />
@@ -365,6 +368,10 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
+    <ClInclude Include="Application\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.h" />
     <ClInclude Include="Engine\Asset\Manager\AnimationManager\AnimationManager.h" />
     <ClInclude Include="Engine\Asset\Animation.h" />

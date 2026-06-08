@@ -4,7 +4,9 @@
 class Timer {
 public:
     void Start(float duration);
-    void Update(float deltaTime);
+    void Update();
+
+    void AddTime(float additionalTime);
 
     bool IsFinished() const {
         return !isActive_;

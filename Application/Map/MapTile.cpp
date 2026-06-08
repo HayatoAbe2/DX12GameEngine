@@ -148,7 +148,6 @@ void MapTile::Update(bool canGoal) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 	auto& light = ctx.Light();
-	goal_->Update();
 	if (canGoal) {
 		if (!soundPlayed_) {
 			audio.SoundPlay(L"Resources/Sounds/SE/floorClear.mp3", false);

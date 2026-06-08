@@ -6,7 +6,7 @@ void Model::Update() {
 		skeleton_->joints.size() > 1) {
 		animationPlayer_->Update(*skeleton_);
 		UpdateSkeleton();
-	}else {
+	}else if(animationPlayer_){
 		animationPlayer_->Update(*rootNode_.get());
 	}
 }

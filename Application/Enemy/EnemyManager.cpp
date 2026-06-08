@@ -46,7 +46,6 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
    auto enemyShadowModel = std::make_unique<Model>();
    enemyShadowModel->SetTranslate(pos);
 
-   std::unique_ptr<Weapon> weapon = nullptr;
    std::vector<std::unique_ptr<Weapon>> weapons;
    EnemyStatus status;
 
@@ -54,33 +53,29 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
    case 1:
        enemyModel = asset.LoadModel("Resources/Enemy", "bat.obj");
        enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat.obj");
-       weapon = weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall));
+       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
        status.hp = 10;
        status.radius = 0.5f;
        status.moveSpeed = 0.15f;
        status.defaultSearchRadius = 80.0f;
-       status.loseSightRadius = 100.0f;
-       status.loseSightTime = 180;
        status.stunResist = 0;
        status.canFly = true;
 
-       enemies_.push_back(std::make_unique<Bat>(std::move(enemyModel),std::move(enemyShadowModel), pos, status, std::move(weapon)));
+       enemies_.push_back(std::make_unique<Bat>(std::move(enemyModel),std::move(enemyShadowModel), pos, status, std::move(weapons)));
        break;
 
    case 2:
        enemyModel = asset.LoadModel("Resources/Enemy", "knight.obj");
        enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight.obj");
-       weapon = weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle));
+       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
        status.hp = 20;
        status.radius = 0.9f;
        status.moveSpeed = 0.07f;
        status.defaultSearchRadius = 80.0f;
-       status.loseSightRadius = 100.0f;
-       status.loseSightTime = 300;
        status.stunResist = 2;
        status.canFly = false;
 
-       enemies_.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapon)));
+       enemies_.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
        break;
 
    case 3:
@@ -93,8 +88,6 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
        status.radius = 1.5f;
        status.moveSpeed = 0.07f;
        status.defaultSearchRadius = 100.0f;
-       status.loseSightRadius = 300.0f;
-       status.loseSightTime = 300;
        status.stunResist = 30;
        status.canFly = false;
 
@@ -111,8 +104,6 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
        status.radius = 0.75f;
        status.moveSpeed = 0.15f;
        status.defaultSearchRadius = 100.0f;
-       status.loseSightRadius = 300.0f;
-       status.loseSightTime = 180;
        status.stunResist = 30;
        status.canFly = true;
 

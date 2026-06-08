@@ -6,29 +6,22 @@ class BulletManager;
 
 class Weapon {
 public:
+	Weapon(const WeaponData& data, std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel);
 	virtual ~Weapon() = default;
-	virtual int Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, bool isEnemyBullet) = 0;
+	virtual float Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, bool isEnemyBullet) = 0;
 	virtual void Update() = 0;
 
 	Model* GetWeaponModel() { return model_.get(); }
 	Model* GetWeaponShadowModel() { return shadowModel_.get(); }
+	// ステータス(強化分)
 	const WeaponStatus& GetStatus() const { return status_; }
+	// データ(基礎数値)
 	const WeaponData& GetData() const { return data_; }
-	bool CanShoot() { return reloadTimer_ <= 0; }
-	int GetReloadTimer() { return reloadTimer_; }
-	int GetAmmoLeft() { return ammoLeft_; }
-	bool IsReloading() { return isReloading_; }
-
-	void StartReload() { isReloading_ = true; }
 	
 protected:
 	WeaponData data_;
-	WeaponStatus status_;
+	WeaponStatus status_{};
 	std::unique_ptr<Model> model_;
 	std::unique_ptr<Model> shadowModel_;
-	int ammoLeft_ = 0;
-	int reloadTimer_ = 0;
-	bool isReloading_ = false;
-
 };
 

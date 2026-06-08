@@ -242,7 +242,7 @@ bool MapCheck::IsGoal(const Vector2& pos, float radius, bool canGoal) {
 }
 
 bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerPos) {
-	Ray ray = { enemyPos, enemyPos - playerPos };
+	Ray ray = { enemyPos, playerPos - enemyPos };
 	ray.diff.y = 0.0001f;
 
 	int mapH = static_cast<int>(map_.size());

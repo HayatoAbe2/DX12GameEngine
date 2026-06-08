@@ -41,8 +41,7 @@ void GameScene::Initialize() {
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	wallShadow_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	floor_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	goal_ = asset.LoadModel("Resources/Debug/AnimatedCube", "AnimatedCube.gltf");
-	goal_->SetAnimation(std::move(asset.LoadAnimation("Resources/Debug/AnimatedCube", "AnimatedCube.gltf")));
+	goal_ = asset.LoadModel("Resources/Tiles", "sphere.obj");
 	
 	auto matData = wall_->GetMaterial(0)->GetData();
 	matData.useEnvironmentMap = true;
@@ -324,6 +323,23 @@ void GameScene::Draw() {
 	}
 
 	render.DrawSprite(fade_.get());
+
+#ifdef USE_IMGUI
+	ImGui::Begin("Weapon");
+	if (ImGui::Button("Pistol")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(0)));
+	};
+	if (ImGui::Button("AssaultRifle")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(1)));
+	};
+	if (ImGui::Button("Shotgun")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(2)));
+	};
+	if (ImGui::Button("Fire")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(3)));
+	};
+	ImGui::End();
+#endif
 }
 
 void GameScene::Reset() {

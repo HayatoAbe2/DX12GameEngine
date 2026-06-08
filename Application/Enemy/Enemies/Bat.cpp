@@ -1,11 +1,6 @@
 #include "Bat.h"
 
-void Bat::Attack(Weapon* weapon, BulletManager* bulletManager, Camera* camera) {
-	if (attackCoolTimer_ <= 0) {
-		// 射撃
-		attackCoolTimer_ = weapon_->Shoot(model_->GetTransform().translate, attackDirection_, bulletManager, camera, true);
-
-	} else {
-		attackCoolTimer_--;
-	}
+void Bat::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) {
+	attackCoolTimer_->Start(weapons_[0]->Shoot(model_->GetTransform().translate, dir, bulletManager, camera, true));
+	isAttacking_ = false;
 }

@@ -1,12 +1,18 @@
 #pragma once
 
 struct EnemyStatus {
-	float hp = 10; // hp
-	float radius = 0.5f; 	// 半径
-	float moveSpeed = 0.1f;	// 移動の速さ
-	float defaultSearchRadius = 8.0f; // 検知範囲
-	float loseSightRadius = 15.0f; // 見失い距離
-	int loseSightTime = 120; 	// 見失いカウント
-	int stunResist = 0; // スタン時間を減らす量
-	bool canFly = false; // 飛行する
+	// hp
+	float hp = 10;
+	// 半径
+	float radius = 0.5f;
+	// 移動の速さ
+	float moveSpeed = 0.1f;
+	// 検知範囲
+	float defaultSearchRadius = 8.0f;
+	// 攻撃開始範囲
+	float attackRadius = 9.0f;
+	// スタン時間を減らす量
+	int stunResist = 0;
+	// 飛行する
+	bool canFly = false;
 };

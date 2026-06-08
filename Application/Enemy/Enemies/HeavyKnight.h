@@ -5,7 +5,7 @@ class HeavyKnight : public Enemy {
 public:
 	HeavyKnight(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) :
 		Enemy(std::move(model), std::move(shadowModel), pos, status, move(rWeapons)) {}
-	void Attack(Weapon* weapon, BulletManager* bulletManager, Camera* camera) override;
+	void Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) override;
 
 private:
 	const int maxCombo_ = 8;

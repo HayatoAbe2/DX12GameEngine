@@ -1,0 +1,12 @@
+{ 
+    "Spellbook": {
+        "modelName": "Spellbook.obj",
+        "damage": 8.0,
+        "weight": 0.2,
+        "bulletSize": 1.2,
+        "bulletSpeed": 0.4,
+        "shootCoolTime": 1.0,
+        "bulletLifeTime": 300,
+        "knockback": 0.5
+  }
+}

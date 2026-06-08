@@ -1,6 +1,7 @@
 #pragma once
 #include "GameCommon.h"
 #include "Weapon/Weapon.h"
+#include "Timer/Timer.h"
 
 class Camera;
 class MapCheck;
@@ -106,9 +107,7 @@ private:
 	int boostCoolTime_ = 10;
 
 	// 射撃
-	int shootCoolTime_ = 0;
-	int extraBulletWaitTime_ = 0;
-	bool canShootExtraBullet_ = false;
+	std::unique_ptr<Timer> shootCooldownTimer_;
 
 	// 所持武器
 	std::unique_ptr<Weapon> weapon_ = nullptr;

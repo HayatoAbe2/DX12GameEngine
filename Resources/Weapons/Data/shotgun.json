@@ -1,0 +1,12 @@
+{ 
+    "Shotgun": {
+        "modelName": "Shotgun.obj",
+        "damage": 3.0,
+        "weight": 0.5,
+        "bulletSize": 0.4,
+        "bulletSpeed": 0.9,
+        "shootCoolTime": 0.66,
+        "bulletLifeTime": 9,
+        "knockback": 0.3
+  }
+}
