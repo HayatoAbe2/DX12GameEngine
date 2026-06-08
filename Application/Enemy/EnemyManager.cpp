@@ -56,8 +56,8 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
        weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
        status.hp = 10;
        status.radius = 0.5f;
-       status.moveSpeed = 0.15f;
-       status.defaultSearchRadius = 80.0f;
+       status.moveSpeed = 0.2f;
+       status.defaultSearchRadius = 5.0f;
        status.stunResist = 0;
        status.canFly = true;
 
@@ -71,7 +71,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
        status.hp = 20;
        status.radius = 0.9f;
        status.moveSpeed = 0.07f;
-       status.defaultSearchRadius = 80.0f;
+       status.defaultSearchRadius = 10.0f;
        status.stunResist = 2;
        status.canFly = false;
 

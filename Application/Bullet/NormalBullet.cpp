@@ -25,17 +25,26 @@ void NormalBullet::Update(MapCheck* mapCheck) {
 
 	if (!isDead_) {
 		prePos_ = model_->GetTransform().translate;
-		model_->SetTranslate(model_->GetTransform().translate + velocity_);
-
+		model_->SetTranslate(model_->GetTransform().translate + Vector3{velocity_.x,0,0});
 		// マップ当たり判定
 		Vector2 pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
 
-		lifeTime_--;
-		if (lifeTime_ <= 0) {
-			Hit();
+		if (mapCheck->IsHitWall(pos, data_.bulletSize / 2.0f)) {
+			velocity_.x *= -1;
+			model_->SetTranslate(model_->GetTransform().translate + Vector3{ velocity_.x * 2,0,0 });
 		}
 
+		model_->SetTranslate(model_->GetTransform().translate + Vector3{ 0,0,velocity_.z });
+		// マップ当たり判定
+		pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
+
 		if (mapCheck->IsHitWall(pos, data_.bulletSize / 2.0f)) {
+			velocity_.z *= -1;
+			model_->SetTranslate(model_->GetTransform().translate + Vector3{ 0,0,velocity_.z * 2 });
+		}
+
+		lifeTime_--;
+		if (lifeTime_ <= 0) {
 			Hit();
 		}
 

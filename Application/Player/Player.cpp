@@ -119,9 +119,9 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 				}
 
 				// 入れ替え
-				/*if (input.IsTrigger(DIK_TAB)) {
+				if (input.IsTrigger(DIK_TAB) && subWeapon_) {
 					weapon_.swap(subWeapon_);
-				}*/
+				}
 			} else {
 				shootCooldownTimer_->Update();
 			}
@@ -399,10 +399,10 @@ void Player::Fall() {
 }
 
 void Player::SetWeapon(std::unique_ptr<Weapon> weapon) { 
-	/*if(weapon_ && subWeapon_ == nullptr){
+	if(weapon_ && subWeapon_ == nullptr){
 		subWeapon_ = std::move(weapon);
 		return;
-	}*/
+	}
 
 	weapon_ = std::move(weapon); 
 }

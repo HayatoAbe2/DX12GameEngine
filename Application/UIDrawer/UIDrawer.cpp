@@ -118,7 +118,7 @@ void UIDrawer::Draw() {
 
 	auto subWeapon = player_->GetSubWeapon();
 	if (subWeapon != nullptr) {
-		render.DrawSprite(equipment2_);
+		//render.DrawSprite(equipment2_);
 	}
 
 	// hp

@@ -53,7 +53,6 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 
 	if (stunTimer_->IsActive()) {
 		Stun(mapCheck);
-
 		return;
 	}
 
