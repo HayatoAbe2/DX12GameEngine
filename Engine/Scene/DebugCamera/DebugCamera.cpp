@@ -20,7 +20,7 @@ void DebugCamera::Initialize() {
 }
 
 void DebugCamera::Update() {
-	if (inputCtx_->IsTrigger(DIK_RSHIFT)) {
+	if (inputCtx_->keyboard.IsTrigger(DIK_RSHIFT)) {
 		// デバッグカメラの切り替え
 		isEnable_ = !isEnable_;
 	}
@@ -38,10 +38,10 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	Vector3 up = { 0,1,0 };
 
 	// shift+マウスホイール押し込み中,ドラッグで視点移動
-	if (inputCtx_->IsPress(DIK_LSHIFT) && inputCtx_->IsClickWheel()) {
+	if (inputCtx_->keyboard.IsPress(DIK_LSHIFT) && inputCtx_->mouse.IsPress(MouseButton::Middle)) {
 
-		float moveX = inputCtx_->GetMouseMove().x * kMoveSpeed_;
-		float moveY = inputCtx_->GetMouseMove().y * kMoveSpeed_;
+		float moveX = inputCtx_->mouse.GetMouseMove().x * kMoveSpeed_;
+		float moveY = inputCtx_->mouse.GetMouseMove().y * kMoveSpeed_;
 
 		target_ = target_ + moveX * -right;
 		target_ = target_+ moveY * up;
@@ -49,10 +49,10 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	} else {
 
 		// マウスホイール押し込み中,ドラッグで視点回転
-		if (inputCtx_->IsClickWheel()) {
+		if (inputCtx_->mouse.IsPress(MouseButton::Middle)) {
 			// マウスの移動量に回転速度を掛ける
-			float deltaYaw = inputCtx_->GetMouseMove().x * kRotateSpeed_;   // マウスXでY軸回転（左右）
-			float deltaPitch = inputCtx_->GetMouseMove().y * kRotateSpeed_; // マウスYでX軸回転（上下）
+			float deltaYaw = inputCtx_->mouse.GetMouseMove().x * kRotateSpeed_;   // マウスXでY軸回転（左右）
+			float deltaPitch = inputCtx_->mouse.GetMouseMove().y * kRotateSpeed_; // マウスYでX軸回転（上下）
 
 			Matrix4x4 matRotDelta = MakeIdentity4x4();
 			matRotDelta = Multiply(MakeRotateYMatrix(deltaYaw), matRotDelta);
@@ -63,7 +63,7 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	}
 
 	// マウスホイールでズームイン・ズームアウト
-	float moveZ = inputCtx_->GetMouseMove().z * kMoveSpeed_;
+	float moveZ = inputCtx_->mouse.GetMouseMove().z * kMoveSpeed_;
 	distance_ += -moveZ;
 
 	// カメラは注視点から後ろ向きにdistance_移動した位置

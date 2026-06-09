@@ -42,7 +42,7 @@ void TitleScene::Update() {
 
 	debugCamera_->Update();
 
-	if (input.IsTriggerLeftClick() && !isFadeIn_ && !isFadeOut_) {
+	if ((input.mouse.IsTrigger(MouseButton::Left) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_A)) && !isFadeIn_ && !isFadeOut_) {
 		isFadeOut_ = true;
 		fadeTimer_ = 0;
 		audio.SoundPlay(L"Resources/Sounds/SE/press.mp3", false);

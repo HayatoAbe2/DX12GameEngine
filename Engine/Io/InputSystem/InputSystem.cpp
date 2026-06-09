@@ -38,46 +38,6 @@ InputSystem::InputSystem(HINSTANCE hInstance, HWND hwnd) {
 		hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
 
-	///
-	/// コントローラー
-	///
-
-	// コールバック関数
-	auto EnumJoysticksCallback = [](const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) -> BOOL {
-		auto pDI = reinterpret_cast<LPDIRECTINPUT8>(pContext);
-		LPDIRECTINPUTDEVICE8* ppController = reinterpret_cast<LPDIRECTINPUTDEVICE8*>(pContext);
-		LPDIRECTINPUTDEVICE8 tmpDevice = nullptr;
-
-		HRESULT hr = pDI->CreateDevice(pdidInstance->guidInstance, &tmpDevice, NULL);
-		if (SUCCEEDED(hr)) {
-			*ppController = tmpDevice;
-			return DIENUM_STOP; // 最初の1つだけ使用
-		}
-		return DIENUM_CONTINUE;
-		};
-
-	// コントローラーデバイス列挙
-	directInput_->EnumDevices(
-			DI8DEVCLASS_GAMECTRL,
-			[](const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) -> BOOL {
-				auto self = reinterpret_cast<InputSystem*>(pContext);
-				if (SUCCEEDED(self->directInput_->CreateDevice(pdidInstance->guidInstance, &self->controller_, NULL))) {
-					self->controller_->SetDataFormat(&c_dfDIJoystick2);
-					self->controller_->SetCooperativeLevel(self->hwnd_, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-					self->SetRange();
-					return DIENUM_STOP;
-				}
-				return DIENUM_CONTINUE;
-			},
-			this,
-			DIEDFL_ATTACHEDONLY
-		);
-
-	// コントローラーが見つかった場合 
-	if (controller_) {
-		controller_->Acquire();
-	}
-
 	hwnd_ = hwnd;
 }
 
@@ -101,52 +61,14 @@ void InputSystem::Update() {
 
 	// 前フレームのコントローラー入力状態
 	preControllerState_ = controllerState_;
-	if (controller_) {
-		HRESULT hr = controller_->Poll();
-		if (FAILED(hr)) {
-			hr = controller_->Acquire();
-			if (FAILED(hr)) {
-				// 再試行
-				controller_->Release();
-				controller_ = nullptr;
-			}
-		}
+	ZeroMemory(
+		&controllerState_,
+		sizeof(XINPUT_STATE));
 
-		if (controller_) {
-			controller_->GetDeviceState(sizeof(controllerState_), &controllerState_);
-		}
+	DWORD result =
+		XInputGetState(
+			0,
+			&controllerState_);
 
-	} else {
-		// コントローラーがない場合
-		directInput_->EnumDevices(
-			DI8DEVCLASS_GAMECTRL,
-			[](const DIDEVICEINSTANCE* pdidInstance, VOID* pContext) -> BOOL {
-				auto self = reinterpret_cast<InputSystem*>(pContext);
-				if (SUCCEEDED(self->directInput_->CreateDevice(pdidInstance->guidInstance, &self->controller_, NULL))) {
-					self->controller_->SetDataFormat(&c_dfDIJoystick2);
-					self->controller_->SetCooperativeLevel(self->hwnd_, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-					self->SetRange();
-					return DIENUM_STOP;
-				}
-				return DIENUM_CONTINUE;
-			},
-			this,
-			DIEDFL_ATTACHEDONLY
-		);
-	}
-}
-
-void InputSystem::SetRange() {
-	// 軸範囲を設定（-1000～+1000）
-	DIPROPRANGE diprg;
-	diprg.diph.dwSize = sizeof(DIPROPRANGE);
-	diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-	diprg.diph.dwHow = DIPH_BYOFFSET;
-	diprg.lMin = -1000;
-	diprg.lMax = +1000;
-
-	diprg.diph.dwObj = DIJOFS_X;
-	controller_->SetProperty(DIPROP_RANGE, &diprg.diph);
-	diprg.diph.dwObj = DIJOFS_Y;
-	controller_->SetProperty(DIPROP_RANGE, &diprg.diph);
+	isControllerConnected_ = (result == ERROR_SUCCESS);
 }

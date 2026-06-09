@@ -3,7 +3,19 @@
 #include <dinput.h>
 #include <cstdint>
 #include <wrl.h>
+#include <Xinput.h>
+#pragma comment(lib, "Xinput.lib")
 #include "Engine/Math/MathUtils.h"
+
+enum class MouseButton {
+	// 左クリック
+	Left,
+	// 右クリック
+	Right,
+	// ホイール
+	Middle
+};
+
 class InputSystem {
 public:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -23,41 +35,29 @@ public:
 	/// </summary>
 	/// <param name="keyNumber">キー番号</param>
 	/// <returns>キーを押した瞬間のみtrue</returns>
-	bool IsTrigger(uint8_t keyNumber) { return (!preKey_[keyNumber] && key_[keyNumber]); };
-
+	bool IsTrigger(uint8_t keyNumber) { return (!preKey_[keyNumber] && key_[keyNumber]); };	
+	
 	/// <summary>
 	/// キーを押している状態か
 	/// </summary>
 	/// <param name="keyNumber">キー番号</param>
 	/// <returns>キーが押されていればtrue</returns>
 	bool IsPress(uint8_t keyNumber) { return (key_[keyNumber]); };
-
+	
 	/// <summary>
 	/// キーを離した瞬間か
 	/// </summary>
 	/// <param name="keyNumber">キー番号</param>
 	/// <returns>キーが離された瞬間のみtrue</returns>
 	bool IsRelease(uint8_t keyNumber) { return (preKey_[keyNumber] && !key_[keyNumber]); };
-
+	
 	//
 	// マウス入力関連
 	//
 
-	bool IsClickLeft() { return (mouseState_.rgbButtons[0] & 0x80); }
-	bool IsClickRight() { return (mouseState_.rgbButtons[1] & 0x80); }
-	bool IsClickWheel() { return (mouseState_.rgbButtons[2] & 0x80); }
-	bool IsTriggerLeftClick() {
-		return !(preMouseState_.rgbButtons[0] & 0x80) &&
-			(mouseState_.rgbButtons[0] & 0x80);
-	}
-	bool IsTriggerRightClick() {
-		return !(preMouseState_.rgbButtons[1] & 0x80) &&
-			(mouseState_.rgbButtons[1] & 0x80);
-	}
-	bool IsTriggerMouseWheel() {
-		return !(preMouseState_.rgbButtons[2] & 0x80) &&
-			(mouseState_.rgbButtons[2] & 0x80);
-	}
+	bool IsTrigger(const MouseButton& button) { return (!preMouseState_.rgbButtons[uint8_t(button)] && 0x80) && (mouseState_.rgbButtons[uint8_t(button)] && 0x80); };
+	bool IsPress(const MouseButton& button) { return mouseState_.rgbButtons[uint8_t(button)] && 0x80; };
+	bool IsRelease(const MouseButton& button) { return (preMouseState_.rgbButtons[uint8_t(button)] && 0x80) && (!mouseState_.rgbButtons[uint8_t(button)] && 0x80); };
 
 	Vector3 GetMouseMove() { return { float(mouseState_.lX),float(mouseState_.lY),float(mouseState_.lZ) }; };
 	Vector2 GetMousePosition() {
@@ -73,15 +73,16 @@ public:
 	// コントローラー入力関連
 	//
 
-	bool IsControllerPress(uint8_t buttonNumber) {
-		return (controllerState_.rgbButtons[buttonNumber] & 0x80);
-	}
+	bool IsControllerConnected() { return isControllerConnected_; }
+	bool IsTrigger(WORD button) { return !(preControllerState_.Gamepad.wButtons & button) && (controllerState_.Gamepad.wButtons & button);}
+	bool IsPress(WORD button) { return controllerState_.Gamepad.wButtons & button;}
+	bool IsRelease(WORD button) { return (preControllerState_.Gamepad.wButtons & button) && !(controllerState_.Gamepad.wButtons & button);}
 
 	Vector2 GetLeftStick() {
 		// -1000~1000の範囲を-1.0f~1.0fに正規化
 		Vector2 stick = {
-		controllerState_.lX / 1000.0f,
-		controllerState_.lY / 1000.0f
+			controllerState_.Gamepad.sThumbLX / 32767.0f,
+			controllerState_.Gamepad.sThumbLY / 32767.0f
 		};
 
 		if (fabs(stick.x) < deadZone_) stick.x = 0.0f;
@@ -92,8 +93,8 @@ public:
 
 	Vector2 GetRightStick() {
 		Vector2 stick = {
-			controllerState_.lRx / 1000.0f,
-			controllerState_.lRy / 1000.0f
+			controllerState_.Gamepad.sThumbRX / 32767.0f,
+			controllerState_.Gamepad.sThumbRY / 32767.0f
 		};
 
 		if (fabs(stick.x) < deadZone_) stick.x = 0.0f;
@@ -102,13 +103,20 @@ public:
 		return stick;
 	}
 
+	float GetLeftTrigger() {
+		return controllerState_.Gamepad.bLeftTrigger / 255.0f;
+	}
+
+	float GetRightTrigger() {
+		return controllerState_.Gamepad.bRightTrigger / 255.0f;
+	}
+
 	HWND GetHwnd() { return hwnd_; }
 
 private:
 	ComPtr<IDirectInput8> directInput_ = nullptr;
 	ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
 	ComPtr<IDirectInputDevice8> mouse_ = nullptr;
-	ComPtr<IDirectInputDevice8> controller_ = nullptr;
 
 	// キー入力状態
 	BYTE preKey_[256]{};
@@ -119,8 +127,9 @@ private:
 	DIMOUSESTATE mouseState_{};
 
 	// コントローラー入力状態
-	DIJOYSTATE2 preControllerState_{};
-	DIJOYSTATE2 controllerState_{};
+	XINPUT_STATE preControllerState_{};
+	XINPUT_STATE controllerState_{};
+	bool isControllerConnected_ = false;
 
 	// スティックのデッドゾーン
 	const float deadZone_ = 0.1f;

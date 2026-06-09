@@ -79,7 +79,11 @@ void UIDrawer::Update() {
 	auto& ctx = GameContext::GetInstance();
 	auto& input = ctx.Input();
 
-	if (input.IsRelease(DIK_F)) { UpdatePlayerUI(); }
+	if (input.gamepad.IsConnected()) {
+		if (input.keyboard.IsRelease(DIK_F)) { UpdatePlayerUI(); }
+	} else {
+		if (input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) { UpdatePlayerUI(); }
+	}
 
 	// hp
 	float hpRate = player_->GetHP() / player_->GetMaxHP();

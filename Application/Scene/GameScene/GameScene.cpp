@@ -27,7 +27,7 @@ void GameScene::Initialize() {
 
 	playerModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
 	playerModel_->SetAnimation(asset.LoadAnimation("Resources/Debug/human", "walk.gltf"));
-	playerShadowModel_ = asset.LoadModel("Resources/Player", "player.obj");
+	playerShadowModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
 	MaterialData data = playerModel_->GetMaterial(0)->GetData();
 	data.color = { 0.0f,0.0f,0.0f,1.0f };
 	data.useEnvironmentMap = true;
@@ -126,7 +126,7 @@ void GameScene::Update() {
 	if (!isShowResult_) {
 		if (isPause_) {
 			// ポーズ中
-			if (input.IsRelease(DIK_ESCAPE)) {
+			if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
 				isPause_ = false;
 			}
 
@@ -252,7 +252,7 @@ void GameScene::Update() {
 		float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_);
 		resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
 
-		if (input.IsTrigger(DIK_SPACE)) {
+		if (input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) {
 			isFadeOut_ = true;
 			fadeTimer_ = 0;
 		}

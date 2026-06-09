@@ -1,62 +1,64 @@
 #include "InputContext.h"
 
-InputContext::InputContext(InputSystem* input) {
-	input_ = input;
-}
-
-bool InputContext::IsTrigger(uint8_t keyNumber) {
+// --------------------
+// キーボード
+// --------------------
+bool KeyboardContext::IsTrigger(uint8_t keyNumber) {
 	return input_->IsTrigger(keyNumber);
 }
 
-bool InputContext::IsPress(uint8_t keyNumber) {
+bool KeyboardContext::IsPress(uint8_t keyNumber) {
 	return input_->IsPress(keyNumber);
 }
 
-bool InputContext::IsRelease(uint8_t keyNumber) {
+bool KeyboardContext::IsRelease(uint8_t keyNumber) {
 	return input_->IsRelease(keyNumber);
 }
 
-bool InputContext::IsClickLeft() {
-	return input_->IsClickLeft();
+// --------------------
+// マウス
+// --------------------
+
+bool MouseContext::IsTrigger(const MouseButton& button) {
+	return input_->IsTrigger(button);
 }
 
-bool InputContext::IsClickRight() {
-	return input_->IsClickRight();
+bool MouseContext::IsPress(const MouseButton& button) {
+	return input_->IsPress(button);
 }
 
-bool InputContext::IsClickWheel() {
-	return input_->IsClickWheel();
+bool MouseContext::IsRelease(const MouseButton& button) {
+	return input_->IsRelease(button);
 }
 
-bool InputContext::IsTriggerLeftClick() {
-	return input_->IsTriggerLeftClick();
-}
-
-bool InputContext::IsTriggerRightClick() {
-	return input_->IsTriggerRightClick();
-}
-
-bool InputContext::IsTriggerMouseWheel() {
-	return input_->IsTriggerMouseWheel();
-}
-
-Vector3 InputContext::GetMouseMove() {
+Vector3 MouseContext::GetMouseMove() {
 	return input_->GetMouseMove();
 }
 
-Vector2 InputContext::GetMousePosition() {
+Vector2 MouseContext::GetPosition() {
 	return input_->GetMousePosition();
 }
 
-bool InputContext::IsControllerPress(uint8_t buttonNumber) {
-	return input_->IsControllerPress(buttonNumber);
+// --------------------
+// コントローラー
+// --------------------
+bool GamepadContext::IsTrigger(WORD button) {
+	return input_->IsTrigger(button);
+}
+
+bool GamepadContext::IsPress(WORD button) {
+	return input_->IsPress(button);
+}
+
+bool GamepadContext::IsRelease(WORD button) {
+	return input_->IsRelease(button);
 }
 
 /// <summary>
 /// 左スティック
 /// </summary>
 /// <returns>-1~1</returns>
-Vector2 InputContext::GetLeftStick() {
+Vector2 GamepadContext::GetLeftStick() {
 	return input_->GetLeftStick();
 }
 
@@ -64,6 +66,18 @@ Vector2 InputContext::GetLeftStick() {
 /// 右スティック
 /// </summary>
 /// <returns>-1~1</returns>
-Vector2 InputContext::GetRightStick() {
+Vector2 GamepadContext::GetRightStick() {
 	return input_->GetRightStick();
+}
+
+float GamepadContext::GetLTrigger() {
+	return input_->GetLeftTrigger();
+}
+
+float GamepadContext::GetRTrigger() {
+	return input_->GetRightTrigger();
+}
+
+bool GamepadContext::IsConnected() {
+	return input_->IsControllerConnected();
 }

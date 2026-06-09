@@ -33,7 +33,7 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	transform_.translate.z = 1;
 
 	// 残像
-	instancing_ = asset.LoadInstancedModel("Resources/Player", "player.obj", 2);
+	instancing_ = asset.LoadInstancedModel("Resources/Debug/human", "walk.gltf", 2);
 	MaterialData data = instancing_->GetMaterial(0)->GetData();
 	data.color = { 0.3f,0.3f,1,0.2f };
 	data.enableLighting = false;
@@ -81,26 +81,24 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		moveParticle_->Update();
 
 		// アイテム取得
-		if (input.IsTrigger(DIK_F)) {
+		if (input.keyboard.IsTrigger(DIK_F) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_A)) {
 			itemManager->Interact(this);
 		}
 
 		// 攻撃の向き
-		if (input.IsClickLeft() || input.IsClickRight()) {
-			Vector2 win = ctx.GetWindowSize();
-			Vector2 mouse = input.GetMousePosition();
-			mouse.y = win.y - mouse.y;
+		Vector2 win = ctx.GetWindowSize();
+		Vector2 mouse = input.mouse.GetPosition();
+		mouse.y = win.y - mouse.y;
 
-			Vector2 dir = Normalize(mouse - win / 2.0f);
-			attackDirection_ = { dir.x,0,dir.y };
+		Vector2 dir = Normalize(mouse - win / 2.0f);
+		attackDirection_ = { dir.x,0,dir.y };
 
-			// プレイヤーの向き
-			transform_.rotate.y = -std::atan2(attackDirection_.z, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
+		// プレイヤーの向き
+		transform_.rotate.y = -std::atan2(attackDirection_.z, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
 
-			// 減速
-			if (weapon_) {
-				moveSpeed_ = defaultMoveSpeed_ * (1.0f - weapon_->GetStatus().weight);
-			}
+		// 減速
+		if (weapon_) {
+			moveSpeed_ = defaultMoveSpeed_ * (1.0f - weapon_->GetStatus().weight);
 		} else {
 			moveSpeed_ = defaultMoveSpeed_;
 		}
@@ -108,20 +106,21 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		if (weapon_) {
 			weapon_->Update();
 
+			// 入れ替え
+			if ((input.keyboard.IsTrigger(DIK_TAB) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_B)) && subWeapon_) {
+				weapon_.swap(subWeapon_);
+			}
+
 			// 武器のトランスフォーム
 			weaponTransform_ = transform_;
 			weaponTransform_.translate += {std::sin(transform_.rotate.y), 0, std::cos(transform_.rotate.y)}; // 前方に配置
 
 			if (shootCooldownTimer_->IsFinished()) {
 				// 射撃
-				if (input.IsClickLeft()) {
+				if (input.mouse.IsPress(MouseButton::Left)) {
 					Shoot(bulletManager, camera);
 				}
 
-				// 入れ替え
-				if (input.IsTrigger(DIK_TAB) && subWeapon_) {
-					weapon_.swap(subWeapon_);
-				}
 			} else {
 				shootCooldownTimer_->Update();
 			}
@@ -263,22 +262,22 @@ void Player::Move(MapCheck* mapCheck) {
 	Vector2 dir = { 0,0 };
 
 	// 移動
-	dir.x = input.GetLeftStick().x;
-	dir.y = input.GetLeftStick().y;
+	dir.x = input.gamepad.GetLeftStick().x;
+	dir.y = input.gamepad.GetLeftStick().y;
 
-	if (input.IsPress(DIK_A)) {
+	if (input.keyboard.IsPress(DIK_A)) {
 		dir.x = -1;
 	}
 
-	if (input.IsPress(DIK_D)) {
+	if (input.keyboard.IsPress(DIK_D)) {
 		dir.x = 1;
 	}
 
-	if (input.IsPress(DIK_W)) {
+	if (input.keyboard.IsPress(DIK_W)) {
 		dir.y = -1;
 	}
 
-	if (input.IsPress(DIK_S)) {
+	if (input.keyboard.IsPress(DIK_S)) {
 		dir.y = 1;
 	}
 
@@ -290,7 +289,7 @@ void Player::Move(MapCheck* mapCheck) {
 	boostCoolTime_--;
 
 	// ダッシュ入力
-	if (input.IsTrigger(DIK_SPACE) && Length(normalized) > 0.1f && boostCoolTime_ < 0) {
+	if ((input.keyboard.IsTrigger(DIK_SPACE) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_X)) && Length(normalized) > 0.1f && boostCoolTime_ < 0) {
 		isUsingBoost_ = true;
 		boostDir_ = { normalized.x,0,-normalized.y };
 		// ダッシュ前の位置を記憶
