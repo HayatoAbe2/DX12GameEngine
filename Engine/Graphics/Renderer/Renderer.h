@@ -33,7 +33,7 @@ public:
 	/// <summary>
 	/// トランスフォーム更新
 	/// </summary>
-	void UpdateModelTransforms(Model* model, Camera* camera);
+	void UpdateModelTransforms(Model* model);
 
 	void UpdateSpriteTransform(Sprite* sprite);
 
@@ -41,36 +41,37 @@ public:
 	/// モデル描画
 	/// </summary>
 	/// <param name="blendMode">ブレンドモード</param>
-	void DrawModel(Model* model, Camera* camera, LightManager* lightManager, int blendMode);
+	void DrawModel(Model* model, LightManager* lightManager, int blendMode);
 
 	/// <summary>
 	/// インスタンスモデル描画
 	/// </summary>
 	/// <param name="model">複数インスタンスを持つモデル</param>
 	/// <param name="blendMode">ブレンドモード</param>
-	void DrawModelInstance(InstancedModel* model, Camera* camera, LightManager* lightManager, int blendMode);
+	void DrawModelInstance(InstancedModel* model, LightManager* lightManager, int blendMode);
 
-	void DrawParticles(ParticleSystem* particleSys, Camera* camera, int blendMode);
+	void DrawParticles(ParticleSystem* particleSys, int blendMode);
 
 	void DrawSprite(Sprite* sprite, int blendMode);
 
 	// ノードごとに描画
-	void DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parent);
+	void DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parent);
 
 	// メッシュを描画
 	void DrawMesh(Model* model, Mesh* mesh);
 
 	// インスタンシング描画版
-	void DrawNodeInstance(InstancedModel* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld);
+	void DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld);
 	void DrawMeshInstance(InstancedModel* model, Mesh* mesh);
 
-	// 図形描画
-	void DrawPlane(ParticleSystem* particleSys, int blendMode);
 	// Skybox描画
-	void DrawSkybox(Texture* texture, Camera* camera);
+	void DrawSkybox(Texture* texture);
 
 	// ポストエフェクト設定
 	void SetPostEffectType(PostEffectType type);
+
+	// カメラセット
+	void SetCamera(Camera* camera);
 
 	/// <summary>
 	/// フレーム開始時の処理(描画開始時に行う)
@@ -124,4 +125,6 @@ private:
 		TransformationMatrix* transformData = nullptr;
 	};
 	SkyboxData skybox;
+
+	Camera* camera_;
 };

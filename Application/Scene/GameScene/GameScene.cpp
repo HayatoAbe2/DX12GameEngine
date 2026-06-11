@@ -8,11 +8,13 @@ void GameScene::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 	auto& asset = ctx.Asset();
+	auto& render = ctx.Render();
 
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();
 	camera_ = std::make_unique<Camera>();
 	camera_->transform_.rotate = { 1.0f,0,0 };
+	render.SetCamera(camera_.get());
 
 	audio.SoundLoad(L"Resources/Sounds/SE/explosion.mp3");
 	audio.SoundLoad(L"Resources/Sounds/SE/shoot.mp3");
@@ -295,12 +297,12 @@ void GameScene::Update() {
 
 void GameScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
-	render.SetPostEffectType(PostEffectType::None);
+	render.SetPostEffectType(PostEffectType::Outline);
 	if (isFadeOut_)render.SetPostEffectType(PostEffectType::Vignette);
 
-	render.DrawSkybox(skybox_.get(), camera_.get()); // パーティクルを後に描画したい
+	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
-	//render.DrawModel(cloud_.get(), camera_.get(), BlendMode::Add);
+	//render.DrawModel(cloud_.get()_.get(), BlendMode::Add);
 	mapTile_->Draw(camera_.get());
 	player_->Draw(camera_.get());
 	enemyManager_->Draw(camera_.get());

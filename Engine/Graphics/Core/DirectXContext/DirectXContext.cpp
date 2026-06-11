@@ -64,6 +64,9 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D; // 2DTexture
 	// DSVHeapの先頭にDSVを作る
 	deviceManager_->GetDevice()->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, descriptorHeapManager_->GetDSVHeap()->GetCPUDescriptorHandleForHeapStart());
+	// DepthのSRV
+	depthTextureSRVIndex_ = srvManager_->Allocate();
+	srvManager_->CreateDepthSRV(depthTextureSRVIndex_, depthStencilResource_);
 
 	// ルートシグネチャマネージャー
 	rootSignatureManager_ = std::make_unique<RootSignatureManager>();
@@ -103,17 +106,19 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 		shaderCompiler_->Compile(L"Resources/Shaders/Fullscreen.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Fullscreen.PS.hlsl", L"ps_6_0", logger_)
 	);
+	// ポストエフェクト
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Grayscale), shaderCompiler_->Compile(L"Resources/Shaders/Grayscale.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Vignette), shaderCompiler_->Compile(L"Resources/Shaders/Vignette.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::GaussianFilter3x3), shaderCompiler_->Compile(L"Resources/Shaders/GaussianFilter3x3.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::BoxFilter5x5), shaderCompiler_->Compile(L"Resources/Shaders/BoxFilter5x5.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Outline), shaderCompiler_->Compile(L"Resources/Shaders/Outline/Outline.PS.hlsl", L"ps_6_0", logger_));
+
+	// Outline用リソース
+	outlineResource_ = bufferManager_->CreateUploadBuffer(sizeof(OutlineData));
+	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
 
 	// PSOマネージャー
-	pipelineStateManager_->Initialize(
-		deviceManager_->GetDevice(), rootSignatureManager_->GetStandardRootSignature(),
-		rootSignatureManager_->GetInstancingRootSignature(), rootSignatureManager_->GetParticleRootSignature(),
-		rootSignatureManager_->GetSkyboxRootSignature(),rootSignatureManager_->GetGridRootSignature(), rootSignatureManager_->GetFullscreenRootSignature()
-	);
+	pipelineStateManager_->Initialize(deviceManager_->GetDevice(), rootSignatureManager_.get());
 
 	SetViewportAndScissor();
 
@@ -164,7 +169,9 @@ void DirectXContext::BeginFrame() {
 	imGuiManager_->BeginFrame();
 }
 
-void DirectXContext::EndFrame() {  
+void DirectXContext::EndFrame() {
+	auto cmdList = commandListManager_->GetCommandList();
+
 	renderTextureBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	renderTextureBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	renderTextureBarrier_.Transition.pResource = renderTextureResource_.Get();
@@ -188,24 +195,32 @@ void DirectXContext::EndFrame() {
 	// TransitionBarrierを張る
 	assert(renderTargetManager_->GetSwapChainResource(backBufferIndex_));
 
-	commandListManager_->GetCommandList()->ResourceBarrier(1, &swapChainBarrier_);
+	// depthBarrier
+	if (postEffectType_ == PostEffectType::Outline) {
+		depthBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		depthBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		depthBarrier_.Transition.pResource = depthStencilResource_.Get();
+		depthBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		depthBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		cmdList->ResourceBarrier(1, &depthBarrier_);
+	}
+
+	cmdList->ResourceBarrier(1, &swapChainBarrier_);
 
 	// 描画先のRTVとDSVを設定する
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = descriptorHeapManager_->GetCPUDescriptorHandle(descriptorHeapManager_->GetDSVHeap().Get(), descriptorHeapManager_->GetDSVHeapSize(), 0);
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetRTVHandle(backBufferIndex_);
-	commandListManager_->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+	cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色。RGBAの順
-	commandListManager_->GetCommandList()->ClearRenderTargetView(renderTargetManager_->GetRTVHandle(backBufferIndex_), clearColor, 0, nullptr);
+	cmdList->ClearRenderTargetView(renderTargetManager_->GetRTVHandle(backBufferIndex_), clearColor, 0, nullptr);
 	// 描画用のDescriptorHeapの設定
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvManager_->GetHeap().Get() };
-	commandListManager_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	cmdList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
 	// Viewportを設定
-	commandListManager_->GetCommandList()->RSSetViewports(1, &viewport_);
+	cmdList->RSSetViewports(1, &viewport_);
 	// Scissorを設定
-	commandListManager_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
-
-	auto cmdList = commandListManager_->GetCommandList();
+	cmdList->RSSetScissorRects(1, &scissorRect_);
 
 	// コピー
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -228,13 +243,28 @@ void DirectXContext::EndFrame() {
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
 		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::BoxFilter5x5)));
 		break;
+	case PostEffectType::Outline:
+		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
+		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Outline)));
+
+		outlineData_->projectionInverse = Inverse(camera_->projectionMatrix_);
+		cmdList->SetGraphicsRootConstantBufferView(2, outlineResource_->GetGPUVirtualAddress());
+		break;
 	default:
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
 		cmdList->SetPipelineState(pipelineStateManager_->GetCopyImagePSO());
 		break;
 	}
 	cmdList->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderTextureSRVIndex_));
+	cmdList->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(depthTextureSRVIndex_));
 	cmdList->DrawInstanced(3, 1, 0, 0);
+
+	// depthBarrier
+	if (postEffectType_ == PostEffectType::Outline) {
+		depthBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		depthBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		cmdList->ResourceBarrier(1, &depthBarrier_);
+	}
 
 	imGuiManager_->EndFrame(commandListManager_->GetCommandList().Get());
 

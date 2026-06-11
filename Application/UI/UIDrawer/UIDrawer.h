@@ -31,22 +31,6 @@ private:
 	float whiteLife_ = 0;
 	float whiteGaugeSpeed_ = 0.5f;
 
-	// 装備
-	std::unique_ptr<Sprite> equipAssaultRifle_ = nullptr;
-	std::unique_ptr<Sprite> equipPistol_ = nullptr;
-	std::unique_ptr<Sprite> equipShotgun_ = nullptr;
-	std::unique_ptr<Sprite> equipFireBall_ = nullptr;
-	std::unique_ptr<Sprite> equipWavegun_ = nullptr;
-
-	std::unique_ptr<Sprite> enchantDamage_[3]{};
-	std::unique_ptr<Sprite> enchantBulletSize_[3]{};
-	std::unique_ptr<Sprite> enchantBulletSpeed_[3]{};
-	std::unique_ptr<Sprite> enchantFireRate_[3]{};
-	std::unique_ptr<Sprite> enchantKnockback_[3]{};
-	std::unique_ptr<Sprite> enchantExtraBullet_[3]{};
-	std::unique_ptr<Sprite> enchantMoveSpeed_[3]{};
-	std::unique_ptr<Sprite> enchantResist_[3]{};
-
 	Sprite* equipment_ = nullptr;
 	Sprite* equipment2_ = nullptr;
 	Sprite* enchants_[3]{};
@@ -54,14 +38,7 @@ private:
 	std::unique_ptr<Sprite> ammo_ = nullptr;
 	std::unique_ptr<Sprite> magazine_ = nullptr;
 	SpriteData ammoUIData_ = { {640,380}, {100,22} }; 
-	// リロード
-	std::unique_ptr<Sprite> reloadBar_ = nullptr;
-	std::unique_ptr<Sprite> reloadBarBack_ = nullptr;
-	SpriteData reloadBarData_ = { {620,330}, { 20, 40 } };
 
-	// 操作
-	std::unique_ptr<Sprite> control_ = nullptr;
-	SpriteData controlUIData_ = { {640 - 24 + 100,710 - 65}, { 48,65 } };
 	std::unique_ptr<Sprite> dashControl_ = nullptr;
 	SpriteData dashUIData_ = { {10,100}, { 212,32 } };
 

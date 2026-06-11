@@ -12,8 +12,8 @@
 #include "Engine/Graphics/Pipeline/PipelineStateManager/PipelineStateManager.h"
 #include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
 #include "Engine/Graphics/Debug/ImGuiManager/ImGuiManager.h"
-#include "Engine/Graphics/Pipeline/BlendMode.h"
 #include "Engine/Graphics/Renderer/PostEffectType.h"
+#include "Engine/Scene/Camera/Camera.h"
 
 #include <wrl.h>
 #include <dxgi1_6.h>
@@ -58,6 +58,7 @@ public:
 	ConstantBufferManager* GetConstantBufferManager() { return constantBufferManager_.get(); }
 
 	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
+	void SetCamera(Camera* camera) { camera_ = camera; }
 private:
 
 	/// <summary>
@@ -99,6 +100,7 @@ private:
 
 	// 深度ステンシルリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
+	uint32_t depthTextureSRVIndex_;
 
 	// RenderTextureリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_ = nullptr;
@@ -107,6 +109,7 @@ private:
 	// 遷移バリア
 	D3D12_RESOURCE_BARRIER swapChainBarrier_ = {};
 	D3D12_RESOURCE_BARRIER renderTextureBarrier_ = {};
+	D3D12_RESOURCE_BARRIER depthBarrier_ = {};
 
 	// ビューポート
 	D3D12_VIEWPORT viewport_ = {};
@@ -148,6 +151,15 @@ private:
 	std::unique_ptr<BufferManager> bufferManager_ = nullptr;
 	std::unique_ptr<ConstantBufferManager> constantBufferManager_ = nullptr;
 
+	// カメラ
+	Camera* camera_ = nullptr;
+
 	PostEffectType postEffectType_ = PostEffectType::None;
+
+	struct OutlineData {
+		Matrix4x4 projectionInverse;
+	};
+	Microsoft::WRL::ComPtr<ID3D12Resource> outlineResource_;
+	OutlineData* outlineData_ = nullptr;
 };
 

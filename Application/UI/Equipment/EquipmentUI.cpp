@@ -1,4 +1,4 @@
-#include "UIDrawer.h"
+#include "EquipmentUI.h"
 #include "Player/Player.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/Weapons/AssaultRifle.h"
@@ -7,41 +7,15 @@
 #include "Weapon/Weapons/FireBall.h"
 #include "Weapon/Weapons/Wavegun.h"
 
-void UIDrawer::Initialize(Player* player) {
-	player_ = player;
-
+void EquipmentUI::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
-
-#pragma region PlayerUI
-	life_ = asset.LoadSprite("Resources/UI/gauge.png");
-	life_->SetSize({ 290,68 });
-	life_->SetPosition({ 10,10 });
-	damage_ = asset.LoadSprite("Resources/Debug/white1x1.png");
-	damage_->SetSize({ 290,68 });
-	damage_->SetPosition({ 10,10 });
-	lifeBack_ = asset.LoadSprite("Resources/UI/gauge.png");
-	lifeBack_->SetSize({ 290,68 });
-	lifeBack_->SetPosition({ 10,10 });
-	lifeBack_->SetColor({ 0.2f,0.2f,0.2f,1 });
 
 	equipAssaultRifle_ = asset.LoadSprite("Resources/Control/equipmentAssaultRifle.png");
 	equipPistol_ = asset.LoadSprite("Resources/Control/equipmentPistol.png");
 	equipShotgun_ = asset.LoadSprite("Resources/Control/equipmentShotgun.png");
 	equipFireBall_ = asset.LoadSprite("Resources/Control/equipmentSpellbook.png");
 	equipWavegun_ = asset.LoadSprite("Resources/Control/equipmentWavegun.png");
-
-	for (int i = 0; i < 3; ++i) {
-		enchantDamage_[i] = (asset.LoadSprite("Resources/UI/Enchants/damageIncrease.png"));
-		enchantBulletSize_[i] = (asset.LoadSprite("Resources/UI/Enchants/increaseBulletSize.png"));
-		enchantBulletSpeed_[i] = (asset.LoadSprite("Resources/UI/Enchants/increaseBulletSpeed.png"));
-		enchantBulletSpeed_[i] = (asset.LoadSprite("Resources/UI/Enchants/increaseFireRate.png"));
-		enchantFireRate_[i] = (asset.LoadSprite("Resources/UI/Enchants/increaseKnockback.png"));
-		enchantKnockback_[i] = (asset.LoadSprite("Resources/UI/Enchants/extraBullet.png"));
-		enchantExtraBullet_[i] = (asset.LoadSprite("Resources/UI/Enchants/IncreaseMovespeed.png"));
-		enchantMoveSpeed_[i] = (asset.LoadSprite("Resources/UI/Enchants/damageResist.png"));
-		enchantResist_[i] = (asset.LoadSprite("Resources/UI/Enchants/damageIncrease.png"));// 未使用
-	}
 
 	equipment_ = equipPistol_.get();
 	equipment_->SetSize({ 120,120 });
@@ -50,90 +24,15 @@ void UIDrawer::Initialize(Player* player) {
 	equipment2_->SetSize({ 80,80 });
 	equipment2_->SetPosition({ 640 - 200,710 - 100 });*/
 
-	for (int i = 0; i < 3; ++i) {
-		enchants_[i] = enchantDamage_[i].get();
-		enchants_[i]->SetSize({ 240,40 });
-		enchants_[i]->SetPosition({ 640 + 80,float(710 - 180 + i * 40) });
-	}
-
-#pragma endregion
-
 	// 操作
 	control_ = asset.LoadSprite("Resources/Control/leftClick.png");
 	control_->SetSize(controlUIData_.size);
 	control_->SetPosition(controlUIData_.pos);
 
-	dashControl_ = asset.LoadSprite("Resources/Control/dash.png");
-	dashControl_->SetSize(dashUIData_.size);
-	dashControl_->SetPosition(dashUIData_.pos);
-
-	reloadBar_ = asset.LoadSprite("Resources/Debug/white1x1.png");
-	reloadBar_->SetSize({ reloadBarData_.size });
-	reloadBar_->SetPosition({ reloadBarData_.pos });
-	reloadBarBack_ = asset.LoadSprite("Resources/Debug/white1x1.png");
-	reloadBarBack_->SetSize({ reloadBarData_.size });
-	reloadBarBack_->SetPosition({ reloadBarData_.pos });
-}
-
-void UIDrawer::Update() {
-	auto& ctx = GameContext::GetInstance();
-	auto& input = ctx.Input();
-
-	if (input.gamepad.IsConnected()) {
-		if (input.keyboard.IsRelease(DIK_F)) { UpdatePlayerUI(); }
-	} else {
-		if (input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) { UpdatePlayerUI(); }
-	}
-
-	// hp
-	float hpRate = player_->GetHP() / player_->GetMaxHP();
-	life_->SetTextureRect(0, 0, hpRate * 290, 68);
-	life_->SetSize({ hpRate * 290,68 });
-
-	float hp = player_->GetHP();
-	if (hp != whiteLife_) {
-		if (hp >= whiteLife_) {
-			whiteLife_ = hp;
-		} else {
-			whiteLife_ -= whiteGaugeSpeed_;
-		}
-
-		float preHPRate = whiteLife_ / player_->GetMaxHP();
-		damage_->SetTextureRect(0, 0, preHPRate * 290, 68);
-		damage_->SetSize({ preHPRate * 290,68 });
-	}
-}
-
-void UIDrawer::Draw() {
-	auto& ctx = GameContext::GetInstance();
-	auto& render = ctx.Render();
-
-	// プレイヤーUI
-#pragma region PlayerUI
-	// 操作
-	render.DrawSprite(dashControl_.get());
-
-	// 装備
-	auto weapon = player_->GetWeapon();
-	if (weapon != nullptr) {
-		render.DrawSprite(control_.get());
-		render.DrawSprite(equipment_);
-	}
-
-	auto subWeapon = player_->GetSubWeapon();
-	if (subWeapon != nullptr) {
-		//render.DrawSprite(equipment2_);
-	}
-
-	// hp
-	render.DrawSprite(lifeBack_.get());
-	render.DrawSprite(damage_.get());
-	render.DrawSprite(life_.get());
-#pragma endregion
 
 }
 
-void UIDrawer::UpdatePlayerUI() {
+void EquipmentUI::Update(Player* player) {
 	if (player_->GetWeapon() != nullptr) {
 		// 所持武器レア度
 		auto weapon = player_->GetWeapon();
@@ -200,5 +99,20 @@ void UIDrawer::UpdatePlayerUI() {
 	}
 }
 
-void UIDrawer::UpdateStageUI() {
+void EquipmentUI::Draw() {
+	auto& ctx = GameContext::GetInstance();
+	auto& render = ctx.Render();
+
+	// 装備
+	auto weapon = player_->GetWeapon();
+	if (weapon != nullptr) {
+		render.DrawSprite(control_.get());
+		render.DrawSprite(equipment_);
+	}
+
+	auto subWeapon = player_->GetSubWeapon();
+	if (subWeapon != nullptr) {
+		//render.DrawSprite(equipment2_);
+	}
+
 }

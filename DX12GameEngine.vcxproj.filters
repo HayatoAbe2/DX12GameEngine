@@ -235,7 +235,7 @@
     <ClCompile Include="Application\Weapon\WeaponManager.cpp" />
     <ClCompile Include="Application\CollisionChecker\CollisionChecker.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
-    <ClCompile Include="Application\UIDrawer\UIDrawer.cpp" />
+    <ClCompile Include="Application\UI\UIDrawer\UIDrawer.cpp" />
     <ClCompile Include="Application\Scene\SceneFactory\SceneFactory.cpp" />
     <ClCompile Include="Engine\Scene\SceneFactoryBase\SceneFactoryBase.cpp" />
     <ClCompile Include="Engine\Contexts\SceneContext\SceneContext.cpp" />
@@ -247,6 +247,8 @@
     <ClCompile Include="Application\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
+    <ClCompile Include="Application\UI\Equipment\EquipmentUI.cpp" />
+    <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -518,7 +520,7 @@
     <ClInclude Include="Application\CollisionChecker\CollisionChecker.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Rarity.h" />
-    <ClInclude Include="Application\UIDrawer\UIDrawer.h" />
+    <ClInclude Include="Application\UI\UIDrawer\UIDrawer.h" />
     <ClInclude Include="Application\Scene\SceneFactory\SceneFactory.h" />
     <ClInclude Include="Engine\Scene\SceneFactoryBase\SceneFactoryBase.h" />
     <ClInclude Include="Engine\Contexts\SceneContext\SceneContext.h" />
@@ -536,6 +538,7 @@
     <ClInclude Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
     <ClInclude Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
     <ClInclude Include="Application\Enemy\EnemyState\EnemyState.h" />
+    <ClInclude Include="Application\UI\Equipment\EquipmentUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

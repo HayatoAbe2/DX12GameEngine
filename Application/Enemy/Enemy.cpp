@@ -121,9 +121,9 @@ void Enemy::Draw(Camera* camera) {
 		shadowTransform.scale.y = 0.0f;
 		shadowTransform.translate.y = 0.01f;
 		shadowModel_->SetTransform(shadowTransform);
-		render.DrawModel(shadowModel_.get(), camera);
+		render.DrawModel(shadowModel_.get());
 	}
-	render.DrawModel(model_.get(), camera);
+	render.DrawModel(model_.get());
 }
 
 void Enemy::Hit(float damage, Vector3 from, const float knockback) {

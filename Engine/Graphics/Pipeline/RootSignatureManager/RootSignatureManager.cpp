@@ -384,20 +384,38 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	// RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
-
-	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
+	// t0
 	descriptorRange[0].BaseShaderRegister = 0;	// 0から始まる
 	descriptorRange[0].NumDescriptors = 1;		// 数は1つ
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// SRVを使う
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;	// Offsetを自動計算
+	// t1
+	descriptorRange[1].BaseShaderRegister = 1;
+	descriptorRange[1].NumDescriptors = 1;
+	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// SRVを使う
+	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	// RootParameter作成
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
 
 	// t0(テクスチャSRV)
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;					// DescriptorTableを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;								// PixelShaderで使う
-	rootParameters[0].DescriptorTable.pDescriptorRanges = descriptorRange;							// Tableの中身の配列を指定
-	rootParameters[0].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);				// Tableで利用する数
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRange[0];						// Tableの中身の配列を指定
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;										// Tableで利用する数
+
+	// t1(depthSRV)
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRange[1];
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+
+	// b0
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[2].Descriptor.ShaderRegister = 0;
+	rootParameters[2].Descriptor.RegisterSpace = 0;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	// -------------------------
 
@@ -405,7 +423,8 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 	descriptionRootSignature.NumParameters = _countof(rootParameters);		// 配列の長さ
 
 	// Samplerの設定
-	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+	D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
+	// Linear
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP; // 0~1の範囲をリピート
 	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -414,6 +433,10 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // LODの最大値
 	staticSamplers[0].ShaderRegister = 0; // s0
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; // PixelShaderで使う
+	// Point
+	staticSamplers[1] = staticSamplers[0];
+	staticSamplers[1].Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	staticSamplers[1].ShaderRegister = 1; // s1
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 

@@ -65,8 +65,8 @@ void SpreadBullet::Draw(Camera* camera) {
 	auto& render = ctx.Render();
 
 	// パーティクル
-	render.DrawParticle(particle_.get(), camera, BlendMode::Add);
-	render.DrawParticle(hitParticle_.get(), camera, BlendMode::Add);
+	render.DrawParticle(particle_.get(), BlendMode::Add);
+	render.DrawParticle(hitParticle_.get(), BlendMode::Add);
 }
 
 void SpreadBullet::Hit() {

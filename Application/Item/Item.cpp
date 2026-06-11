@@ -46,7 +46,7 @@ void Item::Draw(Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 
-	render.DrawModel(weapon_->GetWeaponModel(), camera);
+	render.DrawModel(weapon_->GetWeaponModel());
 }
 
 void Item::Erase() {

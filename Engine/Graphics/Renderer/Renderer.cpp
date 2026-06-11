@@ -57,9 +57,9 @@ void Renderer::UpdateSpriteTransform(Sprite* sprite) {
 	dxContext_->GetCommandListManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, cbAddress);
 }
 
-void Renderer::DrawModel(Model* model, Camera* camera, LightManager* lightManager, int blendMode) {
+void Renderer::DrawModel(Model* model, LightManager* lightManager, int blendMode) {
 	// GPUに渡すデータの更新
-	cameraData_->position = camera->transform_.translate;
+	cameraData_->position = camera_->transform_.translate;
 	if (lightManager) { lightManager->Update(); }
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
@@ -78,12 +78,12 @@ void Renderer::DrawModel(Model* model, Camera* camera, LightManager* lightManage
 	// ライト
 	cmdList->SetGraphicsRootConstantBufferView(5, lightManager->GetLightResource()->GetGPUVirtualAddress());
 
-	DrawNode(model, camera, cmdList, model->GetRootNode(), MakeIdentity4x4());
+	DrawNode(model, cmdList, model->GetRootNode(), MakeIdentity4x4());
 }
 
-void Renderer::DrawModelInstance(InstancedModel* model, Camera* camera, LightManager* lightManager, int blendMode) {
+void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManager, int blendMode) {
 	// GPUに渡すデータの更新
-	cameraData_->position = camera->transform_.translate;
+	cameraData_->position = camera_->transform_.translate;
 	if (lightManager) { lightManager->Update(); }
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
@@ -110,11 +110,11 @@ void Renderer::DrawModelInstance(InstancedModel* model, Camera* camera, LightMan
 		cmdList->SetGraphicsRootConstantBufferView(6, dummyLightBuffer_->GetGPUVirtualAddress());
 	}
 
-	DrawNodeInstance(model, camera, cmdList, model->GetRootNode(), MakeIdentity4x4());
+	DrawNodeInstance(model, cmdList, model->GetRootNode(), MakeIdentity4x4());
 }
 
-void Renderer::DrawParticles(ParticleSystem* particleSys, Camera* camera, int blendMode) {
-	particleSys->PreDraw(camera);
+void Renderer::DrawParticles(ParticleSystem* particleSys, int blendMode) {
+	particleSys->PreDraw(camera_);
 
 	Material* material = particleSys->GetMaterial();
 	// マテリアル更新
@@ -180,7 +180,7 @@ void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
 	cmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
-void Renderer::DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {
+void Renderer::DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {
 	Matrix4x4 modelWorld = MakeAffineMatrix(model->GetTransform());
 	Matrix4x4 nodeWorld = node->localMatrix * parentWorld;
 
@@ -188,8 +188,8 @@ void Renderer::DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3
 	TransformationMatrix data;
 	data.World = modelWorld;
 	data.WVP = data.World
-		* camera->viewMatrix_
-		* camera->projectionMatrix_;
+		* camera_->viewMatrix_
+		* camera_->projectionMatrix_;
 	data.WorldInverseTranspose = Transpose(Inverse(data.World));
 	auto cbAddress = dxContext_->GetConstantBufferManager()->UploadTransform(data); // gpu送信
 	cmdList->SetGraphicsRootConstantBufferView(1, cbAddress);
@@ -201,7 +201,7 @@ void Renderer::DrawNode(Model* model, Camera* camera, Microsoft::WRL::ComPtr<ID3
 
 	// 子ノード
 	for (auto& child : node->children) {
-		DrawNode(model, camera, cmdList, child.get(), nodeWorld);
+		DrawNode(model, cmdList, child.get(), nodeWorld);
 	}
 }
 
@@ -228,7 +228,7 @@ void Renderer::DrawMesh(Model* model, Mesh* mesh) {
 	}
 }
 
-void Renderer::DrawNodeInstance(InstancedModel* model, Camera* camera, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {
+void Renderer::DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {
 	Matrix4x4 nodeWorld = parentWorld * node->localMatrix;
 
 	// トランスフォーム更新
@@ -237,7 +237,7 @@ void Renderer::DrawNodeInstance(InstancedModel* model, Camera* camera, Microsoft
 	for (auto& color : colors) {
 		color = { 1,1,1,1 };
 	}
-	model->UpdateInstanceTransformWithNode(camera, nodeWorld, colors);
+	model->UpdateInstanceTransformWithNode(camera_, nodeWorld, colors);
 
 	// メッシュを描画
 	for (uint32_t meshIndex : node->meshIndices) {
@@ -246,7 +246,7 @@ void Renderer::DrawNodeInstance(InstancedModel* model, Camera* camera, Microsoft
 
 	// 子ノード
 	for (auto& child : node->children) {
-		DrawNodeInstance(model, camera, cmdList, child.get(), nodeWorld);
+		DrawNodeInstance(model, cmdList, child.get(), nodeWorld);
 	}
 }
 
@@ -566,8 +566,8 @@ void Renderer::InitializeSkybox() {
 	skybox.transformData->WorldInverseTranspose = MakeIdentity4x4();
 }
 
-void Renderer::DrawSkybox(Texture* texture, Camera* camera) {
-	skybox.transformData->WVP = skybox.transformData->World * camera->viewMatrix_ * camera->projectionMatrix_;
+void Renderer::DrawSkybox(Texture* texture) {
+	skybox.transformData->WVP = skybox.transformData->World * camera_->viewMatrix_ * camera_->projectionMatrix_;
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetSkyboxPSO(int(BlendMode::Normal));
@@ -590,6 +590,11 @@ void Renderer::DrawSkybox(Texture* texture, Camera* camera) {
 
 void Renderer::SetPostEffectType(PostEffectType type) {
 	dxContext_->SetPostEffectType(type);
+}
+
+void Renderer::SetCamera(Camera* camera) {
+	camera_ = camera; 
+	dxContext_->SetCamera(camera);
 }
 
 void Renderer::BeginFrame() {

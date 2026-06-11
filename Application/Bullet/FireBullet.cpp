@@ -82,8 +82,8 @@ void FireBullet::Draw(Camera* camera) {
 	}
 
 	// パーティクル
-	render.DrawParticle(particle_.get(), camera, BlendMode::Add);
-	render.DrawParticle(explosionParticle_.get(), camera, BlendMode::Add);
+	render.DrawParticle(particle_.get(), BlendMode::Add);
+	render.DrawParticle(explosionParticle_.get(), BlendMode::Add);
 }
 
 void FireBullet::Hit() {

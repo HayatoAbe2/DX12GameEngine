@@ -24,8 +24,6 @@ public:
 	~InputSystem();
 	void Update();
 
-	void SetRange();
-
 	//
 	// キー入力関連
 	//

@@ -34,7 +34,7 @@ void EffectManager::Draw(Camera* camera) {
 		Vector3 rotate = camera->transform_.rotate;
 		rotate.x += float(std::numbers::pi);
 		effect->SetRotate(rotate);
-		render.DrawModel(effect.get(), camera, BlendMode::Add);
+		render.DrawModel(effect.get(), BlendMode::Add);
 	}
 }
 

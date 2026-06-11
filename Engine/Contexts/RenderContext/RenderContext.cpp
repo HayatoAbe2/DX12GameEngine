@@ -7,22 +7,22 @@ RenderContext::RenderContext(Renderer* renderer, LightManager* lightManager) {
 	lightManager_ = lightManager;
 }
 
-void RenderContext::DrawModel(Model* model, Camera* camera, BlendMode blendMode) {
-	renderer_->DrawModel(model, camera, lightManager_, static_cast<int>(blendMode));
+void RenderContext::DrawModel(Model* model, BlendMode blendMode) {
+	renderer_->DrawModel(model, lightManager_, static_cast<int>(blendMode));
 }
 
 void RenderContext::DrawSprite(Sprite* sprite, BlendMode blendMode) {
 	renderer_->DrawSprite(sprite, static_cast<int>(blendMode));
 }
 
-void RenderContext::DrawInstancedModel(InstancedModel* instancedModel, Camera* camera, BlendMode blendMode) {
-	renderer_->DrawModelInstance(instancedModel, camera, lightManager_, static_cast<int>(blendMode));
+void RenderContext::DrawInstancedModel(InstancedModel* instancedModel, BlendMode blendMode) {
+	renderer_->DrawModelInstance(instancedModel, lightManager_, static_cast<int>(blendMode));
 }
 
-void RenderContext::DrawParticle(ParticleSystem* particleSystem, Camera* camera, BlendMode blendMode) {
-	renderer_->DrawParticles(particleSystem, camera, static_cast<int>(blendMode));
+void RenderContext::DrawParticle(ParticleSystem* particleSystem, BlendMode blendMode) {
+	renderer_->DrawParticles(particleSystem, static_cast<int>(blendMode));
 }
 
-void RenderContext::DrawSkybox(Texture* skybox, Camera* camera) {
-	renderer_->DrawSkybox(skybox, camera);
+void RenderContext::DrawSkybox(Texture* skybox) {
+	renderer_->DrawSkybox(skybox);
 }

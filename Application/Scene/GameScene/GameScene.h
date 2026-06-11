@@ -10,7 +10,7 @@
 #include "Weapon/WeaponManager.h"
 #include "Item/ItemManager.h"
 #include "CollisionChecker/CollisionChecker.h"
-#include "UIDrawer/UIDrawer.h"
+#include "UI/UIDrawer/UIDrawer.h"
 
 // ゲームシーン
 class GameScene : public BaseScene {

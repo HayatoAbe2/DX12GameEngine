@@ -7,6 +7,7 @@ void TitleScene::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	auto& audio = ctx.Audio();
+	auto& render = ctx.Render();
 
 	audio.SoundLoad(L"Resources/Sounds/SE/press.mp3");
 
@@ -14,6 +15,7 @@ void TitleScene::Initialize() {
 	debugCamera_->Initialize();
 	camera_ = std::make_unique<Camera>();
 	camera_->transform_.rotate = { 0,0,0 };
+	render.SetCamera(camera_.get());
 
 	// Skybox
 	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
@@ -74,6 +76,6 @@ void TitleScene::Draw() {
 	//render.DrawSprite(control_.get());
 	//render.DrawSprite(logo_.get());
 	
-	render.DrawSkybox(skybox_.get(), camera_.get());
+	render.DrawSkybox(skybox_.get());
 	render.DrawSprite(fade_.get());
 }

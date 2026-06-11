@@ -6,10 +6,11 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include <dxcapi.h>
+class RootSignatureManager;
 class PipelineStateManager {
 public:
 
-	void Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& rootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& instancingRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& particleRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& gridRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& copyImageRootSignature);
+	void Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, RootSignatureManager* rootSignatureManager);
 
 	ID3D12PipelineState* GetStandardPSO(int index) { return standardPSO[index].Get(); }
 	ID3D12PipelineState* GetInstancingPSO(int index) { return instancingPSO_[index].Get(); }

@@ -191,8 +191,8 @@ void MapTile::Draw(Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 
-	render.DrawInstancedModel(wall_.get(), camera);
-	render.DrawInstancedModel(floor_.get(), camera);
-	render.DrawModel(goal_.get(), camera);
-	render.DrawParticle(particle_.get(), camera, BlendMode::Add);
+	render.DrawInstancedModel(wall_.get());
+	render.DrawInstancedModel(floor_.get());
+	render.DrawModel(goal_.get());
+	render.DrawParticle(particle_.get(), BlendMode::Add);
 }

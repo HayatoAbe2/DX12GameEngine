@@ -76,6 +76,16 @@ void SRVManager::CreateRenderTextureSRV(uint32_t srvIndex, Microsoft::WRL::ComPt
 	device_->CreateShaderResourceView(renderTextureResource.Get(), &renderTextureSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
 }
 
+void SRVManager::CreateDepthSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource) {
+	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSrvDesc{};
+	depthTextureSrvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	depthTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	depthTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	depthTextureSrvDesc.Texture2D.MipLevels = 1;
+
+	device_->CreateShaderResourceView(depthStencilResource.Get(), &depthTextureSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUHandle(uint32_t index) {
 	return descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, index);
 }

@@ -5,13 +5,11 @@
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponStatus.h"
 
-#include <vector>
 #include <numbers>
 #include <cmath>
 #define DIRECTINPUT_VERSION 0x0800
 #include "dinput.h"
-#include "Windows.h"
-#include "DirectXMath.h"
+
 
 Player::~Player() {
 
@@ -173,7 +171,7 @@ void Player::Draw(Camera* camera) {
 	auto& render = ctx.Render();
 
 	if (isUsingBoost_) {
-		render.DrawInstancedModel(instancing_.get(), camera, BlendMode::Add);
+		render.DrawInstancedModel(instancing_.get(), BlendMode::Add);
 		render.SetPostEffectType(PostEffectType::GaussianFilter3x3);
 	}
 
@@ -184,13 +182,13 @@ void Player::Draw(Camera* camera) {
 		shadowTransform.scale.y = 0.0f;
 		shadowTransform.translate.y = 0.01f;
 		shadowModel_->SetTransform(shadowTransform);
-		render.DrawModel(shadowModel_.get(), camera);
+		render.DrawModel(shadowModel_.get());
 	} else {
 		render.SetPostEffectType(PostEffectType::BoxFilter5x5);
 	}
 
 	model_->SetTransform(transform_);
-	render.DrawModel(model_.get(), camera);
+	render.DrawModel(model_.get());
 
 	if (weapon_) {
 		// 影描画
@@ -198,19 +196,19 @@ void Player::Draw(Camera* camera) {
 		shadowTransform.scale.y = 0.0f;
 		shadowTransform.translate.y = 0.01f;
 		weapon_->GetWeaponShadowModel()->SetTransform(shadowTransform);
-		render.DrawModel(weapon_->GetWeaponShadowModel(), camera);
+		render.DrawModel(weapon_->GetWeaponShadowModel());
 
 		// 武器描画
 		weapon_->GetWeaponModel()->SetTransform(weaponTransform_);
-		render.DrawModel(weapon_->GetWeaponModel(), camera);
+		render.DrawModel(weapon_->GetWeaponModel());
 
 		// 照準方向
 		direction_->SetTransform(weaponTransform_);
-		render.DrawModel(direction_.get(), camera);
+		render.DrawModel(direction_.get());
 	}
 
 	// パーティクル
-	render.DrawParticle(moveParticle_.get(), camera, BlendMode::Add);
+	render.DrawParticle(moveParticle_.get(), BlendMode::Add);
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Player Info");

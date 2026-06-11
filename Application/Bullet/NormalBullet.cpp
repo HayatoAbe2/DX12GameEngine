@@ -76,9 +76,9 @@ void NormalBullet::Draw(Camera* camera) {
 	auto& render = ctx.Render();
 
 	// パーティクル
-	render.DrawParticle(particle_.get(), camera, BlendMode::Add);
-	render.DrawParticle(hitParticle_.get(), camera, BlendMode::Add);
-	render.DrawParticle(hitParticle2_.get(), camera, BlendMode::Add);
+	render.DrawParticle(particle_.get(), BlendMode::Add);
+	render.DrawParticle(hitParticle_.get(), BlendMode::Add);
+	render.DrawParticle(hitParticle2_.get(), BlendMode::Add);
 }
 
 void NormalBullet::Hit() {

@@ -6,6 +6,7 @@ enum class PostEffectType {
 	Vignette,
 	GaussianFilter3x3,
 	BoxFilter5x5,
+	Outline,
 
 	Count
 };

@@ -1,18 +1,16 @@
 #include "PipelineStateManager.h"
+#include "Engine/Graphics/Pipeline/RootSignatureManager/RootSignatureManager.h"
 #include <cassert>
 
-void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& rootSignature,
-	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& instancingRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& particleRootSignature,
-	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& skyboxRootSignature, const Microsoft::WRL::ComPtr<ID3D12RootSignature>& gridRootSignature,
-	const Microsoft::WRL::ComPtr<ID3D12RootSignature>& copyImageRootSignature) {
+void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, RootSignatureManager* rootSignatureManager) {
 	device_ = device;
-	standardPSOData.rootSignature = rootSignature;
-	instancingPSOData.rootSignature = instancingRootSignature;
-	spritePSOData.rootSignature = rootSignature;
-	particlePSOData.rootSignature = particleRootSignature;
-	skyboxPSOData.rootSignature = skyboxRootSignature;
-	gridPSOData.rootSignature = gridRootSignature;
-	fullscreenPSOData.rootSignature = copyImageRootSignature;
+	standardPSOData.rootSignature = rootSignatureManager->GetStandardRootSignature();
+	instancingPSOData.rootSignature = rootSignatureManager->GetInstancingRootSignature();
+	spritePSOData.rootSignature = rootSignatureManager->GetStandardRootSignature();
+	particlePSOData.rootSignature = rootSignatureManager->GetParticleRootSignature();
+	skyboxPSOData.rootSignature = rootSignatureManager->GetSkyboxRootSignature();
+	gridPSOData.rootSignature = rootSignatureManager->GetGridRootSignature();
+	fullscreenPSOData.rootSignature = rootSignatureManager->GetFullscreenRootSignature();
 
 	// InputLayout
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -62,6 +60,10 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	// boxFilter5x5
 	postEffect[int(PostEffectType::BoxFilter5x5)].desc = fullscreenBaseDesc_;
 	CreatePostEffectPSO(postEffect[int(PostEffectType::BoxFilter5x5)]);
+
+	// outline
+	postEffect[int(PostEffectType::Outline)].desc = fullscreenBaseDesc_;
+	CreatePostEffectPSO(postEffect[int(PostEffectType::Outline)]);
 }
 
 void PipelineStateManager::CreateStandardPSO() {

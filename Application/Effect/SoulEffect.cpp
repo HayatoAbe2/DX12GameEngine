@@ -32,5 +32,5 @@ void SoulEffect::Draw(Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 
-	render.DrawParticle(particle_.get(), camera, BlendMode::Add);
+	render.DrawParticle(particle_.get(), BlendMode::Add);
 }
