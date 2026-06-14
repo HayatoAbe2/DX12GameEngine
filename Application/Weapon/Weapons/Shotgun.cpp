@@ -21,10 +21,10 @@ float Shotgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Cam
 	audio.SoundPlay(L"Resources/Sounds/SE/shoot.mp3", false);
 
 	if (isEnemyBullet) {
-		return data_.shootCoolTime * 2;
+		return data_.stats.shootCoolTime * 2;
 	} else {
 		camera->StartShake(1.5f, 5);
-		return data_.shootCoolTime;
+		return data_.stats.shootCoolTime;
 	}
 }
 

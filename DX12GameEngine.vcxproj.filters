@@ -539,6 +539,9 @@
     <ClInclude Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
     <ClInclude Include="Application\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Application\UI\Equipment\EquipmentUI.h" />
+    <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
+    <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
+    <ClInclude Include="Engine\Asset\Asset.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

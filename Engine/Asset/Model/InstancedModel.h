@@ -8,6 +8,7 @@
 #include "Engine/Object/Transform.h"
 #include "Engine/Math/MathUtils.h"
 #include "Engine/Asset/Model/Node.h"
+#include "Engine/Asset/Asset.h"
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -18,8 +19,10 @@ class Renderer;
 class Camera;
 class BufferManager;
 class ConstantBufferManager;
-class InstancedModel {
+class InstancedModel : public Asset {
 public:
+	InstancedModel(uint32_t id) : Asset(id) {};
+
 	///
 	/// モデル読み込み時のSetter
 	///

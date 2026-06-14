@@ -36,8 +36,8 @@ ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureMan
 	textureManager_ = textureManager;
 }
 
-std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, const std::string& filename, bool enableLighting) {
-	std::unique_ptr<Model> model = std::make_unique<Model>(); // 構築するModel
+std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, bool enableLighting) {
+	std::unique_ptr<Model> model = std::make_unique<Model>(id); // 構築するModel
 	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>(); // データ
 
 	// assimpでモデル作成
@@ -90,7 +90,7 @@ std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, cons
 		/// 
 
 		for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
-			auto texture = std::make_shared<Texture>();
+			auto texture = std::make_shared<Texture>(textureId);
 
 			aiMaterial* aiMaterial = scene->mMaterials[materialIndex];
 			if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
@@ -106,12 +106,12 @@ std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, cons
 			textureManager_->CreateTextureSRV(texture);
 
 			// デフォルト環境テクスチャ
-			auto environmentTexture = std::make_shared<Texture>();
+			auto environmentTexture = std::make_shared<Texture>(envTextureId);
 			environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
 			textureManager_->CreateTextureSRV(environmentTexture);
 
 			// マテリアル初期化
-			std::unique_ptr<Material> material = std::make_unique<Material>();
+			std::unique_ptr<Material> material = std::make_unique<Material>(materialId);
 			bool useTexture = !texture->GetMtlPath().empty();
 			material->Initialize(bufferManager_, useTexture, enableLighting); // テクスチャ座標情報がなければテクスチャ不使用
 			material->SetTexture(texture);	// テクスチャ
@@ -143,10 +143,10 @@ std::unique_ptr<Model> ModelManager::Load(const std::string& directoryPath, cons
 	return model;
 }
 
-std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting) {
+std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting) {
 	if (numInstance == 0) { assert(false); } // インスタンス数0の場合止める
 
-	std::unique_ptr<InstancedModel> model = std::make_unique<InstancedModel>(); // 構築するModel
+	std::unique_ptr<InstancedModel> model = std::make_unique<InstancedModel>(id); // 構築するModel
 	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>(); // データ
 
 	// assimpでモデル作成
@@ -278,7 +278,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryP
 	/// マテリアルの設定
 	/// 
 
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>();	// テクスチャ
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>(textureId);	// テクスチャ
 
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
 		aiMaterial* aiMaterial = scene->mMaterials[materialIndex];
@@ -296,12 +296,12 @@ std::unique_ptr<InstancedModel> ModelManager::Load(const std::string& directoryP
 		textureManager_->CreateTextureSRV(texture);
 
 		// デフォルト環境テクスチャ
-		auto environmentTexture = std::make_shared<Texture>();
+		auto environmentTexture = std::make_shared<Texture>(envTextureId);
 		environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
 		textureManager_->CreateTextureSRV(environmentTexture);
 
 		// マテリアル初期化
-		std::unique_ptr<Material> material = std::make_unique<Material>();
+		std::unique_ptr<Material> material = std::make_unique<Material>(materialId);
 		bool useTexture = !texture->GetMtlPath().empty();
 		material->Initialize(bufferManager_, useTexture, enableLighting); // テクスチャ座標情報がなければテクスチャ不使用
 		material->SetTexture(texture);	// テクスチャ
@@ -492,8 +492,8 @@ Matrix4x4 ModelManager::ConvertAssimpMatrixToLHRow(const aiMatrix4x4& m) {
 	return out;
 }
 
-std::unique_ptr<ParticleSystem> ModelManager::CreateParticleInstanceResource(int numInstance) {
-	std::unique_ptr<ParticleSystem> particleSystem = std::make_unique<ParticleSystem>();
+std::unique_ptr<ParticleSystem> ModelManager::CreateParticleInstanceResource(int numInstance, uint32_t id) {
+	std::unique_ptr<ParticleSystem> particleSystem = std::make_unique<ParticleSystem>(id);
 
 	// インスタンス数分のtransformリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformResource = bufferManager_->CreateUploadBuffer(sizeof(InstanceGPUData) * numInstance);
@@ -518,15 +518,15 @@ std::unique_ptr<ParticleSystem> ModelManager::CreateParticleInstanceResource(int
 	return std::move(particleSystem);
 }
 
-std::unique_ptr<Material> ModelManager::LoadMaterial(std::shared_ptr<Texture> texture) {
+std::unique_ptr<Material> ModelManager::LoadMaterial(std::shared_ptr<Texture> texture, uint32_t id, uint32_t textureId) {
 	// マテリアル初期化
-	std::unique_ptr<Material> material = std::make_unique<Material>();
+	std::unique_ptr<Material> material = std::make_unique<Material>(id);
 	bool useTexture = !texture->GetMtlPath().empty();
 	material->Initialize(bufferManager_, useTexture, true); // テクスチャ座標情報がなければテクスチャ不使用
 	material->SetTexture(texture);	// テクスチャ
 
 	// デフォルト環境テクスチャ
-	auto environmentTexture = std::make_shared<Texture>();
+	auto environmentTexture = std::make_shared<Texture>(textureId);
 	environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
 	textureManager_->CreateTextureSRV(environmentTexture);
 	material->SetEnvironmentTexture(environmentTexture);

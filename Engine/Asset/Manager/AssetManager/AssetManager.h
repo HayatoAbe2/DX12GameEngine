@@ -18,30 +18,17 @@ public:
 	AssetManager(DirectXContext* dxContext, Logger* logger);
 
 	// 読み込み
-	std::unique_ptr<Model> LoadModelFile(const std::string& directoryPath, const std::string& filename, bool enableLighting = true) {
-		return std::move(modelManager_->Load(directoryPath, filename, enableLighting));
-	}
-	std::unique_ptr<InstancedModel> LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting = true) {
-		return std::move(modelManager_->Load(directoryPath, filename, numInstance, enableLighting));
-	}
-	std::unique_ptr<ParticleSystem> CreateParticle(int numInstance) {
-		return std::move(modelManager_->CreateParticleInstanceResource(numInstance));
-	}
-
-	std::unique_ptr<Sprite> LoadSprite(const std::string& filePath) {
-		return std::move(spriteManager_->Load(filePath));
-	}
-	std::shared_ptr<Texture> LoadTexture(const std::string& filePath) {
-		return textureManager_->Load(filePath);
-	}
-	std::unique_ptr<Material> CreateMaterial(std::shared_ptr<Texture> texture) {
-		return std::move(modelManager_->LoadMaterial(texture));
-	}
-	std::shared_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
-		return animationManager_->Load(directoryPath, filePath);
-	}
+	std::unique_ptr<Model> LoadModelFile(const std::string& directoryPath, const std::string& filename, bool enableLighting = true);
+	std::unique_ptr<InstancedModel> LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting = true);
+	std::unique_ptr<ParticleSystem> CreateParticle(int numInstance);
+	std::unique_ptr<Sprite> LoadSprite(const std::string& filePath);
+	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
+	std::unique_ptr<Material> CreateMaterial(std::shared_ptr<Texture> texture);
+	std::shared_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
 
 private:
+	uint32_t GenerateID();
+
 	// テクスチャマネージャー
 	std::unique_ptr<TextureManager> textureManager_ = nullptr;
 
@@ -53,5 +40,7 @@ private:
 
 	// アニメーション
 	std::unique_ptr<AnimationManager> animationManager_ = nullptr;
+
+	uint32_t assetId_ = 0;
 };
 

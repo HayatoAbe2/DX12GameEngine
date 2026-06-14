@@ -32,7 +32,7 @@ void SpreadBullet::Update(MapCheck* mapCheck) {
 			Hit();
 		}
 
-		if (mapCheck->IsHitWall(pos, data_.bulletSize / 2.0f)) {
+		if (mapCheck->IsHitWall(pos, data_.stats.bulletSize / 2.0f)) {
 			Hit();
 		}
 

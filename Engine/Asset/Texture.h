@@ -3,9 +3,12 @@
 #include <wrl.h>
 #include <string>
 #include "Engine/Math/MathUtils.h"
+#include "Engine/Asset/Asset.h"
 
-class Texture {
+class Texture : public Asset {
 public:
+	Texture(uint32_t id) : Asset(id) {};
+
 	const std::string& GetMtlPath()const { return mtlFilePath; }
 	const D3D12_GPU_DESCRIPTOR_HANDLE& GetSRVHandle() const { return srvHandle_; }
 	const Microsoft::WRL::ComPtr<ID3D12Resource> GetResource() const { return resource_; }

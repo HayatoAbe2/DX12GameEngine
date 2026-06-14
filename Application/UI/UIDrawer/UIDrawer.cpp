@@ -4,6 +4,9 @@
 void UIDrawer::Initialize(Player* player) {
 	player_ = player;
 
+	equipment_ = std::make_unique<EquipmentUI>();
+	equipment_->Initialize(player);
+
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
@@ -20,9 +23,16 @@ void UIDrawer::Initialize(Player* player) {
 	lifeBack_->SetColor({ 0.2f,0.2f,0.2f,1 });
 
 #pragma endregion
-	dashControl_ = asset.LoadSprite("Resources/Control/dash.png");
-	dashControl_->SetSize(dashUIData_.size);
-	dashControl_->SetPosition(dashUIData_.pos);
+
+	dodgeControl_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	dodgeControl_->SetSize(dodgeControlUIData_.size);
+	dodgeControl_->SetPosition(dodgeControlUIData_.pos);
+	dodgeControl_->SetTextureRect(64 * 16, 64 * 4, 64, 64);
+
+	dodge_ = asset.LoadSprite("Resources/Control/Dodge.png");
+	dodge_->SetSize(dodgeUIData_.size);
+	dodge_->SetPosition(dodgeUIData_.pos);
+
 }
 
 void UIDrawer::Update() {
@@ -52,6 +62,8 @@ void UIDrawer::Update() {
 		damage_->SetTextureRect(0, 0, preHPRate * 290, 68);
 		damage_->SetSize({ preHPRate * 290,68 });
 	}
+
+	equipment_->Update();
 }
 
 void UIDrawer::Draw() {
@@ -61,7 +73,8 @@ void UIDrawer::Draw() {
 	// プレイヤーUI
 #pragma region PlayerUI
 	// 操作
-	render.DrawSprite(dashControl_.get());
+	render.DrawSprite(dodge_.get());
+	render.DrawSprite(dodgeControl_.get());
 
 	// hp
 	render.DrawSprite(lifeBack_.get());
@@ -69,6 +82,7 @@ void UIDrawer::Draw() {
 	render.DrawSprite(life_.get());
 #pragma endregion
 
+	equipment_->Draw();
 }
 
 void UIDrawer::UpdatePlayerUI() {

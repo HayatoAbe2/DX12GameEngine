@@ -1,5 +1,6 @@
 #pragma once
 #include "GameCommon.h"
+#include "UI/Equipment/EquipmentUI.h"
 
 class Player;
 class UIDrawer {
@@ -31,16 +32,16 @@ private:
 	float whiteLife_ = 0;
 	float whiteGaugeSpeed_ = 0.5f;
 
-	Sprite* equipment_ = nullptr;
-	Sprite* equipment2_ = nullptr;
-	Sprite* enchants_[3]{};
+	std::unique_ptr<EquipmentUI> equipment_;
 	// 弾数(〇とかで表示,8個*2色目とか)
 	std::unique_ptr<Sprite> ammo_ = nullptr;
 	std::unique_ptr<Sprite> magazine_ = nullptr;
 	SpriteData ammoUIData_ = { {640,380}, {100,22} }; 
 
-	std::unique_ptr<Sprite> dashControl_ = nullptr;
-	SpriteData dashUIData_ = { {10,100}, { 212,32 } };
+	std::unique_ptr<Sprite> dodgeControl_ = nullptr;
+	SpriteData dodgeControlUIData_ = { {0,80}, { 64, 64 } };
+	std::unique_ptr<Sprite> dodge_ = nullptr;
+	SpriteData dodgeUIData_ = { {60,80}, { 96, 64 } };
 
 	// 階数
 	std::unique_ptr<Sprite> currentFloor_ = nullptr;

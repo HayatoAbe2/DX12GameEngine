@@ -7,7 +7,9 @@
 #include "Weapon/Weapons/FireBall.h"
 #include "Weapon/Weapons/Wavegun.h"
 
-void EquipmentUI::Initialize() {
+void EquipmentUI::Initialize(Player* player) {
+	player_ = player;
+
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
@@ -17,22 +19,28 @@ void EquipmentUI::Initialize() {
 	equipFireBall_ = asset.LoadSprite("Resources/Control/equipmentSpellbook.png");
 	equipWavegun_ = asset.LoadSprite("Resources/Control/equipmentWavegun.png");
 
+	equipAssaultRifle2_ = asset.LoadSprite("Resources/Control/equipmentAssaultRifle.png");
+	equipPistol2_ = asset.LoadSprite("Resources/Control/equipmentPistol.png");
+	equipShotgun2_ = asset.LoadSprite("Resources/Control/equipmentShotgun.png");
+	equipFireBall2_ = asset.LoadSprite("Resources/Control/equipmentSpellbook.png");
+	equipWavegun2_ = asset.LoadSprite("Resources/Control/equipmentWavegun.png");
+
 	equipment_ = equipPistol_.get();
-	equipment_->SetSize({ 120,120 });
-	equipment_->SetPosition({ 640 - 60,710 - 160 });
-	/*equipment2_ = asset.LoadSprite("Resources/Control/equipmentPistol.png");
-	equipment2_->SetSize({ 80,80 });
-	equipment2_->SetPosition({ 640 - 200,710 - 100 });*/
+	equipment2_ = equipShotgun_.get();
 
 	// 操作
-	control_ = asset.LoadSprite("Resources/Control/leftClick.png");
-	control_->SetSize(controlUIData_.size);
-	control_->SetPosition(controlUIData_.pos);
-
+	shootUI = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	shootUI->SetSize(shootUIData_.size);
+	shootUI->SetPosition(shootUIData_.pos);
+	shootUI->SetTextureRect(64 * 14, 64 * 2, 64, 64);
+	swapUI = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	swapUI->SetSize(swapUIData_.size);
+	swapUI->SetPosition(swapUIData_.pos);
+	swapUI->SetTextureRect(64 * 5, 64 * 3, 64, 64);
 
 }
 
-void EquipmentUI::Update(Player* player) {
+void EquipmentUI::Update() {
 	if (player_->GetWeapon() != nullptr) {
 		// 所持武器レア度
 		auto weapon = player_->GetWeapon();
@@ -63,39 +71,43 @@ void EquipmentUI::Update(Player* player) {
 		} else if (dynamic_cast<Wavegun*>(weapon)) {
 			equipment_ = equipWavegun_.get();
 		}
-		equipment_->SetSize({ 120, 120 });
-		equipment_->SetPosition({ 640 - 60, 710 - 160 });
+		equipment_->SetSize({ 150, 150 });
+		equipment_->SetPosition({ 1100, 530 });
 
-		// 二個目
+		auto weapon2 = player_->GetSubWeapon();
+		if (weapon2 != nullptr) {
+			// 二個目
+			switch (weapon2->GetData().rarity) {
+			case static_cast<int>(Rarity::Common):
+				equipment2_->SetColor({ 0.5f,0.5f,0.5f,1.0f });
+				break;
+			case static_cast<int>(Rarity::Rare):
+				equipment2_->SetColor({ 0.1f,0.1f,0.7f,1.0f });
+				break;
+			case static_cast<int>(Rarity::Epic):
+				equipment2_->SetColor({ 0.8f,0.1f,0.8f,1.0f });
+				break;
+			case static_cast<int>(Rarity::Legendary):
+				equipment2_->SetColor({ 1.0f,0.8f,0.0f,1.0f });
+				break;
+			}
 
-		//	// 武器アイコン
-		//	if (dynamic_cast<AssaultRifle*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2AssaultRifle.png");
-		//	} else if (dynamic_cast<Pistol*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Pistol.png");
-		//	} else if (dynamic_cast<Shotgun*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Shotgun.png");
-		//	} else if (dynamic_cast<FireBall*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Spellbook.png");
-		//	} else if (dynamic_cast<Wavegun*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Wavegun.png");
-		//	}
+			// 武器アイコン
+			if (dynamic_cast<AssaultRifle*>(weapon2)) {
+				equipment2_ = equipAssaultRifle2_.get();
+			} else if (dynamic_cast<Pistol*>(weapon2)) {
+				equipment2_ = equipPistol2_.get();
+			} else if (dynamic_cast<Shotgun*>(weapon2)) {
+				equipment2_ = equipShotgun2_.get();
+			} else if (dynamic_cast<FireBall*>(weapon2)) {
+				equipment2_ = equipFireBall2_.get();
+			} else if (dynamic_cast<Wavegun*>(weapon2)) {
+				equipment2_ = equipWavegun2_.get();
+			}
 
-		//	if (dynamic_cast<AssaultRifle*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2AssaultRifle.png");
-		//	} else if (dynamic_cast<Pistol*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Pistol.png");
-		//	} else if (dynamic_cast<Shotgun*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Shotgun.png");
-		//	} else if (dynamic_cast<FireBall*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Spellbook.png");
-		//	} else if (dynamic_cast<Wavegun*>(subWeapon)) {
-		//		equipment2_ = asset.LoadSprite("Resources/Control/equipment2Wavegun.png");
-		//	}
-
-		//	equipment2_->SetSize({ 120, 120 });
-		//	equipment2_->SetPosition({ 640 - 60, 710 - 160 });
-		//}
+			equipment2_->SetSize({ 85, 85 });
+			equipment2_->SetPosition({ 1165, 433 });
+		}
 	}
 }
 
@@ -106,13 +118,13 @@ void EquipmentUI::Draw() {
 	// 装備
 	auto weapon = player_->GetWeapon();
 	if (weapon != nullptr) {
-		render.DrawSprite(control_.get());
+		render.DrawSprite(shootUI.get());
 		render.DrawSprite(equipment_);
 	}
 
 	auto subWeapon = player_->GetSubWeapon();
 	if (subWeapon != nullptr) {
-		//render.DrawSprite(equipment2_);
+		render.DrawSprite(swapUI.get());
+		render.DrawSprite(equipment2_);
 	}
-
 }

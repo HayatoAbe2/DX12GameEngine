@@ -29,7 +29,7 @@ void NormalBullet::Update(MapCheck* mapCheck) {
 		// マップ当たり判定
 		Vector2 pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
 
-		if (mapCheck->IsHitWall(pos, data_.bulletSize / 2.0f)) {
+		if (mapCheck->IsHitWall(pos, data_.stats.bulletSize / 2.0f)) {
 			velocity_.x *= -1;
 			model_->SetTranslate(model_->GetTransform().translate + Vector3{ velocity_.x * 2,0,0 });
 		}
@@ -38,7 +38,7 @@ void NormalBullet::Update(MapCheck* mapCheck) {
 		// マップ当たり判定
 		pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
 
-		if (mapCheck->IsHitWall(pos, data_.bulletSize / 2.0f)) {
+		if (mapCheck->IsHitWall(pos, data_.stats.bulletSize / 2.0f)) {
 			velocity_.z *= -1;
 			model_->SetTranslate(model_->GetTransform().translate + Vector3{ 0,0,velocity_.z * 2 });
 		}

@@ -38,6 +38,7 @@ public:
 	void Shoot(BulletManager* bulletManager, Camera* camera);
 	void Boost(MapCheck* mapCheck);
 	void Fall();
+	Vector3 Raticle(Camera* camera);
 
 	Transform GetTransform() const { return transform_; }
 	float GetRadius() const { return radius_; }
@@ -73,8 +74,8 @@ private:
 	Vector3 velocity_ = { 0,0,0 };
 
 	// 移動の速さ
-	float moveSpeed_ = 0.2f;
-	const float defaultMoveSpeed_ = 0.2f;
+	float moveSpeed_ = 10.0f;
+	const float defaultMoveSpeed_ = 10.0f;
 
 	// 攻撃の向き
 	Vector3 attackDirection_ = {};
@@ -102,7 +103,7 @@ private:
 	bool isUsingBoost_ = false;
 	int boostTime_ = 0;
 	int maxBoostTime_ = 10;
-	float boostSpeed_ = 0.3f;
+	float boostSpeed_ = 15.0f;
 	Vector3 boostDir_{};
 	int boostCoolTime_ = 10;
 

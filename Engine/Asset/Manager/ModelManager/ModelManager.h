@@ -26,10 +26,10 @@ class TextureManager;
 class ModelManager {
 public:
 	ModelManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager);
-	std::unique_ptr<Model> Load(const std::string& directoryPath, const std::string& filename, bool enableLighting = true);
-	std::unique_ptr<InstancedModel> Load(const std::string& directoryPath, const std::string& filename, const int numInstance_, bool enableLighting = true);
-	std::unique_ptr<ParticleSystem> CreateParticleInstanceResource(int numInstance);
-	std::unique_ptr<Material> LoadMaterial(std::shared_ptr<Texture> texture);
+	std::unique_ptr<Model> Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, bool enableLighting = true);
+	std::unique_ptr<InstancedModel> Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, const int numInstance_, bool enableLighting = true);
+	std::unique_ptr<ParticleSystem> CreateParticleInstanceResource(int numInstance, uint32_t id);
+	std::unique_ptr<Material> LoadMaterial(std::shared_ptr<Texture> texture, uint32_t id, uint32_t textureId);
 
 private:
 	// 関数内で使う関数

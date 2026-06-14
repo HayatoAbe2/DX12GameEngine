@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "Engine/Asset/Asset.h"
 #include "Engine/Math/Mathutils.h"
 
 template <typename T>
@@ -20,7 +21,9 @@ struct NodeAnimation {
 	std::vector<KeyframeVector3> scale;
 };
 
-struct Animation {
+struct Animation : public Asset{
+	Animation(uint32_t id) : Asset(id) {};
+
 	float duration; // 全体時間
 	std::map<std::string, NodeAnimation> nodeAnimations;
 };

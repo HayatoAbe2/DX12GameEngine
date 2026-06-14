@@ -12,10 +12,10 @@ void ItemManager::Initialize(WeaponManager* weaponManager) {
 	auto& asset = ctx.Asset();
 
 	// 操作
-	control_ = std::make_unique<Sprite>();
-	control_ = asset.LoadSprite("Resources/Control/pickup.png");
+	control_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
 	control_->SetSize({ 96,39 });
-	control_->SetPosition({ 640 - 48,720 - 450 });
+	control_->SetPosition({ 640 - 24,720 - 450 });
+	control_->SetTextureRect(0, 64 * 9, 64, 64);
 }
 
 void ItemManager::Update(Player* player) {

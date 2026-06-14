@@ -26,8 +26,8 @@ TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) {
 	logger_ = logger;
 }
 
-std::shared_ptr<Texture> TextureManager::Load(const std::string& texturePath) {
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+std::shared_ptr<Texture> TextureManager::Load(const std::string& texturePath, uint32_t id) {
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>(id);
 	texture->SetMtlFilePath(texturePath);
 	CreateTextureSRV(texture);
 

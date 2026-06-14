@@ -88,7 +88,6 @@ void GameScene::Initialize() {
 	uiDrawer_->Initialize(player_.get());
 
 	// 雲
-	cloud_ = std::make_unique<Model>();
 	cloud_ = asset.LoadModel("Resources/Cloud", "Cloud.obj", false);
 	cloud_->SetTranslate({ 0,-20,0 });
 	data = cloud_->GetMaterial(0)->GetData();
@@ -98,17 +97,14 @@ void GameScene::Initialize() {
 	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,0,-cameraDistance_ };
 
 	// フェード
-	fade_ = std::make_unique<Sprite>();
 	fade_ = asset.LoadSprite("resources/Debug/white1x1.png");
 	fade_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
 	fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
 
-	resultBG_ = std::make_unique<Sprite>();
 	resultBG_ = asset.LoadSprite("resources/Result/result.png");
 	resultBG_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
 	resultBG_->SetColor({ 1, 1, 1, 0.7f });
 
-	resultCursor_ = std::make_unique<Sprite>();
 	resultCursor_ = asset.LoadSprite("resources/Result/cursor.png");
 	resultCursor_->SetSize({ 48,56 });
 	resultCursor_->SetColor({ 1, 1, 1, 0.7f });
@@ -229,10 +225,10 @@ void GameScene::Update() {
 	} else {
 		// リザルト
 		if (resultArrowMove_ < 1.0f) {
-			resultArrowMove_ += 1.0f / 60.0f;
+			resultArrowMove_ += ctx.GetDeltatime() * 1;
 		}
 
-		resultTime_ += 1.0f / 60.0f;
+		resultTime_ += ctx.GetDeltatime();
 		float endX = 0;
 		switch (currentFloor_) {
 		case 0:
@@ -298,7 +294,7 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
 	render.SetPostEffectType(PostEffectType::Outline);
-	if (isFadeOut_)render.SetPostEffectType(PostEffectType::Vignette);
+	//if (isFadeOut_)render.SetPostEffectType(PostEffectType::Vignette);
 
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 

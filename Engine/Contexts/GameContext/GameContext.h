@@ -13,6 +13,7 @@ class AudioSystem;
 class InputSystem;
 class AssetManager;
 class LightManager;
+class FixFPS;
 
 // 各Contextのまとめ役
 class GameContext {
@@ -28,7 +29,7 @@ public:
 	}
 
 	// コンストラクタ
-	GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager);
+	GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager, FixFPS* fixFps);
 
 	// モデルなどの読み込み
 	AssetContext& Asset() { return *asset_; }
@@ -54,6 +55,12 @@ public:
 
 	Vector2 GetWindowSize() const;
 
+	///
+	/// ウィンドウ情報
+	///
+	
+	float GetDeltatime() const;
+
 	/// 
 	/// 乱数
 	///
@@ -70,6 +77,9 @@ private:
 	std::unique_ptr<LightContext> light_ = nullptr;
 	std::unique_ptr<RenderContext> render_ = nullptr;
 	std::unique_ptr<SceneContext> scene_ = nullptr;
+
+	// deltatime取得
+	FixFPS* fixFps_ = nullptr;;
 
 	// ランダム関連
 	std::random_device randomDevice_;

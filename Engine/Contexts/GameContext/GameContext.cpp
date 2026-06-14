@@ -4,8 +4,9 @@
 #include "Engine/Io/InputSystem/InputSystem.h"
 #include "Engine/Asset/Manager/AssetManager/AssetManager.h"
 #include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
 
-GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager) {
+GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager, FixFPS* fixFps) {
 	asset_ = std::make_unique<AssetContext>(assetManager);
 	audio_ = std::make_unique<AudioContext>(audio);
 	input_ = std::make_unique<InputContext>(input);
@@ -15,6 +16,7 @@ GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* in
 
 	std::mt19937 randomEngine(randomDevice_());
 	randomEngine_ = randomEngine;
+	fixFps_ = fixFps;
 
 	hwnd_ = input->GetHwnd();
 }
@@ -23,6 +25,10 @@ Vector2 GameContext::GetWindowSize() const {
 	RECT rect;
 	GetClientRect(hwnd_, &rect);
 	return { float(rect.right),float(rect.bottom) };
+}
+
+float GameContext::GetDeltatime() const {
+	return fixFps_->GetDeltatime();
 }
 
 int GameContext::RandomInt(int min, int max) {

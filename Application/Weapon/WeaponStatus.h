@@ -1,56 +1,53 @@
 #pragma once
 #include "Rarity.h"
+#include "Weapon/Trait/BulletTrait.h"
 #include "GameCommon.h"
+#include <variant>
 
-enum Enchants {
-	increaseDamage, // ダメージ増加
-	bigBullet, // 弾サイズ増加
-	fastBullet, // 弾速度増加
-	shortCooldown, // 連射速度増加
-	hardKnockback, // ノックバック増加
-	moveSpeed, // 持っているときの移動速度増加
-	resist, // 持っているときの被ダメージ軽減
-	extraBullet, // たまに弾が増える
-	avoid, // 敵の攻撃を低確率で回避
+struct NormalParam {};
+struct ShotgunParam {
+	// 発射数
+	int8_t pelletCount;
+
+	// 拡散角度
+	float maxAngle = 0;
 };
-constexpr int enchantsCount = int(Enchants::resist) + 1;
+
+struct WeaponStats {
+	// ダメージ
+	float damage;
+	// 射撃中減速率
+	float weight;
+	// 弾の大きさ
+	float bulletSize;
+	// 弾速
+	float bulletSpeed;
+	// 射撃クールダウン
+	float shootCoolTime;
+	// 弾の生存時間
+	int bulletLifeTime;
+	// ノックバック
+	float knockback;
+};
 
 struct WeaponData {
 	std::string name;
 	std::string modelName;
 
-	// ダメージ
-	float damage;
-	// 射撃中減速率
-	float weight;
-	// 弾の大きさ
-	float bulletSize;
-	// 弾速
-	float bulletSpeed;
-	// 射撃クールダウン
-	float shootCoolTime;
-	// 弾の生存時間
-	int bulletLifeTime;
-	// ノックバック
-	float knockback;
-	// レア度
+	// 共通の基本ステータス
+	WeaponStats stats;
+	// 種類ごとの特殊パラメータ
+	std::variant<NormalParam, ShotgunParam> weaponSpecialData;
+	// 属性(弾の性質)
+	BulletTraits bulletTraits;
+	// レア度(表示に影響)
 	Rarity rarity;
 };
 
-// 強化数値(0が標準)
-struct WeaponStatus {
-	// ダメージ
-	float damage;
-	// 射撃中減速率
-	float weight;
-	// 弾の大きさ
-	float bulletSize;
-	// 弾速
-	float bulletSpeed;
-	// 射撃クールダウン
-	float shootCoolTime;
-	// 弾の生存時間
-	int bulletLifeTime;
-	// ノックバック
-	float knockback;
+// 強化
+struct WeaponModifier {
+	WeaponStats add;
+	WeaponStats multiplier{
+		1,1,1,1,1,1,1
+	};
 };

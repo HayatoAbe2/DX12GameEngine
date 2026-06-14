@@ -24,12 +24,26 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_
 }
 
 uint32_t SRVManager::Allocate() {
+	// フリーリストに空きがあれば再利用
+	if (!freeList_.empty()) {
+		uint32_t idx = freeList_.back();
+		freeList_.pop_back();
+		return idx;
+	}
+
 	assert(useIndex_ < kMaxSRVCount_);
 
 	// 現在インデックスを返す
 	int index = useIndex_;
 	useIndex_++;
 	return index;
+}
+
+void SRVManager::Free(uint32_t index) {
+	// 範囲チェック（デバッグ用）
+	if (index >= kMaxSRVCount_) return;
+	// ここで重複解放検出などが必要なら追加
+	freeList_.push_back(index);
 }
 
 void SRVManager::CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT mipLevels, bool isCubemap) {

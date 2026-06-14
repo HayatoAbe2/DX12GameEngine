@@ -2,12 +2,14 @@
 #include "Engine/Graphics/GPUData/TransformationMatrix.h"
 #include "Engine/Graphics/GPUData/VertexData.h"
 #include "Engine/Asset/Material/Material.h"
+#include "Engine/Asset/Asset.h"
 #include <wrl.h>
 #include <d3d12.h>
 #include <memory>
 
-class Sprite {
+class Sprite : public Asset {
 public:
+	Sprite(uint32_t id) : Asset(id) {};
 
 	///
 	/// スプライト読み込み時のSetter
@@ -102,6 +104,7 @@ private:
 	Vector2 size_ = { 640.0f,360.0f };
 	Vector2 position_ = {};
 	float rotation_ = 0.0f;
+	bool debugKeepAspect_ = false;
 
 	std::unique_ptr<Material> material_;
 

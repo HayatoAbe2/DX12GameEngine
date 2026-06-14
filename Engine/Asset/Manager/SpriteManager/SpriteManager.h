@@ -15,7 +15,7 @@ class SpriteManager {
 public:
 	SpriteManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager);
 
-	std::unique_ptr<Sprite> Load(const std::string& texturePath);
+	std::unique_ptr<Sprite> Load(const std::string& texturePath, uint32_t id, uint32_t textureId, uint32_t materialId);
 
 private:
 	// デバイス

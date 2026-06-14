@@ -56,6 +56,7 @@ public:
 	RootSignatureManager* GetRootSignatureManager() { return rootSignatureManager_.get(); }
 	BufferManager* GetBufferManager() { return bufferManager_.get(); }
 	ConstantBufferManager* GetConstantBufferManager() { return constantBufferManager_.get(); }
+	FixFPS* GetFixFPS() { return fixFPS_.get(); }
 
 	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
 	void SetCamera(Camera* camera) { camera_ = camera; }

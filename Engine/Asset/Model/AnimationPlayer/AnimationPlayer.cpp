@@ -1,5 +1,6 @@
 #include "AnimationPlayer.h"
 #include <cmath>
+#include "Engine/Contexts/GameContext/GameContext.h"
 
 AnimationPlayer::AnimationPlayer(std::shared_ptr<Animation> animation, const std::string& rootNodeName) {
 	animation_ = animation;
@@ -7,7 +8,7 @@ AnimationPlayer::AnimationPlayer(std::shared_ptr<Animation> animation, const std
 }
 
 void AnimationPlayer::Update(ModelNode& rootNode) {
-	animationTime_ += 1.0f / 60.0f;
+	animationTime_ += GameContext::GetInstance().GetDeltatime();
 	animationTime_ = std::fmod(animationTime_, animation_->duration);
 
 	Vector3 translate = CalculateValue(nodeAnim_.translate, animationTime_);

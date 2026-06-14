@@ -15,7 +15,7 @@ class TextureManager {
 public:
 	TextureManager(DirectXContext* dxContext, Logger* logger);
 	
-	std::shared_ptr<Texture> Load(const std::string& texturePath);
+	std::shared_ptr<Texture> Load(const std::string& texturePath, uint32_t id);
 	void CreateTextureSRV(const std::shared_ptr<Texture>& texture);
 
 private:

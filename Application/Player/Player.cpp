@@ -38,7 +38,6 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	instancing_->GetMaterial(0)->SetData(data);
 
 	// 方向線
-	direction_ = std::make_unique<Model>();
 	direction_ = asset.LoadModel("Resources/Direction", "Direction.obj");
 	auto dData = direction_->GetMaterial(0)->GetData();
 	dData.color = { 1,0,0,dirDisplayAlpha_ };
@@ -96,7 +95,10 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 
 		// 減速
 		if (weapon_) {
-			moveSpeed_ = defaultMoveSpeed_ * (1.0f - weapon_->GetStatus().weight);
+			float weight = weapon_->GetData().stats.weight + weapon_->GetModifier().add.weight;
+			weight *= weapon_->GetModifier().multiplier.weight;
+
+			moveSpeed_ = defaultMoveSpeed_ * (1.0f - weight);
 		} else {
 			moveSpeed_ = defaultMoveSpeed_;
 		}
@@ -116,7 +118,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 			if (shootCooldownTimer_->IsFinished()) {
 				// 射撃
 				if (input.mouse.IsPress(MouseButton::Left)) {
-					Shoot(bulletManager, camera);
+					//Shoot(bulletManager, camera);
 				}
 
 			} else {
@@ -130,7 +132,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 
 			// ノックバック
 			model_->SetScale({ 1,1,1 });
-			float length = Length(velocity_);
+			float length = Length(velocity_) * ctx.GetDeltatime();
 			length -= 0.05f;
 			if (length < 0) { length = 0; }
 			velocity_ = Normalize(velocity_) * length;
@@ -281,8 +283,8 @@ void Player::Move(MapCheck* mapCheck) {
 
 	// 入力を反映
 	Vector2 normalized = Normalize(dir);
-	velocity_.x = normalized.x * moveSpeed_;
-	velocity_.z = -normalized.y * moveSpeed_;
+	velocity_.x = normalized.x * moveSpeed_ * ctx.GetDeltatime();
+	velocity_.z = -normalized.y * moveSpeed_ * ctx.GetDeltatime();
 
 	boostCoolTime_--;
 
@@ -355,7 +357,7 @@ void Player::Boost(MapCheck* mapCheck) {
 	auto& audio = ctx.Audio();
 
 	// ダッシュ
-	velocity_ = boostDir_ * boostSpeed_;
+	velocity_ = boostDir_ * boostSpeed_ * ctx.GetDeltatime();
 
 	Vector2 pos = { transform_.translate.x,transform_.translate.z };
 	for (int i = 0; i < 4; ++i) {

@@ -4,8 +4,8 @@
 class Player;
 class EquipmentUI {
 public:
-	void Initialize();
-	void Update(Player* player);
+	void Initialize(Player* player);
+	void Update();
 	void Draw();
 
 private:
@@ -25,9 +25,18 @@ private:
 	std::unique_ptr<Sprite> equipFireBall_ = nullptr;
 	std::unique_ptr<Sprite> equipWavegun_ = nullptr;
 
+	std::unique_ptr<Sprite> equipAssaultRifle2_ = nullptr;
+	std::unique_ptr<Sprite> equipPistol2_ = nullptr;
+	std::unique_ptr<Sprite> equipShotgun2_ = nullptr;
+	std::unique_ptr<Sprite> equipFireBall2_ = nullptr;
+	std::unique_ptr<Sprite> equipWavegun2_ = nullptr;
+
+
 	// 操作
-	std::unique_ptr<Sprite> control_ = nullptr;
-	SpriteData controlUIData_ = { {640 - 24 + 100,710 - 65}, { 48,65 } };
+	std::unique_ptr<Sprite> shootUI = nullptr;
+	std::unique_ptr<Sprite> swapUI = nullptr;
+	SpriteData shootUIData_ = { {1030, 620}, { 64,64 } };
+	SpriteData swapUIData_ = { {1110, 425}, { 50,50 } };
 
 };
 

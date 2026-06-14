@@ -2,6 +2,7 @@
 #include <wrl.h>
 #include <cstdint>
 #include <d3d12.h>
+#include <vector>
 
 class DescriptorHeapManager;
 
@@ -17,6 +18,8 @@ public:
 
 	// メモリ確保
 	uint32_t Allocate();
+	// 解放
+	void Free(uint32_t index);
 
 	// SRV生成
 	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT mipLevels, bool isCubemap);
@@ -52,5 +55,7 @@ private:
 
 	// 次のindex
 	uint32_t useIndex_ = 0;
+
+	std::vector<uint32_t> freeList_;
 };
 

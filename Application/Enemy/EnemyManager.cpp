@@ -37,79 +37,89 @@ void EnemyManager::Draw(Camera* camera) {
 	}
 }
 
-void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyType){
-    auto& ctx = GameContext::GetInstance();
-    auto& asset = ctx.Asset();
+void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyType) {
+	auto& ctx = GameContext::GetInstance();
+	auto& asset = ctx.Asset();
 
-   auto enemyModel = std::make_unique<Model>();
-   enemyModel->SetTranslate(pos);
-   auto enemyShadowModel = std::make_unique<Model>();
-   enemyShadowModel->SetTranslate(pos);
 
-   std::vector<std::unique_ptr<Weapon>> weapons;
-   EnemyStatus status;
+	std::vector<std::unique_ptr<Weapon>> weapons;
+	EnemyStatus status;
 
-   switch (enemyType) {
-   case 1:
-       enemyModel = asset.LoadModel("Resources/Enemy", "bat.obj");
-       enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat.obj");
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
-       status.hp = 10;
-       status.radius = 0.5f;
-       status.moveSpeed = 0.2f;
-       status.defaultSearchRadius = 5.0f;
-       status.stunResist = 0;
-       status.canFly = true;
+	switch (enemyType) {
+	case 1:
+	{
+		auto enemyModel = asset.LoadModel("Resources/Enemy", "bat.obj");
+		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat.obj");
+		enemyModel->SetTranslate(pos);
+		enemyShadowModel->SetTranslate(pos);
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
+		status.hp = 10;
+		status.radius = 0.5f;
+		status.moveSpeed = 7.0f;
+		status.defaultSearchRadius = 5.0f;
+		status.stunResist = 0;
+		status.canFly = true;
+		enemies_.push_back(std::make_unique<Bat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		break;
+	}
 
-       enemies_.push_back(std::make_unique<Bat>(std::move(enemyModel),std::move(enemyShadowModel), pos, status, std::move(weapons)));
-       break;
+	case 2:
+	{
+		auto enemyModel = asset.LoadModel("Resources/Enemy", "knight.obj");
+		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight.obj");
+		enemyModel->SetTranslate(pos);
+		enemyShadowModel->SetTranslate(pos);
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
+		status.hp = 20;
+		status.radius = 0.9f;
+		status.moveSpeed = 3.5f;
+		status.defaultSearchRadius = 10.0f;
+		status.stunResist = 2;
+		status.canFly = false;
 
-   case 2:
-       enemyModel = asset.LoadModel("Resources/Enemy", "knight.obj");
-       enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight.obj");
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
-       status.hp = 20;
-       status.radius = 0.9f;
-       status.moveSpeed = 0.07f;
-       status.defaultSearchRadius = 10.0f;
-       status.stunResist = 2;
-       status.canFly = false;
+		enemies_.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		break;
+	}
+	case 3:
+	{
+		auto enemyModel = asset.LoadModel("Resources/Enemy", "knight2.obj");
+		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight2.obj");
+		enemyModel->SetTranslate(pos);
+		enemyShadowModel->SetTranslate(pos);
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
+		status.hp = 150;
+		status.radius = 1.5f;
+		status.moveSpeed = 3.5f;
+		status.defaultSearchRadius = 100.0f;
+		status.stunResist = 30;
+		status.canFly = false;
 
-       enemies_.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
-       break;
+		enemies_.push_back(std::make_unique<HeavyKnight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		break;
+	}
 
-   case 3:
-       enemyModel = asset.LoadModel("Resources/Enemy", "knight2.obj");
-       enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight2.obj");
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
-       status.hp = 150;
-       status.radius = 1.5f;
-       status.moveSpeed = 0.07f;
-       status.defaultSearchRadius = 100.0f;
-       status.stunResist = 30;
-       status.canFly = false;
+	default:
+	{
+		auto enemyModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
+		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
+		enemyModel->SetTranslate(pos);
+		enemyShadowModel->SetTranslate(pos);
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Pistol)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Wavegun)));
+		status.hp = 110;
+		status.radius = 0.75f;
+		status.moveSpeed = 7.0f;
+		status.defaultSearchRadius = 100.0f;
+		status.stunResist = 30;
+		status.canFly = true;
 
-       enemies_.push_back(std::make_unique<HeavyKnight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
-       break;
-
-   default:
-       enemyModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
-       enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Pistol)));
-       weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Wavegun)));
-       status.hp = 110;
-       status.radius = 0.75f;
-       status.moveSpeed = 0.15f;
-       status.defaultSearchRadius = 100.0f;
-       status.stunResist = 30;
-       status.canFly = true;
-
-       enemies_.push_back(std::make_unique<RedBat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
-       break;
-   }
+		enemies_.push_back(std::make_unique<RedBat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		break;
+	}
+	}
 }
 
 void EnemyManager::Reset() {
@@ -117,28 +127,28 @@ void EnemyManager::Reset() {
 }
 
 void EnemyManager::LoadCSV(std::string filePath, float tileSize, WeaponManager* weaponManager) {
-    std::ifstream file(filePath);
-    std::string line;
+	std::ifstream file(filePath);
+	std::string line;
 
-    assert(file.is_open());
+	assert(file.is_open());
 
-    std::getline(file, line); // 最初の行をスキップ
+	std::getline(file, line); // 最初の行をスキップ
 
-    while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string enemyStr, xStr, zStr;
+	while (std::getline(file, line)) {
+		std::stringstream ss(line);
+		std::string enemyStr, xStr, zStr;
 
-        std::getline(ss, enemyStr, ',');
-        std::getline(ss, xStr, ',');
-        std::getline(ss, zStr, ',');
+		std::getline(ss, enemyStr, ',');
+		std::getline(ss, xStr, ',');
+		std::getline(ss, zStr, ',');
 
-        int enemyNum = std::stoi(enemyStr);
-        float x = std::stof(xStr);
-        float z = std::stof(zStr);
+		int enemyNum = std::stoi(enemyStr);
+		float x = std::stof(xStr);
+		float z = std::stof(zStr);
 
-        Vector3 pos = Vector3{ x * tileSize, 0, z * tileSize };
-        Spawn(pos, weaponManager, enemyNum);
-    }
+		Vector3 pos = Vector3{ x * tileSize, 0, z * tileSize };
+		Spawn(pos, weaponManager, enemyNum);
+	}
 }
 
 std::vector<Enemy*> EnemyManager::GetEnemies() {

@@ -14,13 +14,13 @@ public:
 	Model* GetWeaponModel() { return model_.get(); }
 	Model* GetWeaponShadowModel() { return shadowModel_.get(); }
 	// ステータス(強化分)
-	const WeaponStatus& GetStatus() const { return status_; }
+	const WeaponModifier& GetModifier() const { return modifier_; }
 	// データ(基礎数値)
 	const WeaponData& GetData() const { return data_; }
 	
 protected:
 	WeaponData data_;
-	WeaponStatus status_{};
+	WeaponModifier modifier_{};
 	std::unique_ptr<Model> model_;
 	std::unique_ptr<Model> shadowModel_;
 };

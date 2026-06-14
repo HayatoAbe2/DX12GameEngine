@@ -4,7 +4,7 @@
         "damage": 1.2,
         "weight": 0.4,
         "bulletSize": 0.3,
-        "bulletSpeed": 1.2,
+        "bulletSpeed": 45,
         "shootCoolTime": 0.08,
         "bulletLifeTime": 60,
         "knockback": 0.1,

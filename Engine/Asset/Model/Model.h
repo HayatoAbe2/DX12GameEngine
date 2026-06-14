@@ -4,7 +4,7 @@
 #include "Engine/Asset/Model/Node.h"
 #include "Engine/Asset/Model/Skeleton.h"
 #include "Engine/Asset/Model/AnimationPlayer/AnimationPlayer.h"
-
+#include "Engine/Asset/Asset.h"
 #include <d3d12.h>
 #include <wrl.h>
 #include <vector>
@@ -13,9 +13,9 @@
 class Renderer;
 class Camera;
 class BufferManager;
-class Model {
+class Model : public Asset {
 public:
-
+	Model(uint32_t id) : Asset(id) {};
 	void Update();
 
 	///

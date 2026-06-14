@@ -29,8 +29,8 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 
 		Vector3 direction = Normalize(velocity_);
 		EnemyStatus status = enemy->GetStatus();
-		velocity_.x = direction.x * status.moveSpeed * (1.0f - enemy->GetCurrentWeapon()->GetData().weight);
-		velocity_.z = direction.z * status.moveSpeed * (1.0f - enemy->GetCurrentWeapon()->GetData().weight);
+		velocity_.x = direction.x * status.moveSpeed * (1.0f - enemy->GetCurrentWeapon()->GetData().stats.weight);
+		velocity_.z = direction.z * status.moveSpeed * (1.0f - enemy->GetCurrentWeapon()->GetData().stats.weight);
 	} else {
 		if (rotateTimer_->IsFinished()) {
 			// 方向転換の間隔

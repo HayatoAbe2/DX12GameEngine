@@ -5,12 +5,15 @@
 #include <vector>
 #include <memory>
 #include <Engine/Graphics/GPUData/InstanceGPUData.h>
+#include "Engine/Asset/Asset.h"
 
 class InstancedModel;
 class Camera;
 
-class ParticleSystem {
+class ParticleSystem : public Asset {
 public:
+    ParticleSystem(uint32_t id) : Asset(id) {};
+
     void Initialize(const ParticleShape& shape, std::unique_ptr<Material> material, int numInstance);
     void Emit(const Transform& baseTransform, const Vector3& velocity);
     void Update();
@@ -55,8 +58,8 @@ private:
     std::unique_ptr<Material> material_;
     int maxLifeTime_ = 1;
 
-    D3D12_GPU_DESCRIPTOR_HANDLE instanceSRVHandleGPU_;
-    std::vector<Transform> transforms_;
+    D3D12_GPU_DESCRIPTOR_HANDLE instanceSRVHandleGPU_{};
+    std::vector<Transform> transforms_{};
     Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformationResource_ = nullptr;
     InstanceGPUData* instanceTransformationData_ = nullptr;
 };

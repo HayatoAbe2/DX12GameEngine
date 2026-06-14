@@ -42,8 +42,7 @@ void EffectManager::SpawnHitEffect(const Vector3& pos) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	auto effect = std::make_unique<Model>();
-	effect = asset.LoadModel("Resources/HitEffect", "hitEffect.obj");
+	auto effect = asset.LoadModel("Resources/HitEffect", "hitEffect.obj");
 	effect->SetTransform({ {0.5f,0.5f,0.5f},{},pos });
 	hitEffect_.push_back(std::move(effect));
 }

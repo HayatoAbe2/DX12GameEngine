@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include "GameCommon.h"
 
 void Timer::Start(float duration) {
 	time_ = duration;
@@ -7,8 +8,9 @@ void Timer::Start(float duration) {
 
 void Timer::Update() {
     if (!isActive_) return;
+    auto& ctx = GameContext::GetInstance();
 
-    time_ -= 1.0f / 60.0f;
+    time_ -= ctx.GetDeltatime();
 
     if (time_ <= 0.0f) {
         time_ = 0.0f;

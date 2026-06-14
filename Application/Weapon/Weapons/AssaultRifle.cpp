@@ -16,10 +16,10 @@ float AssaultRifle::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager
 	audio.SoundPlay(L"Resources/Sounds/SE/shoot.mp3", false);
 
 	if (isEnemyBullet) {
-		return data_.shootCoolTime * 2;
+		return data_.stats.shootCoolTime * 2;
 	} else {
 		camera->StartShake(0.5f, 2);
-		return data_.shootCoolTime;
+		return data_.stats.shootCoolTime;
 	}
 }
 

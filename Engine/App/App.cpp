@@ -77,7 +77,7 @@ void App::Initialize() {
 	sceneManager_ = std::make_unique<SceneManager>();
 	
 	// コンテキスト(ゲームコードからの関数窓口)
-	gameContext_ = std::make_unique<GameContext>(renderer_.get(), audio_.get(), input_.get(), assetManager_.get(), lightManager_.get(), sceneManager_.get());
+	gameContext_ = std::make_unique<GameContext>(renderer_.get(), audio_.get(), input_.get(), assetManager_.get(), lightManager_.get(), sceneManager_.get(), dxContext_->GetFixFPS());
 	gameContext_->Set(gameContext_.get());
 
 	sceneManager_->Initialize();

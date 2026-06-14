@@ -6,10 +6,13 @@ Bullet::Bullet(std::unique_ptr<Model> model, const Vector3& direction, const Wea
 	model_ = std::move(model);
 	data_ = data;
 
-	velocity_ = direction * data.bulletSpeed;
+	auto& ctx = GameContext::GetInstance();
+	velocity_ = direction * data.stats.bulletSpeed * ctx.GetDeltatime();
+
 	if (isEnemyBullet) { velocity_ /= 2.0f; }
-	lifeTime_ = data.bulletLifeTime;
+	lifeTime_ = data.stats.bulletLifeTime;
 	isEnemyBullet_ = isEnemyBullet;
-	model_->SetScale({ data.bulletSize,data.bulletSize ,data.bulletSize });
+
+	model_->SetScale({ data.stats.bulletSize,data.stats.bulletSize ,data.stats.bulletSize });
 	model_->SetRotate({ 0, -std::atan2(velocity_.z, velocity_.x) + float(std::numbers::pi) / 2.0f,0 });
 }

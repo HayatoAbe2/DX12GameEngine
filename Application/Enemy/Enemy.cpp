@@ -60,7 +60,8 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 
 	// 現在Stateの行動
 	currentState_->Update(this, player, mapCheck, bulletManager);
-	velocity_ = currentState_->GetVelocity();
+	velocity_ = currentState_->GetVelocity() * ctx.GetDeltatime();
+
 	if (slowTimer_->IsActive()) {
 		velocity_ *= 0.4f;
 	}

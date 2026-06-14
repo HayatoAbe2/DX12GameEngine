@@ -378,6 +378,9 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
     <ClInclude Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
     <ClInclude Include="Application\Enemy\EnemyState\EnemyState.h" />
+    <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
+    <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
+    <ClInclude Include="Engine\Asset\Asset.h" />
     <ClInclude Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.h" />
     <ClInclude Include="Engine\Asset\Manager\AnimationManager\AnimationManager.h" />
     <ClInclude Include="Engine\Asset\Animation.h" />
