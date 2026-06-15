@@ -426,7 +426,7 @@ SubMesh ModelManager::CreateSubMesh(aiMesh* aiMesh) {
 
 	// IBV
 	size_t indexSize = sizeof(uint32_t) * subMesh.indices_.size();
-	subMesh.indexBuffer_ = bufferManager_->CreateUploadBuffer(size);
+	subMesh.indexBuffer_ = bufferManager_->CreateUploadBuffer(indexSize);
 
 	uint32_t* dst2 = nullptr;
 	subMesh.indexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dst2));

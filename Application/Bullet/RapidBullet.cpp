@@ -50,6 +50,7 @@ void RapidBullet::Update(MapCheck* mapCheck) {
 	}
 	particle_->Update();
 	hitParticle_->Update();
+	noHitTimer_->Update();
 
 	if (isDead_) {
 		hitParticleLifeTime--;
@@ -71,8 +72,8 @@ void RapidBullet::Draw(Camera* camera) {
 void RapidBullet::Hit() {
 	auto& ctx = GameContext::GetInstance();
 
+	noHitTimer_->Start(0.2f);
 	if (particleField_) {
-
 		// 飛散パーティクル
 		particleField_->SetGravity(-0.4f, model_->GetTransform().translate);
 		hitParticle_->AddField(std::move(particleField_));

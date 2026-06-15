@@ -12,10 +12,14 @@ void ItemManager::Initialize(WeaponManager* weaponManager) {
 	auto& asset = ctx.Asset();
 
 	// 操作
-	control_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
-	control_->SetSize({ 96,39 });
-	control_->SetPosition({ 640 - 24,720 - 450 });
-	control_->SetTextureRect(0, 64 * 9, 64, 64);
+	controlKey_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	controlKey_->SetSize({ 40,40 });
+	controlKey_->SetPosition({ 640 - 24,720 - 450 });
+	controlKey_->SetTextureRect(0, 64 * 9, 64, 64);
+	controlPad_ = asset.LoadSprite("Resources/Control/XboxController.png");
+	controlPad_->SetSize({ 40,40 });
+	controlPad_->SetPosition({ 640 - 24,720 - 450 });
+	controlPad_->SetTextureRect(64 * 8, 64 * 2, 64, 64);
 }
 
 void ItemManager::Update(Player* player) {
@@ -49,6 +53,7 @@ void ItemManager::Update(Player* player) {
 
 void ItemManager::Draw(Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
+	auto& input = ctx.Input();
 	auto& render = ctx.Render();
 
 	for (const auto& item : items_) {
@@ -56,7 +61,11 @@ void ItemManager::Draw(Camera* camera) {
 	}
 
 	if (canInteract_) {
-		render.DrawSprite(control_.get());
+		if (input.gamepad.IsConnected()) {
+			render.DrawSprite(controlPad_.get());
+		} else {
+			render.DrawSprite(controlKey_.get());
+		}
 	}
 }
 
@@ -108,7 +117,7 @@ void ItemManager::Spawn(Vector3 pos, int index, Rarity rarity) {
 void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
 	// アイテムを落とす
 	if (weapon) {
-		auto newItem = std::make_unique<Item>(std::move(weapon), pos, weapon->GetData().rarity);
+		auto newItem = std::make_unique<Item>(std::move(weapon), pos + Vector3{0,0.5f,0}, weapon->GetData().rarity);
 		items_.push_back(std::move(newItem));
 	}
 }
@@ -137,7 +146,7 @@ void ItemManager::LoadCSV(const std::string& filePath, const float tileSize) {
 		float x = std::stof(xStr);
 		float z = std::stof(zStr);
 
-		Vector3 pos = Vector3{ x * tileSize, 0, z * tileSize };
+		Vector3 pos = Vector3{ x * tileSize, 0.5f, z * tileSize };
 		Spawn(pos, itemNum);
 	}
 }

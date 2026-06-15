@@ -38,7 +38,8 @@ private:
 	std::unique_ptr<Sprite> magazine_ = nullptr;
 	SpriteData ammoUIData_ = { {640,380}, {100,22} }; 
 
-	std::unique_ptr<Sprite> dodgeControl_ = nullptr;
+	std::unique_ptr<Sprite> dodgeControlKey_ = nullptr;
+	std::unique_ptr<Sprite> dodgeControlPad_ = nullptr;
 	SpriteData dodgeControlUIData_ = { {0,80}, { 64, 64 } };
 	std::unique_ptr<Sprite> dodge_ = nullptr;
 	SpriteData dodgeUIData_ = { {60,80}, { 96, 64 } };

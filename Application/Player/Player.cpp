@@ -49,6 +49,10 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	moveParticle_->SetColor({ 0.6f, 0.6f, 0.6f, 1.0f });
 
 	shootCooldownTimer_ = std::make_unique<Timer>();
+	shootCooldownSprite_ = asset.LoadSprite("Resources/Debug/White1x1.png");
+	shootCooldownSprite_->SetPivot({ 0.0f,0.5f });
+	shootCooldownSprite_->SetSize(scSize_);
+	shootCooldownSprite_->SetPosition({640 - scSize_.x / 2.0f,370});
 }
 
 void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera, BulletManager* bulletManager) {
@@ -83,13 +87,22 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		}
 
 		// 攻撃の向き
-		Vector2 win = ctx.GetWindowSize();
-		Vector2 mouse = input.mouse.GetPosition();
-		mouse.y = win.y - mouse.y;
+		if (input.gamepad.IsConnected()) {
+			if (Length(input.gamepad.GetRightStick()) > 0.3f) {
+				Vector2 dir;
+				dir.x = input.gamepad.GetRightStick().x;
+				dir.y = input.gamepad.GetRightStick().y;
 
-		Vector2 dir = Normalize(mouse - win / 2.0f);
-		attackDirection_ = { dir.x,0,dir.y };
+				attackDirection_ = Normalize(Vector3(dir.x,0,dir.y));
+			}
+		} else {
+			Vector2 win = ctx.GetWindowSize();
+			Vector2 mouse = input.mouse.GetPosition();
+			mouse.y = win.y - mouse.y;
 
+			Vector2 dir = Normalize(mouse - win / 2.0f);
+			attackDirection_ = { dir.x,0,dir.y };
+		}
 		// プレイヤーの向き
 		transform_.rotate.y = -std::atan2(attackDirection_.z, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
 
@@ -117,13 +130,16 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 
 			if (shootCooldownTimer_->IsFinished()) {
 				// 射撃
-				if (input.mouse.IsPress(MouseButton::Left)) {
-					//Shoot(bulletManager, camera);
+				if (input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > 0.2f) {
+					Shoot(bulletManager, camera);
 				}
 
 			} else {
 				shootCooldownTimer_->Update();
 			}
+
+			float ct = weapon_->GetData().stats.shootCoolTime;
+			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / ct), scSize_.y });
 		}
 
 		// ノックバック中(操作はさせる)
@@ -207,6 +223,11 @@ void Player::Draw(Camera* camera) {
 		// 照準方向
 		direction_->SetTransform(weaponTransform_);
 		render.DrawModel(direction_.get());
+
+		// クールダウン表示
+		if (shootCooldownTimer_->IsActive()) {
+			render.DrawSprite(shootCooldownSprite_.get());
+		}
 	}
 
 	// パーティクル
@@ -262,8 +283,10 @@ void Player::Move(MapCheck* mapCheck) {
 	Vector2 dir = { 0,0 };
 
 	// 移動
-	dir.x = input.gamepad.GetLeftStick().x;
-	dir.y = input.gamepad.GetLeftStick().y;
+	if (Length(input.gamepad.GetLeftStick()) > 0.3f) {
+		dir.x = input.gamepad.GetLeftStick().x;
+		dir.y = -input.gamepad.GetLeftStick().y;
+	}
 
 	if (input.keyboard.IsPress(DIK_A)) {
 		dir.x = -1;

@@ -40,7 +40,7 @@ uint32_t SRVManager::Allocate() {
 }
 
 void SRVManager::Free(uint32_t index) {
-	// 範囲チェック（デバッグ用）
+	// 範囲チェック
 	if (index >= kMaxSRVCount_) return;
 	// ここで重複解放検出などが必要なら追加
 	freeList_.push_back(index);

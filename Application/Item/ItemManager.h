@@ -20,7 +20,8 @@ public:
 	void LoadCSV(const std::string& filePath,const float tileSize);
 	
 private:
-	std::unique_ptr<Sprite> control_ = nullptr;
+	std::unique_ptr<Sprite> controlKey_ = nullptr;
+	std::unique_ptr<Sprite> controlPad_ = nullptr;
 	WeaponManager* weaponManager_ = nullptr;
 	std::vector<std::unique_ptr<Item>> items_;
 	bool canInteract_ = true;

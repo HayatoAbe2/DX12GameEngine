@@ -122,5 +122,9 @@ private:
 	int moveParticleEmitInterval_ = 20;
 
 	float dirDisplayAlpha_ = 0.3f;
+
+	// クールダウン表示
+	std::unique_ptr<Sprite> shootCooldownSprite_;
+	Vector2 scSize_ = {70,20};
 };
 

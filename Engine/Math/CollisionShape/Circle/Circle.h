@@ -5,10 +5,10 @@ struct Circle {
     float radius;
     Vector2 center;
 
-    static bool CheckCollision(const Circle& a, const Circle& b) {
-        Vector2 diff = a.center - b.center;
+    bool CheckCollision(const Circle& other) {
+        Vector2 diff = center - other.center;
         float distSq = Dot(diff, diff);
-        float radiusSum = a.radius + b.radius;
+        float radiusSum = radius + other.radius;
 
         return distSq <= radiusSum * radiusSum;
     }

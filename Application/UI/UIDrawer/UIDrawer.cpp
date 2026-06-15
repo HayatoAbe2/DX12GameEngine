@@ -24,10 +24,14 @@ void UIDrawer::Initialize(Player* player) {
 
 #pragma endregion
 
-	dodgeControl_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
-	dodgeControl_->SetSize(dodgeControlUIData_.size);
-	dodgeControl_->SetPosition(dodgeControlUIData_.pos);
-	dodgeControl_->SetTextureRect(64 * 16, 64 * 4, 64, 64);
+	dodgeControlKey_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	dodgeControlKey_->SetSize(dodgeControlUIData_.size);
+	dodgeControlKey_->SetPosition(dodgeControlUIData_.pos);
+	dodgeControlKey_->SetTextureRect(64 * 16, 64 * 4, 64, 64);
+	dodgeControlPad_ = asset.LoadSprite("Resources/Control/XboxController.png");
+	dodgeControlPad_->SetSize(dodgeControlUIData_.size);
+	dodgeControlPad_->SetPosition(dodgeControlUIData_.pos);
+	dodgeControlPad_->SetTextureRect(64 * 6, 64 * 8, 64, 64);
 
 	dodge_ = asset.LoadSprite("Resources/Control/Dodge.png");
 	dodge_->SetSize(dodgeUIData_.size);
@@ -68,13 +72,18 @@ void UIDrawer::Update() {
 
 void UIDrawer::Draw() {
 	auto& ctx = GameContext::GetInstance();
+	auto& input = ctx.Input();
 	auto& render = ctx.Render();
 
 	// プレイヤーUI
 #pragma region PlayerUI
 	// 操作
 	render.DrawSprite(dodge_.get());
-	render.DrawSprite(dodgeControl_.get());
+	if (input.gamepad.IsConnected()) {
+		render.DrawSprite(dodgeControlPad_.get());
+	} else {
+		render.DrawSprite(dodgeControlKey_.get());
+	}
 
 	// hp
 	render.DrawSprite(lifeBack_.get());

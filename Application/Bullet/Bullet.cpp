@@ -15,4 +15,6 @@ Bullet::Bullet(std::unique_ptr<Model> model, const Vector3& direction, const Wea
 
 	model_->SetScale({ data.stats.bulletSize,data.stats.bulletSize ,data.stats.bulletSize });
 	model_->SetRotate({ 0, -std::atan2(velocity_.z, velocity_.x) + float(std::numbers::pi) / 2.0f,0 });
+
+	noHitTimer_ = std::make_unique<Timer>();
 }

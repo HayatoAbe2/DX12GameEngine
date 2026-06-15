@@ -2,6 +2,7 @@
 #include "GameCommon.h"
 #include "Weapon/WeaponStatus.h"
 #include <memory>
+#include <Timer/Timer.h>
 
 class MapCheck;
 
@@ -20,6 +21,7 @@ public:
 	bool IsDead() { return isDead_; }
 	bool CanErase() { return canErase_; }
 	Vector3 GetPrePos() { return prePos_; }
+	bool CanHit() { return noHitTimer_->IsFinished(); }
 	
 protected:
 	// 前フレーム場所
@@ -45,5 +47,9 @@ protected:
 
 	// 弾リストから削除可能
 	bool canErase_ = false;
+
+	// 無敵時間
+	std::unique_ptr<Timer> noHitTimer_;
+	float invinsibleTime_ = 0.15f;
 };
 

@@ -5,6 +5,7 @@
 #include "Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
 #include <Bullet/WaveBullet.h>
+#include <Engine/Math/CollisionShape/Circle/Circle.h>
 
 void CollisionChecker::Initialize(EffectManager* effectManager) {
 	effectManager_ = effectManager;
@@ -32,7 +33,7 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 	auto& audio = ctx.Audio();
 
 	// 敵の弾だったら判定しない
-	if (bullet->IsEnemyBullet() || bullet->IsDead() || enemy->GetInvinsibleTimer()->IsActive()) { return; }
+	if (bullet->IsEnemyBullet() || bullet->IsDead() || !bullet->CanHit()) { return; }
 
 	if (Length(enemy->GetTransform().translate - bullet->GetTransform().translate) <=
 		enemy->GetRadius() + bullet->GetTransform().scale.x / 2.0f) {
@@ -44,5 +45,13 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 		camera->StartShake(1.0f, 3);
 		effectManager_->SpawnHitEffect(bullet->GetTransform().translate);
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
+	}
+}
+
+void CollisionChecker::Check(Player* player, Enemy* enemy, Camera* camera) {
+	Circle p = { player->GetRadius(), {player->GetTransform().translate.x, player->GetTransform().translate.z} };
+	Circle e = { enemy->GetRadius(), {enemy->GetTransform().translate.x, enemy->GetTransform().translate.z} };
+	if (p.CheckCollision(e)) {
+		player->Hit(3.0f, enemy->GetTransform().translate);
 	}
 }

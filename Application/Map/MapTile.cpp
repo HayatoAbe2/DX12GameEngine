@@ -13,12 +13,13 @@ MapTile::~MapTile() {
 	light.RemoveSpotLight(lightIndex_);
 }
 
-void MapTile::Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<InstancedModel> floor, std::unique_ptr<Model> goal) {
+void MapTile::Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<InstancedModel> floor, std::unique_ptr<InstancedModel> barrier, std::unique_ptr<Model> goal) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
 	wall_ = std::move(wall);
 	floor_ = std::move(floor);
+	barrier_ = std::move(barrier);
 	goal_ = std::move(goal);
 
 	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Goal/circle.png")), particleNum_);
@@ -68,6 +69,7 @@ void MapTile::LoadCSV(const std::string& filePath) {
 	// トランスフォーム設定
 	std::vector<Transform> transformsFloor;
 	std::vector<Transform> transformsWall;
+	std::vector<Transform> transformsBarrier;
 	Transform transformGoal;
 	for (int x = 0; x < mapWidth_; ++x) {
 		for (int y = 0; y < mapHeight_; ++y) {
@@ -75,7 +77,7 @@ void MapTile::LoadCSV(const std::string& filePath) {
 			Transform transformFloor;
 			if (map_[y][x] == Tile::Floor) {
 				transformFloor.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
-				transformFloor.translate.y = -tileSize_;
+				transformFloor.translate.y = -tileSize_ / 2.0f;
 				transformFloor.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
 				transformFloor.scale = { tileSize_,tileSize_ ,tileSize_ };
 			} else {
@@ -90,16 +92,35 @@ void MapTile::LoadCSV(const std::string& filePath) {
 				map_[y][x] == Tile::UpWall ||
 				map_[y][x] == Tile::BottomWall) {
 				transformWall.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
-				transformWall.translate.y = 0;
+				transformWall.translate.y = tileSize_ / 2.0f;
 				transformWall.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
 				transformWall.scale = { tileSize_,tileSize_ ,tileSize_ };
 
-				// 方向に応じて回転
-
+				
 			} else {
 				transformWall.translate.y = 200.0f;
 			}
 			transformsWall.push_back(transformWall);
+
+			// 壁
+			Transform transformBarrier;
+			if (map_[y][x] == Tile::CombatWall) {
+				transformBarrier.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
+				transformBarrier.translate.y = tileSize_ / 2.0f;
+				transformBarrier.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
+				transformBarrier.scale = { tileSize_,tileSize_ ,tileSize_ };
+
+				Transform floor;
+				floor.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
+				floor.translate.y = -tileSize_ / 2.0f;
+				floor.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
+				floor.scale = { tileSize_,tileSize_ ,tileSize_ };
+
+				transformsFloor.push_back(floor);
+			} else { 
+				transformBarrier.translate.y = 200.0f;
+			}
+			transformsBarrier.push_back(transformBarrier);
 
 
 			// ゴール
@@ -139,8 +160,15 @@ void MapTile::LoadCSV(const std::string& filePath) {
 		transformsFloor[i].scale = {};
 	}
 
+	preSize = int(transformsBarrier.size());
+	transformsBarrier.resize(barrier_->GetNumInstance());
+	for (int i = preSize; i < int(barrier_->GetTransforms().size()); ++i) {
+		transformsBarrier[i].scale = {};
+	}
+
 	floor_->SetInstanceTransforms(transformsFloor);
 	wall_->SetInstanceTransforms(transformsWall);
+	barrier_->SetInstanceTransforms(transformsBarrier);
 	goal_->SetTransform(transformGoal);
 }
 
@@ -193,6 +221,9 @@ void MapTile::Draw(Camera* camera) {
 
 	render.DrawInstancedModel(wall_.get());
 	render.DrawInstancedModel(floor_.get());
+	if (!soundPlayed_) {
+		render.DrawInstancedModel(barrier_.get());
+	}
 	render.DrawModel(goal_.get());
 	render.DrawParticle(particle_.get(), BlendMode::Add);
 }

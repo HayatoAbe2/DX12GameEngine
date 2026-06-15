@@ -13,10 +13,11 @@ public:
 		UpWall,
 		BottomWall,
 		Goal,
+		CombatWall
 	};
 
 	~MapTile();
-	void Initialize(std::unique_ptr<InstancedModel> wall,std::unique_ptr<InstancedModel> floor,std::unique_ptr<Model> goal);
+	void Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<InstancedModel> floor, std::unique_ptr<InstancedModel> barrier, std::unique_ptr<Model> goal);
 	void LoadCSV(const std::string& filePath);
 	void Update(bool canGoal);
 	void Draw(Camera* camera);
@@ -33,6 +34,7 @@ private:
 	int mapHeight_ = 0;
 
 	std::unique_ptr<InstancedModel> wall_ = nullptr;
+	std::unique_ptr<InstancedModel> barrier_ = nullptr;
 	std::unique_ptr<InstancedModel> floor_ = nullptr;
 	std::unique_ptr<Model> goal_ = nullptr;
 

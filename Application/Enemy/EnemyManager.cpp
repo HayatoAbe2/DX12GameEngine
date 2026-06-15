@@ -9,6 +9,7 @@
 #include "Enemy/Enemies/Knight.h"
 #include "Enemy/Enemies/HeavyKnight.h"
 #include "Enemy/Enemies/RedBat.h"
+#include "Enemy/Enemies/Spiker.h"
 #include <fstream>
 #include <sstream>
 
@@ -59,6 +60,8 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 5.0f;
 		status.stunResist = 0;
 		status.canFly = true;
+		status.attackRadius = 0.9f;
+
 		enemies_.push_back(std::make_unique<Bat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
@@ -76,6 +79,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 10.0f;
 		status.stunResist = 2;
 		status.canFly = false;
+		status.attackRadius = 0.9f;
 
 		enemies_.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
@@ -95,12 +99,13 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 100.0f;
 		status.stunResist = 30;
 		status.canFly = false;
+		status.attackRadius = 0.9f;
 
 		enemies_.push_back(std::make_unique<HeavyKnight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
 
-	default:
+	case 4:
 	{
 		auto enemyModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
 		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
@@ -115,8 +120,29 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 100.0f;
 		status.stunResist = 30;
 		status.canFly = true;
+		status.attackRadius = 0.9f;
 
 		enemies_.push_back(std::make_unique<RedBat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		break;
+	}
+	default:
+	{
+		status.hp = 10;
+		status.radius = 0.3f;
+		status.moveSpeed = 4.0f;
+		status.defaultSearchRadius = 8.5f;
+		status.stunResist = 0;
+		status.canFly = false;
+		status.attackRadius = -1;
+		for (int i = 0; i < 5; ++i) {
+			auto enemyModel = asset.LoadModel("Resources/Enemy", "hedgehog.obj");
+			auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "hedgehog.obj");
+			Vector3 spawnPos = pos + Vector3{ ctx.RandomFloat(-1,1), 0, ctx.RandomFloat(-1,1) };
+			enemyModel->SetTranslate(spawnPos);
+			enemyShadowModel->SetTranslate(spawnPos);
+
+			enemies_.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		}
 		break;
 	}
 	}

@@ -6,6 +6,8 @@
 #include "externals/imgui/imgui_impl_win32.h"
 
 void Sprite::UpdateTransform(Vector2 windowSize) {
+	UpdateVertex();
+
 	Transform transform{};
 	transform.scale = { size_.x, size_.y, 1.0f };
 	transform.translate = { position_.x,position_.y, 0.0f };
@@ -17,7 +19,18 @@ void Sprite::UpdateTransform(Vector2 windowSize) {
 	// WVPMatrixを作る
 	transformationData_->WVP = worldViewProjectionMatrix;
 	transformationData_->World = worldMatrix;
-	//transformationData_->WorldInverseTranspose = Transpose(Inverse(worldMatrix));
+}
+
+void Sprite::UpdateVertex() {
+	float left = -pivot_.x;
+	float right = 1.0f - pivot_.x;
+	float top = -pivot_.y;
+	float bottom = 1.0f - pivot_.y;
+
+	vertexData_[0].position = { left,  bottom, 0.0f, 1.0f };
+	vertexData_[1].position = { left,  top,    0.0f, 1.0f };
+	vertexData_[2].position = { right, bottom, 0.0f, 1.0f };
+	vertexData_[3].position = { right, top,    0.0f, 1.0f };
 }
 
 void Sprite::SetTextureRect(float x, float y, float w, float h) {

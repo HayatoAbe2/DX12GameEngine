@@ -38,7 +38,6 @@ public:
 
 	Transform GetTransform() const { return model_->GetTransform(); }
 	void SetTransform(const Transform& transform) const { model_->SetTransform(transform); }
-	Timer* GetInvinsibleTimer() const { return invincibleTimer_.get(); }
 	float GetRadius() const { return status_.radius; }
 	bool IsDead() { return isDead_; }
 
@@ -63,7 +62,7 @@ protected:
 
 	// 武器
 	std::vector<std::unique_ptr<Weapon>> weapons_; // 複数ある場合
-	Weapon* currentWeapon_;
+	Weapon* currentWeapon_ = nullptr;
 
 	// 射撃クールダウン
 	std::unique_ptr<Timer> attackCoolTimer_;
@@ -86,10 +85,6 @@ protected:
 
 	// プレイヤーに近づく最小距離
 	float minDistance_ = 10.0f;
-
-	// 無敵時間
-	std::unique_ptr<Timer> invincibleTimer_;
-	float invinsibleTime_ = 0.15f;
 
 	// 行動状態
 	std::unique_ptr<EnemyState> currentState_ = nullptr;

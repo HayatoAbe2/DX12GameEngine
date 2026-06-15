@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include <numbers>
+#include <Enemy/Enemies/Spiker.h>
 
 GameScene::~GameScene() {
 }
@@ -43,6 +44,7 @@ void GameScene::Initialize() {
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	wallShadow_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	floor_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	barrier_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	goal_ = asset.LoadModel("Resources/Tiles", "sphere.obj");
 	
 	auto matData = wall_->GetMaterial(0)->GetData();
@@ -53,8 +55,13 @@ void GameScene::Initialize() {
 	wall_->GetMaterial(1)->SetEnvironmentTexture(skybox_);
 	wall_->GetMaterial(1)->SetData(matData);
 
+	matData = barrier_->GetMaterial(0)->GetData();
+	matData.color = { 0.3f,0.3f,1,0.5f };
+	barrier_->GetMaterial(0)->SetData(matData);
+	barrier_->GetMaterial(1)->SetData(matData);
+
 	mapTile_ = std::make_unique<MapTile>();
-	mapTile_->Initialize(std::move(wall_), std::move(floor_), std::move(goal_));
+	mapTile_->Initialize(std::move(wall_), std::move(floor_), std::move(barrier_), std::move(goal_));
 
 	// 武器マネージャー
 	weaponManager_ = std::make_unique<WeaponManager>();
@@ -159,6 +166,7 @@ void GameScene::Update() {
 
 			// 敵
 			enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), camera_.get());
+			mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
 
 			// 弾の処理
 			bulletManager_->Update(mapCheck_.get());
@@ -169,6 +177,16 @@ void GameScene::Update() {
 
 				for (auto enemy : enemyManager_->GetEnemies()) {
 					collisionChecker_->Check(enemy, bullet, camera_.get());
+
+					if (dynamic_cast<Spiker*>(enemy)) {
+						collisionChecker_->Check(player_.get(), enemy, camera_.get());
+					}
+				}
+			}
+
+			for (auto enemy : enemyManager_->GetEnemies()) {
+				if (dynamic_cast<Spiker*>(enemy)) {
+					collisionChecker_->Check(player_.get(), enemy, camera_.get());
 				}
 			}
 
@@ -232,22 +250,22 @@ void GameScene::Update() {
 		float endX = 0;
 		switch (currentFloor_) {
 		case 0:
-			endX = 200;
+			endX = 205;
 			break;
 		case 1:
-			endX = 465;
+			endX = 471;
 			break;
 		case 2:
-			endX = 754;
+			endX = 765;
 			break;
 		case 3:
-			endX = 1016;
+			endX = 1033;
 			break;
 		case 4:
 			endX = 1300;
 			break;
 		}
-		float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_);
+		float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
 		resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
 
 		if (input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) {
@@ -318,6 +336,7 @@ void GameScene::Draw() {
 		render.SetPostEffectType(PostEffectType::Grayscale);
 		render.DrawSprite(resultBG_.get());
 		render.DrawSprite(resultCursor_.get());
+		resultCursor_->ImGuiEdit();
 	}
 
 	render.DrawSprite(fade_.get());

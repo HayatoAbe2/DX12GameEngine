@@ -15,8 +15,11 @@ public:
 	bool IsGoal(const Vector2& pos, float radius, bool canGoal);
 	bool EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerPos);
 
+	void SetCombat(bool isCombat) { isCombat_ = isCombat; }
+
 private:	
 	std::vector<std::vector<MapTile::Tile>> map_;
 	float tileSize_ = 0;
+	bool isCombat_ = false;
 };
 

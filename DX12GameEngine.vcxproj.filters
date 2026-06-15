@@ -249,6 +249,7 @@
     <ClCompile Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
     <ClCompile Include="Application\UI\Equipment\EquipmentUI.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl" />
+    <ClCompile Include="Application\Enemy\Enemies\Spiker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -542,6 +543,7 @@
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Engine\Asset\Asset.h" />
+    <ClInclude Include="Application\Enemy\Enemies\Spiker.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

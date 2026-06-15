@@ -33,8 +33,10 @@ private:
 
 
 	// 操作
-	std::unique_ptr<Sprite> shootUI = nullptr;
-	std::unique_ptr<Sprite> swapUI = nullptr;
+	std::unique_ptr<Sprite> shootUIKey = nullptr;
+	std::unique_ptr<Sprite> shootUIPad = nullptr;
+	std::unique_ptr<Sprite> swapUIKey = nullptr;
+	std::unique_ptr<Sprite> swapUIPad = nullptr;
 	SpriteData shootUIData_ = { {1030, 620}, { 64,64 } };
 	SpriteData swapUIData_ = { {1110, 425}, { 50,50 } };
 

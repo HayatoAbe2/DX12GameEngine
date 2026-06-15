@@ -67,6 +67,8 @@ public:
 
 	void UpdateTransform(Vector2 windowSize);
 
+	void UpdateVertex();
+
 	// 切り取り
 	void SetTextureRect(float x, float y, float w, float h);
 
@@ -83,6 +85,9 @@ public:
 	// 位置
 	const Vector2& GetPosition() const { return position_; }
 	void SetPosition(const Vector2& position) { position_ = position; }
+
+	// pivot
+	void SetPivot(const Vector2& pivot) { pivot_ = pivot; }
 
 	// 回転
 	float GetRotation() const { return rotation_; }
@@ -103,6 +108,7 @@ public:
 private:
 	Vector2 size_ = { 640.0f,360.0f };
 	Vector2 position_ = {};
+	Vector2 pivot_ = {};
 	float rotation_ = 0.0f;
 	bool debugKeepAspect_ = false;
 

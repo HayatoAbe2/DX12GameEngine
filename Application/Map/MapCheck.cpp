@@ -37,6 +37,7 @@ bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 				charMinY = pos.y - 0.1f;
 				charMaxY = pos.y + 0.1f;
 			}
+			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
 
 			// タイルAABB
 			float tileMinX = x * tileSize_;
@@ -101,6 +102,7 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 				charMinY = pos.y - 0.1f;
 				charMaxY = pos.y + 0.1f;
 			}
+			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
 
 			float tileMinX = x * tileSize_;
 			float tileMinY = y * tileSize_;

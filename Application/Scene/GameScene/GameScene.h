@@ -38,6 +38,7 @@ private:
 	std::unique_ptr<InstancedModel> wall_ = nullptr;
 	std::unique_ptr<InstancedModel> wallShadow_ = nullptr;
 	std::unique_ptr<InstancedModel> floor_ = nullptr;
+	std::unique_ptr<InstancedModel> barrier_ = nullptr;
 	std::unique_ptr<Model> goal_ = nullptr;
 	std::unique_ptr<Model> cloud_ = nullptr;
 

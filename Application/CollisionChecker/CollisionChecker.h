@@ -12,6 +12,8 @@ public:
 	void Check(Player* player, Bullet* bullet, Camera* camera);
 	void Check(Enemy* enemy, Bullet* bullet, Camera* camera);
 
+	void Check(Player* player, Enemy* enemy, Camera* camera);
+
 private:
 	EffectManager* effectManager_;
 };

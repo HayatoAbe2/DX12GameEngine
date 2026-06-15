@@ -29,14 +29,22 @@ void EquipmentUI::Initialize(Player* player) {
 	equipment2_ = equipShotgun_.get();
 
 	// 操作
-	shootUI = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
-	shootUI->SetSize(shootUIData_.size);
-	shootUI->SetPosition(shootUIData_.pos);
-	shootUI->SetTextureRect(64 * 14, 64 * 2, 64, 64);
-	swapUI = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
-	swapUI->SetSize(swapUIData_.size);
-	swapUI->SetPosition(swapUIData_.pos);
-	swapUI->SetTextureRect(64 * 5, 64 * 3, 64, 64);
+	shootUIKey = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	shootUIKey->SetSize(shootUIData_.size);
+	shootUIKey->SetPosition(shootUIData_.pos);
+	shootUIKey->SetTextureRect(64 * 14, 64 * 2, 64, 64);
+	swapUIKey = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	swapUIKey->SetSize(swapUIData_.size);
+	swapUIKey->SetPosition(swapUIData_.pos);
+	swapUIKey->SetTextureRect(64 * 5, 64 * 3, 64, 64);
+	shootUIPad = asset.LoadSprite("Resources/Control/XboxController.png");
+	shootUIPad->SetSize(shootUIData_.size);
+	shootUIPad->SetPosition(shootUIData_.pos);
+	shootUIPad->SetTextureRect(64 * 7, 64 * 2, 64, 64);
+	swapUIPad = asset.LoadSprite("Resources/Control/XboxController.png");
+	swapUIPad->SetSize(swapUIData_.size);
+	swapUIPad->SetPosition(swapUIData_.pos);
+	swapUIPad->SetTextureRect(64 * 4, 64 * 8, 64, 64);
 
 }
 
@@ -113,18 +121,27 @@ void EquipmentUI::Update() {
 
 void EquipmentUI::Draw() {
 	auto& ctx = GameContext::GetInstance();
+	auto& input = ctx.Input();
 	auto& render = ctx.Render();
 
 	// 装備
 	auto weapon = player_->GetWeapon();
 	if (weapon != nullptr) {
-		render.DrawSprite(shootUI.get());
+		if (input.gamepad.IsConnected()) {
+			render.DrawSprite(shootUIPad.get());
+		} else {
+			render.DrawSprite(shootUIKey.get());
+		}
 		render.DrawSprite(equipment_);
 	}
 
 	auto subWeapon = player_->GetSubWeapon();
 	if (subWeapon != nullptr) {
-		render.DrawSprite(swapUI.get());
+		if (input.gamepad.IsConnected()) {
+			render.DrawSprite(swapUIPad.get());
+		} else {
+			render.DrawSprite(swapUIKey.get());
+		}
 		render.DrawSprite(equipment2_);
 	}
 }
