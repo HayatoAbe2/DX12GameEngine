@@ -6,7 +6,11 @@ public:
     void Start(float duration);
     void Update();
 
+    // 時間追加
     void AddTime(float additionalTime);
+
+    // リセット
+    void Reset() { time_ = 0; isActive_ = false; }
 
     bool IsFinished() const {
         return !isActive_;

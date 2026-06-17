@@ -52,7 +52,13 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	shootCooldownSprite_ = asset.LoadSprite("Resources/Debug/White1x1.png");
 	shootCooldownSprite_->SetPivot({ 0.0f,0.5f });
 	shootCooldownSprite_->SetSize(scSize_);
-	shootCooldownSprite_->SetPosition({640 - scSize_.x / 2.0f,370});
+	shootCooldownSprite_->SetPosition({ 640 - scSize_.x / 2.0f,370 });
+
+	// タイマー類
+	hitColorTimer_ = std::make_unique<Timer>();
+	stunTimer_ = std::make_unique<Timer>();
+	boostTimer_ = std::make_unique<Timer>();
+	invincibleTimer_ = std::make_unique<Timer>();
 }
 
 void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera, BulletManager* bulletManager) {
@@ -60,10 +66,11 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
 
-	invincibleTimer_--;
-	if (redTime_) {
-		redTime_--;
-		if (redTime_ <= 0) {
+	invincibleTimer_->Update();
+	if (hitColorTimer_->IsActive()) {
+		hitColorTimer_->Update();
+
+		if (hitColorTimer_->IsFinished()) {
 			for (auto& mesh : model_->GetData()->meshes) {
 				auto data = model_->GetMaterial(0)->GetData();
 				data.color = { 1.0f,1.0f,1.0f,1.0f };
@@ -72,14 +79,14 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		}
 	}
 
-	if (!isFall_) {
+	if (isFall_) {
+		Fall();
+	} else {
 		if (isUsingBoost_) {
 			Boost(mapCheck);
 		} else {
 			Move(mapCheck);
 		}
-
-		moveParticle_->Update();
 
 		// アイテム取得
 		if (input.keyboard.IsTrigger(DIK_F) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_A)) {
@@ -93,7 +100,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 				dir.x = input.gamepad.GetRightStick().x;
 				dir.y = input.gamepad.GetRightStick().y;
 
-				attackDirection_ = Normalize(Vector3(dir.x,0,dir.y));
+				attackDirection_ = Normalize(Vector3(dir.x, 0, dir.y));
 			}
 		} else {
 			Vector2 win = ctx.GetWindowSize();
@@ -126,7 +133,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 
 			// 武器のトランスフォーム
 			weaponTransform_ = transform_;
-			weaponTransform_.translate += {std::sin(transform_.rotate.y), 0, std::cos(transform_.rotate.y)}; // 前方に配置
+			weaponTransform_.translate += {std::sin(transform_.rotate.y), 0.5f, std::cos(transform_.rotate.y)}; // 前方に配置
 
 			if (shootCooldownTimer_->IsFinished()) {
 				// 射撃
@@ -142,36 +149,12 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / ct), scSize_.y });
 		}
 
-		// ノックバック中(操作はさせる)
-		if (stunTimer_ > 0) {
-			stunTimer_--;
-
-			// ノックバック
-			model_->SetScale({ 1,1,1 });
-			float length = Length(velocity_) * ctx.GetDeltatime();
-			length -= 0.05f;
-			if (length < 0) { length = 0; }
-			velocity_ = Normalize(velocity_) * length;
-
-			// 速度をもとに移動
-			Vector2 pos = { transform_.translate.x,transform_.translate.z };
-			for (int i = 0; i < 3; ++i) { // 3回に分ける
-				pos.x += velocity_.x / 3.0f;
-				mapCheck->ResolveCollisionX(pos, radius_, true);
-				pos.y += velocity_.z / 3.0f;
-				mapCheck->ResolveCollisionY(pos, radius_, true);
-			}
-
-			if (stunTimer_ <= 0 && mapCheck->IsFall(pos)) {
-				audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
-			}
-
-			transform_.translate = { pos.x,model_->GetTransform().translate.y,pos.y };
+		if (stunTimer_->IsActive()) {
+			Stun(mapCheck);
 		}
-
-	} else {
-		Fall();
 	}
+
+	moveParticle_->Update();
 
 	// 残像
 	instancingTransforms[3] = instancingTransforms[2];
@@ -180,18 +163,13 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	instancingTransforms[0] = transform_;
 
 	for (int i = 0; i < 2; ++i) {
-		instancing_->SetInstanceTransforms(i, instancingTransforms[i * 2 + 1]);
+		instancing_->SetInstanceTransforms(i, instancingTransforms[i]);
 	}
 }
 
 void Player::Draw(Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
-
-	if (isUsingBoost_) {
-		render.DrawInstancedModel(instancing_.get(), BlendMode::Add);
-		render.SetPostEffectType(PostEffectType::GaussianFilter3x3);
-	}
 
 	// 影描画
 	Transform shadowTransform;
@@ -203,6 +181,10 @@ void Player::Draw(Camera* camera) {
 		render.DrawModel(shadowModel_.get());
 	} else {
 		render.SetPostEffectType(PostEffectType::BoxFilter5x5);
+	}
+
+	if (isUsingBoost_) {
+		render.DrawInstancedModel(instancing_.get(), BlendMode::Add);
 	}
 
 	model_->SetTransform(transform_);
@@ -246,27 +228,27 @@ void Player::Draw(Camera* camera) {
 void Player::Hit(float damage, Vector3 from) {
 	auto& ctx = GameContext::GetInstance();
 
-	if (invincibleTimer_ <= 0) {
+	if (invincibleTimer_->IsFinished()) {
 
 		if (damage > 0) {
 			hp_ -= damage;
-			invincibleTimer_ = invincibleTime_;
+			invincibleTimer_->Start(invincibleTimeOnHit_);
 
 			if (hp_ <= 0) {
 				// ゲームオーバー
 
 			} else {
 				// 行動不能
-				stunTimer_ = 10;
+				stunTimer_->Start(stunTime_);
 
 				// ノックバック
-				velocity_ = Normalize(model_->GetTransform().translate - from) * 0.3f;
+				knockbackVel_ = Normalize(model_->GetTransform().translate - from) * 15.0f;
 
-				// ダメージを受けたら赤くする
+				// ダメージを受けると色変更
 				auto data = model_->GetMaterial(0)->GetData();
-				data.color = { 1.0f,0.2f,0.2f,1.0f };
+				data.color = { 3.0f,3.0f,3.0f,1.0f };
 				model_->GetMaterial(0)->SetData(data);
-				redTime_ = 3;
+				hitColorTimer_->Start(0.2f);
 
 				// 被ダメージ時の位置を記憶
 				landPos_ = transform_.translate;
@@ -314,6 +296,7 @@ void Player::Move(MapCheck* mapCheck) {
 	// ダッシュ入力
 	if ((input.keyboard.IsTrigger(DIK_SPACE) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_X)) && Length(normalized) > 0.1f && boostCoolTime_ < 0) {
 		isUsingBoost_ = true;
+		boostTimer_->Start(maxBoostTime_);
 		boostDir_ = { normalized.x,0,-normalized.y };
 		// ダッシュ前の位置を記憶
 		landPos_ = transform_.translate;
@@ -330,6 +313,8 @@ void Player::Move(MapCheck* mapCheck) {
 			moveParticle_->Emit(transform, -velocity_ * 0.4f);
 		}
 		moveParticleEmitTimer_ = 0;
+
+		invincibleTimer_->Start(invincibleTimeOnDodge_);
 	}
 
 	// 速度をもとに移動
@@ -392,11 +377,10 @@ void Player::Boost(MapCheck* mapCheck) {
 	transform_.translate.x = pos.x;
 	transform_.translate.z = pos.y;
 
-	boostTime_++;
+	boostTimer_->Update();
 
-	if (maxBoostTime_ <= boostTime_) { // 終了時
+	if (boostTimer_->IsFinished()) { // 終了時
 		isUsingBoost_ = false;
-		boostTime_ = 0;
 
 		// 落下判定
 		if (mapCheck->IsFall({ transform_.translate.x,transform_.translate.z })) {
@@ -411,20 +395,52 @@ void Player::Fall() {
 	transform_.translate.y -= 1.0f;
 	if (transform_.translate.y < -20.0f) {
 		hp_ -= maxHp_ / 8.0f;
-		invincibleTimer_ = invincibleTime_;
+		invincibleTimer_->Start(invincibleTimeOnHit_);
 
 		// その前にいた位置に戻す
 		transform_.translate = landPos_;
 		isFall_ = false;
-		stunTimer_ = 0;
+		stunTimer_->Reset();
 	}
 }
 
-void Player::SetWeapon(std::unique_ptr<Weapon> weapon) { 
-	if(weapon_ && subWeapon_ == nullptr){
+void Player::Stun(MapCheck* mapCheck) {
+	auto& ctx = GameContext::GetInstance();
+	auto& audio = ctx.Audio();
+
+	if (stunTimer_->IsActive()) {
+		stunTimer_->Update();
+
+		// ノックバック
+		model_->SetScale({ 1,1,1 });
+		float length = Length(knockbackVel_) * ctx.GetDeltatime();
+		float x = stunTimer_->GetRemaining() / stunTime_;
+		length *= x * x;
+		if (length < 0) { length = 0; }
+		knockbackVel_ = Normalize(knockbackVel_) * length;
+
+		// 速度をもとに移動
+		Vector2 pos = { transform_.translate.x,transform_.translate.z };
+		for (int i = 0; i < 3; ++i) { // 3回に分ける
+			pos.x += knockbackVel_.x / 3.0f;
+			mapCheck->ResolveCollisionX(pos, radius_, true);
+			pos.y += knockbackVel_.z / 3.0f;
+			mapCheck->ResolveCollisionY(pos, radius_, true);
+		}
+
+		if (stunTimer_->IsFinished() && mapCheck->IsFall(pos)) {
+			audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
+		}
+
+		transform_.translate = { pos.x,model_->GetTransform().translate.y,pos.y };
+	}
+}
+
+void Player::SetWeapon(std::unique_ptr<Weapon> weapon) {
+	if (weapon_ && subWeapon_ == nullptr) {
 		subWeapon_ = std::move(weapon);
 		return;
 	}
 
-	weapon_ = std::move(weapon); 
+	weapon_ = std::move(weapon);
 }

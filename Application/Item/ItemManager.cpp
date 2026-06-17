@@ -62,6 +62,7 @@ void ItemManager::Draw(Camera* camera) {
 
 	if (canInteract_) {
 		if (input.gamepad.IsConnected()) {
+			
 			render.DrawSprite(controlPad_.get());
 		} else {
 			render.DrawSprite(controlKey_.get());

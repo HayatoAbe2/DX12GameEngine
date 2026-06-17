@@ -1,6 +1,5 @@
 #include "ParticleSystem.h"
 #include "Engine/Scene/Camera/Camera.h"
-#include "Engine/Asset/Model/InstancedModel.h"
 
 void ParticleSystem::Initialize(const ParticleShape& shape, std::unique_ptr<Material> material, int numInstance) {
 	particleShape_ = shape;
@@ -33,7 +32,8 @@ void ParticleSystem::PreDraw(Camera* camera) {
 
 	for (auto& particle : particles_) {
 
-		particle.transform.rotate = camera->transform_.rotate;
+		particle.transform.rotate.x = camera->transform_.rotate.x;
+		particle.transform.rotate.y = camera->transform_.rotate.y;
 		transforms.push_back(particle.transform);
 
 		particle.color.w = float(particle.lifeTime) / float(maxLifeTime_);
@@ -44,7 +44,32 @@ void ParticleSystem::PreDraw(Camera* camera) {
 
 	// WVPMatrixを作る
 	for (int i = 0; i < particles_.size(); ++i) {
-		Matrix4x4 worldMatrix = MakeAffineMatrix(transforms[i]);
+		Transform& t = transforms[i];
+
+		// カメラのX/Y回転）
+		Matrix4x4 camRot = Multiply(MakeRotateXMatrix(camera->transform_.rotate.x),
+			MakeRotateYMatrix(camera->transform_.rotate.y));
+
+		// Z回転
+		Matrix4x4 rotZ = MakeRotateZMatrix(t.rotate.z);
+		Matrix4x4 rotateMatrix = Multiply(rotZ, camRot);
+
+		Matrix4x4 worldMatrix = {};
+		worldMatrix.m[0][0] = t.scale.x * rotateMatrix.m[0][0];
+		worldMatrix.m[0][1] = t.scale.x * rotateMatrix.m[0][1];
+		worldMatrix.m[0][2] = t.scale.x * rotateMatrix.m[0][2];
+		worldMatrix.m[1][0] = t.scale.y * rotateMatrix.m[1][0];
+		worldMatrix.m[1][1] = t.scale.y * rotateMatrix.m[1][1];
+		worldMatrix.m[1][2] = t.scale.y * rotateMatrix.m[1][2];
+		worldMatrix.m[2][0] = t.scale.z * rotateMatrix.m[2][0];
+		worldMatrix.m[2][1] = t.scale.z * rotateMatrix.m[2][1];
+		worldMatrix.m[2][2] = t.scale.z * rotateMatrix.m[2][2];
+		worldMatrix.m[3][0] = t.translate.x;
+		worldMatrix.m[3][1] = t.translate.y;
+		worldMatrix.m[3][2] = t.translate.z;
+		worldMatrix.m[3][3] = 1.0f;
+
+		//Matrix4x4 worldMatrix = MakeAffineMatrix(transforms[i]);
 		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(camera->viewMatrix_, camera->projectionMatrix_));
 		instanceTransformationData_[i].WVP = worldViewProjectionMatrix;
 		instanceTransformationData_[i].World = worldMatrix;

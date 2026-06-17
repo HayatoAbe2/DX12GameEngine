@@ -1,11 +1,11 @@
 { 
     "AssaultRifle": {
         "modelName": "AssaultRifle.obj",
-        "damage": 1.2,
+        "damage": 1.4,
         "weight": 0.4,
         "bulletSize": 0.3,
         "bulletSpeed": 45,
-        "shootCoolTime": 0.08,
+        "shootCoolTime": 0.15,
         "bulletLifeTime": 60,
         "knockback": 0.1,
         "rarity": "Common"

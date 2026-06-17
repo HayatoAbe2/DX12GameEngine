@@ -20,5 +20,6 @@ public:
 private:
 	std::vector<std::unique_ptr<Enemy>> enemies_ = {};
 
+	std::unique_ptr<ParticleSystem> deathParticle_ = nullptr;
 };
 

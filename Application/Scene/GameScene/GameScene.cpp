@@ -82,6 +82,7 @@ void GameScene::Initialize() {
 	// プレイヤー
 	player_ = std::make_unique<Player>();
 	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_));
+	player_->SetWeapon(weaponManager_->GetWeapon(0));
 
 	// 敵
 	enemyManager_ = std::make_unique<EnemyManager>();
@@ -216,7 +217,7 @@ void GameScene::Update() {
 
 				if (player_->IsDead() || currentFloor_ == 3) {
 					if (isShowResult_) {
-						scene.SceneChange("Title");
+						scene.SceneChange("Game");
 					} else {
 						// ゲームオーバーまたはクリア
 						isShowResult_ = true;
@@ -288,7 +289,7 @@ void GameScene::Update() {
 
 				if (player_->IsDead() || currentFloor_ == 3) {
 					if (isShowResult_) {
-						scene.SceneChange("Title");
+						scene.SceneChange("Game");
 					} else {
 						// ゲームオーバーまたはクリア
 						isShowResult_ = true;
@@ -312,8 +313,7 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	auto& render = GameContext::GetInstance().Render();
 	render.SetPostEffectType(PostEffectType::Outline);
-	//if (isFadeOut_)render.SetPostEffectType(PostEffectType::Vignette);
-
+	
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
 	//render.DrawModel(cloud_.get()_.get(), BlendMode::Add);

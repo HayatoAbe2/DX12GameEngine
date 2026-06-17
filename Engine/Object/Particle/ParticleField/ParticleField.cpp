@@ -9,7 +9,7 @@ void ParticleField::Update(Particle* particle) {
 		if (gravity_ != 0) {
 			Vector3 toCenter = Normalize(center_ - particle->transform.translate);
 			particle->transform.translate += toCenter * gravity_;
-			particle->transform.rotate = { -sinf(toCenter.x),cosf(toCenter.y),0.0f };
+			particle->transform.rotate = { -sinf(toCenter.x),cosf(toCenter.y), particle->transform.rotate.z };
 		}
 
 		// 回転

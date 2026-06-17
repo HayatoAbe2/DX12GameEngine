@@ -34,7 +34,7 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 
-	if (hitColorTime_) {
+	if (hitColorTimer_->) {
 		hitColorTime_--;
 		if (hitColorTime_ <= 0) {
 			for (auto& mesh : model_->GetData()->meshes) {

@@ -16,7 +16,7 @@ class Model;
 class InstancedModel;
 class Sprite;
 class Texture;
-class Material;
+struct MaterialData;
 class ParticleSystem;
 class DirectXContext;
 class ConstantBufferManager;
@@ -121,7 +121,7 @@ private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
 		Microsoft::WRL::ComPtr<ID3D12Resource> transformResource;
 
-		Material* materialData = nullptr;
+		MaterialData* materialData = nullptr;
 		TransformationMatrix* transformData = nullptr;
 	};
 	SkyboxData skybox;

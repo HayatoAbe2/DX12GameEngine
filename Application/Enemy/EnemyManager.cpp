@@ -60,7 +60,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 5.0f;
 		status.stunResist = 0;
 		status.canFly = true;
-		status.attackRadius = 0.9f;
+		status.attackRadius = 9;
 
 		enemies_.push_back(std::make_unique<Bat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
@@ -79,7 +79,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 10.0f;
 		status.stunResist = 2;
 		status.canFly = false;
-		status.attackRadius = 0.9f;
+		status.attackRadius = 9;
 
 		enemies_.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
@@ -99,7 +99,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 100.0f;
 		status.stunResist = 30;
 		status.canFly = false;
-		status.attackRadius = 0.9f;
+		status.attackRadius = 9;
 
 		enemies_.push_back(std::make_unique<HeavyKnight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
@@ -120,7 +120,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.defaultSearchRadius = 100.0f;
 		status.stunResist = 30;
 		status.canFly = true;
-		status.attackRadius = 0.9f;
+		status.attackRadius = 9;
 
 		enemies_.push_back(std::make_unique<RedBat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
@@ -128,7 +128,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 	default:
 	{
 		status.hp = 10;
-		status.radius = 0.3f;
+		status.radius = 0.5f;
 		status.moveSpeed = 4.0f;
 		status.defaultSearchRadius = 8.5f;
 		status.stunResist = 0;

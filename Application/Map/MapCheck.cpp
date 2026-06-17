@@ -259,8 +259,8 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 			if (map_[y][x] == MapTile::Tile::Floor) { continue; }
 			if (map_[y][x] == MapTile::Tile::None) { continue; }
 			AABB aabb;
-			aabb.min = { x * tileSize_,0,y * tileSize_ };
-			aabb.max = { (x + 1) * tileSize_,0,(y + 1) * tileSize_ };
+			aabb.min = { x * tileSize_,0,(mapH - 1 - y) * tileSize_ };
+			aabb.max = { (x + 1) * tileSize_,0,(mapH - y) * tileSize_ };
 
 			Vector3 tMin =
 			{
@@ -293,10 +293,8 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 			float tmin = std::max(std::max(tNear.x, tNear.y), tNear.z);
 			float tmax = std::min(std::min(tFar.x, tFar.y), tFar.z);
 
-			if (tmax >= 0.0f) {
-				if (tmin <= tmax) {
-					return false;
-				}
+			if (tmax >= 0.0f && tmin <= tmax && tmin <= Length(ray.diff)) {
+				return false;
 			}
 		}
 	}

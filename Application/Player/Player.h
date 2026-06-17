@@ -38,6 +38,7 @@ public:
 	void Shoot(BulletManager* bulletManager, Camera* camera);
 	void Boost(MapCheck* mapCheck);
 	void Fall();
+	void Stun(MapCheck* mapCheck);
 	Vector3 Raticle(Camera* camera);
 
 	Transform GetTransform() const { return transform_; }
@@ -54,7 +55,7 @@ public:
 	void SetWeapon(std::unique_ptr<Weapon> weapon);
 	bool IsDead() { return hp_ <= 0; }
 
-	void Stop() { boostTime_ = 0; }
+	void Stop() { boostTimer_->Reset(); }
 
 private:
 	// 照準
@@ -81,16 +82,20 @@ private:
 	Vector3 attackDirection_ = {};
 
 	// hp
-	float hp_ = 40;
-	float maxHp_ = 40;
+	float hp_ = 100;
+	float maxHp_ = 100;
 
 	// スタン時間
-	int stunTimer_ = 0;
+	std::unique_ptr<Timer> stunTimer_ = nullptr;
+	float stunTime_ = 0.25f;
+	Vector3 knockbackVel_{};
+
 	bool isFall_ = false;
 	Vector3 landPos_{};
-	int redTime_ = 0;
-	int invincibleTimer_ = 0;
-	int invincibleTime_ = 20;
+	std::unique_ptr<Timer> hitColorTimer_ = nullptr;
+	std::unique_ptr<Timer> invincibleTimer_ = nullptr;
+	float invincibleTimeOnHit_ = 1.0f;
+	float invincibleTimeOnDodge_ = 0.5f;
 
 	// モデル
 	std::unique_ptr<Model> model_ = nullptr;
@@ -101,8 +106,8 @@ private:
 	// ダッシュ
 	bool canBoost_ = false;
 	bool isUsingBoost_ = false;
-	int boostTime_ = 0;
-	int maxBoostTime_ = 10;
+	std::unique_ptr<Timer> boostTimer_;
+	float maxBoostTime_ = 0.2f;
 	float boostSpeed_ = 15.0f;
 	Vector3 boostDir_{};
 	int boostCoolTime_ = 10;

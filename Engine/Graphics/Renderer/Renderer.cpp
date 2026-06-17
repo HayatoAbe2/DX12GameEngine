@@ -537,7 +537,7 @@ void Renderer::InitializeSkybox() {
 
 	// Material
 	skybox.materialResource =
-		bufferManager->CreateUploadBuffer(sizeof(Material));
+		bufferManager->CreateUploadBuffer(sizeof(MaterialData));
 
 	skybox.materialResource->Map(
 		0,
@@ -549,7 +549,7 @@ void Renderer::InitializeSkybox() {
 	data.uvTransform = MakeIdentity4x4();
 	data.enableLighting = false;
 	data.useTexture = true;
-	skybox.materialData->SetData(data);
+	*skybox.materialData = data;
 
 	// Transform
 	skybox.transformResource =

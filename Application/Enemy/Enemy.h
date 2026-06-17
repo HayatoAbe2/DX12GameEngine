@@ -78,7 +78,7 @@ protected:
 
 	// スタン時間
 	std::unique_ptr<Timer> stunTimer_ = nullptr;
-	int hitColorTime_ = 0;
+	std::unique_ptr<Timer> hitColorTimer_ = nullptr;
 
 	// 落下
 	bool isFall_ = false;
