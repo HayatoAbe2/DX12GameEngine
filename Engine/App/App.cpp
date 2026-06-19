@@ -5,7 +5,7 @@
 #include "Engine/Io/AudioSystem/AudioSystem.h"
 #include "Engine/Io/InputSystem/InputSystem.h"
 #include "Engine/Asset/Manager/AssetManager/AssetManager.h"
-#include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/SceneObject/LightManager/LightManager.h"
 #include "Engine/Scene/SceneManager/SceneManager.h"
 #include "Engine/Contexts/GameContext/GameContext.h"
 
@@ -58,7 +58,7 @@ void App::Initialize() {
 
 	// DirectX準備
 	dxContext_ = std::make_unique<DirectXContext>();
-	dxContext_->Initialize(kClientWidth, kClientHeight, window_->GetHwnd(), logger_.get());
+	dxContext_->Initialize(window_->GetHwnd(), logger_.get());
 
 	// 描画クラス
 	renderer_ = std::make_unique<Renderer>();

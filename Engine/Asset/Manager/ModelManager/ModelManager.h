@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine/Asset/Model/Model.h"
-#include "Engine/Asset/Model/InstancedModel.h"
-#include "Engine/Object/Particle/ParticleSystem/ParticleSystem.h"
+#include "Engine/SceneObject/Model/Model.h"
+#include "Engine/SceneObject/Model/InstancedModel.h"
+#include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
 
 #include <unordered_map>
 #include <string>

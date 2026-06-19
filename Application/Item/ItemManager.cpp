@@ -13,13 +13,13 @@ void ItemManager::Initialize(WeaponManager* weaponManager) {
 
 	// 操作
 	controlKey_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
-	controlKey_->SetSize({ 40,40 });
-	controlKey_->SetPosition({ 640 - 24,720 - 450 });
+	controlKey_->SetSize({ 64,64 });
+	controlKey_->SetPosition({ 640 - 32,720 - 460 });
 	controlKey_->SetTextureRect(0, 64 * 9, 64, 64);
 	controlPad_ = asset.LoadSprite("Resources/Control/XboxController.png");
-	controlPad_->SetSize({ 40,40 });
-	controlPad_->SetPosition({ 640 - 24,720 - 450 });
-	controlPad_->SetTextureRect(64 * 8, 64 * 2, 64, 64);
+	controlPad_->SetSize({ 64,64 });
+	controlPad_->SetPosition({ 640 - 32,720 - 460 });
+	controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
 }
 
 void ItemManager::Update(Player* player) {
@@ -62,9 +62,18 @@ void ItemManager::Draw(Camera* camera) {
 
 	if (canInteract_) {
 		if (input.gamepad.IsConnected()) {
-			
+			if (input.gamepad.IsPress(XINPUT_GAMEPAD_A)) {
+				controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
+			} else {
+				controlPad_->SetTextureRect(64 * 3, 64 * 8, 64, 64);
+			}
 			render.DrawSprite(controlPad_.get());
 		} else {
+			if (input.keyboard.IsPress(DIK_F)) {
+				controlKey_->SetTextureRect(64 * 0, 64 * 9, 64, 64);
+			} else {
+				controlKey_->SetTextureRect(64 * 1, 64 * 9, 64, 64);
+			}
 			render.DrawSprite(controlKey_.get());
 		}
 	}
@@ -94,17 +103,7 @@ void ItemManager::Spawn(Vector3 pos, int index) {
 	auto& ctx = GameContext::GetInstance();
 
 	// レア度ランダム
-	Rarity rarity{};
-	int random = ctx.RandomInt(1, 200);
-	if (random < 80) {
-		rarity = Rarity::Common;
-	} else if (random < 140) {
-		rarity = Rarity::Rare;
-	} else if (random < 180) {
-		rarity = Rarity::Epic;
-	} else {
-		rarity = Rarity::Legendary;
-	}
+	Rarity rarity = Common;
 	Spawn(pos, index, rarity);
 }
 

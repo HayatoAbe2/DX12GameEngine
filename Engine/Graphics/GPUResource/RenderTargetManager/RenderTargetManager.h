@@ -17,6 +17,9 @@ public:
 	/// <param name="renderTextureResource">RenderTextureのリソース</param>
 	void Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource);
 
+	void ReleaseSwapChainBuffers();
+	void Resize(IDXGISwapChain4* swapChain, ID3D12Device* device, ID3D12Resource* renderTexture);
+
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(size_t index) const { return rtvHandles_[index]; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRenderTextureRTVHandle() const { return renderTextureRTVHandle_; }
 

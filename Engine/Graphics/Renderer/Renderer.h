@@ -1,10 +1,10 @@
 #pragma once
 #include "Engine/Scene/DebugCamera/DebugCamera.h"
 #include "Engine/Graphics/GPUData/LightsForGPU.h"
-#include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/SceneObject/LightManager/LightManager.h"
 #include "Engine/Graphics/GPUData/CameraForGPU.h"
-#include "Engine/Asset/Model/Node.h"
-#include "Engine/Asset/Model/Mesh.h"
+#include "Engine/SceneObject/Model/Node.h"
+#include "Engine/SceneObject/Model/Mesh.h"
 
 #include "Engine/Graphics/Renderer/PostEffectType.h"
 #include "Engine/Graphics/GPUData/TransformationMatrix.h"

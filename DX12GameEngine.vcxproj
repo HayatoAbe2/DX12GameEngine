@@ -165,7 +165,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
-    <ClCompile Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.cpp" />
+    <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\Bullet\BulletManager.cpp" />
@@ -211,7 +211,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\App\App.cpp" />
     <ClCompile Include="Engine\Io\AudioSystem\AudioSystem.cpp" />
     <ClCompile Include="Engine\Math\Vector2\Vector2.cpp" />
-    <ClCompile Include="Engine\Asset\Material\Material.cpp" />
+    <ClCompile Include="Engine\Asset\Resource\Material\Material.cpp" />
     <ClCompile Include="Engine\Scene\BaseScene\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Scene\DebugCamera\DebugCamera.cpp" />
@@ -246,24 +246,24 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Math\Lerp\Lerp.cpp" />
     <ClCompile Include="Engine\Io\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Graphics\Utility\FixFPS\FixFPS.cpp" />
-    <ClCompile Include="Engine\Asset\Model\InstancedModel.cpp" />
+    <ClCompile Include="Engine\SceneObject\Model\InstancedModel.cpp" />
     <ClCompile Include="Engine\Graphics\Debug\ImGuiManager\ImGuiManager.cpp" />
-    <ClCompile Include="Engine\Object\LightManager\LightManager.cpp" />
+    <ClCompile Include="Engine\SceneObject\LightManager\LightManager.cpp" />
     <ClCompile Include="Engine\Contexts\InputContext\InputContext.cpp" />
     <ClCompile Include="Engine\Contexts\LightContext\LightContext.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Math\Matrix4x4\Matrix4x4.cpp" />
-    <ClCompile Include="Engine\Asset\Model\Model.cpp" />
+    <ClCompile Include="Engine\SceneObject\Model\Model.cpp" />
     <ClCompile Include="Engine\Graphics\GPUResource\RenderTargetManager\RenderTargetManager.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager\SceneManager.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.cpp" />
-    <ClCompile Include="Engine\Asset\Sprite\Sprite.cpp" />
+    <ClCompile Include="Engine\SceneObject\Sprite\Sprite.cpp" />
     <ClCompile Include="Engine\Math\Vector3\Vector3.cpp" />
     <ClCompile Include="Engine\Math\Vector4\Vector4.cpp" />
     <ClCompile Include="Engine\App\Window.cpp" />
     <ClCompile Include="Engine\Graphics\GPUResource\SRVManager\SRVManager.cpp" />
-    <ClCompile Include="Engine\Object\Particle\ParticleSystem\ParticleSystem.cpp" />
-    <ClCompile Include="Engine\Object\Particle\ParticleField\ParticleField.cpp" />
+    <ClCompile Include="Engine\SceneObject\Particle\ParticleSystem\ParticleSystem.cpp" />
+    <ClCompile Include="Engine\SceneObject\Particle\ParticleField\ParticleField.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ModelManager\ModelManager.cpp" />
     <ClCompile Include="Engine\Asset\Manager\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\Contexts\RenderContext\RenderContext.cpp" />
@@ -279,6 +279,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Application\Enemy\Enemies\Spiker.cpp" />
+    <ClCompile Include="Engine\Editor\Scene\SceneEditor\SceneEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\GaussianFilter3x3.PS.hlsl">
@@ -381,10 +382,10 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
-    <ClInclude Include="Engine\Asset\Asset.h" />
-    <ClInclude Include="Engine\Asset\Model\AnimationPlayer\AnimationPlayer.h" />
+    <ClInclude Include="Engine\Asset\Resource\Resource.h" />
+    <ClInclude Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.h" />
     <ClInclude Include="Engine\Asset\Manager\AnimationManager\AnimationManager.h" />
-    <ClInclude Include="Engine\Asset\Animation.h" />
+    <ClInclude Include="Engine\Asset\Resource\Animation.h" />
     <ClInclude Include="Application\Bullet\Bullet.h" />
     <ClInclude Include="Application\Bullet\BulletManager.h" />
     <ClInclude Include="Application\Bullet\FireBullet.h" />
@@ -418,9 +419,11 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Weapon\Weapons\Pistol.h" />
     <ClInclude Include="Application\Weapon\Weapons\Shotgun.h" />
     <ClInclude Include="Application\Weapon\Weapons\Wavegun.h" />
-    <ClInclude Include="Engine\Asset\Model\Skeleton.h" />
+    <ClInclude Include="Engine\SceneObject\Model\Skeleton.h" />
+    <ClInclude Include="Engine\SceneObject\SceneObject.h" />
     <ClInclude Include="Engine\Contexts\AssetContext\AssetContext.h" />
     <ClInclude Include="Engine\Contexts\AudioContext\AudioContext.h" />
+    <ClInclude Include="Engine\Editor\Scene\Scene.h" />
     <ClInclude Include="Engine\Graphics\Renderer\PostEffectType.h" />
     <ClInclude Include="Engine\Graphics\GPUResource\BufferManager\BufferManager.h" />
     <ClInclude Include="Engine\Graphics\GPUResource\ConstantBufferManager\ConstantBufferManager.h" />
@@ -430,7 +433,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Graphics\Pipeline\BlendMode.h" />
     <ClInclude Include="Engine\Graphics\Core\CommandListManager\CommandListManager.h" />
     <ClInclude Include="Engine\Graphics\Core\DeviceManager\DeviceManager.h" />
-    <ClInclude Include="Engine\Asset\Model\Node.h" />
+    <ClInclude Include="Engine\SceneObject\Model\Node.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.h" />
     <ClInclude Include="Engine\Math\CollisionShape\AABB\AABB.h" />
@@ -439,18 +442,18 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Math\CollisionShape\Circle\Circle.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Sphere\Sphere.h" />
     <ClInclude Include="Engine\Graphics\GPUData\LightsForGPU.h" />
-    <ClInclude Include="Engine\Object\Lights\SpotLight.h" />
+    <ClInclude Include="Engine\SceneObject\Lights\SpotLight.h" />
     <ClInclude Include="Engine\Graphics\GPUData\MaterialData.h" />
-    <ClInclude Include="Engine\Object\Particle\Particle.h" />
-    <ClInclude Include="Engine\Object\Lights\PointLight.h" />
+    <ClInclude Include="Engine\SceneObject\Particle\Particle.h" />
+    <ClInclude Include="Engine\SceneObject\Lights\PointLight.h" />
     <ClInclude Include="Engine\Graphics\GPUData\InstanceGPUData.h" />
-    <ClInclude Include="Engine\Asset\Model\SubMesh.h" />
-    <ClInclude Include="Engine\Asset\Texture.h" />
+    <ClInclude Include="Engine\SceneObject\Model\SubMesh.h" />
+    <ClInclude Include="Engine\Asset\Resource\Texture.h" />
     <ClInclude Include="Engine\Scene\BaseScene\BaseScene.h" />
     <ClInclude Include="Engine\Scene\Camera\Camera.h" />
     <ClInclude Include="Engine\Scene\DebugCamera\DebugCamera.h" />
     <ClInclude Include="Engine\Graphics\Core\DescriptorHeapManager\DescriptorHeapManager.h" />
-    <ClInclude Include="Engine\Object\Lights\DirectionalLight.h" />
+    <ClInclude Include="Engine\SceneObject\Lights\DirectionalLight.h" />
     <ClInclude Include="Engine\Io\DumpExporter\DumpExporter.h" />
     <ClInclude Include="Engine\Contexts\GameContext\GameContext.h" />
     <ClInclude Include="Engine\Scene\GameCommon\GameCommon.h" />
@@ -468,16 +471,16 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Io\InputSystem\InputSystem.h" />
     <ClInclude Include="Engine\Math\Lerp\Lerp.h" />
     <ClInclude Include="Engine\Io\Logger\Logger.h" />
-    <ClInclude Include="Engine\Asset\Material\Material.h" />
+    <ClInclude Include="Engine\Asset\Resource\Material\Material.h" />
     <ClInclude Include="Engine\Math\MathUtils.h" />
     <ClInclude Include="Engine\Math\Matrix3x3\Matrix3x3.h" />
     <ClInclude Include="Engine\Math\Matrix4x4\Matrix4x4.h" />
-    <ClInclude Include="Engine\Asset\Model\Model.h" />
+    <ClInclude Include="Engine\SceneObject\Model\Model.h" />
     <ClInclude Include="Engine\Graphics\GPUResource\RenderTargetManager\RenderTargetManager.h" />
     <ClInclude Include="Engine\Scene\SceneManager\SceneManager.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.h" />
-    <ClInclude Include="Engine\Asset\Sprite\Sprite.h" />
-    <ClInclude Include="Engine\Object\Transform.h" />
+    <ClInclude Include="Engine\SceneObject\Sprite\Sprite.h" />
+    <ClInclude Include="Engine\SceneObject\Transform.h" />
     <ClInclude Include="Engine\Graphics\GPUData\TransformationMatrix.h" />
     <ClInclude Include="Engine\Math\Vector2\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector3\Vector3.h" />
@@ -485,14 +488,14 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Graphics\GPUData\VertexData.h" />
     <ClInclude Include="Engine\App\Window.h" />
     <ClInclude Include="Engine\Graphics\Utility\FixFPS\FixFPS.h" />
-    <ClInclude Include="Engine\Asset\Model\Mesh.h" />
+    <ClInclude Include="Engine\SceneObject\Model\Mesh.h" />
     <ClInclude Include="Engine\Graphics\GPUResource\SRVManager\SRVManager.h" />
-    <ClInclude Include="Engine\Asset\Model\InstancedModel.h" />
-    <ClInclude Include="Engine\Object\Particle\ParticleSystem\ParticleSystem.h" />
+    <ClInclude Include="Engine\SceneObject\Model\InstancedModel.h" />
+    <ClInclude Include="Engine\SceneObject\Particle\ParticleSystem\ParticleSystem.h" />
     <ClInclude Include="Engine\Graphics\Debug\ImGuiManager\ImGuiManager.h" />
-    <ClInclude Include="Engine\Object\Particle\ParticleField\ParticleField.h" />
-    <ClInclude Include="Engine\Object\LightManager\LightManager.h" />
-    <ClInclude Include="Engine\Asset\Model\ModelData.h" />
+    <ClInclude Include="Engine\SceneObject\Particle\ParticleField\ParticleField.h" />
+    <ClInclude Include="Engine\SceneObject\LightManager\LightManager.h" />
+    <ClInclude Include="Engine\SceneObject\Model\ModelData.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Ray\Ray.h" />
     <ClInclude Include="Engine\Asset\Manager\ModelManager\ModelManager.h" />
     <ClInclude Include="Engine\Asset\Manager\TextureManager\TextureManager.h" />
@@ -507,6 +510,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Timer\Timer.h" />
     <ClInclude Include="Externals\nlohmann\json.hpp" />
     <ClInclude Include="Application\Enemy\Enemies\Spiker.h" />
+    <ClInclude Include="Engine\Editor\Scene\SceneEditor\SceneEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

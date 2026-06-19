@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 
-class Asset {
+class Resource {
 public:
-	explicit Asset(uint32_t id) : id_(id) {}
+	explicit Resource(uint32_t id) : id_(id) {}
 
 	uint32_t GetID() { return id_; }
 

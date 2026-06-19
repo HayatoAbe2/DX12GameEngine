@@ -13,10 +13,12 @@
 
 class ImGuiManager {
 public:
-	void Initialize(HWND* hwnd, ID3D12Device* device, int bufferCount, DXGI_FORMAT format, ID3D12DescriptorHeap* srvHeap, D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle, D3D12_GPU_DESCRIPTOR_HANDLE srvGPUHandle);
+	void Initialize(HWND* hwnd, ID3D12Device* device, int bufferCount, DXGI_FORMAT format, ID3D12DescriptorHeap* srvHeap, D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle, D3D12_GPU_DESCRIPTOR_HANDLE srvGPUHandle, ID3D12CommandQueue* cmdQueue);
 	void Finalize();
 
 	void BeginFrame();
 	void EndFrame(ID3D12GraphicsCommandList* cmdList);
+
+	void DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle);
 };
 

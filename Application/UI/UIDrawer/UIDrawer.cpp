@@ -80,6 +80,11 @@ void UIDrawer::Draw() {
 	// 操作
 	render.DrawSprite(dodge_.get());
 	if (input.gamepad.IsConnected()) {
+		if (input.gamepad.IsPress(XINPUT_GAMEPAD_X)) {
+			dodgeControlPad_->SetTextureRect(64 * 6, 64 * 8, 64, 64);
+		} else {
+			dodgeControlPad_->SetTextureRect(64 * 7, 64 * 8, 64, 64);
+		}
 		render.DrawSprite(dodgeControlPad_.get());
 	} else {
 		render.DrawSprite(dodgeControlKey_.get());

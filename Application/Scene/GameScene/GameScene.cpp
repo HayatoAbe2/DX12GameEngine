@@ -129,7 +129,7 @@ void GameScene::Update() {
 	auto& audio = ctx.Audio();
 	auto& scene = ctx.Scene();
 
-	if (!isShowResult_) {
+	if (!isShowResult_ ) {
 		if (isPause_) {
 			// ポーズ中
 			if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
@@ -352,7 +352,7 @@ void GameScene::Draw() {
 	if (ImGui::Button("Shotgun")) {
 		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(2)));
 	};
-	if (ImGui::Button("Fire")) {
+	if (ImGui::Button("Flame")) {
 		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(3)));
 	};
 	if (ImGui::Button("Wave")) {

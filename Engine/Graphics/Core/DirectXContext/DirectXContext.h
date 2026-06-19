@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(int32_t clientWidth, int32_t clientHeight, HWND hwnd, Logger* logger);
+	void Initialize(HWND hwnd, Logger* logger);
 
 	/// <summary>
 	/// 解放処理(ループ終了後に行う)
@@ -46,8 +46,7 @@ public:
 	void EndFrame();
 
 	// アクセサ
-	int32_t GetWindowWidth() { return clientWidth_; }
-	int32_t GetWindowHeight() { return clientHeight_; }
+	RECT GetWindowRect() { return windowRect_; }
 	DeviceManager* GetDeviceManager() { return deviceManager_.get(); }
 	CommandListManager* GetCommandListManager() { return commandListManager_.get(); }
 	DescriptorHeapManager* GetDescriptorHeapManager() { return descriptorHeapManager_.get(); }
@@ -80,12 +79,7 @@ private:
 	/// <summary>
 	/// TextureResource作成
 	/// </summary>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(
-		const Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height);
-
-	// 画面サイズ
-	int32_t clientWidth_;
-	int32_t clientHeight_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device);
 
 	// DXGIファクトリー
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
@@ -162,5 +156,9 @@ private:
 	};
 	Microsoft::WRL::ComPtr<ID3D12Resource> outlineResource_;
 	OutlineData* outlineData_ = nullptr;
+
+	// 前フレームのウィンドウサイズ
+	HWND hwnd_{};
+	RECT windowRect_{};
 };
 

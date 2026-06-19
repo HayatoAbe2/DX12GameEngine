@@ -26,6 +26,7 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	stunTimer_ = std::make_unique<Timer>();
 	attackCoolTimer_ = std::make_unique<Timer>();
 	slowTimer_ = std::make_unique<Timer>();
+	hitColorTimer_ = std::make_unique<Timer>();
 
 	// 初期State
 	currentState_ = std::make_unique<EnemyIdle>();
@@ -34,9 +35,9 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 
-	if (hitColorTimer_->) {
-		hitColorTime_--;
-		if (hitColorTime_ <= 0) {
+	if (hitColorTimer_->IsActive()) {
+		hitColorTimer_->Update();
+		if (hitColorTimer_->IsFinished()) {
 			for (auto& mesh : model_->GetData()->meshes) {
 				auto data = model_->GetMaterial(0)->GetData();
 				data.color = { 1.0f,1.0f,1.0f,1.0f };
@@ -83,17 +84,17 @@ void Enemy::Stun(MapCheck* mapCheck) {
 
 	// ノックバック
 	model_->SetScale({ 1,1,1 });
-	float length = Length(velocity_);
+	float length = Length(knockbackVelocity_);
 	length -= 0.05f;
 	if (length < 0) { length = 0; }
-	velocity_ = Normalize(velocity_) * length;
+	knockbackVelocity_ = Normalize(knockbackVelocity_) * length;
 
 	// 速度をもとに移動
 	Vector2 pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
 	for (int i = 0; i < 3; ++i) { // 3回に分ける
-		pos.x += velocity_.x / 3.0f;
+		pos.x += knockbackVelocity_.x / 3.0f;
 		mapCheck->ResolveCollisionX(pos, status_.radius, true);
-		pos.y += velocity_.z / 3.0f;
+		pos.y += knockbackVelocity_.z / 3.0f;
 		mapCheck->ResolveCollisionY(pos, status_.radius, true);
 	}
 
@@ -137,7 +138,7 @@ void Enemy::Hit(float damage, Vector3 from, const float knockback) {
 		stunTimer_->Start(float(10 - status_.stunResist) / 60);
 
 		// ノックバック
-		velocity_ = Normalize(model_->GetTransform().translate - from) * knockback;
+		knockbackVelocity_ = Normalize(model_->GetTransform().translate - from) * knockback;
 	}
 
 	// 待機状態なら発見させる
@@ -150,5 +151,5 @@ void Enemy::Hit(float damage, Vector3 from, const float knockback) {
 	data.color = { 1.0f,0.2f,0.2f,1.0f };
 	model_->GetMaterial(0)->SetData(data);
 	model_->GetMaterial(1)->SetData(data);
-	hitColorTime_ = 3;
+	hitColorTimer_->Start(0.2f);
 }

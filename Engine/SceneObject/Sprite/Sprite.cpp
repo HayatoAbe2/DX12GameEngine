@@ -1,25 +1,9 @@
 #include "Sprite.h"
-#include "Engine/Asset/Material/Material.h"
+#include "Engine/Asset/Resource/Material/Material.h"
 
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-
-void Sprite::UpdateTransform(Vector2 windowSize) {
-	UpdateVertex();
-
-	Transform transform{};
-	transform.scale = { size_.x, size_.y, 1.0f };
-	transform.translate = { position_.x,position_.y, 0.0f };
-	transform.rotate = { 0.0f,0.0f,rotation_ };
-	// トランスフォーム
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform);
-	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, windowSize.x, windowSize.y, 0.0f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, projectionMatrix);
-	// WVPMatrixを作る
-	transformationData_->WVP = worldViewProjectionMatrix;
-	transformationData_->World = worldMatrix;
-}
 
 void Sprite::UpdateVertex() {
 	float left = -pivot_.x;

@@ -1,15 +1,15 @@
 #pragma once
 #include "Engine/Graphics/GPUData/TransformationMatrix.h"
 #include "Engine/Graphics/GPUData/VertexData.h"
-#include "Engine/Asset/Material/Material.h"
-#include "Engine/Asset/Asset.h"
+#include "Engine/Asset/Resource/Material/Material.h"
+#include "Engine/SceneObject/SceneObject.h"
 #include <wrl.h>
 #include <d3d12.h>
 #include <memory>
 
-class Sprite : public Asset {
+class Sprite : public SceneObject {
 public:
-	Sprite(uint32_t id) : Asset(id) {};
+	Sprite(uint32_t id) : SceneObject(id) {};
 
 	///
 	/// スプライト読み込み時のSetter
@@ -64,8 +64,6 @@ public:
 	void SetMaterial(std::unique_ptr<Material> material) {
 		material_ = std::move(material);
 	}
-
-	void UpdateTransform(Vector2 windowSize);
 
 	void UpdateVertex();
 

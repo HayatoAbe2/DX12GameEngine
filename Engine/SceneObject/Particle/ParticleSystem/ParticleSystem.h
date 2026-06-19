@@ -1,18 +1,18 @@
 #pragma once
-#include "Engine/Object/Particle/Particle.h"
-#include "Engine/Object/Particle/ParticleField/ParticleField.h"
-#include "Engine/Asset/Material/Material.h"
+#include "Engine/SceneObject/Particle/Particle.h"
+#include "Engine/SceneObject/Particle/ParticleField/ParticleField.h"
+#include "Engine/Asset/Resource/Material/Material.h"
 #include <vector>
 #include <memory>
 #include <Engine/Graphics/GPUData/InstanceGPUData.h>
-#include "Engine/Asset/Asset.h"
+#include "Engine/SceneObject/SceneObject.h"
 
 class InstancedModel;
 class Camera;
 
-class ParticleSystem : public Asset {
+class ParticleSystem : public SceneObject {
 public:
-    ParticleSystem(uint32_t id) : Asset(id) {};
+    ParticleSystem(uint32_t id) : SceneObject(id) {};
 
     void Initialize(const ParticleShape& shape, std::unique_ptr<Material> material, int numInstance);
     void Emit(const Transform& baseTransform, const Vector3& velocity);

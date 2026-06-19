@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine/Asset/Animation.h"
-#include "Engine/Asset/Model/Node.h"
-#include "Engine/Asset/Model/Skeleton.h"
+#include "Engine/Asset/Resource/Animation.h"
+#include "Engine/SceneObject/Model/Node.h"
+#include "Engine/SceneObject/Model/Skeleton.h"
 #include <string>
 #include <memory>
 

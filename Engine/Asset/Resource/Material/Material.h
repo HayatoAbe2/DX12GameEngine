@@ -1,14 +1,14 @@
 #pragma once
 #include "Engine/Graphics/GPUData/MaterialData.h"
-#include "Engine/Asset/Texture.h"
-#include "Engine/Asset/Asset.h"
+#include "Engine/Asset/Resource/Texture.h"
+#include "Engine/Asset/Resource/Resource.h"
 #include <wrl.h>
 #include <memory>
 
 class BufferManager;
-class Material : public Asset {
+class Material : public Resource {
 public:
-	Material(uint32_t id) : Asset(id) {};
+	Material(uint32_t id) : Resource(id) {};
 
     void Initialize(BufferManager* bufferManager, bool useTexture, bool enableLighting);
     void UpdateGPU(); // GPUに転送

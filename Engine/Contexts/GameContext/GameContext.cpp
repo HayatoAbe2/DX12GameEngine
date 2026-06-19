@@ -3,7 +3,7 @@
 #include "Engine/Io/AudioSystem/AudioSystem.h"
 #include "Engine/Io/InputSystem/InputSystem.h"
 #include "Engine/Asset/Manager/AssetManager/AssetManager.h"
-#include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/SceneObject/LightManager/LightManager.h"
 #include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
 
 GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager, FixFPS* fixFps) {

@@ -1,14 +1,14 @@
 #pragma once
-#include "Engine/Asset/Material/Material.h"
+#include "Engine/Asset/Resource/Material/Material.h"
 #include "Engine/Graphics/GPUData/VertexData.h"
 #include "Engine/Graphics/GPUData/InstanceGPUData.h"
-#include "Engine/Asset/Texture.h"
-#include "Engine/Asset/Model/Mesh.h"
-#include "Engine/Asset/Model/ModelData.h"
-#include "Engine/Object/Transform.h"
+#include "Engine/Asset/Resource/Texture.h"
+#include "Engine/SceneObject/Model/Mesh.h"
+#include "Engine/SceneObject/Model/ModelData.h"
+#include "Engine/SceneObject/Transform.h"
 #include "Engine/Math/MathUtils.h"
-#include "Engine/Asset/Model/Node.h"
-#include "Engine/Asset/Asset.h"
+#include "Engine/SceneObject/Model/Node.h"
+#include "Engine/SceneObject/SceneObject.h"
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -19,9 +19,9 @@ class Renderer;
 class Camera;
 class BufferManager;
 class ConstantBufferManager;
-class InstancedModel : public Asset {
+class InstancedModel : public SceneObject {
 public:
-	InstancedModel(uint32_t id) : Asset(id) {};
+	InstancedModel(uint32_t id) : SceneObject(id) {};
 
 	///
 	/// モデル読み込み時のSetter

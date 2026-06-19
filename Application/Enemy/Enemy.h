@@ -55,6 +55,7 @@ protected:
 
 	// 移動
 	Vector3 velocity_{};
+	Vector3 knockbackVelocity_{};
 
 	// モデル
 	std::unique_ptr<Model> model_ = nullptr;

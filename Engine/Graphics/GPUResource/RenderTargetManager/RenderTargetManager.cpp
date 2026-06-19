@@ -30,3 +30,42 @@ void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* d
 	renderTextureRTVHandle_.ptr = rtvHandles_[1].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device->CreateRenderTargetView(renderTextureResource.Get(), &rtvDesc_, renderTextureRTVHandle_);
 }
+
+void RenderTargetManager::ReleaseSwapChainBuffers() {
+    for (int i = 0; i < 2; i++) {
+        swapChainResources_[i].Reset();
+    }
+}
+
+void RenderTargetManager::Resize(
+    IDXGISwapChain4* swapChain,
+    ID3D12Device* device,
+    ID3D12Resource* renderTexture) {
+    for (int i = 0; i < 2; i++) {
+        swapChainResources_[i].Reset();
+    }
+
+    for (int i = 0; i < 2; i++) {
+        HRESULT hr =
+            swapChain->GetBuffer(
+                i,
+                IID_PPV_ARGS(&swapChainResources_[i]));
+
+        assert(SUCCEEDED(hr));
+    }
+
+    device->CreateRenderTargetView(
+        swapChainResources_[0].Get(),
+        &rtvDesc_,
+        rtvHandles_[0]);
+
+    device->CreateRenderTargetView(
+        swapChainResources_[1].Get(),
+        &rtvDesc_,
+        rtvHandles_[1]);
+
+    device->CreateRenderTargetView(
+        renderTexture,
+        &rtvDesc_,
+        renderTextureRTVHandle_);
+}

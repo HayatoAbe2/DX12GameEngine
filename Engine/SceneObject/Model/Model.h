@@ -1,10 +1,10 @@
 #pragma once
 #include "ModelData.h"
-#include "Engine/Object/Transform.h"
-#include "Engine/Asset/Model/Node.h"
-#include "Engine/Asset/Model/Skeleton.h"
-#include "Engine/Asset/Model/AnimationPlayer/AnimationPlayer.h"
-#include "Engine/Asset/Asset.h"
+#include "Engine/SceneObject/Transform.h"
+#include "Engine/SceneObject/Model/Node.h"
+#include "Engine/SceneObject/Model/Skeleton.h"
+#include "Engine/SceneObject/Model/AnimationPlayer/AnimationPlayer.h"
+#include "Engine/SceneObject/SceneObject.h"
 #include <d3d12.h>
 #include <wrl.h>
 #include <vector>
@@ -13,9 +13,9 @@
 class Renderer;
 class Camera;
 class BufferManager;
-class Model : public Asset {
+class Model : public SceneObject {
 public:
-	Model(uint32_t id) : Asset(id) {};
+	Model(uint32_t id) : SceneObject(id) {};
 	void Update();
 
 	///

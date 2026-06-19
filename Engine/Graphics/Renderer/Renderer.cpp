@@ -6,10 +6,10 @@
 #include "Engine/Graphics/Core/DeviceManager/DeviceManager.h"
 #include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
-#include "Engine/Asset/Model/Model.h"
-#include "Engine/Asset/Model/InstancedModel.h"
-#include "Engine/Asset/Sprite/Sprite.h"
-#include "Engine/Object/Particle/ParticleSystem/ParticleSystem.h"
+#include "Engine/SceneObject/Model/Model.h"
+#include "Engine/SceneObject/Model/InstancedModel.h"
+#include "Engine/SceneObject/Sprite/Sprite.h"
+#include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
 #include "Engine/Scene/Camera/Camera.h"
 #include <numbers>
 
@@ -40,7 +40,8 @@ void Renderer::UpdateSpriteTransform(Sprite* sprite) {
 	Vector2 size = sprite->GetSize();
 	Vector2 pos = sprite->GetPosition();
 	float rot = sprite->GetRotation();
-	Vector2 windowSize = { float(dxContext_->GetWindowWidth()),float(dxContext_->GetWindowHeight()) };
+	RECT rect = dxContext_->GetWindowRect();
+	Vector2 windowSize = { float(rect.right),float(rect.bottom) };
 
 	transform.scale = { size.x, size.y, 1.0f };
 	transform.translate = { pos.x,pos.y, 0.0f };

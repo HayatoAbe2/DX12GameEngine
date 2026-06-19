@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Math/MathUtils.h"
-#include "Engine/Object/Particle/Particle.h"
+#include "Engine/SceneObject/Particle/Particle.h"
 
 class ParticleField {
 public:

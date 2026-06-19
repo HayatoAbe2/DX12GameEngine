@@ -72,7 +72,7 @@ void RapidBullet::Draw(Camera* camera) {
 void RapidBullet::Hit() {
 	auto& ctx = GameContext::GetInstance();
 
-	noHitTimer_->Start(0.15f);
+	noHitTimer_->Start(0.1f);
 	if (particleField_) {
 		// 飛散パーティクル
 		particleField_->SetGravity(-0.4f, model_->GetTransform().translate);

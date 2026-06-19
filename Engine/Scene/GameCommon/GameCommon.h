@@ -8,11 +8,11 @@
 
 // 配置物
 #include "Engine/Scene/Camera/Camera.h"
-#include "Engine/Object/Particle/ParticleSystem/ParticleSystem.h"
+#include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
 
 // 構造体、関数
 #include "Engine/Math/MathUtils.h"
-#include "Engine/Object/Transform.h"
+#include "Engine/SceneObject/Transform.h"
 
 // エンジン側との窓口
 #include "Engine/Contexts/GameContext/GameContext.h"

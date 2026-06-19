@@ -128,6 +128,11 @@ void EquipmentUI::Draw() {
 	auto weapon = player_->GetWeapon();
 	if (weapon != nullptr) {
 		if (input.gamepad.IsConnected()) {
+			if (input.gamepad.GetRTrigger() >= 0.2f) {
+				shootUIPad->SetTextureRect(64 * 7, 64 * 2, 64, 64);
+			} else {
+				shootUIPad->SetTextureRect(64 * 8, 64 * 2, 64, 64);
+			}
 			render.DrawSprite(shootUIPad.get());
 		} else {
 			render.DrawSprite(shootUIKey.get());
@@ -138,6 +143,11 @@ void EquipmentUI::Draw() {
 	auto subWeapon = player_->GetSubWeapon();
 	if (subWeapon != nullptr) {
 		if (input.gamepad.IsConnected()) {
+			if (input.gamepad.IsPress(XINPUT_GAMEPAD_B)) {
+				swapUIPad->SetTextureRect(64 * 4, 64 * 8, 64, 64);
+			} else {
+				swapUIPad->SetTextureRect(64 * 5, 64 * 8, 64, 64);
+			}
 			render.DrawSprite(swapUIPad.get());
 		} else {
 			render.DrawSprite(swapUIKey.get());

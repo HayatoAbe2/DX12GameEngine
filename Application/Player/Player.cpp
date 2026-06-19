@@ -59,6 +59,9 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	stunTimer_ = std::make_unique<Timer>();
 	boostTimer_ = std::make_unique<Timer>();
 	invincibleTimer_ = std::make_unique<Timer>();
+
+	attackDirection_ = Normalize(Vector3(1, 0, 0));
+	transform_.rotate.y = -std::atan2(attackDirection_.z, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
 }
 
 void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera, BulletManager* bulletManager) {
@@ -89,7 +92,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		}
 
 		// アイテム取得
-		if (input.keyboard.IsTrigger(DIK_F) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_A)) {
+		if (input.keyboard.IsRelease(DIK_F) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) {
 			itemManager->Interact(this);
 		}
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "Engine/Asset/Model/Mesh.h"
-#include "Engine/Asset/Material/Material.h"
+#include "Engine/SceneObject/Model/Mesh.h"
+#include "Engine/Asset/Resource/Material/Material.h"
 #include <vector>
 #include <memory>
 

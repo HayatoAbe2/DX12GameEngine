@@ -1,8 +1,8 @@
 #include "ModelManager.h"
 #include "Engine/Asset/Manager/TextureManager/TextureManager.h"
-#include "Engine/Asset/Model/Model.h"
-#include "Engine/Asset/Model/InstancedModel.h"
-#include "Engine/Asset/Model/ModelData.h"
+#include "Engine/SceneObject/Model/Model.h"
+#include "Engine/SceneObject/Model/InstancedModel.h"
+#include "Engine/SceneObject/Model/ModelData.h"
 
 #include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 #include "Engine/Io/Logger/Logger.h"

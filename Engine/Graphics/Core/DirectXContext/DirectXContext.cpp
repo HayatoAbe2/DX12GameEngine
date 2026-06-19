@@ -7,11 +7,13 @@
 #include <mfobjects.h>
 #include <numbers>
 
-void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND hwnd, Logger* logger) {
+void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	HRESULT hr;
+	hwnd_ = hwnd;
 
-	clientWidth_ = clientWidth;
-	clientHeight_ = clientHeight;
+	// ウィンドウサイズ
+	GetClientRect(hwnd, &windowRect_);
+
 	logger_ = logger;
 
 	// FPS固定クラス初期化
@@ -51,13 +53,13 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 	// SRVマネージャー
 	srvManager_ = std::make_unique<SRVManager>();
 	srvManager_->Initialize(descriptorHeapManager_.get(), deviceManager_->GetDevice().Get());
-	
+
 	renderTextureSRVIndex_ = srvManager_->Allocate();
 	srvManager_->CreateRenderTextureSRV(renderTextureSRVIndex_, renderTextureResource_);
 	srvManager_->GetGPUHandle(renderTextureSRVIndex_);
 
 	// DepthStencilTextureをウィンドウのサイズで作成
-	depthStencilResource_ = CreateDepthStencilTextureResource(deviceManager_->GetDevice(), clientWidth_, clientHeight_);
+	depthStencilResource_ = CreateDepthStencilTextureResource(deviceManager_->GetDevice());
 	// DSVの設定
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // Format。基本的にはResourceに合わせる
@@ -129,7 +131,8 @@ void DirectXContext::Initialize(int32_t clientWidth, int32_t clientHeight, HWND 
 		renderTargetManager_->GetRTVDesc_().Format,
 		srvManager_->GetHeap().Get(),
 		srvManager_->GetCPUHandle(index),
-		srvManager_->GetGPUHandle(index)
+		srvManager_->GetGPUHandle(index),
+		commandListManager_->GetCommandQueue().Get()
 	);
 }
 
@@ -144,6 +147,45 @@ void DirectXContext::Finalize() {
 }
 
 void DirectXContext::BeginFrame() {
+	RECT newRect;
+	GetClientRect(hwnd_, &newRect);
+	// ウィンドウサイズ変更時の更新
+	if ((newRect.left != windowRect_.left ||
+		newRect.right != windowRect_.right ||
+		newRect.top != windowRect_.top ||
+		newRect.bottom != windowRect_.bottom) &&
+		newRect.right > 0 &&
+		newRect.bottom > 0) {
+		windowRect_ = newRect;
+		commandListManager_->GetCommandList()->Close();
+
+		SetViewportAndScissor();
+		commandListManager_->Wait();
+		commandListManager_->Reset();
+		renderTargetManager_->ReleaseSwapChainBuffers();
+		renderTextureResource_.Reset();
+		depthStencilResource_.Reset();
+		swapChain_->ResizeBuffers(2, UINT(windowRect_.right), UINT(windowRect_.bottom), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+		// RenderTexture再生成
+		renderTextureResource_ = CreateRenderTextureResource();
+		
+		// DepthSRV再作成
+		depthStencilResource_ = CreateDepthStencilTextureResource(deviceManager_->GetDevice());
+
+		// RTV再生成
+		renderTargetManager_->Resize(swapChain_.Get(), deviceManager_->GetDevice().Get(), renderTextureResource_.Get());
+
+		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // Format。基本的にはResourceに合わせる
+		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D; // 2DTexture
+		deviceManager_->GetDevice()->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, descriptorHeapManager_->GetDSVHeap()->GetCPUDescriptorHandleForHeapStart());
+
+		// SRV再作成
+		srvManager_->CreateRenderTextureSRV(renderTextureSRVIndex_, renderTextureResource_);
+		srvManager_->CreateDepthSRV(depthTextureSRVIndex_, depthStencilResource_);
+	}
+
 	srvManager_->PreDraw(commandListManager_->GetCommandList());
 
 	// 描画先のRTVとDSVを設定する
@@ -162,11 +204,13 @@ void DirectXContext::BeginFrame() {
 	commandListManager_->GetCommandList()->RSSetViewports(1, &viewport_);
 	// Scissorを設定
 	commandListManager_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
-	
+
 	// CBV書き込み先リセット
 	constantBufferManager_->BeginFrame();
 
 	imGuiManager_->BeginFrame();
+
+	imGuiManager_->DrawSceneWindow(srvManager_->GetGPUHandle(renderTextureSRVIndex_));
 }
 
 void DirectXContext::EndFrame() {
@@ -233,7 +277,7 @@ void DirectXContext::EndFrame() {
 	case PostEffectType::Vignette:
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
 		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Vignette)));
-		
+
 		break;
 	case PostEffectType::GaussianFilter3x3:
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
@@ -297,12 +341,16 @@ void DirectXContext::EndFrame() {
 	renderTextureBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	renderTextureBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	commandListManager_->GetCommandList()->ResourceBarrier(1, &renderTextureBarrier_);
+
 }
 
 void DirectXContext::InitializeSwapChain(HWND hwnd) {
 	HRESULT hr;
-	swapChainDesc_.Width = clientWidth_;								// 画面の幅。ウィンドウのクライアント領域を同じものにしておく
-	swapChainDesc_.Height = clientHeight_;							// 画面の高さ。ウィンドウのクライアント領域を同じものにしておく
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+
+	swapChainDesc_.Width = rect.right;								// 画面の幅。ウィンドウのクライアント領域を同じものにしておく
+	swapChainDesc_.Height = rect.bottom;							// 画面の高さ。ウィンドウのクライアント領域を同じものにしておく
 	swapChainDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM;				// 色の形式
 	swapChainDesc_.SampleDesc.Count = 1;							// マルチサンプルしない
 	swapChainDesc_.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	// 描画のターゲットとして利用する
@@ -315,9 +363,10 @@ void DirectXContext::InitializeSwapChain(HWND hwnd) {
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateRenderTextureResource() {
 	HRESULT hr;
+
 	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = clientWidth_;
-	resourceDesc.Height = clientHeight_;
+	resourceDesc.Width = windowRect_.right;
+	resourceDesc.Height = windowRect_.bottom;
 	resourceDesc.MipLevels = 1;
 	resourceDesc.DepthOrArraySize = 1;
 	resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -353,12 +402,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateRenderTextureResour
 }
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateDepthStencilTextureResource(
-	const Microsoft::WRL::ComPtr<ID3D12Device>& device, int32_t width, int32_t height) {
+	const Microsoft::WRL::ComPtr<ID3D12Device>& device) {
 
 	// 生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = width;										// Textureの幅
-	resourceDesc.Height = height;									// Textureの高さ
+	resourceDesc.Width = windowRect_.right;							// Textureの幅
+	resourceDesc.Height = windowRect_.bottom;						// Textureの高さ
 	resourceDesc.MipLevels = 1;										// mipmapの数
 	resourceDesc.DepthOrArraySize = 1;								// 奥行き or 配列Textureの配列数
 	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;			// DepthStencilとして利用可能なフォーマット
@@ -391,8 +440,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateDepthStencilTexture
 
 void DirectXContext::SetViewportAndScissor() {
 	// クライアント領域のサイズと一緒にして画面全体に表示
-	viewport_.Width = float(clientWidth_);
-	viewport_.Height = float(clientHeight_);
+	viewport_.Width = float(windowRect_.right);
+	viewport_.Height = float(windowRect_.bottom);
 	viewport_.TopLeftX = 0;
 	viewport_.TopLeftY = 0;
 	viewport_.MinDepth = 0.0f;
@@ -401,7 +450,7 @@ void DirectXContext::SetViewportAndScissor() {
 	// シザー矩形
 	// 基本的にビューポートと同じ矩形が構成されるようにする
 	scissorRect_.left = 0;
-	scissorRect_.right = LONG(clientWidth_);
+	scissorRect_.right = windowRect_.right;
 	scissorRect_.top = 0;
-	scissorRect_.bottom = LONG(clientHeight_);
+	scissorRect_.bottom = windowRect_.bottom;
 }

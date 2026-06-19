@@ -1,6 +1,6 @@
 #include "RenderContext.h"
 #include "Engine/Contexts/GameContext/GameContext.h"
-#include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/SceneObject/LightManager/LightManager.h"
 
 RenderContext::RenderContext(Renderer* renderer, LightManager* lightManager) {
 	renderer_ = renderer;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Asset/Texture.h"
+#include "Engine/Asset/Resource/Texture.h"
 #include <memory>
 #include <unordered_map>
 #include "externals/DirectXTex/DirectXTex.h"

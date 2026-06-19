@@ -11,7 +11,6 @@ public:
 	void Initialize(int32_t clientWidth, int32_t clientHeight);
 	HWND GetHwnd() const { return hwnd_; }
 	HINSTANCE GetInstance() const { return wc_.hInstance; }
-
 private:
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

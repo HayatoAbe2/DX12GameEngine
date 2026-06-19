@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine/Object/Lights/DirectionalLight.h"
-#include "Engine/Object/Lights/PointLight.h"
-#include "Engine/Object/Lights/SpotLight.h"
+#include "Engine/SceneObject/Lights/DirectionalLight.h"
+#include "Engine/SceneObject/Lights/PointLight.h"
+#include "Engine/SceneObject/Lights/SpotLight.h"
 
 // ポイントライト最大数(PSと合わせる)
 const int maxPointLights = 32;

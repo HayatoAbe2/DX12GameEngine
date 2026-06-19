@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Asset/Sprite/Sprite.h"
+#include "Engine/SceneObject/Sprite/Sprite.h"
 #include <memory>
 
 class DirectXContext;

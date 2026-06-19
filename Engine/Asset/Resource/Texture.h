@@ -3,11 +3,11 @@
 #include <wrl.h>
 #include <string>
 #include "Engine/Math/MathUtils.h"
-#include "Engine/Asset/Asset.h"
+#include "Engine/Asset/Resource/Resource.h"
 
-class Texture : public Asset {
+class Texture : public Resource {
 public:
-	Texture(uint32_t id) : Asset(id) {};
+	Texture(uint32_t id) : Resource(id) {};
 
 	const std::string& GetMtlPath()const { return mtlFilePath; }
 	const D3D12_GPU_DESCRIPTOR_HANDLE& GetSRVHandle() const { return srvHandle_; }

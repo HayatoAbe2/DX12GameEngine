@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Object/LightManager/LightManager.h"
+#include "Engine/SceneObject/LightManager/LightManager.h"
 class LightContext {
 public:
 	LightContext(LightManager* lightManager);
