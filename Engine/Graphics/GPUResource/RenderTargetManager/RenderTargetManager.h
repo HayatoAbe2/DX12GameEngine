@@ -15,13 +15,14 @@ public:
 	/// <param name="device">デバイス</param>
 	/// <param name="heapManager">ヒープ管理クラスのインスタンス</param>x]
 	/// <param name="renderTextureResource">RenderTextureのリソース</param>
-	void Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource);
+	void Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource, Microsoft::WRL::ComPtr<ID3D12Resource> sceneViewResource);
 
 	void ReleaseSwapChainBuffers();
-	void Resize(IDXGISwapChain4* swapChain, ID3D12Device* device, ID3D12Resource* renderTexture);
+	void Resize(IDXGISwapChain4* swapChain, ID3D12Device* device, ID3D12Resource* renderTexture, ID3D12Resource* sceneView);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRTVHandle(size_t index) const { return rtvHandles_[index]; }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetRenderTextureRTVHandle() const { return renderTextureRTVHandle_; }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSceneViewRTVHandle() const { return sceneViewRTVHandle_; }
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetSwapChainResource(size_t index) { return swapChainResources_[index]; }
 
@@ -34,6 +35,7 @@ private:
 	// RTVハンドル
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
 	D3D12_CPU_DESCRIPTOR_HANDLE renderTextureRTVHandle_;
+	D3D12_CPU_DESCRIPTOR_HANDLE sceneViewRTVHandle_;
 
 	// バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2];

@@ -19,6 +19,7 @@ public:
 	ID3D12PipelineState* GetSkyboxPSO(int index) { return skyboxPSO_[index].Get(); }
 	ID3D12PipelineState* GetGridPSO() { return gridPSO_.Get(); }
 	ID3D12PipelineState* GetCopyImagePSO() { return copyImagePSO_.Get(); }
+	ID3D12PipelineState* GetSceneViewPSO() { return sceneViewPSO_.Get(); }
 	ID3D12PipelineState* GetPostEffectPSO(int effectType) { return postEffect[effectType].pso.Get(); }
 
 	void SetStandardBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { standardPSOData.vertexShaderBlob = vsBlob; standardPSOData.pixelShaderBlob = psBlob; }
@@ -29,6 +30,7 @@ public:
 	void SetGridBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { gridPSOData.vertexShaderBlob = vsBlob; gridPSOData.pixelShaderBlob = psBlob; }
 	
 	void SetCopyImageBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { fullscreenPSOData.vertexShaderBlob = vsBlob; fullscreenPSOData.pixelShaderBlob = psBlob; }
+	void SetSceneViewBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { sceneViewPSOData.vertexShaderBlob = vsBlob; sceneViewPSOData.pixelShaderBlob = psBlob; }
 	void SetPostEffectPSBlob(int effectType, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { postEffect[effectType].psBlob = psBlob; }
 
 private:
@@ -51,6 +53,7 @@ private:
 	PSOData skyboxPSOData;
 	PSOData gridPSOData;
 	PSOData fullscreenPSOData;
+	PSOData sceneViewPSOData;
 	PostEffectData postEffect[int(PostEffectType::Count)];
 
 	void CreateStandardPSO();
@@ -60,6 +63,7 @@ private:
 	void CreateSkyboxPSO();
 	void CreateGridPSO();
 	void CreateFullscreenPSO();
+	void CreateSceneViewPSO();
 	void CreatePostEffectPSO(PostEffectData& postEffect);
 
 	// inputLayout
@@ -83,6 +87,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> skyboxPSO_[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> gridPSO_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> copyImagePSO_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> sceneViewPSO_ = nullptr;
 
 	//
 	// 参照
@@ -102,5 +107,6 @@ private:
 
 	// フルスクリーンDesc
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC fullscreenBaseDesc_;
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC sceneViewBaseDesc_;
 };
 

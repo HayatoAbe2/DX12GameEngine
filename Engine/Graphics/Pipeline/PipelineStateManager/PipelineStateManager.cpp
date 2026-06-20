@@ -11,6 +11,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	skyboxPSOData.rootSignature = rootSignatureManager->GetSkyboxRootSignature();
 	gridPSOData.rootSignature = rootSignatureManager->GetGridRootSignature();
 	fullscreenPSOData.rootSignature = rootSignatureManager->GetFullscreenRootSignature();
+	sceneViewPSOData.rootSignature = rootSignatureManager->GetFullscreenRootSignature();
 
 	// InputLayout
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -40,6 +41,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateSkyboxPSO();
 	CreateGridPSO();
 	CreateFullscreenPSO();
+	CreateSceneViewPSO();
 
 	//
 	// ポストエフェクト
@@ -337,6 +339,37 @@ void PipelineStateManager::CreateFullscreenPSO() {
 	fullscreenBaseDesc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	CreatePSO(fullscreenBaseDesc_, CreateNoneBlendDesc(), &copyImagePSO_); // ブレンドなし
+}
+
+void PipelineStateManager::CreateSceneViewPSO() {
+	assert(sceneViewPSOData.rootSignature);
+	assert(sceneViewPSOData.vertexShaderBlob);
+	assert(sceneViewPSOData.pixelShaderBlob);
+
+	// 共通部分作成
+	sceneViewBaseDesc_.pRootSignature = sceneViewPSOData.rootSignature.Get();
+	sceneViewBaseDesc_.InputLayout = { nullptr, 0 }; // 使用しない
+	sceneViewBaseDesc_.VS = { sceneViewPSOData.vertexShaderBlob->GetBufferPointer(), sceneViewPSOData.vertexShaderBlob->GetBufferSize() };
+	sceneViewBaseDesc_.PS = { sceneViewPSOData.pixelShaderBlob->GetBufferPointer(), sceneViewPSOData.pixelShaderBlob->GetBufferSize() };
+
+	// ブレンド
+	sceneViewBaseDesc_.BlendState = CreateNoneBlendDesc();
+
+	// ラスタライザ
+	sceneViewBaseDesc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	sceneViewBaseDesc_.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+
+	// DepthStencil
+	sceneViewBaseDesc_.DepthStencilState.DepthEnable = FALSE;
+
+	sceneViewBaseDesc_.DSVFormat = DXGI_FORMAT_UNKNOWN;
+	sceneViewBaseDesc_.NumRenderTargets = 1;
+	sceneViewBaseDesc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	sceneViewBaseDesc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	sceneViewBaseDesc_.SampleDesc.Count = 1;
+	sceneViewBaseDesc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	CreatePSO(sceneViewBaseDesc_, CreateNoneBlendDesc(), &sceneViewPSO_); // ブレンドなし
 }
 
 void PipelineStateManager::CreatePostEffectPSO(PostEffectData& postEffect) {

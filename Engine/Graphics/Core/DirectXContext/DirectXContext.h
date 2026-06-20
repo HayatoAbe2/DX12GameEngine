@@ -72,6 +72,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource();
 
 	/// <summary>
+	/// SceneView作成
+	/// </summary>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateSceneViewResource();
+
+	/// <summary>
 	/// Viewport,Scissor設定
 	/// </summary>
 	void SetViewportAndScissor();
@@ -104,6 +110,7 @@ private:
 	// 遷移バリア
 	D3D12_RESOURCE_BARRIER swapChainBarrier_ = {};
 	D3D12_RESOURCE_BARRIER renderTextureBarrier_ = {};
+	D3D12_RESOURCE_BARRIER sceneViewBarrier_ = {};
 	D3D12_RESOURCE_BARRIER depthBarrier_ = {};
 
 	// ビューポート
@@ -160,5 +167,12 @@ private:
 	// 前フレームのウィンドウサイズ
 	HWND hwnd_{};
 	RECT windowRect_{};
+
+	// デバッグでの、シーン描画用
+	Microsoft::WRL::ComPtr<ID3D12Resource> sceneViewResource_;
+	uint32_t sceneViewSRVIndex_;
+
+	uint32_t sceneViewRTVIndex_;
+	D3D12_CPU_DESCRIPTOR_HANDLE sceneViewRTVHandle_;
 };
 

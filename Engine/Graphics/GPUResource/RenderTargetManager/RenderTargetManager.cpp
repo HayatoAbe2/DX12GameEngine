@@ -2,7 +2,7 @@
 #include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include <cassert>
 
-void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource) {
+void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource, Microsoft::WRL::ComPtr<ID3D12Resource> sceneViewResource) {
 	// ---------------------
 	// SwapChain
 	// ---------------------
@@ -29,6 +29,9 @@ void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* d
 
 	renderTextureRTVHandle_.ptr = rtvHandles_[1].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	device->CreateRenderTargetView(renderTextureResource.Get(), &rtvDesc_, renderTextureRTVHandle_);
+
+    sceneViewRTVHandle_.ptr = renderTextureRTVHandle_.ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    device->CreateRenderTargetView(sceneViewResource.Get(), &rtvDesc_, sceneViewRTVHandle_);
 }
 
 void RenderTargetManager::ReleaseSwapChainBuffers() {
@@ -40,7 +43,8 @@ void RenderTargetManager::ReleaseSwapChainBuffers() {
 void RenderTargetManager::Resize(
     IDXGISwapChain4* swapChain,
     ID3D12Device* device,
-    ID3D12Resource* renderTexture) {
+    ID3D12Resource* renderTexture,
+    ID3D12Resource* sceneView) {
     for (int i = 0; i < 2; i++) {
         swapChainResources_[i].Reset();
     }
@@ -68,4 +72,9 @@ void RenderTargetManager::Resize(
         renderTexture,
         &rtvDesc_,
         renderTextureRTVHandle_);
+
+    device->CreateRenderTargetView(
+        sceneView,
+        &rtvDesc_,
+        sceneViewRTVHandle_);
 }

@@ -69,6 +69,7 @@ void ImGuiManager::DrawSceneWindow(
 		(ImTextureID)handle.ptr,
 		size
 	);
+
 	ImGui::End();
 #endif
 }
