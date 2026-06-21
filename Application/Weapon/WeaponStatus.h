@@ -40,6 +40,8 @@ struct WeaponData {
 	std::variant<NormalParam, ShotgunParam> weaponSpecialData;
 	// 属性(弾の性質)
 	BulletTraits bulletTraits;
+	// 弾の色
+	Vector4 bulletColor;
 	// レア度(表示に影響)
 	Rarity rarity;
 };

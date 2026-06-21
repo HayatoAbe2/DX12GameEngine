@@ -17,6 +17,7 @@ public:
 
 	// シーン変更
 	void SceneChange(std::string& nextSceneName);
+	BaseScene* GetCurrentScene() { return currentScene_.get(); }
 
 private:
 	// 現在のシーン

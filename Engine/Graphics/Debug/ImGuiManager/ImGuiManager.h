@@ -10,6 +10,7 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #endif
+#include <Engine/Math/Vector2/Vector2.h>
 
 class ImGuiManager {
 public:
@@ -19,6 +20,9 @@ public:
 	void BeginFrame();
 	void EndFrame(ID3D12GraphicsCommandList* cmdList);
 
-	void DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle);
-};
+	void DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT windowRect);
 
+	Vector2 GetSceneWindowSize() { return sceneWindowSize_; }
+private:
+	Vector2 sceneWindowSize_{};
+};

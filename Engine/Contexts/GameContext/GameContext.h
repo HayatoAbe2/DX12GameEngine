@@ -87,4 +87,6 @@ private:
 
 	// ウィンドウサイズ確認用
 	HWND hwnd_;
+
+	Renderer* renderer_ = nullptr;
 };

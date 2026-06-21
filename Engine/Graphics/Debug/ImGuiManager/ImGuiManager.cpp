@@ -59,16 +59,34 @@ void ImGuiManager::EndFrame([[maybe_unused]] ID3D12GraphicsCommandList* cmdList)
 }
 
 void ImGuiManager::DrawSceneWindow(
-	D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+	D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT windowRect) {
 #ifdef USE_IMGUI
 	ImGui::Begin("Scene");
 
-	ImVec2 size = ImGui::GetContentRegionAvail();
+	float textureWidth = float(windowRect.right);
+	float textureHeight = float(windowRect.bottom);
+	float aspect = textureWidth / textureHeight;
+
+	ImVec2 avail = ImGui::GetContentRegionAvail();
+
+	ImVec2 imageSize;
+
+	if (avail.x / avail.y > aspect) {
+		imageSize.y = avail.y;
+		imageSize.x = avail.y * aspect;
+	} else {
+		imageSize.x = avail.x;
+		imageSize.y = avail.x / aspect;
+	}
 
 	ImGui::Image(
 		(ImTextureID)handle.ptr,
-		size
+		imageSize
 	);
+
+	ImVec2 size = ImGui::GetItemRectSize();
+	sceneWindowSize_.x = size.x;
+	sceneWindowSize_.y = size.y;
 
 	ImGui::End();
 #endif

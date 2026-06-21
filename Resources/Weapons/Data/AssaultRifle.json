@@ -8,6 +8,7 @@
         "shootCoolTime": 0.15,
         "bulletLifeTime": 60,
         "knockback": 0.1,
+        "bulletColor": [0.5, 0.7, 0.0, 1.0],
         "rarity": "Common"
   }
 }

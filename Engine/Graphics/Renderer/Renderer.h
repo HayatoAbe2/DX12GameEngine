@@ -8,6 +8,7 @@
 
 #include "Engine/Graphics/Renderer/PostEffectType.h"
 #include "Engine/Graphics/GPUData/TransformationMatrix.h"
+#include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 
 #include <wrl.h>
 #include <d3d12.h>
@@ -18,7 +19,6 @@ class Sprite;
 class Texture;
 struct MaterialData;
 class ParticleSystem;
-class DirectXContext;
 class ConstantBufferManager;
 class Camera;
 
@@ -72,6 +72,7 @@ public:
 
 	// カメラセット
 	void SetCamera(Camera* camera);
+	Camera* GetCamera() { return camera_; }
 
 	/// <summary>
 	/// フレーム開始時の処理(描画開始時に行う)
@@ -83,6 +84,8 @@ public:
 	/// </summary>
 	void EndFrame();
 
+	// ImGuiシーンのサイズ
+	Vector2 GetSceneWindowSize() { return dxContext_->GetSceneWindowSize(); }
 private:
 	void InitializePlane();
 	void InitializeRing();

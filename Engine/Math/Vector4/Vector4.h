@@ -44,5 +44,6 @@ struct Vector4 {
 };
 
 Vector4 HSVtoRGB(float h, float s = 1.0f, float v = 1.0f);
+Vector4 TransformVector(const Vector4& vector, const Matrix4x4& matrix);
 
 Vector4 operator*(const Matrix4x4& mat, const Vector4& v);

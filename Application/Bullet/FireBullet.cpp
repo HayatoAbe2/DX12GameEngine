@@ -9,11 +9,11 @@ void FireBullet::Initialize() {
 
 	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(10);
-	particle_->SetColor({ 0.3f, 0.03f, 0.0f, 1.0f });
+	particle_->SetColor(data_.bulletColor);
 
 	explosionParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	explosionParticle_->SetLifeTime(10);
-	explosionParticle_->SetColor({ 0.7f, 0.03f, 0.0f, 1.0f });
+	explosionParticle_->SetColor(data_.bulletColor);
 
 	particleField_ = std::make_unique<ParticleField>();
 	particleField_->SetCheckArea(false);
@@ -24,7 +24,7 @@ void FireBullet::Initialize() {
 	fireLight.color = { 1,1,1,1 };
 }
 
-void FireBullet::Update(MapCheck* mapCheck) {
+void FireBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 	auto& ctx = GameContext::GetInstance();
 	auto& light = ctx.Light();
 
@@ -38,10 +38,12 @@ void FireBullet::Update(MapCheck* mapCheck) {
 		lifeTime_--;
 		if (lifeTime_ <= 0) {
 			Hit();
+			effectManager->SpawnExplodeEffect(model_->GetTransform().translate);
 		}
 
 		if (mapCheck->IsHitWall(pos, data_.stats.bulletSize / 2.0f)) {
 			Hit();
+			effectManager->SpawnExplodeEffect(model_->GetTransform().translate);
 		}
 
 		// パーティクル

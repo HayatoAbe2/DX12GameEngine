@@ -8,7 +8,7 @@ public:
 		Bullet(std::move(model), direction, data, isEnemyBullet) {
 	};
 	void Initialize();
-	void Update(MapCheck* mapCheck) override;
+	void Update(MapCheck* mapCheck, EffectManager* effectManager) override;
 	void Draw(Camera* camera) override;
 	void Hit() override;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "GameCommon.h"
+#include "Engine/SceneObject/SceneObject.h"
 
 /// <summary>
 /// 各シーンの基底クラス
@@ -24,6 +25,9 @@ public:
 	/// </summary>
 	virtual void Draw() = 0;
 
+	// 登録オブジェクト取得
+	std::vector<SceneObject*> GetObjects() { return sceneObjects_; }
+
 protected:
 	// カメラ
 	std::unique_ptr<Camera> camera_ = nullptr;
@@ -31,5 +35,8 @@ protected:
 
 	// デバッグカメラ
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
+
+	// オブジェクト
+	std::vector<SceneObject*> sceneObjects_{};
 };
 

@@ -1,12 +1,6 @@
 #include "App.h"
 #include "Engine/App/Window.h"
-#include "Engine/Io/DumpExporter/DumpExporter.h"
-#include "Engine/Io/Logger/Logger.h"
-#include "Engine/Io/AudioSystem/AudioSystem.h"
-#include "Engine/Io/InputSystem/InputSystem.h"
 #include "Engine/Asset/Manager/AssetManager/AssetManager.h"
-#include "Engine/SceneObject/LightManager/LightManager.h"
-#include "Engine/Scene/SceneManager/SceneManager.h"
 #include "Engine/Contexts/GameContext/GameContext.h"
 
 #include <format>
@@ -82,6 +76,8 @@ void App::Initialize() {
 
 	sceneManager_->Initialize();
 	logger_->Log(logger_->GetStream(), std::format("[SceneManager] Initialization complete.\n"));
+
+	sceneEditor_ = std::make_unique<SceneEditor>();
 }
 
 void App::Run() {
@@ -115,6 +111,9 @@ void App::Run() {
 
 			// 描画処理
 			sceneManager_->Draw();
+
+			sceneEditor_->scene_ = sceneManager_->GetCurrentScene();
+			sceneEditor_->Draw();
 
 			// 描画終了時に呼ぶ
 			renderer_->EndFrame();

@@ -118,6 +118,12 @@ void WeaponManager::LoadJson(const std::string& path) {
 
 		wd.stats.knockback = data["knockback"];
 
+		auto color = data["bulletColor"];
+		wd.bulletColor.x = color[0];
+		wd.bulletColor.y = color[1];
+		wd.bulletColor.z = color[2];
+		wd.bulletColor.w = color[3];
+
 		// enum変換機能
 		wd.rarity = data["rarity"].get<Rarity>();
 

@@ -19,9 +19,14 @@ GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* in
 	fixFps_ = fixFps;
 
 	hwnd_ = input->GetHwnd();
+	renderer_ = renderer;
 }
 
 Vector2 GameContext::GetWindowSize() const {
+#ifdef USE_IMGUI
+	return renderer_->GetSceneWindowSize();
+#endif
+
 	RECT rect;
 	GetClientRect(hwnd_, &rect);
 	return { float(rect.right),float(rect.bottom) };

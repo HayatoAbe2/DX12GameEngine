@@ -39,6 +39,7 @@ void GameScene::Initialize() {
 	//	playerModel_->GetMaterial(i)->SetData(data);
 	//	playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
 	//}
+	sceneObjects_.push_back(playerModel_.get());
 
 	// マップ
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
@@ -95,13 +96,6 @@ void GameScene::Initialize() {
 	uiDrawer_ = std::make_unique<UIDrawer>();
 	uiDrawer_->Initialize(player_.get());
 
-	// 雲
-	cloud_ = asset.LoadModel("Resources/Cloud", "Cloud.obj", false);
-	cloud_->SetTranslate({ 0,-20,0 });
-	data = cloud_->GetMaterial(0)->GetData();
-	data.color.w = 1.0f;
-	cloud_->GetMaterial(0)->SetData(data);
-
 	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,0,-cameraDistance_ };
 
 	// フェード
@@ -137,10 +131,6 @@ void GameScene::Update() {
 			}
 
 		} else {
-			MaterialData data = cloud_->GetMaterial(0)->GetData();
-			data.uvTransform.m[3][1] += 0.001f;
-			cloud_->GetMaterial(0)->SetData(data);
-
 			// プレイヤー処理
 			if (!isFadeOut_) {
 				player_->Update(mapCheck_.get(), itemManager_.get(), camera_.get(), bulletManager_.get());
@@ -170,7 +160,7 @@ void GameScene::Update() {
 			mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
 
 			// 弾の処理
-			bulletManager_->Update(mapCheck_.get());
+			bulletManager_->Update(mapCheck_.get(), effectManager_.get());
 			for (const auto& bullet : bulletManager_->GetBullets()) {
 
 				// 当たり判定
@@ -182,12 +172,6 @@ void GameScene::Update() {
 					if (dynamic_cast<Spiker*>(enemy)) {
 						collisionChecker_->Check(player_.get(), enemy, camera_.get());
 					}
-				}
-			}
-
-			for (auto enemy : enemyManager_->GetEnemies()) {
-				if (dynamic_cast<Spiker*>(enemy)) {
-					collisionChecker_->Check(player_.get(), enemy, camera_.get());
 				}
 			}
 
@@ -316,7 +300,6 @@ void GameScene::Draw() {
 	
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
-	//render.DrawModel(cloud_.get()_.get(), BlendMode::Add);
 	mapTile_->Draw(camera_.get());
 	player_->Draw(camera_.get());
 	enemyManager_->Draw(camera_.get());
@@ -391,7 +374,7 @@ void GameScene::Reset() {
 		itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
 		enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
 		enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
-
+		break;
 	case 1:
 		floorType = ctx.RandomInt(1, 2);
 

@@ -5,6 +5,7 @@
 #include "Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
 #include <Bullet/WaveBullet.h>
+#include <Bullet/FireBullet.h>
 #include <Engine/Math/CollisionShape/Circle/Circle.h>
 
 void CollisionChecker::Initialize(EffectManager* effectManager) {
@@ -23,7 +24,12 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera) {
 		player->Hit(bullet->GetDamage(), bullet->GetPrePos());
 		bullet->Hit();
 		camera->StartShake(1.0f, 3);
-		effectManager_->SpawnHitEffect(bullet->GetTransform().translate);
+		if (dynamic_cast<FireBullet*>(bullet)) {
+			effectManager_->SpawnExplodeEffect(bullet->GetTransform().translate);
+		} else {
+			effectManager_->SpawnHitEffect(bullet->GetTransform().translate);
+		}
+
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 	}
 }
@@ -43,7 +49,11 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 		}
 		bullet->Hit();
 		camera->StartShake(1.0f, 3);
-		effectManager_->SpawnHitEffect(bullet->GetTransform().translate);
+		if (dynamic_cast<FireBullet*>(bullet)) {
+			effectManager_->SpawnExplodeEffect(bullet->GetTransform().translate);
+		} else {
+			effectManager_->SpawnHitEffect(bullet->GetTransform().translate);
+		}
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 	}
 }

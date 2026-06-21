@@ -26,6 +26,7 @@ public:
 
 	// カメラセット
 	void SetCamera(Camera* camera) { renderer_->SetCamera(camera); }
+	Camera* GetCamera() { return renderer_->GetCamera(); }
 private:
 	Renderer* renderer_ = nullptr;
 	LightManager* lightManager_ = nullptr;

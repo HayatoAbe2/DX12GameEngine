@@ -7,16 +7,16 @@ void RapidBullet::Initialize() {
 
 	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(2);
-	particle_->SetColor({ 0.0f, 0.1f, 0.8f, 1.0f });
+	particle_->SetColor(data_.bulletColor);
 
 	hitParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	hitParticle_->SetLifeTime(hitParticleLifeTime);
-	hitParticle_->SetColor({ 0.2f, 0.1f, 1.0f, 1.0f });
+	hitParticle_->SetColor(data_.bulletColor);
 	particleField_ = std::make_unique<ParticleField>();
 	particleField_->SetCheckArea(false);
 }
 
-void RapidBullet::Update(MapCheck* mapCheck) {
+void RapidBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 	auto& ctx = GameContext::GetInstance();
 
 	if (!isDead_) {
@@ -28,11 +28,7 @@ void RapidBullet::Update(MapCheck* mapCheck) {
 
 		lifeTime_--;
 		if (lifeTime_ <= 0) {
-			Hit();
-		}
-
-		if (mapCheck->IsHitWall(pos, data_.stats.bulletSize / 2.0f)) {
-			Hit();
+			isDead_ = true;
 		}
 
 		// パーティクル
@@ -55,7 +51,7 @@ void RapidBullet::Update(MapCheck* mapCheck) {
 	if (isDead_) {
 		hitParticleLifeTime--;
 		if (hitParticleLifeTime <= 0) {
-			canErase_ = true;
+ 			canErase_ = true;
 		}
 	}
 }

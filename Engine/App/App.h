@@ -9,6 +9,7 @@
 #include "Engine/Graphics/Renderer/Renderer.h"
 #include "Engine/SceneObject/LightManager/LightManager.h"
 #include "Engine/Scene/SceneManager/SceneManager.h"
+#include "Engine/Editor/Scene/SceneEditor/SceneEditor.h"
 
 #include <memory>
 #include <Windows.h>
@@ -103,6 +104,9 @@ private:
 
 	// シーン管理
 	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
+
+	// シーンエディタ
+	std::unique_ptr<SceneEditor> sceneEditor_ = nullptr;
 };
 
 

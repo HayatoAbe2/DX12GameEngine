@@ -8,7 +8,7 @@ public:
 		Bullet(std::move(model), direction, data, isEnemyBullet) {
 	};
 	void Initialize();
-	void Update(MapCheck* mapCheck) override;
+	void Update(MapCheck* mapCheck, EffectManager* effectManager) override;
 	void Draw(Camera* camera) override;
 	void Hit() override;
 
@@ -18,7 +18,6 @@ private:
 	float particleRange_ = 0.7f;
 
 	std::unique_ptr<ParticleSystem> hitParticle_;
-	std::unique_ptr<ParticleSystem> hitParticle2_;
 	const int hitParticleNum_ = 5;
 	float hitParticleRange_ = 1.0f;
 	int hitParticleLifeTime = 30;

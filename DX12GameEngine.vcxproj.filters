@@ -215,7 +215,6 @@
     <ClCompile Include="Application\Bullet\SpreadBullet.cpp" />
     <ClCompile Include="Application\Bullet\WaveBullet.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
-    <ClCompile Include="Application\Effect\SoulEffect.cpp" />
     <ClCompile Include="Application\Enemy\Enemies\Bat.cpp" />
     <ClCompile Include="Application\Enemy\Enemies\HeavyKnight.cpp" />
     <ClCompile Include="Application\Enemy\Enemies\Knight.cpp" />
@@ -251,6 +250,8 @@
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl" />
     <ClCompile Include="Application\Enemy\Enemies\Spiker.cpp" />
     <ClCompile Include="Engine\Editor\Scene\SceneEditor\SceneEditor.cpp" />
+    <ClCompile Include="Application\Effect\Hit\HitEffect.cpp" />
+    <ClCompile Include="Application\Effect\Explode\ExplodeEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -499,7 +500,6 @@
     <ClInclude Include="Application\Bullet\SpreadBullet.h" />
     <ClInclude Include="Application\Bullet\WaveBullet.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
-    <ClInclude Include="Application\Effect\SoulEffect.h" />
     <ClInclude Include="Application\Enemy\Enemies\Bat.h" />
     <ClInclude Include="Application\Enemy\Enemies\HeavyKnight.h" />
     <ClInclude Include="Application\Enemy\Enemies\Knight.h" />
@@ -545,9 +545,10 @@
     <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Application\Enemy\Enemies\Spiker.h" />
-    <ClInclude Include="Engine\Editor\Scene\Scene.h" />
     <ClInclude Include="Engine\SceneObject\SceneObject.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\SceneEditor.h" />
+    <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
+    <ClInclude Include="Application\Effect\Explode\ExplodeEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

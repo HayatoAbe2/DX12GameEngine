@@ -56,6 +56,7 @@ public:
 	BufferManager* GetBufferManager() { return bufferManager_.get(); }
 	ConstantBufferManager* GetConstantBufferManager() { return constantBufferManager_.get(); }
 	FixFPS* GetFixFPS() { return fixFPS_.get(); }
+	Vector2 GetSceneWindowSize() { return imGuiManager_->GetSceneWindowSize(); }
 
 	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
 	void SetCamera(Camera* camera) { camera_ = camera; }

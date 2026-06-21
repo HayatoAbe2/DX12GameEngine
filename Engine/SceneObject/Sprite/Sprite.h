@@ -6,6 +6,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <memory>
+#include <Engine/Math/Vector4/Vector4.h>
 
 class Sprite : public SceneObject {
 public:
@@ -92,7 +93,7 @@ public:
 	void SetRotation(float rotation) { rotation_ = rotation; }
 
 	// 色
-	const Vector4& GetColor() const { return material_->GetData().color; }
+	Vector4 GetColor() const { return material_->GetData().color; }
 	void SetColor(Vector4 color) { MaterialData data = material_->GetData(); data.color = color; material_->SetData(data); }
 
 	const D3D12_INDEX_BUFFER_VIEW& GetIBV()const { return indexBufferView_; };
@@ -110,13 +111,13 @@ private:
 	float rotation_ = 0.0f;
 	bool debugKeepAspect_ = false;
 
-	std::unique_ptr<Material> material_;
+	std::unique_ptr<Material> material_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 	VertexData* vertexData_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_;
-	TransformationMatrix* transformationData_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationResource_ = nullptr;
+	TransformationMatrix* transformationData_ = nullptr;
 };

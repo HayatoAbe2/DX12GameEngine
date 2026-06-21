@@ -226,7 +226,7 @@ void DirectXContext::BeginFrame() {
 
 	imGuiManager_->BeginFrame();
 
-	imGuiManager_->DrawSceneWindow(srvManager_->GetGPUHandle(sceneViewSRVIndex_));
+	imGuiManager_->DrawSceneWindow(srvManager_->GetGPUHandle(sceneViewSRVIndex_), windowRect_);
 }
 
 void DirectXContext::EndFrame() {
@@ -238,7 +238,7 @@ void DirectXContext::EndFrame() {
 	renderTextureBarrier_.Transition.pResource = renderTextureResource_.Get();
 	renderTextureBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	renderTextureBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	commandListManager_->GetCommandList()->ResourceBarrier(1, &renderTextureBarrier_);
+	cmdList->ResourceBarrier(1, &renderTextureBarrier_);
 
 	// SRV>RTV
 	sceneViewBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
