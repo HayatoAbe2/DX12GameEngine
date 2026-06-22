@@ -3,6 +3,7 @@
 
 void Timer::Start(float duration) {
 	time_ = duration;
+    startTime_ = duration;
 	isActive_ = true;
 }
 

@@ -88,6 +88,7 @@ void ImGuiManager::EndFrame([[maybe_unused]] ID3D12GraphicsCommandList* cmdList)
 void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT windowRect) {
 #ifdef USE_IMGUI
 	ImGui::Begin("Scene");
+	isSceneHovered_ = ImGui::IsWindowHovered();
 
 	float textureWidth = float(windowRect.right);
 	float textureHeight = float(windowRect.bottom);

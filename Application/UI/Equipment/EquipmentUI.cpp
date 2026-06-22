@@ -6,6 +6,11 @@
 #include "Weapon/Weapons/Shotgun.h"
 #include "Weapon/Weapons/FireBall.h"
 #include "Weapon/Weapons/Wavegun.h"
+#include "Weapon/Weapons/OrbitStaff.h"
+#include "Weapon/Weapons/AccelGun.h"
+#include "Weapon/Weapons/ChargeGun.h"
+#include "Weapon/Weapons/Sniper.h"
+#include "Weapon/Weapons/Burstgun.h"
 
 void EquipmentUI::Initialize(Player* player) {
 	player_ = player;
@@ -78,6 +83,16 @@ void EquipmentUI::Update() {
 			equipment_ = equipFireBall_.get();
 		} else if (dynamic_cast<Wavegun*>(weapon)) {
 			equipment_ = equipWavegun_.get();
+		}else if(dynamic_cast<OrbitStaff*>(weapon)) {
+			equipment_ = equipFireBall_.get();
+		} else if (dynamic_cast<ChargeGun*>(weapon)) {
+			equipment_ = equipShotgun_.get();
+		} else if (dynamic_cast<AccelGun*>(weapon)) {
+			equipment_ = equipPistol_.get();
+		} else if (dynamic_cast<Sniper*>(weapon)) {
+			equipment_ = equipAssaultRifle_.get();
+		} else if (dynamic_cast<Burstgun*>(weapon)) {
+			equipment_ = equipWavegun_.get();
 		}
 		equipment_->SetSize({ 150, 150 });
 		equipment_->SetPosition({ 1100, 530 });
@@ -110,6 +125,16 @@ void EquipmentUI::Update() {
 			} else if (dynamic_cast<FireBall*>(weapon2)) {
 				equipment2_ = equipFireBall2_.get();
 			} else if (dynamic_cast<Wavegun*>(weapon2)) {
+				equipment2_ = equipWavegun2_.get();
+			} else if (dynamic_cast<OrbitStaff*>(weapon2)) {
+				equipment2_ = equipFireBall2_.get();
+			} else if (dynamic_cast<ChargeGun*>(weapon2)) {
+				equipment2_ = equipShotgun2_.get();
+			} else if (dynamic_cast<AccelGun*>(weapon2)) {
+				equipment2_ = equipPistol2_.get();
+			} else if (dynamic_cast<Sniper*>(weapon2)) {
+				equipment2_ = equipAssaultRifle2_.get();
+			} else if (dynamic_cast<Burstgun*>(weapon2)) {
 				equipment2_ = equipWavegun2_.get();
 			}
 

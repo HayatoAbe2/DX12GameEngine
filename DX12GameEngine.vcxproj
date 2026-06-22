@@ -162,9 +162,13 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Weapon\Weapons\AccelGun.cpp" />
+    <ClCompile Include="Application\Bullet\AccelBullet.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
+    <ClCompile Include="Application\Weapon\Weapons\ChargeGun.cpp" />
+    <ClCompile Include="Application\Weapon\Weapons\Burstgun.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Bullet\Bullet.cpp" />
@@ -277,6 +281,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Contexts\SceneContext\SceneContext.cpp" />
     <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp" />
     <ClCompile Include="Application\Timer\Timer.cpp" />
+    <ClCompile Include="Application\Bullet\OrbitBullet.cpp" />
+    <ClCompile Include="Application\Weapon\Weapons\OrbitStaff.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -284,6 +290,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </ClCompile>
     <ClCompile Include="Application\Character\Enemy\Enemies\Spiker.cpp" />
     <ClCompile Include="Engine\Editor\Scene\SceneEditor\SceneEditor.cpp" />
+    <ClCompile Include="Application\Weapon\Weapons\Sniper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\GaussianFilter3x3.PS.hlsl">
@@ -380,6 +387,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Weapon\Weapons\AccelGun.h" />
+    <ClInclude Include="Application\Bullet\AccelBullet.h" />
     <ClInclude Include="Application\Character\Character.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
@@ -387,6 +396,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
+    <ClInclude Include="Application\Weapon\Weapons\ChargeGun.h" />
+    <ClInclude Include="Application\Weapon\Weapons\Burstgun.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.h" />
@@ -520,6 +531,9 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\Enemies\Spiker.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\SceneEditor.h" />
     <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
+    <ClInclude Include="Application\Bullet\OrbitBullet.h" />
+    <ClInclude Include="Application\Weapon\Weapons\OrbitStaff.h" />
+    <ClInclude Include="Application\Weapon\Weapons\Sniper.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

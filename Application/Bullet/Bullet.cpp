@@ -6,6 +6,7 @@
 Bullet::Bullet(std::unique_ptr<Model> model, const Vector3& direction, const WeaponData& data, Character* from) {
 	model_ = std::move(model);
 	data_ = data;
+	user_ = from;
 
 	auto& ctx = GameContext::GetInstance();
 	velocity_ = direction * data.stats.bulletSpeed * ctx.GetDeltatime();

@@ -16,7 +16,11 @@ public:
 		Shotgun,
 		FireBall,
 		Wavegun,
-		//SMG,
+		OrbitStaff,
+		ChargeGun,
+		AccelGun,
+		Sniper,
+		Burstgun,
 	};
 
 private:

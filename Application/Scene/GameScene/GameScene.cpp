@@ -341,7 +341,22 @@ void GameScene::Draw() {
 		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(3)));
 	};
 	if (ImGui::Button("Wave")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(4, Rare)));
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(4)));
+	};
+	if (ImGui::Button("Orbit")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(5)));
+	};
+	if (ImGui::Button("Charge")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(6)));
+	};
+	if (ImGui::Button("Accel")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(7)));
+	};
+	if (ImGui::Button("Sniper")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(8)));
+	};
+	if (ImGui::Button("Burst")) {
+		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(9)));
 	};
 	ImGui::End();
 #endif

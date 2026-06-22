@@ -55,6 +55,8 @@ public:
 
 	Vector2 GetWindowSize() const;
 
+	bool IsSceneWindowHovered() const;
+
 	///
 	/// ウィンドウ情報
 	///

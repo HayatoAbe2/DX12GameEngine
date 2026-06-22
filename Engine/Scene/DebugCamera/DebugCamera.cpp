@@ -69,10 +69,6 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	distance_ += -moveZ;
 
 	// カメラは注視点から後ろ向きにdistance_移動した位置
-	//Vector3 back;
-	//back = { 0,0,-distance_ };
-	//translation_ = target_ + back;
-
 	Vector3 back = { 0,0,-distance_ };
 	back = TransformNormal(back, matRot_);
 	translation_ = target_ + back;

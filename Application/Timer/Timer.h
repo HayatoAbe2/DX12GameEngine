@@ -23,8 +23,12 @@ public:
     float GetRemaining() const {
         return time_;
     }
+    float GetStartTime() const {
+        return startTime_;
+    }
 
 private:
     float time_ = 0.0f;
+    float startTime_ = 0.0f;
     bool isActive_ = false;
 };

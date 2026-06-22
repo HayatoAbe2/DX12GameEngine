@@ -6,6 +6,7 @@
 #include "Effect/EffectManager.h"
 #include <Bullet/WaveBullet.h>
 #include <Bullet/FireBullet.h>
+#include <Bullet/OrbitBullet.h>
 #include <Engine/Math/CollisionShape/Circle/Circle.h>
 
 void CollisionChecker::Initialize(EffectManager* effectManager) {
@@ -46,8 +47,11 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 		enemy->Hit(bullet->GetDamage(), bullet->GetPrePos(), bullet->GetKnockback());
 		if (dynamic_cast<WaveBullet*>(bullet)) {
 			enemy->Slow();
+			bullet->Hit();
+		} else if (dynamic_cast<OrbitBullet*>(bullet)) {
+		} else {
+			bullet->Hit();
 		}
-		bullet->Hit();
 		camera->StartShake(1.0f, 3);
 		if (dynamic_cast<FireBullet*>(bullet)) {
 			effectManager_->SpawnExplodeEffect(bullet->GetTransform().translate);

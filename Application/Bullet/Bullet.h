@@ -53,5 +53,8 @@ protected:
 	// 無敵時間
 	std::unique_ptr<Timer> noHitTimer_;
 	float invinsibleTime_ = 0.15f;
+
+	// 射撃者
+	Character* user_ = nullptr;
 };
 

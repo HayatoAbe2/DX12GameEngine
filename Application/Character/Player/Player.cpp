@@ -140,7 +140,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 
 			if (shootCooldownTimer_->IsFinished()) {
 				// 射撃
-				if (input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > 0.2f) {
+				if (ctx.IsSceneWindowHovered() && input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > 0.2f) {
 					Shoot(bulletManager, camera);
 				}
 
@@ -148,8 +148,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 				shootCooldownTimer_->Update();
 			}
 
-			float ct = weapon_->GetData().stats.shootCoolTime;
-			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / ct), scSize_.y });
+			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / shootCooldownTimer_->GetStartTime()), scSize_.y });
 		}
 
 		if (stunTimer_->IsActive()) {

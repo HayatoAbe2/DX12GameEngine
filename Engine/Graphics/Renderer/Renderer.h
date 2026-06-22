@@ -87,7 +87,7 @@ public:
 
 	// ImGuiシーンのサイズ
 	Vector2 GetSceneWindowSize() { return dxContext_->GetSceneWindowSize(); }
-
+	bool GetSceneWindowHovered() { return dxContext_->GetSceneWindowHovered(); }
 	void SetGizmoCtx(const GizmoCtx& ctx) { dxContext_->SetGizmoCtx(ctx); }
 private:
 	void InitializePlane();

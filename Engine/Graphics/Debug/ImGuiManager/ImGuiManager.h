@@ -25,7 +25,9 @@ public:
 
 	Vector2 GetSceneWindowSize() { return sceneWindowSize_; }
 	void SetGizmoCtx(const GizmoCtx& ctx) { gizmoCtx_ = ctx; }
+	bool IsSceneHovered() { return isSceneHovered_; }
 private:
 	Vector2 sceneWindowSize_{};
 	GizmoCtx gizmoCtx_{};
+	bool isSceneHovered_ = false;
 };
