@@ -36,12 +36,16 @@ public:
 
 	void SetSkeleton(std::shared_ptr<Skeleton> skeleton) { skeleton_ = skeleton; }
 
+	void SetDirectoryPath(std::string directoryPath) {
+		directory_ = directoryPath;
+	}
+
 	///
 	/// Getter
 	///
 
 	// トランスフォーム
-	Transform GetTransform() { return transform_; }
+	const Transform& GetTransform() { return transform_; }
 
 	// データの取得
 	std::shared_ptr<const ModelData> GetData() { return data_; }
@@ -51,6 +55,8 @@ public:
 
 	// rootNode取得
 	ModelNode* GetRootNode() { return rootNode_.get(); }
+
+	const std::string& GetDirectoryPath() { return directory_; }
 
 private:
 	void UpdateSkeleton();
@@ -72,4 +78,6 @@ private:
 
 	// スケルトン
 	std::shared_ptr<Skeleton> skeleton_ = nullptr;
+
+	std::string directory_;
 };

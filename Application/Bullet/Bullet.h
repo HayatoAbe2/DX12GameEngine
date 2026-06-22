@@ -4,12 +4,13 @@
 #include <memory>
 #include <Timer/Timer.h>
 #include "Effect/EffectManager.h"
+#include <Character/Character.h>
 
 class MapCheck;
 
 class Bullet {
 public:
-	Bullet(std::unique_ptr<Model> model,const Vector3& direction,const WeaponData& data,bool isEnemyBullet);
+	Bullet(std::unique_ptr<Model> model,const Vector3& direction,const WeaponData& data, Character* from);
 	virtual ~Bullet() = default;
 	virtual void Update(MapCheck* mapCheck, EffectManager* effectManager) = 0;
 	virtual void Draw(Camera* camera) = 0;

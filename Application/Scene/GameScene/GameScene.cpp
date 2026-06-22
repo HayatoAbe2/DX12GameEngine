@@ -1,6 +1,6 @@
 #include "GameScene.h"
 #include <numbers>
-#include <Enemy/Enemies/Spiker.h>
+#include "Character/Enemy/Enemies/Spiker.h"
 
 GameScene::~GameScene() {
 }
@@ -39,7 +39,7 @@ void GameScene::Initialize() {
 	//	playerModel_->GetMaterial(i)->SetData(data);
 	//	playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
 	//}
-	sceneObjects_.push_back(playerModel_.get());
+	sceneObjects_.push_back(asset.LoadModel("Resources/Debug/human", "walk.gltf"));
 
 	// マップ
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
@@ -295,6 +295,8 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
+	BaseScene::Draw();
+
 	auto& render = GameContext::GetInstance().Render();
 	render.SetPostEffectType(PostEffectType::Outline);
 	

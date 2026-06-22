@@ -1,6 +1,6 @@
 #include "MapCheck.h"
 #include "MapTile.h"
-#include "Player/Player.h"
+#include "Character/Player/Player.h"
 #include <algorithm>
 
 void MapCheck::Initialize(std::vector<std::vector<MapTile::Tile>> map, float tileSize) {

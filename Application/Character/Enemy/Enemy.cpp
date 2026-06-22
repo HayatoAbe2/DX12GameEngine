@@ -1,10 +1,11 @@
 #include "Enemy.h"
 #include "Map/MapCheck.h"
-#include "Player/Player.h"
 #include "EnemyStatus.h"
-#include "Enemy/EnemyState/EnemyApproach/EnemyApproach.h"
-#include "Enemy/EnemyState/EnemyAttack/EnemyAttack.h"
-#include "Enemy/EnemyState/EnemyIdle/EnemyIdle.h"
+#include "Character/Player/Player.h"
+
+#include "Character/Enemy/EnemyState/EnemyApproach/EnemyApproach.h"
+#include "Character/Enemy/EnemyState/EnemyAttack/EnemyAttack.h"
+#include "Character/Enemy/EnemyState/EnemyIdle/EnemyIdle.h"
 
 #include <numbers>
 #include <cmath>

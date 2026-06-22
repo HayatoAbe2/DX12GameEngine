@@ -1,7 +1,7 @@
 #include "EnemyIdle.h"
-#include "Player/Player.h"
+#include "Character/Player/Player.h"
 #include "Map/MapCheck.h"
-#include "Enemy/EnemyState/EnemyApproach/EnemyApproach.h"
+#include "Character/Enemy/EnemyState/EnemyApproach/EnemyApproach.h"
 
 EnemyIdle::EnemyIdle() {
 	randomTimer_ = std::make_unique<Timer>();

@@ -39,6 +39,7 @@ ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureMan
 std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, bool enableLighting) {
 	std::unique_ptr<Model> model = std::make_unique<Model>(id); // 構築するModel
 	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>(); // データ
+	model->SetDirectoryPath(directoryPath);
 
 	// assimpでモデル作成
 	Assimp::Importer importer;

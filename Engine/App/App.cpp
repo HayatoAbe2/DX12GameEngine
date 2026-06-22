@@ -105,6 +105,7 @@ void App::Run() {
 
 			// 更新処理
 			sceneManager_->Update();
+			sceneEditor_->Update();
 
 			// 描画開始時に呼ぶ
 			renderer_->BeginFrame();
@@ -113,7 +114,8 @@ void App::Run() {
 			sceneManager_->Draw();
 
 			sceneEditor_->scene_ = sceneManager_->GetCurrentScene();
-			sceneEditor_->Draw();
+			renderer_->SetGizmoCtx(sceneEditor_->gizmoCtx_);
+			sceneEditor_->Draw(renderer_->GetCamera());
 
 			// 描画終了時に呼ぶ
 			renderer_->EndFrame();

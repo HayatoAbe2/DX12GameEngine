@@ -11,6 +11,7 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #endif
 #include <Engine/Math/Vector2/Vector2.h>
+#include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
 
 class ImGuiManager {
 public:
@@ -23,6 +24,8 @@ public:
 	void DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT windowRect);
 
 	Vector2 GetSceneWindowSize() { return sceneWindowSize_; }
+	void SetGizmoCtx(const GizmoCtx& ctx) { gizmoCtx_ = ctx; }
 private:
 	Vector2 sceneWindowSize_{};
+	GizmoCtx gizmoCtx_{};
 };

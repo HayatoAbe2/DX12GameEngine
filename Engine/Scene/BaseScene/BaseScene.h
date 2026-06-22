@@ -23,12 +23,34 @@ public:
 	/// <summary>
 	/// 描画処理
 	/// </summary>
-	virtual void Draw() = 0;
+	virtual void Draw();
 
 	// 登録オブジェクト取得
-	std::vector<SceneObject*> GetObjects() { return sceneObjects_; }
+	std::vector<SceneObject*> GetObjects() {
+		std::vector<SceneObject*> objects;
+		for (auto& object : sceneObjects_) {
+			objects.push_back(object.get());
+		}
+		return objects;
+	}
 
+	// オブジェクト追加
+	void AddObject(std::unique_ptr<SceneObject> object) { sceneObjects_.push_back(std::move(object)); }
+	// オブジェクト削除
+	void RemoveObject(SceneObject* object) {
+		pendingDelete_.push_back(object);
+	}
+
+	void FlushDelete() {
+		for (auto* obj : pendingDelete_) {
+			std::erase_if(sceneObjects_, [&](const std::unique_ptr<SceneObject>& ptr) {
+				return ptr.get() == obj;
+				});
+		}
+		pendingDelete_.clear();
+	}
 protected:
+
 	// カメラ
 	std::unique_ptr<Camera> camera_ = nullptr;
 	float cameraDistance_ = 20.0f;
@@ -37,6 +59,7 @@ protected:
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 
 	// オブジェクト
-	std::vector<SceneObject*> sceneObjects_{};
+	std::vector<std::unique_ptr<SceneObject>> sceneObjects_;
+	std::vector<SceneObject*> pendingDelete_;
 };
 

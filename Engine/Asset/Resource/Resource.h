@@ -6,8 +6,8 @@ public:
 	explicit Resource(uint32_t id) : id_(id) {}
 
 	uint32_t GetID() { return id_; }
-
+	
+	std::string name_;
 protected:
 	uint32_t id_;
-	std::string name_;
 };

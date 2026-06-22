@@ -255,27 +255,6 @@ void DirectXContext::EndFrame() {
 	cmdList->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderTextureSRVIndex_));
 	cmdList->DrawInstanced(3, 1, 0, 0);
 
-	// RTV>SRV
-	sceneViewBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	sceneViewBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	cmdList->ResourceBarrier(1, &sceneViewBarrier_);
-
-	// これから書き込むバックバッファのインデックスを取得
-	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
-	// TransitionBarrierの設定
-	// バリアはTransition
-	swapChainBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	// Noneにしておく
-	swapChainBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	// バリアを張る対象のリソース。現存のバックバッファに対して行う
-	swapChainBarrier_.Transition.pResource = renderTargetManager_->GetSwapChainResource(backBufferIndex_).Get();
-	// 遷移前(現存)のResourceState
-	swapChainBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	// 遷移後のResourceState
-	swapChainBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	// TransitionBarrierを張る
-	assert(renderTargetManager_->GetSwapChainResource(backBufferIndex_));
-
 	// depthBarrier
 	if (postEffectType_ == PostEffectType::Outline) {
 		depthBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -285,23 +264,6 @@ void DirectXContext::EndFrame() {
 		depthBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 		cmdList->ResourceBarrier(1, &depthBarrier_);
 	}
-
-	cmdList->ResourceBarrier(1, &swapChainBarrier_);
-
-	// 描画先のRTVとDSVを設定する
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = descriptorHeapManager_->GetCPUDescriptorHandle(descriptorHeapManager_->GetDSVHeap().Get(), descriptorHeapManager_->GetDSVHeapSize(), 0);
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetRTVHandle(backBufferIndex_);
-	cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
-	// 指定した色で画面全体をクリアする
-	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色。RGBAの順
-	cmdList->ClearRenderTargetView(renderTargetManager_->GetRTVHandle(backBufferIndex_), clearColor, 0, nullptr);
-	// 描画用のDescriptorHeapの設定
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvManager_->GetHeap().Get() };
-	cmdList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-	// Viewportを設定
-	cmdList->RSSetViewports(1, &viewport_);
-	// Scissorを設定
-	cmdList->RSSetScissorRects(1, &scissorRect_);
 
 	// コピー
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -347,6 +309,50 @@ void DirectXContext::EndFrame() {
 		cmdList->ResourceBarrier(1, &depthBarrier_);
 	}
 
+	// RTV>SRV
+	sceneViewBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	sceneViewBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	cmdList->ResourceBarrier(1, &sceneViewBarrier_);
+
+	// これから書き込むバックバッファのインデックスを取得
+	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
+	// TransitionBarrierの設定
+	// バリアはTransition
+	swapChainBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	// Noneにしておく
+	swapChainBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	// バリアを張る対象のリソース。現存のバックバッファに対して行う
+	swapChainBarrier_.Transition.pResource = renderTargetManager_->GetSwapChainResource(backBufferIndex_).Get();
+	// 遷移前(現存)のResourceState
+	swapChainBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	// 遷移後のResourceState
+	swapChainBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	// TransitionBarrierを張る
+	assert(renderTargetManager_->GetSwapChainResource(backBufferIndex_));
+
+	cmdList->ResourceBarrier(1, &swapChainBarrier_);
+
+	// 描画先のRTVとDSVを設定する
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = descriptorHeapManager_->GetCPUDescriptorHandle(descriptorHeapManager_->GetDSVHeap().Get(), descriptorHeapManager_->GetDSVHeapSize(), 0);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetRTVHandle(backBufferIndex_);
+	cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+	// 指定した色で画面全体をクリアする
+	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色。RGBAの順
+	cmdList->ClearRenderTargetView(renderTargetManager_->GetRTVHandle(backBufferIndex_), clearColor, 0, nullptr);
+	// 描画用のDescriptorHeapの設定
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvManager_->GetHeap().Get() };
+	cmdList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	// Viewportを設定
+	cmdList->RSSetViewports(1, &viewport_);
+	// Scissorを設定
+	cmdList->RSSetScissorRects(1, &scissorRect_);
+
+	// SceneViewをコピー
+	cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
+	cmdList->SetPipelineState(pipelineStateManager_->GetSceneViewPSO());
+	cmdList->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(sceneViewSRVIndex_));
+	cmdList->DrawInstanced(3, 1, 0, 0);
+
 	imGuiManager_->EndFrame(commandListManager_->GetCommandList().Get());
 
 	// 今回はRenderTargetからPresentにする
@@ -356,6 +362,7 @@ void DirectXContext::EndFrame() {
 	commandListManager_->GetCommandList()->ResourceBarrier(1, &swapChainBarrier_);
 
 	// コマンドリストの内容を確定させる。すべてのコマンドを積んでからCloseすること
+	commandListManager_->Wait();
 	HRESULT hr = commandListManager_->GetCommandList()->Close();
 	assert(SUCCEEDED(hr));
 

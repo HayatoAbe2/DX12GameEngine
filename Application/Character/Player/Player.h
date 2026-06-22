@@ -2,13 +2,14 @@
 #include "GameCommon.h"
 #include "Weapon/Weapon.h"
 #include "Timer/Timer.h"
+#include "Character/Character.h"
 
 class Camera;
 class MapCheck;
 class ItemManager;
 class BulletManager;
 
-class Player {
+class Player : public Character{
 public:
 	~Player();
 
@@ -41,7 +42,6 @@ public:
 	void Stun(MapCheck* mapCheck);
 	Vector3 Raticle(Camera* camera);
 
-	Transform GetTransform() const { return transform_; }
 	float GetRadius() const { return radius_; }
 	float GetInteractRadius() const { return interactRadius_; }
 	Weapon* GetWeapon() { return weapon_.get(); }
@@ -50,6 +50,7 @@ public:
 	float GetMaxHP() { return maxHp_; }
 	bool IsBoosting() { return isUsingBoost_; }
 
+	Transform GetTransform() const override { return transform_; }
 	void SetTransform(const Transform& transform) { transform_ = transform; }
 	std::unique_ptr<Weapon> DropWeapon() { if (weapon_ && subWeapon_) { return std::move(weapon_); } else { return nullptr; } };
 	void SetWeapon(std::unique_ptr<Weapon> weapon);

@@ -5,11 +5,11 @@
 #include "Bullet/BulletManager.h"
 #include "EnemyStatus.h"
 
-#include "Enemy/Enemies/Bat.h"
-#include "Enemy/Enemies/Knight.h"
-#include "Enemy/Enemies/HeavyKnight.h"
-#include "Enemy/Enemies/RedBat.h"
-#include "Enemy/Enemies/Spiker.h"
+#include "Character/Enemy/Enemies/Bat.h"
+#include "Character/Enemy/Enemies/Knight.h"
+#include "Character/Enemy/Enemies/HeavyKnight.h"
+#include "Character/Enemy/Enemies/RedBat.h"
+#include "Character/Enemy/Enemies/Spiker.h"
 #include <fstream>
 #include <sstream>
 

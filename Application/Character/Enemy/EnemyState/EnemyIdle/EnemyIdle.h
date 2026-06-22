@@ -1,5 +1,5 @@
 #pragma once
-#include "Enemy/Enemy.h"
+#include "Character/Enemy/Enemy.h"
 class EnemyIdle : public EnemyState {
 public:
 	EnemyIdle();

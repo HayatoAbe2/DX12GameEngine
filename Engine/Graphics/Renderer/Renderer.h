@@ -12,6 +12,7 @@
 
 #include <wrl.h>
 #include <d3d12.h>
+#include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
 
 class Model;
 class InstancedModel;
@@ -86,6 +87,8 @@ public:
 
 	// ImGuiシーンのサイズ
 	Vector2 GetSceneWindowSize() { return dxContext_->GetSceneWindowSize(); }
+
+	void SetGizmoCtx(const GizmoCtx& ctx) { dxContext_->SetGizmoCtx(ctx); }
 private:
 	void InitializePlane();
 	void InitializeRing();

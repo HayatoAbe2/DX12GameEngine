@@ -1,7 +1,7 @@
 #include "CollisionChecker.h"
 #include "GameCommon.h"
-#include "Player/Player.h"
-#include "Enemy/Enemy.h"
+#include "Character/Player/Player.h"
+#include "Character/Enemy/Enemy.h"
 #include "Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
 #include <Bullet/WaveBullet.h>

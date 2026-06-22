@@ -1,8 +1,8 @@
 #pragma once
 #include "Engine/Scene/BaseScene/BaseScene.h"
 
-#include "Player/Player.h"
-#include "Enemy/EnemyManager.h"
+#include "Character/Player/Player.h"
+#include "Character/Enemy/EnemyManager.h"
 #include "Bullet/BulletManager.h"
 #include "Effect/EffectManager.h"
 #include "Map/MapTile.h"

@@ -1,6 +1,7 @@
 #pragma once
 #include "GameCommon.h"
 #include "WeaponStatus.h"
+#include "Character/Character.h"
 
 class BulletManager;
 
@@ -8,7 +9,7 @@ class Weapon {
 public:
 	Weapon(const WeaponData& data, std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel);
 	virtual ~Weapon() = default;
-	virtual float Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, bool isEnemyBullet) = 0;
+	virtual float Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) = 0;
 	virtual void Update() = 0;
 
 	Model* GetWeaponModel() { return model_.get(); }

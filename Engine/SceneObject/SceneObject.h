@@ -7,9 +7,8 @@ public:
 	virtual ~SceneObject() = default;
 
 	uint32_t GetID() { return id_; }
-	std::string GetName() { return name_; }
 
+	std::string name_;
 protected:
 	uint32_t id_;
-	std::string name_;
 };

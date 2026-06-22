@@ -1,4 +1,31 @@
 #include "ImGuiManager.h"
+#include <Engine/Contexts/GameContext/GameContext.h>
+
+Matrix4x4 ToMatrix4x4(const float m[16]) {
+	Matrix4x4 r{};
+
+	r.m[0][0] = m[0];
+	r.m[0][1] = m[1];
+	r.m[0][2] = m[2];
+	r.m[0][3] = m[3];
+
+	r.m[1][0] = m[4];
+	r.m[1][1] = m[5];
+	r.m[1][2] = m[6];
+	r.m[1][3] = m[7];
+
+	r.m[2][0] = m[8];
+	r.m[2][1] = m[9];
+	r.m[2][2] = m[10];
+	r.m[2][3] = m[11];
+
+	r.m[3][0] = m[12];
+	r.m[3][1] = m[13];
+	r.m[3][2] = m[14];
+	r.m[3][3] = m[15];
+
+	return r;
+}
 
 void ImGuiManager::Initialize([[maybe_unused]] HWND* hwnd, [[maybe_unused]] ID3D12Device* device, [[maybe_unused]] int bufferCount, [[maybe_unused]] DXGI_FORMAT format,
 	[[maybe_unused]] ID3D12DescriptorHeap* srvHeap, [[maybe_unused]] D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle,
@@ -58,8 +85,7 @@ void ImGuiManager::EndFrame([[maybe_unused]] ID3D12GraphicsCommandList* cmdList)
 #endif
 }
 
-void ImGuiManager::DrawSceneWindow(
-	D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT windowRect) {
+void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT windowRect) {
 #ifdef USE_IMGUI
 	ImGui::Begin("Scene");
 
@@ -88,6 +114,41 @@ void ImGuiManager::DrawSceneWindow(
 	sceneWindowSize_.x = size.x;
 	sceneWindowSize_.y = size.y;
 
-	ImGui::End();
+	if (gizmoCtx_.isActive) {
+		Vector2 winSize = GameContext::GetInstance().GetWindowSize();
+		ImGuizmo::SetRect(0, 0, winSize.x, winSize.y);
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::Manipulate(gizmoCtx_.view, gizmoCtx_.proj, gizmoCtx_.op, ImGuizmo::WORLD, gizmoCtx_.model);
+
+		if (ImGuizmo::IsUsing()) {
+			if (auto* target = dynamic_cast<Model*>(gizmoCtx_.target)) {
+				Matrix4x4 m = (ToMatrix4x4(gizmoCtx_.model));
+
+				Transform t = target->GetTransform();
+				t.scale.x = Length(Vector3(m.m[0][0], m.m[0][1], m.m[0][2]));
+				t.scale.y = Length(Vector3(m.m[1][0], m.m[1][1], m.m[1][2]));
+				t.scale.z = Length(Vector3(m.m[2][0], m.m[2][1], m.m[2][2]));
+
+				Matrix4x4 rot = m;
+				rot.m[0][0] /= t.scale.x;
+				rot.m[0][1] /= t.scale.x;
+				rot.m[0][2] /= t.scale.x;
+				rot.m[1][0] /= t.scale.y;
+				rot.m[1][1] /= t.scale.y;
+				rot.m[1][2] /= t.scale.y;
+				rot.m[2][0] /= t.scale.z;
+				rot.m[2][1] /= t.scale.z;
+				rot.m[2][2] /= t.scale.z;
+				t.rotate.y = asin(-rot.m[0][2]);
+				t.rotate.x = atan2(rot.m[1][2], rot.m[2][2]);
+				t.rotate.z = atan2(rot.m[0][1], rot.m[0][0]);
+				t.translate.x = m.m[3][0];
+				t.translate.y = m.m[3][1];
+				t.translate.z = m.m[3][2];
+				target->SetTransform(t);
+			}
+		}
+	}
+		ImGui::End();
 #endif
-}
+	}

@@ -359,7 +359,7 @@ void Player::Shoot(BulletManager* bulletManager, Camera* camera) {
 	auto& input = ctx.Input();
 
 	if (weapon_) {
-		shootCooldownTimer_->Start(weapon_->Shoot(weaponTransform_.translate, attackDirection_, bulletManager, camera, false));
+		shootCooldownTimer_->Start(weapon_->Shoot(weaponTransform_.translate, attackDirection_, bulletManager, camera, this));
 	}
 }
 

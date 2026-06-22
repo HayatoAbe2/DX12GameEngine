@@ -8,7 +8,7 @@ void Knight::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* ca
 		
 		if (comboInterval_ <= 0) {
 			// 射撃
-			float time = weapons_[0]->Shoot(model_->GetTransform().translate, dir, bulletManager, camera, true);
+			float time = weapons_[0]->Shoot(model_->GetTransform().translate, dir, bulletManager, camera, this);
 
 			if (attackCoolTimer_->IsActive()) {
 				attackCoolTimer_->AddTime(time);

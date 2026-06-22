@@ -1,6 +1,6 @@
 #include "EnemyApproach.h"
-#include "Enemy/EnemyState/EnemyAttack/EnemyAttack.h"
-#include "Player/Player.h"
+#include "Character/Enemy/EnemyState/EnemyAttack/EnemyAttack.h"
+#include "Character/Player/Player.h"
 
 EnemyApproach::EnemyApproach() {
 	rotateTimer_ = std::make_unique<Timer>();

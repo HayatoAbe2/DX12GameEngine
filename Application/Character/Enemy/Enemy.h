@@ -4,12 +4,13 @@
 #include "Bullet/BulletManager.h"
 #include "Timer/Timer.h"
 #include "GameCommon.h"
-#include "Enemy/EnemyState/EnemyState.h"
+#include "Character/Enemy/EnemyState/EnemyState.h"
+#include "Character/Character.h"
 
 class MapCheck;
 class Player;
 
-class Enemy {
+class Enemy : public Character{
 public:
 	virtual ~Enemy() = default;
 	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status,std::vector<std::unique_ptr<Weapon>> rWeapons);
@@ -36,7 +37,7 @@ public:
 	// 敵ごとの関数
 	virtual void Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) = 0;
 
-	Transform GetTransform() const { return model_->GetTransform(); }
+	Transform GetTransform() const override { return model_->GetTransform(); };
 	void SetTransform(const Transform& transform) const { model_->SetTransform(transform); }
 	float GetRadius() const { return status_.radius; }
 	bool IsDead() { return isDead_; }

@@ -1,10 +1,11 @@
 #pragma once
 #include "Bullet.h"
 #include "GameCommon.h"
+
 class FireBullet : public Bullet {
 public:
-	FireBullet(std::unique_ptr<Model> model, const Vector3& direction, const WeaponData& data, bool isEnemyBullet) :
-		Bullet(std::move(model), direction, data, isEnemyBullet) {
+	FireBullet(std::unique_ptr<Model> model, const Vector3& direction, const WeaponData& data, Character* from) :
+		Bullet(std::move(model), direction, data, from) {
 	};
 	void Initialize();
 	void Update(MapCheck* mapCheck, EffectManager* effectManager) override;

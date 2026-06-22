@@ -1,5 +1,5 @@
 #include "UIDrawer.h"
-#include "Player/Player.h"
+#include "Character/Player/Player.h"
 
 void UIDrawer::Initialize(Player* player) {
 	player_ = player;

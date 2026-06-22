@@ -20,6 +20,8 @@
 #include <d3d12.h>
 #include <dxcapi.h>
 
+#include <vector>
+
 #include "externals/DirectXTex/DirectXTex.h"
 
 class DirectXContext {
@@ -60,6 +62,7 @@ public:
 
 	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
 	void SetCamera(Camera* camera) { camera_ = camera; }
+	void SetGizmoCtx(const GizmoCtx& ctx) { imGuiManager_->SetGizmoCtx(ctx); }
 private:
 
 	/// <summary>

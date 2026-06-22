@@ -1,5 +1,5 @@
 #include "EquipmentUI.h"
-#include "Player/Player.h"
+#include "Character/Player/Player.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/Weapons/AssaultRifle.h"
 #include "Weapon/Weapons/Pistol.h"
