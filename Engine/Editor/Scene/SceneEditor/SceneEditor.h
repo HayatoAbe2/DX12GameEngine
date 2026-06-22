@@ -16,6 +16,13 @@ public:
 	void Save();
 	void Load(const std::string& path);
 
+	std::string SerializeScene();
+	void DeserializeScene(const std::string& jsonText);
+
+	void PushUndo();
+	void Undo();
+	void Redo();
+
 	std::vector<std::unique_ptr<Resource>> resources_;
 	BaseScene* scene_;
 	SceneObject* selected_;
@@ -24,5 +31,9 @@ public:
 	int selectedAssetIndex_ = 0;
 	int gizmoMode_ = 0;
 	GizmoCtx gizmoCtx_{};
+
+	std::vector<std::string> undoStack_;
+	std::vector<std::string> redoStack_;
+	bool wasUsing_ = false;
 };
 

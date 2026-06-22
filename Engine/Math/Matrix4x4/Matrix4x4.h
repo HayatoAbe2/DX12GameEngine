@@ -50,7 +50,9 @@ Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 /// <param name="vector">変換するベクトル</param>
 /// <param name="matrix">変換に使われる行列</param>
 /// <returns>変換後のベクトル</returns>
-Vector3 TransformVector(const Vector3& vector, const Matrix4x4 matrix);
+Vector3 TransformVector(const Vector3& vector, const Matrix4x4& matrix);
+
+Vector3 TransformNormal(const Vector3& normal, const Matrix4x4& matrix);
 
 /// <summary>
 /// 4x4平行移動行列の作成

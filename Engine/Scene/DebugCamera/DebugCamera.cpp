@@ -36,6 +36,8 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	Vector3 forward = { 0,0,1 };
 	Vector3 right = { 1,0,0 };
 	Vector3 up = { 0,1,0 };
+	right = TransformNormal({ 1,0,0 }, matRot_);
+	up = TransformNormal({ 0,1,0 }, matRot_);
 
 	// shift+マウスホイール押し込み中,ドラッグで視点移動
 	if (inputCtx_->keyboard.IsPress(DIK_LSHIFT) && inputCtx_->mouse.IsPress(MouseButton::Middle)) {
@@ -67,8 +69,12 @@ void DebugCamera::ControlCamera() { // 球面座標系での移動
 	distance_ += -moveZ;
 
 	// カメラは注視点から後ろ向きにdistance_移動した位置
-	Vector3 back;
-	back = { 0,0,-distance_ };
+	//Vector3 back;
+	//back = { 0,0,-distance_ };
+	//translation_ = target_ + back;
+
+	Vector3 back = { 0,0,-distance_ };
+	back = TransformNormal(back, matRot_);
 	translation_ = target_ + back;
 }
 
@@ -78,7 +84,7 @@ void DebugCamera::UpdateView() {
 	Matrix4x4 translateMatrix = MakeTranslateMatrix(translation_);
 
 	// ワールド行列を計算
-	Matrix4x4 worldMatrix = Multiply(translateMatrix, matRot_);
+	Matrix4x4 worldMatrix = Multiply(matRot_, translateMatrix);
 
 	// ワールド行列の逆行列をビュー行列に代入
 	viewMatrix_ = Inverse(worldMatrix);

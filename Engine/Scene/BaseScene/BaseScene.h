@@ -40,6 +40,11 @@ public:
 	void RemoveObject(SceneObject* object) {
 		pendingDelete_.push_back(object);
 	}
+	void Clear() {
+		for (auto& obj : sceneObjects_) {
+			pendingDelete_.push_back(obj.get());
+		}
+	}
 
 	void FlushDelete() {
 		for (auto* obj : pendingDelete_) {

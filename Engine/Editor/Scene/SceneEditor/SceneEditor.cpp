@@ -50,6 +50,7 @@ void SceneEditor::Draw(Camera* camera) {
 			ImGui::Separator();
 			// 削除
 			if (ImGui::Button("Delete")) {
+				PushUndo();
 				scene_->RemoveObject(selected_);
 				selected_ = nullptr;
 			}
@@ -81,12 +82,18 @@ void SceneEditor::Draw(Camera* camera) {
 
 		if (ImGui::Button("Add")) {
 			auto& asset = GameContext::GetInstance().Asset();
+			PushUndo();
 			scene_->AddObject(asset.LoadModel(selectedAssetDir_[selectedAssetIndex_], selectedAssetPath_[selectedAssetIndex_]));
 		}
 		ImGui::End();
 
 		// ギズモ
 		if (selected_) {
+			if (ImGuizmo::IsUsing() && !wasUsing_) {
+				PushUndo();
+			}
+			wasUsing_ = ImGuizmo::IsUsing();
+
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::BeginFrame();
 	
@@ -117,6 +124,16 @@ void SceneEditor::Draw(Camera* camera) {
 					gizmoCtx_.model[i] = modelMat[i];
 				};
 			}
+		}
+
+		if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) &&
+			ImGui::IsKeyPressed(ImGuiKey_Z)) {
+			Undo();
+		}
+
+		if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) &&
+			ImGui::IsKeyPressed(ImGuiKey_Y)) {
+			Redo();
 		}
 	}
 #endif
@@ -224,4 +241,116 @@ void SceneEditor::Load(const std::string& path) {
 			scene_->AddObject(std::move(model));
 		}
 	}
+}
+
+std::string SceneEditor::SerializeScene() {
+	nlohmann::json root;
+	root["objects"] = nlohmann::json::array();
+
+	for (auto* object : scene_->GetObjects()) {
+		if (auto* model = dynamic_cast<Model*>(object)) {
+			nlohmann::json object;
+			object["type"] = "Model";
+			object["name"] = model->name_;
+			object["path"] = model->GetDirectoryPath();
+
+			Transform transform = model->GetTransform();
+			object["translate"] =
+			{
+				transform.translate.x,
+				transform.translate.y,
+				transform.translate.z
+			};
+			object["rotate"] =
+			{
+				transform.rotate.x,
+				transform.rotate.y,
+				transform.rotate.z
+			};
+			object["scale"] =
+			{
+				transform.scale.x,
+				transform.scale.y,
+				transform.scale.z
+			};
+
+			root["objects"].push_back(object);
+		}
+	}
+
+	return root.dump(4);
+}
+
+void SceneEditor::DeserializeScene(const std::string& jsonText) {
+	selected_ = nullptr;
+	gizmoCtx_.isActive = false;
+	gizmoCtx_.target = nullptr;
+
+	nlohmann::json root = nlohmann::json::parse(jsonText);
+	scene_->Clear();
+
+	for (auto& objectJson : root["objects"]) {
+		std::string type = objectJson["type"];
+
+		// モデル
+		if (type == "Model") {
+			auto& asset = GameContext::GetInstance().Asset();
+			auto model = asset.LoadModel(objectJson["path"], objectJson["name"]);
+
+			// Transform
+			Vector3 scale;
+			scale.x = objectJson["scale"][0];
+			scale.y = objectJson["scale"][1];
+			scale.z = objectJson["scale"][2];
+			Vector3 rotate;
+			rotate.x = objectJson["rotate"][0];
+			rotate.y = objectJson["rotate"][1];
+			rotate.z = objectJson["rotate"][2];
+			Vector3 translate;
+			translate.x = objectJson["translate"][0];
+			translate.y = objectJson["translate"][1];
+			translate.z = objectJson["translate"][2];
+			model->SetTransform({ scale, rotate, translate });
+
+			scene_->AddObject(std::move(model));
+		}
+	}
+}
+
+void SceneEditor::PushUndo() {
+	undoStack_.push_back({
+		SerializeScene()
+		});
+
+	redoStack_.clear();
+}
+
+void SceneEditor::Undo() {
+	if (undoStack_.empty()) {
+		return;
+	}
+
+	redoStack_.push_back({
+		SerializeScene()
+		});
+
+	auto snapshot = undoStack_.back();
+	undoStack_.pop_back();
+
+	DeserializeScene(snapshot);
+}
+
+void SceneEditor::Redo() {
+	if (redoStack_.empty()) {
+		return;
+	}
+
+	undoStack_.push_back({
+		SerializeScene()
+		});
+
+	auto snapshot = redoStack_.back();
+	redoStack_.pop_back();
+
+	DeserializeScene(snapshot);
 }
