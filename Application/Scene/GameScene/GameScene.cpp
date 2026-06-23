@@ -301,7 +301,9 @@ void GameScene::Draw() {
 	BaseScene::Draw();
 
 	auto& render = GameContext::GetInstance().Render();
-	render.SetPostEffectType(PostEffectType::RadialBlur);
+	
+	render.SetPostEffectType(PostEffectType::Dissolve);
+	render.SetDissolveMask(dissolveMask_->GetSRVHandle());
 	
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
