@@ -3,8 +3,10 @@
 #include <memory>
 #include "Engine/Asset/Resource/Resource.h"
 #include "Engine/Scene/BaseScene/BaseScene.h"
+#ifdef USE_IMGUI
 #include <Externals/nlohmann/json.hpp>
 #include "GizmoCtx.h"
+#endif
 
 class SceneEditor {
 public:
@@ -30,7 +32,9 @@ public:
 	std::string selectedAssetPath_[2] = { "walk.gltf", "floor.obj" };
 	int selectedAssetIndex_ = 0;
 	int gizmoMode_ = 0;
+#ifdef USE_IMGUI
 	GizmoCtx gizmoCtx_{};
+#endif
 
 	std::vector<std::string> undoStack_;
 	std::vector<std::string> redoStack_;

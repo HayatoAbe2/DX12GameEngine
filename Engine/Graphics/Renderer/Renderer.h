@@ -70,6 +70,7 @@ public:
 
 	// ポストエフェクト設定
 	void SetPostEffectType(PostEffectType type);
+	void SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 	// カメラセット
 	void SetCamera(Camera* camera);
@@ -87,8 +88,11 @@ public:
 
 	// ImGuiシーンのサイズ
 	Vector2 GetSceneWindowSize() { return dxContext_->GetSceneWindowSize(); }
+
+#ifdef USE_IMGUI
 	bool GetSceneWindowHovered() { return dxContext_->GetSceneWindowHovered(); }
 	void SetGizmoCtx(const GizmoCtx& ctx) { dxContext_->SetGizmoCtx(ctx); }
+#endif
 private:
 	void InitializePlane();
 	void InitializeRing();

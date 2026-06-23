@@ -113,9 +113,11 @@ void App::Run() {
 			// 描画処理
 			sceneManager_->Draw();
 
+#ifdef USE_IMGUI
 			sceneEditor_->scene_ = sceneManager_->GetCurrentScene();
 			renderer_->SetGizmoCtx(sceneEditor_->gizmoCtx_);
 			sceneEditor_->Draw(renderer_->GetCamera());
+#endif
 
 			// 描画終了時に呼ぶ
 			renderer_->EndFrame();

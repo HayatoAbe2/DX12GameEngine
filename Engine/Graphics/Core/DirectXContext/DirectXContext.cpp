@@ -128,6 +128,8 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::GaussianFilter3x3), shaderCompiler_->Compile(L"Resources/Shaders/GaussianFilter3x3.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::BoxFilter5x5), shaderCompiler_->Compile(L"Resources/Shaders/BoxFilter5x5.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Outline), shaderCompiler_->Compile(L"Resources/Shaders/Outline/Outline.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::RadialBlur), shaderCompiler_->Compile(L"Resources/Shaders/RadialBlur/RadialBlur.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Dissolve), shaderCompiler_->Compile(L"Resources/Shaders/Dissolve/Dissolve.PS.hlsl", L"ps_6_0", logger_));
 
 	// Outline用リソース
 	outlineResource_ = bufferManager_->CreateUploadBuffer(sizeof(OutlineData));
@@ -290,8 +292,18 @@ void DirectXContext::EndFrame() {
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
 		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Outline)));
 
+		cmdList->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(depthTextureSRVIndex_));
 		outlineData_->projectionInverse = Inverse(camera_->projectionMatrix_);
 		cmdList->SetGraphicsRootConstantBufferView(2, outlineResource_->GetGPUVirtualAddress());
+		break;
+	case PostEffectType::RadialBlur:
+		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
+		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::RadialBlur)));
+		break;
+	case PostEffectType::Dissolve:
+		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
+		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Dissolve)));
+		cmdList->SetGraphicsRootDescriptorTable(1, dissolveMaskHandle_);
 		break;
 	default:
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
@@ -299,7 +311,6 @@ void DirectXContext::EndFrame() {
 		break;
 	}
 	cmdList->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderTextureSRVIndex_));
-	cmdList->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(depthTextureSRVIndex_));
 	cmdList->DrawInstanced(3, 1, 0, 0);
 
 	// depthBarrier

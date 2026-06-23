@@ -1,4 +1,5 @@
 #pragma once
+#ifdef USE_IMGUI
 #include <Externals/ImGuizmo/ImGuizmo.h>
 #include "Engine/SceneObject/SceneObject.h"
 
@@ -10,3 +11,4 @@ struct GizmoCtx {
 	ImGuizmo::OPERATION op;
 	SceneObject* target;
 };
+#endif

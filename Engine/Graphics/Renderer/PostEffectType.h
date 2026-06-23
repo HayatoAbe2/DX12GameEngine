@@ -7,6 +7,8 @@ enum class PostEffectType {
 	GaussianFilter3x3,
 	BoxFilter5x5,
 	Outline,
+	RadialBlur,
+	Dissolve,
 
 	Count
 };

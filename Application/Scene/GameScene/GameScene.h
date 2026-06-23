@@ -42,6 +42,7 @@ private:
 	std::unique_ptr<Model> goal_ = nullptr;
 
 	std::shared_ptr<Texture> skybox_ = nullptr;
+	std::shared_ptr<Texture> dissolveMask_ = nullptr;
 	std::unique_ptr<Sprite> fade_ = nullptr;
 
 	std::unique_ptr<Sprite> resultBG_ = nullptr;

@@ -187,7 +187,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 		model->SetInstanceResource(instanceTransformResource);
 		model->SetInstanceTransformData(transformData);
 		CreateInstancingSRV(model.get(), numInstance);
-		return model; // キャッシュにあったのでそれを返す
+		return model; // キャッシュにあったのでそれを返す 
 	}
 
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {

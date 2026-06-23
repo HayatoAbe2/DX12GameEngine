@@ -39,7 +39,7 @@ void GameScene::Initialize() {
 	//	playerModel_->GetMaterial(i)->SetData(data);
 	//	playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
 	//}
-	sceneObjects_.push_back(asset.LoadModel("Resources/Debug/human", "walk.gltf"));
+	//sceneObjects_.push_back(asset.LoadModel("Resources/Debug/human", "walk.gltf"));
 
 	// マップ
 	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
@@ -115,6 +115,9 @@ void GameScene::Initialize() {
 	mapCheck_ = std::make_unique<MapCheck>();
 
 	Reset();
+
+	// dissolve用
+	dissolveMask_ = asset.LoadTexture("Resources/Debug/noise0.png");
 }
 
 void GameScene::Update() {
@@ -298,7 +301,7 @@ void GameScene::Draw() {
 	BaseScene::Draw();
 
 	auto& render = GameContext::GetInstance().Render();
-	render.SetPostEffectType(PostEffectType::Outline);
+	render.SetPostEffectType(PostEffectType::RadialBlur);
 	
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 

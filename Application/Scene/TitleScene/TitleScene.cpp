@@ -63,8 +63,7 @@ void TitleScene::Update() {
 		if (fadeTimer_ >= kMaxFadeoutTimer_) {
 			isFadeOut_ = false;
 
-			// ゲームオーバーまたはクリア
-			scene.SceneChange("Game");
+			//scene.SceneChange("Game");
 		}
 	}
 }

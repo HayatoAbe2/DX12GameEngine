@@ -592,6 +592,9 @@ void Renderer::DrawSkybox(Texture* texture) {
 void Renderer::SetPostEffectType(PostEffectType type) {
 	dxContext_->SetPostEffectType(type);
 }
+void Renderer::SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+	dxContext_->SetDissolveMask(handle);
+}
 
 void Renderer::SetCamera(Camera* camera) {
 	camera_ = camera; 

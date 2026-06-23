@@ -32,9 +32,11 @@ Vector2 GameContext::GetWindowSize() const {
 	return { float(rect.right),float(rect.bottom) };
 }
 
+#ifdef USE_IMGUI
 bool GameContext::IsSceneWindowHovered() const {
 	return renderer_->GetSceneWindowHovered();
 }
+#endif
 
 float GameContext::GetDeltatime() const {
 	return fixFps_->GetDeltatime();

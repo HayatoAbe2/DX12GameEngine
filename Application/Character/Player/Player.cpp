@@ -140,7 +140,16 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 
 			if (shootCooldownTimer_->IsFinished()) {
 				// 射撃
-				if (ctx.IsSceneWindowHovered() && input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > 0.2f) {
+#ifdef USE_IMGUI
+				if (ctx.IsSceneWindowHovered()) {
+#endif
+					if (input.mouse.IsPress(MouseButton::Left)) {
+						Shoot(bulletManager, camera);
+					}
+#ifdef USE_IMGUI
+				}
+#endif
+				if (input.gamepad.GetRTrigger() > 0.2f) {
 					Shoot(bulletManager, camera);
 				}
 

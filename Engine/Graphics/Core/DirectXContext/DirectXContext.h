@@ -59,11 +59,15 @@ public:
 	ConstantBufferManager* GetConstantBufferManager() { return constantBufferManager_.get(); }
 	FixFPS* GetFixFPS() { return fixFPS_.get(); }
 	Vector2 GetSceneWindowSize() { return imGuiManager_->GetSceneWindowSize(); }
-	bool GetSceneWindowHovered() { return imGuiManager_->IsSceneHovered(); }
 
 	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
+	void SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle) {dissolveMaskHandle_ = handle;}
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
+#ifdef USE_IMGUI
+	bool GetSceneWindowHovered() { return imGuiManager_->IsSceneHovered(); }
 	void SetGizmoCtx(const GizmoCtx& ctx) { imGuiManager_->SetGizmoCtx(ctx); }
+#endif
 private:
 
 	/// <summary>
@@ -179,5 +183,9 @@ private:
 
 	uint32_t sceneViewRTVIndex_;
 	D3D12_CPU_DESCRIPTOR_HANDLE sceneViewRTVHandle_;
+
+
+	D3D12_GPU_DESCRIPTOR_HANDLE dissolveMaskHandle_{};
+
 };
 

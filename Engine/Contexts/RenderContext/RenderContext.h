@@ -23,6 +23,7 @@ public:
 
 	// ポストエフェクト設定
 	void SetPostEffectType(PostEffectType type) { renderer_->SetPostEffectType(type); }
+	void SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle) { renderer_->SetDissolveMask(handle); }
 
 	// カメラセット
 	void SetCamera(Camera* camera) { renderer_->SetCamera(camera); }

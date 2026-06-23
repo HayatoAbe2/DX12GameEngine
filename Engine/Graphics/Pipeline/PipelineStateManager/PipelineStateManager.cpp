@@ -66,6 +66,14 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	// outline
 	postEffect[int(PostEffectType::Outline)].desc = fullscreenBaseDesc_;
 	CreatePostEffectPSO(postEffect[int(PostEffectType::Outline)]);
+
+	// radialBlur
+	postEffect[int(PostEffectType::RadialBlur)].desc = fullscreenBaseDesc_;
+	CreatePostEffectPSO(postEffect[int(PostEffectType::RadialBlur)]);
+
+	// dissolve
+	postEffect[int(PostEffectType::Dissolve)].desc = fullscreenBaseDesc_;
+	CreatePostEffectPSO(postEffect[int(PostEffectType::Dissolve)]);
 }
 
 void PipelineStateManager::CreateStandardPSO() {

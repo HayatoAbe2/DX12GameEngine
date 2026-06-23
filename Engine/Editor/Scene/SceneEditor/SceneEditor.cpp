@@ -172,6 +172,7 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 }
 
 void SceneEditor::Save() {
+#ifdef USE_IMGUI
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 
@@ -208,9 +209,14 @@ void SceneEditor::Save() {
 
 	std::ofstream file("Resources/Debug/SceneEditor/SceneData.json");
 	file << root.dump(4);
+#endif
 }
 
 void SceneEditor::Load(const std::string& path) {
+#ifdef USE_IMGUI
+	// 現在シーンをクリア
+	scene_->Clear();
+
 	std::ifstream file(path);
 	nlohmann::json root;
 	file >> root;
@@ -241,9 +247,11 @@ void SceneEditor::Load(const std::string& path) {
 			scene_->AddObject(std::move(model));
 		}
 	}
+#endif
 }
 
 std::string SceneEditor::SerializeScene() {
+#ifdef USE_IMGUI
 	nlohmann::json root;
 	root["objects"] = nlohmann::json::array();
 
@@ -279,9 +287,11 @@ std::string SceneEditor::SerializeScene() {
 	}
 
 	return root.dump(4);
+#endif
 }
 
 void SceneEditor::DeserializeScene(const std::string& jsonText) {
+#ifdef USE_IMGUI
 	selected_ = nullptr;
 	gizmoCtx_.isActive = false;
 	gizmoCtx_.target = nullptr;
@@ -315,17 +325,21 @@ void SceneEditor::DeserializeScene(const std::string& jsonText) {
 			scene_->AddObject(std::move(model));
 		}
 	}
+#endif
 }
 
 void SceneEditor::PushUndo() {
+#ifdef USE_IMGUI
 	undoStack_.push_back({
 		SerializeScene()
 		});
 
 	redoStack_.clear();
+#endif
 }
 
 void SceneEditor::Undo() {
+#ifdef USE_IMGUI
 	if (undoStack_.empty()) {
 		return;
 	}
@@ -338,9 +352,11 @@ void SceneEditor::Undo() {
 	undoStack_.pop_back();
 
 	DeserializeScene(snapshot);
+#endif
 }
 
 void SceneEditor::Redo() {
+#ifdef USE_IMGUI
 	if (redoStack_.empty()) {
 		return;
 	}
@@ -353,4 +369,5 @@ void SceneEditor::Redo() {
 	redoStack_.pop_back();
 
 	DeserializeScene(snapshot);
+#endif
 }

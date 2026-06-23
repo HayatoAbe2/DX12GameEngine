@@ -55,7 +55,9 @@ public:
 
 	Vector2 GetWindowSize() const;
 
+#ifdef USE_IMGUI
 	bool IsSceneWindowHovered() const;
+#endif
 
 	///
 	/// ウィンドウ情報

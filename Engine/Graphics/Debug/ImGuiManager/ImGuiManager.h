@@ -9,9 +9,9 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
 #endif
 #include <Engine/Math/Vector2/Vector2.h>
-#include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
 
 class ImGuiManager {
 public:
@@ -24,10 +24,14 @@ public:
 	void DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT windowRect);
 
 	Vector2 GetSceneWindowSize() { return sceneWindowSize_; }
+#ifdef USE_IMGUI
 	void SetGizmoCtx(const GizmoCtx& ctx) { gizmoCtx_ = ctx; }
 	bool IsSceneHovered() { return isSceneHovered_; }
+#endif
 private:
 	Vector2 sceneWindowSize_{};
+#ifdef USE_IMGUI
 	GizmoCtx gizmoCtx_{};
 	bool isSceneHovered_ = false;
+#endif
 };
