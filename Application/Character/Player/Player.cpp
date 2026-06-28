@@ -69,6 +69,8 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
 
+	model_->Update();
+
 	invincibleTimer_->Update();
 	if (hitColorTimer_->IsActive()) {
 		hitColorTimer_->Update();

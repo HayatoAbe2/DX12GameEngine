@@ -12,4 +12,6 @@ public:
 
 	// 初期状態のマテリアル
 	std::vector<std::unique_ptr<Material>> defaultMaterials_;
+
+	std::map<std::string, JointWeightData> skinClusterData;
 };

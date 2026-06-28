@@ -100,6 +100,18 @@ void SRVManager::CreateDepthSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12
 	device_->CreateShaderResourceView(depthStencilResource.Get(), &depthTextureSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
 }
 
+void SRVManager::CreateMatrixPalletteSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> resource, UINT numElements, UINT structureByteStride) {
+	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
+	paletteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	paletteSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	paletteSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	paletteSrvDesc.Buffer.FirstElement = 0;
+	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	paletteSrvDesc.Buffer.NumElements = numElements;
+	paletteSrvDesc.Buffer.StructureByteStride = structureByteStride;
+	device_->CreateShaderResourceView(resource.Get(), &paletteSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUHandle(uint32_t index) {
 	return descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, index);
 }

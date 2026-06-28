@@ -34,11 +34,10 @@ public:
 	// 根ノードを設定
 	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); }
 
-	void SetSkeleton(std::shared_ptr<Skeleton> skeleton) { skeleton_ = skeleton; }
+	// スケルトン設定
+	void SetSkeleton(const Skeleton& skeleton) { skeleton_ = skeleton; }
 
-	void SetDirectoryPath(std::string directoryPath) {
-		directory_ = directoryPath;
-	}
+	void SetDirectoryPath(std::string directoryPath) {directory_ = directoryPath;}
 
 	///
 	/// Getter
@@ -60,6 +59,7 @@ public:
 
 private:
 	void UpdateSkeleton();
+	void UpdateSkinCluster();
 
 	// アニメーション再生
 	std::unique_ptr<AnimationPlayer> animationPlayer_ = nullptr;
@@ -77,7 +77,7 @@ private:
 	std::unique_ptr<ModelNode> rootNode_{};
 
 	// スケルトン
-	std::shared_ptr<Skeleton> skeleton_ = nullptr;
+	Skeleton skeleton_;
 
 	std::string directory_;
 };

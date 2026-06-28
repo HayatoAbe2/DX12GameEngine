@@ -7,11 +7,8 @@
 #include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 #include "Engine/Io/Logger/Logger.h"
 #include "Engine/Graphics/GPUData/VertexData.h"
-#include "Engine/Graphics/Core/CommandListManager/CommandListManager.h"
-#include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
-#include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
 
 #include <cassert>
 #include <assimp/Importer.hpp>
@@ -39,12 +36,13 @@ ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureMan
 std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, bool enableLighting) {
 	std::unique_ptr<Model> model = std::make_unique<Model>(id); // 構築するModel
 	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>(); // データ
+
+	// ファイルパス
+	std::string filePath = directoryPath + "/" + filename;
 	model->SetDirectoryPath(directoryPath);
 
 	// assimpでモデル作成
 	Assimp::Importer importer;
-	// ファイルパス
-	std::string filePath = directoryPath + "/" + filename;
 	// obj->DirectX12変換
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 
@@ -56,8 +54,10 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 
 	// rootNode
 	std::unique_ptr<ModelNode> rootNode = std::move(ReadNode(scene->mRootNode));
-	CreateSkeleton(*rootNode.get());
+	// スケルトン作成
+	auto skeleton = CreateSkeleton(*rootNode.get());
 	model->SetRootNode(std::move(rootNode));
+	model->SetSkeleton(skeleton);
 
 	// キャッシュにあるか確認
 	std::string fullPath = directoryPath + "/" + filename;
@@ -74,16 +74,48 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 		for (uint32_t aiMeshIndex = 0; aiMeshIndex < scene->mNumMeshes; ++aiMeshIndex) {
 			aiMesh* aiMesh = scene->mMeshes[aiMeshIndex];
 
-			// subMesh生成
-			SubMesh primitive = CreateSubMesh(aiMesh);
+			// skinCluster用jointWeight
+			for (uint32_t boneIndex = 0; boneIndex < aiMesh->mNumBones; ++boneIndex) {
+				aiBone* bone = aiMesh->mBones[boneIndex];
+				std::string jointName = bone->mName.C_Str();
+				JointWeightData& jointWeightData = modelData->skinClusterData[jointName];
+
+				aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+				aiVector3D scale, translate;
+				aiQuaternion rotate;
+				bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+				// 左手系へ変換
+				Matrix4x4 binePoseMatrix = MakeAffineMatrix({ scale.x, scale.y, scale.z },
+					{ rotate.x, -rotate.y, -rotate.z, rotate.w }, { -translate.x, translate.y, translate.z });
+				jointWeightData.InverseBindPoseMatrix = Inverse(binePoseMatrix);
+
+				// 頂点Weightを取得
+				for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+					jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
+				}
+			}
 
 			// Mesh がまだ無ければ作る
 			if (!modelData->meshes[aiMeshIndex]) {
 				modelData->meshes[aiMeshIndex] = std::make_unique<Mesh>();
 			}
 
+			// subMesh生成
+			SubMesh primitive = CreateSubMesh(aiMesh);
+
 			// メッシュにsubMeshを追加
 			modelData->meshes[aiMeshIndex]->GetPrimitives().push_back(primitive);
+		}
+		CreateSkinCluster(skeleton, *modelData.get());
+
+		for (auto& mesh : modelData->meshes) {
+			for (auto& subMesh : mesh->GetPrimitives()) {
+				if (subMesh.skinCluster_.influenceResource) {
+					subMesh.skinCluster_.influenceBufferView.BufferLocation = subMesh.skinCluster_.influenceResource->GetGPUVirtualAddress();
+					subMesh.skinCluster_.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence) * subMesh.vertices_.size());
+					subMesh.skinCluster_.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
+				}
+			}
 		}
 
 		///
@@ -159,7 +191,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 
 	// rootNode
 	std::unique_ptr<ModelNode> rootNode = std::move(ReadNode(scene->mRootNode));
-	CreateSkeleton(*rootNode.get());
+	Skeleton skeleton = CreateSkeleton(*rootNode.get());
 	model->SetRootNode(std::move(rootNode));
 
 	// キャッシュにあるか確認
@@ -568,4 +600,63 @@ int32_t ModelManager::CreateJoint(const ModelNode& node,
 
 	// 自身のindex
 	return joint.index;
+}
+
+void ModelManager::CreateSkinCluster(const Skeleton& skeleton, const ModelData& data) {
+	auto index = srvManager_->Allocate();
+
+	for (auto& mesh : data.meshes) {
+		for (auto& primitive : mesh->GetPrimitives()) {
+			SkinCluster skinCluster;
+			skinCluster.paletteResource = bufferManager_->CreateUploadBuffer(sizeof(WellForGPU) * skeleton.joints.size());
+			WellForGPU* mappedPalette = nullptr;
+			skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
+			skinCluster.mappedPalette = { mappedPalette, skeleton.joints.size() };
+			skinCluster.paletteSrvHandle.first = srvManager_->GetCPUHandle(index);
+			skinCluster.paletteSrvHandle.second = srvManager_->GetGPUHandle(index);
+			srvManager_->CreateMatrixPalletteSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
+
+			// Influence
+			skinCluster.influenceResource = bufferManager_->CreateUploadBuffer(sizeof(VertexInfluence) * primitive.vertices_.size());
+			VertexInfluence* mappedInfluence = nullptr;
+			skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
+			std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * primitive.vertices_.size());
+			skinCluster.mappedInfluence = { mappedInfluence, primitive.vertices_.size() };
+			// VBV
+			skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
+			skinCluster.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence) * primitive.vertices_.size());
+			skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
+			// InverseBindPoseMatrixの格納
+			skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
+			std::generate(
+				skinCluster.inverseBindPoseMatrices.begin(),
+				skinCluster.inverseBindPoseMatrices.end(),
+				[]() {
+					return MakeIdentity4x4();
+				});
+
+			for (const auto& jointWeight : data.skinClusterData) {
+				auto it = skeleton.jointMap.find(jointWeight.first);
+				if (it == skeleton.jointMap.end()) { continue; }
+
+				skinCluster.inverseBindPoseMatrices[(*it).second] = jointWeight.second.InverseBindPoseMatrix;
+				for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
+					auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex];
+					for (uint32_t index = 0; index < kNumMaxInfluence; ++index) {
+						if (currentInfluence.weights[index] == 0.0f) {
+							currentInfluence.weights[index] = vertexWeight.weight;
+							currentInfluence.jointIndices[index] = (*it).second;
+							break;
+						}
+					}
+				}
+			}
+
+			// Unmapを実行してGPUがアクセスできるようにする
+			skinCluster.paletteResource->Unmap(0, nullptr);
+			skinCluster.influenceResource->Unmap(0, nullptr);
+
+			primitive.skinCluster_ = skinCluster;
+		}
+	}
 }

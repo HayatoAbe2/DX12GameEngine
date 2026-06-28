@@ -30,6 +30,17 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	inputElementDescs_[3].SemanticIndex = 0;
 	inputElementDescs_[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs_[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs_[4].SemanticName = "Weight";
+	inputElementDescs_[4].SemanticIndex = 0;
+	inputElementDescs_[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs_[4].InputSlot = 1;
+	inputElementDescs_[4].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs_[5].SemanticName = "Index";
+	inputElementDescs_[5].SemanticIndex = 0;
+	inputElementDescs_[5].Format = DXGI_FORMAT_R32G32B32A32_SINT;
+	inputElementDescs_[5].InputSlot = 1;
+	inputElementDescs_[5].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
 	inputLayoutDesc_.pInputElementDescs = inputElementDescs_;
 	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
 

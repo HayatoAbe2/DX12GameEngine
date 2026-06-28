@@ -67,7 +67,7 @@ private:
 	void CreatePostEffectPSO(PostEffectData& postEffect);
 
 	// inputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[4] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[6] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_;
 
 	// BlendStateの設定

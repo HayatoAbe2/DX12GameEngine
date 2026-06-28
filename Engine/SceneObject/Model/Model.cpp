@@ -1,25 +1,44 @@
 #include "Model.h"
+#include "SubMesh.h"
 
 void Model::Update() {
 	// アニメーション更新
-	if (skeleton_ &&
-		skeleton_->joints.size() > 1) {
-		animationPlayer_->Update(*skeleton_);
+	if (!animationPlayer_) {
+		return;
+	}
+
+	if (skeleton_.joints.size() > 1) {
+		// ボーンあり
+		animationPlayer_->Update(skeleton_);
 		UpdateSkeleton();
-	}else if(animationPlayer_){
+		UpdateSkinCluster();
+	} else if (animationPlayer_) {
 		animationPlayer_->Update(*rootNode_.get());
 	}
 }
 
 void Model::UpdateSkeleton() {
 	// スケルトン内ジョイントの行列更新
-	for (Joint& joint : skeleton_->joints) {
+	for (Joint& joint : skeleton_.joints) {
 		joint.localMatrix = MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
 		// 親がいる場合親の行列を掛ける
 		if (joint.parent) {
-			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton_->joints[*joint.parent].skeletonSpaceMatrix;
+			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton_.joints[*joint.parent].skeletonSpaceMatrix;
 		} else {
 			joint.skeletonSpaceMatrix = joint.localMatrix;
+		}
+	}
+}
+
+void Model::UpdateSkinCluster() {
+	for (size_t jointIndex = 0; jointIndex < skeleton_.joints.size(); ++jointIndex) {
+		assert(jointIndex < skeleton_.joints.size());
+
+		for (auto& mesh : data_->meshes) {
+			for (auto& primitive : mesh->GetPrimitives()) {
+				primitive.skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix = primitive.skinCluster_.inverseBindPoseMatrices[jointIndex] * skeleton_.joints[jointIndex].skeletonSpaceMatrix;
+				primitive.skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(primitive.skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix));
+			}
 		}
 	}
 }
