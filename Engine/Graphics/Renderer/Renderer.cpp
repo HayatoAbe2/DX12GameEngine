@@ -217,19 +217,22 @@ void Renderer::DrawMesh(Model* model, Mesh* mesh) {
 
 		// マテリアルCBufferの場所を設定
 		cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
-		// メッシュVBV
-		cmdList->IASetVertexBuffers(0, 1, &subMesh.vertexBufferView_);	// VBVを設定
+
+		// スキニング用のVBVを設定
 		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-		subMesh.vertexBufferView_,
-		subMesh.skinCluster_.influenceBufferView
+			subMesh.vertexBufferView_,
+			subMesh.skinCluster_.influenceBufferView
 		};
 		cmdList->IASetVertexBuffers(0, 2, vbvs);
+
 		// IBV
 		cmdList->IASetIndexBuffer(&subMesh.ibv_);
+
 		// SRVの設定
 		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
 		cmdList->SetGraphicsRootDescriptorTable(3, material->GetEnvironmentTextureSRVHandle());
 		cmdList->SetGraphicsRootDescriptorTable(6, subMesh.skinCluster_.paletteSrvHandle.second);
+
 		// ドローコール
 		cmdList->DrawIndexedInstanced(UINT(subMesh.indices_.size()), 1, 0, 0, 0);
 	}

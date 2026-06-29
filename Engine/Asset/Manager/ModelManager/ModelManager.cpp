@@ -603,10 +603,9 @@ int32_t ModelManager::CreateJoint(const ModelNode& node,
 }
 
 void ModelManager::CreateSkinCluster(const Skeleton& skeleton, const ModelData& data) {
-	auto index = srvManager_->Allocate();
-
 	for (auto& mesh : data.meshes) {
 		for (auto& primitive : mesh->GetPrimitives()) {
+			auto index = srvManager_->Allocate();
 			SkinCluster skinCluster;
 			skinCluster.paletteResource = bufferManager_->CreateUploadBuffer(sizeof(WellForGPU) * skeleton.joints.size());
 			WellForGPU* mappedPalette = nullptr;
@@ -651,11 +650,6 @@ void ModelManager::CreateSkinCluster(const Skeleton& skeleton, const ModelData& 
 					}
 				}
 			}
-
-			// Unmapを実行してGPUがアクセスできるようにする
-			skinCluster.paletteResource->Unmap(0, nullptr);
-			skinCluster.influenceResource->Unmap(0, nullptr);
-
 			primitive.skinCluster_ = skinCluster;
 		}
 	}

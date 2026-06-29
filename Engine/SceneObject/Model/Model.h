@@ -32,7 +32,7 @@ public:
 	void CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager);
 
 	// 根ノードを設定
-	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); }
+	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); } 
 
 	// スケルトン設定
 	void SetSkeleton(const Skeleton& skeleton) { skeleton_ = skeleton; }

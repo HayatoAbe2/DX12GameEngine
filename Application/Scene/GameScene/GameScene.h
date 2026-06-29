@@ -35,11 +35,6 @@ private:
 	std::unique_ptr<Model> playerModel_ = nullptr;
 	std::unique_ptr<Model> playerShadowModel_ = nullptr;
 	std::unique_ptr<Model> enemyModel_ = nullptr;
-	std::unique_ptr<InstancedModel> wall_ = nullptr;
-	std::unique_ptr<InstancedModel> wallShadow_ = nullptr;
-	std::unique_ptr<InstancedModel> floor_ = nullptr;
-	std::unique_ptr<InstancedModel> barrier_ = nullptr;
-	std::unique_ptr<Model> goal_ = nullptr;
 
 	std::shared_ptr<Texture> skybox_ = nullptr;
 	std::shared_ptr<Texture> dissolveMask_ = nullptr;

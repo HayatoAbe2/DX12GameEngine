@@ -54,6 +54,8 @@ public:
 		}
 		pendingDelete_.clear();
 	}
+
+	bool IsEditMode() { return isEditMode_; }
 protected:
 
 	// カメラ
@@ -66,5 +68,7 @@ protected:
 	// オブジェクト
 	std::vector<std::unique_ptr<SceneObject>> sceneObjects_;
 	std::vector<SceneObject*> pendingDelete_;
+
+	bool isEditMode_ = false;
 };
 

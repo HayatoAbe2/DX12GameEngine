@@ -2,6 +2,7 @@
 #include "Engine/Math/Matrix4x4/Matrix4x4.h"
 #include "Engine/Math/Vector3/Vector3.h"
 #include <cmath>
+#include <algorithm>
 
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
 	return Quaternion{
@@ -105,12 +106,32 @@ float Dot(const Quaternion& q0, const Quaternion& q1) {
 }
 
 Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
-	float dot = Dot(q0, q1);
-	float theta = acosf(dot);
+	Quaternion to = q1;
 
-	float scale0 = sinf((1 - t) * theta) / sinf(theta);
-	float scale1 = sinf(t * theta) / sinf(theta);
-	return Quaternion(scale0 * q0 + scale1 * q1);
+	float dot = Dot(q0, q1);
+
+	if (dot < 0.0f) {
+		to = -to;
+		dot = -dot;
+	}
+
+	dot = std::clamp(dot, -1.0f, 1.0f);
+
+	if (dot > 0.9995f) {
+		return Normalize(Lerp(q0, to, t));
+	}
+
+	float theta = acosf(dot);
+	float sinTheta = sinf(theta);
+
+	float scale0 = sinf((1.0f - t) * theta) / sinTheta;
+	float scale1 = sinf(t * theta) / sinTheta;
+
+	return Normalize(scale0 * q0 + scale1 * to);
+}
+
+Quaternion Lerp(const Quaternion& q0, const Quaternion& q1, float t) {
+	return Normalize(q0 * (1.0f - t) + q1 * t);
 }
 
 Quaternion operator+(const Quaternion& q0, const Quaternion& q1) {
@@ -121,4 +142,7 @@ Quaternion operator*(const Quaternion& q, const float f) {
 }
 Quaternion operator*(const float f, const Quaternion& q) {
 	return operator*(q, f);
+}
+Quaternion operator-(const Quaternion& q) {
+	return { -q.x, -q.y, -q.z, -q.w };
 }

@@ -55,10 +55,10 @@ VertexShaderOutput main(VertexShaderInput input){
     VertexShaderOutput output;
     Skinned skinned = Skinning(input);
     
-    output.position = mul(input.position, gTransformationMatrix.WVP);
+    output.position = mul(skinned.position, gTransformationMatrix.WVP);
     output.texcoord = input.texcoord;
-    output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrix.WorldInverseTranspose));
+    output.normal = normalize(mul(skinned. normal, (float32_t3x3)gTransformationMatrix.WorldInverseTranspose));
     output.color = input.color;
-    output.worldPosition = mul(input.position, gTransformationMatrix.World).xyz;
+    output.worldPosition = mul(skinned.position, gTransformationMatrix.World).xyz;
     return output;
 }

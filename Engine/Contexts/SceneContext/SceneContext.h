@@ -8,6 +8,7 @@ public:
 	// シーン変更
 	void SceneChange(std::string nextSceneName);
 
+	bool IsEditMode();
 private:
 	SceneManager* sceneManager_ = nullptr;
 };

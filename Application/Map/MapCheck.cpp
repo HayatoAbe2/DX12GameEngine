@@ -258,7 +258,7 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 		for (int x = startX; x <= endX; ++x) {
 			if (map_[y][x] == MapTile::Tile::Floor) { continue; }
 			if (map_[y][x] == MapTile::Tile::None) { continue; }
-			AABB aabb;
+			AABB3D aabb;
 			aabb.min = { x * tileSize_,0,(mapH - 1 - y) * tileSize_ };
 			aabb.max = { (x + 1) * tileSize_,0,(mapH - y) * tileSize_ };
 

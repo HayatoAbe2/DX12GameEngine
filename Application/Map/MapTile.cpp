@@ -13,18 +13,67 @@ MapTile::~MapTile() {
 	light.RemoveSpotLight(lightIndex_);
 }
 
-void MapTile::Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<InstancedModel> floor, std::unique_ptr<InstancedModel> barrier, std::unique_ptr<Model> goal) {
+void MapTile::Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<InstancedModel> floor, std::unique_ptr<InstancedModel> barrier, std::unique_ptr<InstancedModel> weaponSpawn, std::unique_ptr<InstancedModel> enemySpawn,  std::unique_ptr<Model> goal) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
 	wall_ = std::move(wall);
 	floor_ = std::move(floor);
 	barrier_ = std::move(barrier);
+	weaponSpawn_ = std::move(weaponSpawn);
+	enemySpawn_ = std::move(enemySpawn);
 	goal_ = std::move(goal);
 
 	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Goal/circle.png")), particleNum_);
 	particle_->SetLifeTime(40);
 	particle_->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+}
+
+void MapTile::UpdateMapChange() {
+	map_.clear();
+	mapWidth_ = 64;
+	mapHeight_ = 64;
+	map_.assign(mapHeight_, std::vector<Tile>(mapWidth_, Tile::None));
+
+	for (auto& floor : floor_->GetTransforms()) {
+		int x = int(std::round(floor.translate.x / tileSize_));
+		int y = int(std::round(floor.translate.z / tileSize_));
+		map_[y][x] = Tile::Floor;
+	}
+	for (auto& wall : wall_->GetTransforms()) {
+		int x = int(std::round(wall.translate.x / tileSize_));
+		int y = int(std::round(wall.translate.z / tileSize_));
+		map_[y][x] = Tile::LeftWall;
+	}
+	for (auto& barrier : barrier_->GetTransforms()) {
+		int x = int(std::round(barrier.translate.x / tileSize_));
+		int y = int(std::round(barrier.translate.z / tileSize_));
+		map_[y][x] = Tile::CombatWall;
+	}
+	{
+		auto& ctx = GameContext::GetInstance();
+		auto& light = ctx.Light();
+		auto& goal = goal_->GetTransform();
+
+		int x = int(std::round(goal.translate.x / tileSize_));
+		int y = int(std::round(goal.translate.z / tileSize_));
+		map_[y][x] = Tile::Goal;
+
+		auto& spotLight = light.GetSpotLight(lightIndex_);
+		spotLight.position = goal.translate + Vector3{ 0.0f,3.0f,0.0f };
+		spotLight.direction = { 0,-1.0f,0 };
+		spotLight.intensity = 1.0f;
+		spotLight.color = { 1,1,0,0.3f };
+		spotLight.distance = 10.0f;
+		spotLight.decay = 0.9f;
+		spotLight.cosAngle = 0.32f;
+		spotLight.cosFalloffStart = 1.1f;
+
+		std::unique_ptr<ParticleField> particleField = std::make_unique<ParticleField>();
+		particleField->SetCheckArea(false);
+		particleField->SetRotateXZ(0.15f, { x * tileSize_ + tileSize_ / 2.0f, 0, y * tileSize_ + tileSize_ / 2.0f });
+		particle_->AddField(std::move(particleField));
+	}
 }
 
 void MapTile::LoadCSV(const std::string& filePath) {
@@ -215,13 +264,14 @@ void MapTile::Update(bool canGoal) {
 	particle_->Update();
 }
 
-void MapTile::Draw(Camera* camera) {
+void MapTile::Draw(Camera* camera, bool isCombat) {
 	auto& ctx = GameContext::GetInstance();
+	auto& scene = ctx.Scene();
 	auto& render = ctx.Render();
 
 	render.DrawInstancedModel(wall_.get());
 	render.DrawInstancedModel(floor_.get());
-	if (!soundPlayed_) {
+	if (isCombat || scene.IsEditMode()) {
 		render.DrawInstancedModel(barrier_.get());
 	}
 	render.DrawModel(goal_.get());

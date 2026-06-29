@@ -8,3 +8,7 @@ SceneContext::SceneContext(SceneManager* sceneManager) {
 void SceneContext::SceneChange(std::string nextSceneName) {
 	sceneManager_->SceneChange(nextSceneName);
 }
+
+bool SceneContext::IsEditMode() {
+	return sceneManager_->GetCurrentScene()->IsEditMode();
+}

@@ -42,27 +42,35 @@ void GameScene::Initialize() {
 	//sceneObjects_.push_back(asset.LoadModel("Resources/Debug/human", "walk.gltf"));
 
 	// マップ
-	wall_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	wallShadow_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	floor_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	barrier_ = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	goal_ = asset.LoadModel("Resources/Tiles", "sphere.obj");
-	
-	auto matData = wall_->GetMaterial(0)->GetData();
+	std::unique_ptr<InstancedModel> wall = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<InstancedModel> wallShadow = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<InstancedModel> floor = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<InstancedModel> barrier = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<InstancedModel> enemySpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<InstancedModel> weaponSpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<Model> goal = asset.LoadModel("Resources/Tiles", "sphere.obj");
+
+	auto matData = wall->GetMaterial(0)->GetData();
 	matData.useEnvironmentMap = true;
 	matData.environmentIntensity = 0.6f;
-	wall_->GetMaterial(0)->SetEnvironmentTexture(skybox_);
-	wall_->GetMaterial(0)->SetData(matData);
-	wall_->GetMaterial(1)->SetEnvironmentTexture(skybox_);
-	wall_->GetMaterial(1)->SetData(matData);
+	wall->GetMaterial(0)->SetEnvironmentTexture(skybox_);
+	wall->GetMaterial(0)->SetData(matData);
+	wall->GetMaterial(1)->SetEnvironmentTexture(skybox_);
+	wall->GetMaterial(1)->SetData(matData);
 
-	matData = barrier_->GetMaterial(0)->GetData();
-	matData.color = { 0.3f,0.3f,1,0.5f };
-	barrier_->GetMaterial(0)->SetData(matData);
-	barrier_->GetMaterial(1)->SetData(matData);
+	matData = barrier->GetMaterial(0)->GetData();
+	matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
+	barrier->GetMaterial(0)->SetData(matData);
+	barrier->GetMaterial(1)->SetData(matData);
+	matData.color = { 1.0f, 0.3f, 0.3f, 0.5f };
+	enemySpawn->GetMaterial(0)->SetData(matData);
+	enemySpawn->GetMaterial(1)->SetData(matData);
+	matData.color = { 0.3f, 1.0f, 0.3f, 0.5f };
+	weaponSpawn->GetMaterial(0)->SetData(matData);
+	weaponSpawn->GetMaterial(1)->SetData(matData);
 
 	mapTile_ = std::make_unique<MapTile>();
-	mapTile_->Initialize(std::move(wall_), std::move(floor_), std::move(barrier_), std::move(goal_));
+	mapTile_->Initialize(std::move(wall), std::move(floor), std::move(barrier), std::move(enemySpawn), std::move(weaponSpawn), std::move(goal));
 
 	// 武器マネージャー
 	weaponManager_ = std::make_unique<WeaponManager>();
@@ -126,7 +134,7 @@ void GameScene::Update() {
 	auto& audio = ctx.Audio();
 	auto& scene = ctx.Scene();
 
-	if (!isShowResult_ ) {
+	if (!isShowResult_) {
 		if (isPause_) {
 			// ポーズ中
 			if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
@@ -159,8 +167,10 @@ void GameScene::Update() {
 			debugCamera_->Update();
 
 			// 敵
-			enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), camera_.get());
-			mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
+			if (!isEditMode_) {
+				enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), camera_.get());
+				mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
+			}
 
 			// 弾の処理
 			bulletManager_->Update(mapCheck_.get(), effectManager_.get());
@@ -302,10 +312,10 @@ void GameScene::Draw() {
 
 	auto& render = GameContext::GetInstance().Render();
 	render.SetPostEffectType(PostEffectType::Outline);
-	
+
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
-	mapTile_->Draw(camera_.get());
+	mapTile_->Draw(camera_.get(), enemyManager_->GetEnemies().size() != 0);
 	player_->Draw(camera_.get());
 	enemyManager_->Draw(camera_.get());
 	bulletManager_->Draw(camera_.get());
