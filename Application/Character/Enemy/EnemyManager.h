@@ -15,11 +15,13 @@ public:
 	void Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyType);
 	void Reset();
 	void LoadCSV(std::string filePath, float tileSize, WeaponManager* weaponManager);
+	void Load(float tileSize, WeaponManager* weaponManager);
 
 	std::vector<Enemy*> GetEnemies();
 private:
 	std::vector<std::unique_ptr<Enemy>> enemies_ = {};
 
 	std::unique_ptr<ParticleSystem> deathParticle_ = nullptr;
+	bool a = false;
 };
 

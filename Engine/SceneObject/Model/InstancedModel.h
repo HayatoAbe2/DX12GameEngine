@@ -42,11 +42,11 @@ public:
 	void AddInstanceTransform() {
 		transforms_.push_back({});
 	}
-	void SetInstanceTransforms(int index, const Transform& transform) {
+	void SetTransforms(int index, const Transform& transform) {
 		if (index < 0 || index >= numInstance_) return;
 		transforms_[index] = transform;
 	}
-	void SetInstanceTransforms(std::vector<Transform> transforms) {
+	void SetTransforms(std::vector<Transform> transforms) {
 		transforms.resize(transforms_.size());
 		transforms_ = transforms;
 	}
@@ -76,6 +76,8 @@ public:
 	// 根ノードを設定
 	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); }
 
+	void SetDirectoryPath(std::string directoryPath) { directory_ = directoryPath; }
+
 
 	// データの取得
 	std::shared_ptr<ModelData> GetData() { return data_; }
@@ -85,6 +87,8 @@ public:
 
 	// rootNode取得
 	ModelNode* GetRootNode() { return rootNode_.get(); }
+
+	const std::string& GetDirectoryPath() { return directory_; }
 
 private:
 
@@ -103,5 +107,7 @@ private:
 	std::vector<Transform> transforms_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformationResource_ = nullptr;
 	InstanceGPUData* instanceTransformationData_ = nullptr;
+
+	std::string directory_;
 };
 

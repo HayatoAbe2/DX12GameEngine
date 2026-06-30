@@ -9,13 +9,13 @@ AssetManager::AssetManager(DirectXContext* dxContext, Logger* logger) {
 
 std::unique_ptr<Model> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename, bool enableLighting) {
 	auto object = modelManager_->Load(GenerateID(), GenerateID(), GenerateID(), GenerateID(), directoryPath, filename, enableLighting);
-	object->name_ = filename;
+	object->name = filename;
 	return std::move(object);
 }
 
 std::unique_ptr<InstancedModel> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting) {
 	auto object = modelManager_->Load(GenerateID(), GenerateID(), GenerateID(), GenerateID(), directoryPath, filename, numInstance, enableLighting);
-	object->name_ = filename;
+	object->name = filename;
 	return std::move(object);
 }
 
@@ -25,7 +25,7 @@ std::unique_ptr<ParticleSystem> AssetManager::CreateParticle(int numInstance) {
 
 std::unique_ptr<Sprite> AssetManager::LoadSprite(const std::string& filePath) {
 	auto object = spriteManager_->Load(filePath, GenerateID(), GenerateID(), GenerateID());
-	object->name_ = filePath;
+	object->name = filePath;
 	return std::move(object);
 }
 

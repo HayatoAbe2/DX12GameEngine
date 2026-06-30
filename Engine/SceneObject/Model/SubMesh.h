@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include "Engine/Graphics/GPUData/VertexData.h"
+#include "Skeleton.h"
 
 struct SubMesh {
 	std::vector<VertexData> vertices_{};
@@ -14,4 +15,7 @@ struct SubMesh {
 	std::vector<uint32_t> indices_{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW ibv_{};
+
+	// SkinCluster
+	SkinCluster skinCluster_;
 };

@@ -8,6 +8,7 @@ class Player;
 class MapCheck {
 public:
 	void Initialize(std::vector<std::vector<MapTile::Tile>> map, float tileSize);
+	void Update(std::vector<std::vector<MapTile::Tile>> map);
 	bool ResolveCollisionX(Vector2& pos, float radius, bool isFlying);
 	bool ResolveCollisionY(Vector2& pos, float radius, bool isFlying);
 	bool IsHitWall(const Vector2& pos, float radius);

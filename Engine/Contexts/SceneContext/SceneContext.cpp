@@ -8,3 +8,7 @@ SceneContext::SceneContext(SceneManager* sceneManager) {
 void SceneContext::SceneChange(std::string nextSceneName) {
 	sceneManager_->SceneChange(nextSceneName);
 }
+
+BaseScene* SceneContext::GetCurrentScene() {
+	return sceneManager_->GetCurrentScene();
+}

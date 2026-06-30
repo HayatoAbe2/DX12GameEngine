@@ -19,12 +19,26 @@ void AnimationPlayer::Update(ModelNode& rootNode) {
 }
 
 void AnimationPlayer::Update(Skeleton& skeleton) {
+	animationTime_ += GameContext::GetInstance().GetDeltatime();
+	animationTime_ = std::fmod(animationTime_, animation_->duration);
+
 	for (Joint& joint : skeleton.joints) {
 		if (auto it = animation_->nodeAnimations.find(joint.name); it != animation_->nodeAnimations.end()) {
 			const NodeAnimation& rootNodeAnimation = (*it).second;
-			joint.transform.translate = CalculateValue(rootNodeAnimation.translate, animationTime_);
-			joint.transform.rotate = Normalize(CalculateValue(rootNodeAnimation.rotate, animationTime_));
-			joint.transform.scale = CalculateValue(rootNodeAnimation.scale, animationTime_);
+
+			if (rootNodeAnimation.translate.size() != 0) {
+				joint.transform.translate = CalculateValue(rootNodeAnimation.translate, animationTime_);
+			}
+			if (rootNodeAnimation.rotate.size() != 0) {
+				joint.transform.rotate = Normalize(CalculateValue(rootNodeAnimation.rotate, animationTime_));
+			}
+			if (rootNodeAnimation.scale.size() != 0) {
+				joint.transform.scale = CalculateValue(rootNodeAnimation.scale, animationTime_);
+			}
+			joint.localMatrix = MakeAffineMatrix(
+				joint.transform.scale,
+				joint.transform.rotate,
+				joint.transform.translate);
 		}
 	}
 }

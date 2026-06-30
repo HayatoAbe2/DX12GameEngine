@@ -12,6 +12,7 @@
 #include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
 #endif
 #include <Engine/Math/Vector2/Vector2.h>
+#include "Engine/SceneObject/Transform.h"
 
 class ImGuiManager {
 public:
@@ -33,5 +34,8 @@ private:
 #ifdef USE_IMGUI
 	GizmoCtx gizmoCtx_{};
 	bool isSceneHovered_ = false;
+	bool wasUsing_ = false;
+	Transform beginTransform_;
+	Transform deltaTransform_;
 #endif
 };

@@ -90,7 +90,11 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	// Shaderをコンパイルする
 	pipelineStateManager_ = std::make_unique<PipelineStateManager>();
 	pipelineStateManager_->SetStandardBlob(
-		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.VS.hlsl", L"vs_6_0", logger_),
+		shaderCompiler_->Compile(L"Resources/Shaders/Object3d.VS.hlsl", L"vs_6_0", logger_),
+		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
+	);
+	pipelineStateManager_->SetSkinningBlob(
+		shaderCompiler_->Compile(L"Resources/Shaders/Skinning/SkinningObject3d.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
 	);
 	pipelineStateManager_->SetInstancingBlob(

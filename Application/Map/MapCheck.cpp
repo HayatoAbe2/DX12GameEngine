@@ -8,6 +8,10 @@ void MapCheck::Initialize(std::vector<std::vector<MapTile::Tile>> map, float til
 	tileSize_ = tileSize;
 }
 
+void MapCheck::Update(std::vector<std::vector<MapTile::Tile>> map) {
+	map_ = map;
+}
+
 bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 	bool isHit = false;
 	int mapH = static_cast<int>(map_.size());
@@ -258,7 +262,7 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 		for (int x = startX; x <= endX; ++x) {
 			if (map_[y][x] == MapTile::Tile::Floor) { continue; }
 			if (map_[y][x] == MapTile::Tile::None) { continue; }
-			AABB aabb;
+			AABB3D aabb;
 			aabb.min = { x * tileSize_,0,(mapH - 1 - y) * tileSize_ };
 			aabb.max = { (x + 1) * tileSize_,0,(mapH - y) * tileSize_ };
 

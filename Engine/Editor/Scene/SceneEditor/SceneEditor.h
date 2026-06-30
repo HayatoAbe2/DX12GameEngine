@@ -39,5 +39,12 @@ public:
 	std::vector<std::string> undoStack_;
 	std::vector<std::string> redoStack_;
 	bool wasUsing_ = false;
+
+	bool useSnap_ = false;
+	float moveSnap_ = 1.0f;
+	float rotateSnap_ = 15.0f;
+	float scaleSnap_ = 0.1f;
+
+	int editingInstance_ = 0;
 };
 

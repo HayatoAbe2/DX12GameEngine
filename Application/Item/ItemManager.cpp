@@ -4,6 +4,8 @@
 #include "Weapon/Weapon.h"
 #include <fstream>
 #include <sstream>
+#include "Engine/Scene/BaseScene/BaseScene.h"
+#include "Engine/SceneObject/SceneObject.h"
 
 void ItemManager::Initialize(WeaponManager* weaponManager) {
 	weaponManager_ = weaponManager;
@@ -60,7 +62,7 @@ void ItemManager::Draw(Camera* camera) {
 		item->Draw(camera);
 	}
 
-	if (canInteract_) {
+	if (canInteract_ && !ctx.Scene().GetCurrentScene()->IsEditMode()) {
 		if (input.gamepad.IsConnected()) {
 			if (input.gamepad.IsPress(XINPUT_GAMEPAD_A)) {
 				controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
@@ -148,5 +150,34 @@ void ItemManager::LoadCSV(const std::string& filePath, const float tileSize) {
 
 		Vector3 pos = Vector3{ x * tileSize, 0.5f, z * tileSize };
 		Spawn(pos, itemNum);
+	}
+}
+
+void ItemManager::Load(const float tileSize) {
+	auto& ctx = GameContext::GetInstance();
+	auto& scene = ctx.Scene();
+
+	std::vector<InstancedModel*> models;
+	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
+		if (dynamic_cast<InstancedModel*>(obj)) {
+			auto* model = dynamic_cast<InstancedModel*>(obj);
+			models.push_back(model);
+		}
+	}
+
+	for (auto& model : models) {
+		auto matData = model->GetMaterial(0)->GetData();
+		if (model->tag == "weaponSpawn") {
+			for (Transform& t : model->GetTransforms()) {
+				if (t.translate == Vector3{ 0,0,0 }) continue;
+				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+				auto matData = model->GetMaterial(0)->GetData();
+				if (!a) {
+					Spawn(pos, -1);
+
+					a = true;
+				}
+			}
+		}
 	}
 }

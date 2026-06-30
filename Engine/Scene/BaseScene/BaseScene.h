@@ -54,6 +54,9 @@ public:
 		}
 		pendingDelete_.clear();
 	}
+
+	bool IsEditMode() { return enableEditMode_; }
+	void SetEditMode(bool editFlag) { enableEditMode_ = editFlag; }
 protected:
 
 	// カメラ
@@ -66,5 +69,7 @@ protected:
 	// オブジェクト
 	std::vector<std::unique_ptr<SceneObject>> sceneObjects_;
 	std::vector<SceneObject*> pendingDelete_;
+
+	bool enableEditMode_ = false;
 };
 

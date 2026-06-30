@@ -8,7 +8,8 @@ public:
 
 	uint32_t GetID() { return id_; }
 
-	std::string name_;
+	std::string name;
+	std::string tag;
 protected:
 	uint32_t id_;
 };

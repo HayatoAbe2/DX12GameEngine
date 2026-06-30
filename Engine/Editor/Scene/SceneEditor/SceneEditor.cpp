@@ -36,7 +36,7 @@ void SceneEditor::Draw(Camera* camera) {
 		for (auto* object : scene_->GetObjects()) {
 			bool selected = (selected_ == object);
 
-			if (ImGui::Selectable((object->name_ + "##" + std::to_string(object->GetID())).c_str(), selected)) {
+			if (ImGui::Selectable((object->name + "(" + object->tag + ")" + "##" + std::to_string(object->GetID())).c_str(), selected)) {
 				selected_ = object;
 			}
 		}
@@ -48,6 +48,30 @@ void SceneEditor::Draw(Camera* camera) {
 			DrawInspector(selected_);
 
 			ImGui::Separator();
+			// 追加
+			if (auto* model = dynamic_cast<Model*>(selected_)) {
+
+				if (ImGui::Button("Duplicate")) {
+
+					PushUndo();
+
+					auto& asset = GameContext::GetInstance().Asset();
+
+					auto newModel = asset.LoadModel(
+						model->GetDirectoryPath(),
+						model->name);
+
+					newModel->SetTransform(model->GetTransform());
+
+					auto* ptr = newModel.get();
+
+					scene_->AddObject(std::move(newModel));
+
+					selected_ = ptr;
+				}
+			}
+			ImGui::Separator();
+			
 			// 削除
 			if (ImGui::Button("Delete")) {
 				PushUndo();
@@ -62,6 +86,7 @@ void SceneEditor::Draw(Camera* camera) {
 			Save();
 		}
 		if (ImGui::Button("Load")) {
+			selected_ = nullptr;
 			Load("Resources/Debug/SceneEditor/SceneData.json");
 		}
 		ImGui::End();
@@ -96,24 +121,54 @@ void SceneEditor::Draw(Camera* camera) {
 
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::BeginFrame();
-	
+
+			float view[16];
+			float proj[16];
+			ToFloat16(view, (camera->viewMatrix_));
+			ToFloat16(proj, (camera->projectionMatrix_));
 			if (auto* model = dynamic_cast<Model*>(selected_)) {
-				float view[16];
-				float proj[16];
 				float modelMat[16];
-				ToFloat16(view, (camera->viewMatrix_));
-				ToFloat16(proj, (camera->projectionMatrix_));
 				ToFloat16(modelMat, (MakeAffineMatrix(model->GetTransform())));
 
+				
 				if (ImGui::RadioButton("Move", gizmoMode_ == 0)) gizmoMode_ = 0;
+				ImGui::SameLine();
 				if (ImGui::RadioButton("Rotate", gizmoMode_ == 1)) gizmoMode_ = 1;
+				ImGui::SameLine();
 				if (ImGui::RadioButton("Scale", gizmoMode_ == 2)) gizmoMode_ = 2;
+
+				// スナップ設定
+				ImGui::Checkbox("Snap", &useSnap_);
+				switch (gizmoMode_) {
+				case 0:
+					ImGui::DragFloat("Move Snap", &moveSnap_, 0.1f, 0.01f, 100.0f);
+					break;
+
+				case 1:
+					ImGui::DragFloat("Rotate Snap", &rotateSnap_, 1.0f, 1.0f, 180.0f);
+					break;
+
+				case 2:
+					ImGui::DragFloat("Scale Snap", &scaleSnap_, 0.01f, 0.01f, 10.0f);
+					break;
+				}
 
 				ImGuizmo::OPERATION op;
 				switch (gizmoMode_) {
-				case 0: op = ImGuizmo::TRANSLATE; break;
-				case 1: op = ImGuizmo::ROTATE; break;
-				case 2: op = ImGuizmo::SCALE; break;
+				case 0: 
+					op = ImGuizmo::TRANSLATE;
+					gizmoCtx_.snap[0] = moveSnap_;
+					gizmoCtx_.snap[1] = moveSnap_;
+					gizmoCtx_.snap[2] = moveSnap_;
+					break;
+				case 1:
+					op = ImGuizmo::ROTATE;
+					gizmoCtx_.snap[0] = rotateSnap_;
+					break;
+				case 2:
+					op = ImGuizmo::SCALE;
+					gizmoCtx_.snap[0] = scaleSnap_;
+					break;
 				}
 				gizmoCtx_.isActive = selected_ != nullptr;
 				gizmoCtx_.target = selected_;
@@ -121,8 +176,65 @@ void SceneEditor::Draw(Camera* camera) {
 				for (int i = 0; i < 16; ++i) {
 					gizmoCtx_.view[i] = view[i];
 					gizmoCtx_.proj[i] = proj[i];
-					gizmoCtx_.model[i] = modelMat[i];
+					gizmoCtx_.modelMatrix[i] = modelMat[i];
 				};
+				gizmoCtx_.useSnap = useSnap_;
+
+			}else if (auto* model = dynamic_cast<InstancedModel*>(selected_)) {
+				auto transforms = model->GetTransforms();
+
+				float modelMat[16];
+				ToFloat16(modelMat, MakeAffineMatrix(transforms[editingInstance_]));
+
+				if (ImGui::RadioButton("Move", gizmoMode_ == 0)) gizmoMode_ = 0;
+				ImGui::SameLine();
+				if (ImGui::RadioButton("Rotate", gizmoMode_ == 1)) gizmoMode_ = 1;
+				ImGui::SameLine();
+				if (ImGui::RadioButton("Scale", gizmoMode_ == 2)) gizmoMode_ = 2;
+
+				// スナップ設定
+				ImGui::Checkbox("Snap", &useSnap_);
+				switch (gizmoMode_) {
+				case 0:
+					ImGui::DragFloat("Move Snap", &moveSnap_, 0.1f, 0.01f, 100.0f);
+					break;
+
+				case 1:
+					ImGui::DragFloat("Rotate Snap", &rotateSnap_, 1.0f, 1.0f, 180.0f);
+					break;
+
+				case 2:
+					ImGui::DragFloat("Scale Snap", &scaleSnap_, 0.01f, 0.01f, 10.0f);
+					break;
+				}
+				ImGui::Checkbox("EditAllInstances", &gizmoCtx_.editAllInstances);
+
+				ImGuizmo::OPERATION op;
+				switch (gizmoMode_) {
+				case 0: 
+					op = ImGuizmo::TRANSLATE;
+					gizmoCtx_.snap[0] = moveSnap_; 
+					gizmoCtx_.snap[1] = moveSnap_; 
+					gizmoCtx_.snap[2] = moveSnap_; 
+					break;
+				case 1:
+					op = ImGuizmo::ROTATE; 
+					gizmoCtx_.snap[1] = rotateSnap_;
+					break;
+				case 2:
+					op = ImGuizmo::SCALE; 
+					gizmoCtx_.snap[2] = scaleSnap_;
+					break;
+				}
+				gizmoCtx_.isActive = selected_ != nullptr;
+				gizmoCtx_.target = selected_;
+				gizmoCtx_.op = op;
+				for (int i = 0; i < 16; ++i) {
+					gizmoCtx_.view[i] = view[i];
+					gizmoCtx_.proj[i] = proj[i];
+					gizmoCtx_.modelMatrix[i] = modelMat[i];
+				};
+				gizmoCtx_.useSnap = useSnap_;
 			}
 		}
 
@@ -146,10 +258,35 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 		// モデル
 		if (auto* model = dynamic_cast<Model*>(object)) {
 			Transform transform = model->GetTransform();
-			ImGui::DragFloat3("Scale", &transform.scale.x, 0.5f);
-			ImGui::DragFloat3("Rotate", &transform.rotate.x, 0.5f);
-			ImGui::DragFloat3("Translate", &transform.translate.x, 0.5f);
+			ImGui::DragFloat3("Scale", &transform.scale.x, gizmoCtx_.snap[2]);
+			ImGui::DragFloat3("Rotate", &transform.rotate.x, gizmoCtx_.snap[1]);
+			ImGui::DragFloat3("Translate", &transform.translate.x, gizmoCtx_.snap[0]);
 			model->SetTransform(transform);
+		}
+
+		// インスタンシング描画モデル
+		if (auto* model = dynamic_cast<InstancedModel*>(object)) {
+			int count = model->GetNumInstance();
+
+			ImGui::DragInt(
+				"Instance",
+				&editingInstance_,
+				1,
+				0,
+				count - 1);
+			gizmoCtx_.editingInstance = editingInstance_;
+
+			auto transforms = model->GetTransforms();
+
+			Transform t = transforms[editingInstance_];
+
+			ImGui::DragFloat3("Scale", &t.scale.x, gizmoCtx_.snap[2]);
+			ImGui::DragFloat3("Rotate", &t.rotate.x, gizmoCtx_.snap[1]);
+			ImGui::DragFloat3("Translate", &t.translate.x, gizmoCtx_.snap[0]);
+
+			model->SetTransforms(
+				editingInstance_,
+				t);
 		}
 
 		// スプライト
@@ -180,7 +317,8 @@ void SceneEditor::Save() {
 		if (auto* model = dynamic_cast<Model*>(object)) {
 			nlohmann::json object;
 			object["type"] = "Model";
-			object["name"] = model->name_;
+			object["name"] = model->name;
+			object["tag"] = model->tag;
 			object["path"] = model->GetDirectoryPath();
 
 			Transform transform = model->GetTransform();
@@ -204,6 +342,38 @@ void SceneEditor::Save() {
 			};
 
 			root["objects"].push_back(object);
+		}else if (auto* model = dynamic_cast<InstancedModel*>(object)) {
+
+			nlohmann::json object;
+			object["type"] = "InstancedModel";
+			object["name"] = model->name;
+			object["tag"] = model->tag;
+			object["path"] = model->GetDirectoryPath();
+
+			object["transforms"] = nlohmann::json::array();
+
+			for (const auto& t : model->GetTransforms()) {
+
+				object["transforms"].push_back({
+					{"scale", {
+						t.scale.x,
+						t.scale.y,
+						t.scale.z
+					}},
+					{"rotate", {
+						t.rotate.x,
+						t.rotate.y,
+						t.rotate.z
+					}},
+					{"translate", {
+						t.translate.x,
+						t.translate.y,
+						t.translate.z
+					}}
+					});
+			}
+
+			root["objects"].push_back(object);
 		}
 	}
 
@@ -214,6 +384,8 @@ void SceneEditor::Save() {
 
 void SceneEditor::Load(const std::string& path) {
 #ifdef USE_IMGUI
+	auto& asset = GameContext::GetInstance().Asset();
+
 	// 現在シーンをクリア
 	scene_->Clear();
 
@@ -226,8 +398,8 @@ void SceneEditor::Load(const std::string& path) {
 
 		// モデル
 		if (type == "Model") {
-			auto& asset = GameContext::GetInstance().Asset();
 			auto model = asset.LoadModel(objectJson["path"], objectJson["name"]);
+			model->tag = objectJson["tag"];
 
 			// Transform
 			Vector3 scale;
@@ -245,6 +417,37 @@ void SceneEditor::Load(const std::string& path) {
 			model->SetTransform({ scale, rotate, translate });
 
 			scene_->AddObject(std::move(model));
+		}else if (type == "InstancedModel") {
+			auto model = asset.LoadInstancedModel(objectJson["path"], objectJson["name"], int(objectJson["transforms"].size()));
+			model->tag = objectJson["tag"];
+
+			std::vector<Transform> transforms;
+			for (auto& json : objectJson["transforms"]) {
+
+				Transform t;
+
+				t.scale = {
+					json["scale"][0],
+					json["scale"][1],
+					json["scale"][2]
+				};
+
+				t.rotate = {
+					json["rotate"][0],
+					json["rotate"][1],
+					json["rotate"][2]
+				};
+
+				t.translate = {
+					json["translate"][0],
+					json["translate"][1],
+					json["translate"][2]
+				};
+				transforms.push_back(t);
+			}
+			model->SetTransforms(transforms);
+
+			scene_->AddObject(std::move(model));
 		}
 	}
 #endif
@@ -259,7 +462,8 @@ std::string SceneEditor::SerializeScene() {
 		if (auto* model = dynamic_cast<Model*>(object)) {
 			nlohmann::json object;
 			object["type"] = "Model";
-			object["name"] = model->name_;
+			object["name"] = model->name;
+			object["tag"] = model->tag;
 			object["path"] = model->GetDirectoryPath();
 
 			Transform transform = model->GetTransform();
@@ -281,6 +485,36 @@ std::string SceneEditor::SerializeScene() {
 				transform.scale.y,
 				transform.scale.z
 			};
+
+			root["objects"].push_back(object);
+		}else if (auto* model = dynamic_cast<InstancedModel*>(object)) {
+			nlohmann::json object;
+			object["type"] = "InstancedModel";
+			object["name"] = model->name;
+			object["tag"] = model->tag;
+			object["path"] = model->GetDirectoryPath();
+
+			object["transforms"] = nlohmann::json::array();
+
+			for (const auto& t : model->GetTransforms()) {
+				object["transforms"].push_back({
+					{"scale", {
+						t.scale.x,
+						t.scale.y,
+						t.scale.z
+					}},
+					{"rotate", {
+						t.rotate.x,
+						t.rotate.y,
+						t.rotate.z
+					}},
+					{"translate", {
+						t.translate.x,
+						t.translate.y,
+						t.translate.z
+					}}
+					});
+			}
 
 			root["objects"].push_back(object);
 		}
@@ -306,6 +540,7 @@ void SceneEditor::DeserializeScene(const std::string& jsonText) {
 		if (type == "Model") {
 			auto& asset = GameContext::GetInstance().Asset();
 			auto model = asset.LoadModel(objectJson["path"], objectJson["name"]);
+			model->tag = objectJson["tag"];
 
 			// Transform
 			Vector3 scale;
@@ -321,6 +556,45 @@ void SceneEditor::DeserializeScene(const std::string& jsonText) {
 			translate.y = objectJson["translate"][1];
 			translate.z = objectJson["translate"][2];
 			model->SetTransform({ scale, rotate, translate });
+
+			scene_->AddObject(std::move(model));
+		}else if (type == "InstancedModel") {
+
+			auto& asset = GameContext::GetInstance().Asset();
+			int count = static_cast<int>(objectJson["transforms"].size());
+			auto model = asset.LoadInstancedModel(
+				objectJson["path"],
+				objectJson["name"], count);
+			model->tag = objectJson["tag"];
+
+			for (int i = 0; i < count; i++) {
+
+				model->AddInstanceTransform();
+
+				Transform t;
+
+				auto& json = objectJson["transforms"][i];
+
+				t.scale = {
+					json["scale"][0],
+					json["scale"][1],
+					json["scale"][2]
+				};
+
+				t.rotate = {
+					json["rotate"][0],
+					json["rotate"][1],
+					json["rotate"][2]
+				};
+
+				t.translate = {
+					json["translate"][0],
+					json["translate"][1],
+					json["translate"][2]
+				};
+
+				model->SetTransforms(i, t);
+			}
 
 			scene_->AddObject(std::move(model));
 		}

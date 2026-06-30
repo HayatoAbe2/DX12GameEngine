@@ -69,6 +69,8 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
 
+	model_->Update();
+
 	invincibleTimer_->Update();
 	if (hitColorTimer_->IsActive()) {
 		hitColorTimer_->Update();
@@ -174,7 +176,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	instancingTransforms[0] = transform_;
 
 	for (int i = 0; i < 2; ++i) {
-		instancing_->SetInstanceTransforms(i, instancingTransforms[i]);
+		instancing_->SetTransforms(i, instancingTransforms[i]);
 	}
 }
 

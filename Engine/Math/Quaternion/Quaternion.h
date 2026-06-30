@@ -40,6 +40,9 @@ Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion);
 // 球面線形補間
 Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
 
+Quaternion Lerp(const Quaternion& q0, const Quaternion& q1, float t);
+
 Quaternion operator+(const Quaternion& q0, const Quaternion& q1);
 Quaternion operator*(const Quaternion& q, const float f);
 Quaternion operator*(const float f, const Quaternion& q);
+Quaternion operator-(const Quaternion& q);

@@ -26,6 +26,7 @@ public:
 	void CreateStructuredBufferSRV(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structuredByteStride);
 	void CreateRenderTextureSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource);
 	void CreateDepthSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource);
+	void CreateMatrixPalletteSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> resource, UINT numElements, UINT structureByteStride);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t index);
@@ -51,7 +52,7 @@ private:
 	uint32_t descriptorSize_;
 
 	// 最大数
-	const uint32_t kMaxSRVCount_ = 1024;
+	const uint32_t kMaxSRVCount_ = 2048;
 
 	// 次のindex
 	uint32_t useIndex_ = 0;

@@ -13,6 +13,7 @@ public:
 	void Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, RootSignatureManager* rootSignatureManager);
 
 	ID3D12PipelineState* GetStandardPSO(int index) { return standardPSO[index].Get(); }
+	ID3D12PipelineState* GetSkinningPSO(int index) { return skinningPSO[index].Get(); }
 	ID3D12PipelineState* GetInstancingPSO(int index) { return instancingPSO_[index].Get(); }
 	ID3D12PipelineState* GetSpritePSO(int index) { return spritePSO[index].Get(); }
 	ID3D12PipelineState* GetParticlePSO(int index) { return particlePSO_[index].Get(); }
@@ -23,6 +24,7 @@ public:
 	ID3D12PipelineState* GetPostEffectPSO(int effectType) { return postEffect[effectType].pso.Get(); }
 
 	void SetStandardBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { standardPSOData.vertexShaderBlob = vsBlob; standardPSOData.pixelShaderBlob = psBlob; }
+	void SetSkinningBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { skinningPSOData.vertexShaderBlob = vsBlob; skinningPSOData.pixelShaderBlob = psBlob; }
 	void SetInstancingBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { instancingPSOData.vertexShaderBlob = vsBlob; instancingPSOData.pixelShaderBlob = psBlob; }
 	void SetSpriteBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { spritePSOData.vertexShaderBlob = vsBlob; spritePSOData.pixelShaderBlob = psBlob; }
 	void SetParticleBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { particlePSOData.vertexShaderBlob = vsBlob; particlePSOData.pixelShaderBlob = psBlob; }
@@ -47,6 +49,7 @@ private:
 	};
 
 	PSOData standardPSOData;
+	PSOData skinningPSOData;
 	PSOData instancingPSOData;
 	PSOData spritePSOData;
 	PSOData particlePSOData;
@@ -57,6 +60,7 @@ private:
 	PostEffectData postEffect[int(PostEffectType::Count)];
 
 	void CreateStandardPSO();
+	void CreateSkinningPSO();
 	void CreateInstancingPSO();
 	void CreateSpritePSO();
 	void CreateParticlePSO();
@@ -67,7 +71,7 @@ private:
 	void CreatePostEffectPSO(PostEffectData& postEffect);
 
 	// inputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[4] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[6] = {};
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_;
 
 	// BlendStateの設定
@@ -81,6 +85,7 @@ private:
 
 	// PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> standardPSO[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningPSO[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> instancingPSO_[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> spritePSO[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> particlePSO_[6]{};
