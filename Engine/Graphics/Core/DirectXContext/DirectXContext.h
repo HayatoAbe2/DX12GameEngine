@@ -173,6 +173,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> outlineResource_;
 	OutlineData* outlineData_ = nullptr;
 
+	struct TimeData {
+		float time;
+		float padding[3];
+	};
+	Microsoft::WRL::ComPtr<ID3D12Resource> timeResource_;
+	TimeData* timeData_ = nullptr;
+
 	// 前フレームのウィンドウサイズ
 	HWND hwnd_{};
 	RECT windowRect_{};

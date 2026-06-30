@@ -134,10 +134,15 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Outline), shaderCompiler_->Compile(L"Resources/Shaders/Outline/Outline.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::RadialBlur), shaderCompiler_->Compile(L"Resources/Shaders/RadialBlur/RadialBlur.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Dissolve), shaderCompiler_->Compile(L"Resources/Shaders/Dissolve/Dissolve.PS.hlsl", L"ps_6_0", logger_));
+	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::RandomNoise), shaderCompiler_->Compile(L"Resources/Shaders/Random/RandomNoise.PS.hlsl", L"ps_6_0", logger_));
 
 	// Outline用リソース
 	outlineResource_ = bufferManager_->CreateUploadBuffer(sizeof(OutlineData));
 	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
+
+	// Time用リソース
+	timeResource_ = bufferManager_->CreateUploadBuffer(sizeof(TimeData));
+	timeResource_->Map(0, nullptr, reinterpret_cast<void**>(&timeData_));
 
 	// PSOマネージャー
 	pipelineStateManager_->Initialize(deviceManager_->GetDevice(), rootSignatureManager_.get());
@@ -308,6 +313,12 @@ void DirectXContext::EndFrame() {
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
 		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Dissolve)));
 		cmdList->SetGraphicsRootDescriptorTable(1, dissolveMaskHandle_);
+		break;
+	case PostEffectType::RandomNoise:
+		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());
+		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::RandomNoise)));
+		timeData_->time += 1.0f / 60.0f;
+		cmdList->SetGraphicsRootConstantBufferView(2, timeResource_->GetGPUVirtualAddress());
 		break;
 	default:
 		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetFullscreenRootSignature().Get());

@@ -60,33 +60,10 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	// ポストエフェクト
 	//
 
-	// grayscale
-	postEffect[int(PostEffectType::Grayscale)].desc = fullscreenBaseDesc_;
-	CreatePostEffectPSO(postEffect[int(PostEffectType::Grayscale)]);
-
-	// vignette
-	postEffect[int(PostEffectType::Vignette)].desc = fullscreenBaseDesc_;
-	CreatePostEffectPSO(postEffect[int(PostEffectType::Vignette)]);
-
-	// boxFilter3x3
-	postEffect[int(PostEffectType::GaussianFilter3x3)].desc = fullscreenBaseDesc_;
-	CreatePostEffectPSO(postEffect[int(PostEffectType::GaussianFilter3x3)]);
-
-	// boxFilter5x5
-	postEffect[int(PostEffectType::BoxFilter5x5)].desc = fullscreenBaseDesc_;
-	CreatePostEffectPSO(postEffect[int(PostEffectType::BoxFilter5x5)]);
-
-	// outline
-	postEffect[int(PostEffectType::Outline)].desc = fullscreenBaseDesc_;
-	CreatePostEffectPSO(postEffect[int(PostEffectType::Outline)]);
-
-	// radialBlur
-	postEffect[int(PostEffectType::RadialBlur)].desc = fullscreenBaseDesc_;
-	CreatePostEffectPSO(postEffect[int(PostEffectType::RadialBlur)]);
-
-	// dissolve
-	postEffect[int(PostEffectType::Dissolve)].desc = fullscreenBaseDesc_;
-	CreatePostEffectPSO(postEffect[int(PostEffectType::Dissolve)]);
+	for (int i = 1; i < int(PostEffectType::Count); ++i) {
+		postEffect[i].desc = fullscreenBaseDesc_;
+		CreatePostEffectPSO(postEffect[i]);
+	}
 }
 
 void PipelineStateManager::CreateStandardPSO() {

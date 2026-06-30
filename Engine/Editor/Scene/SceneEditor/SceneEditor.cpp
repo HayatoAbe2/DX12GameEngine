@@ -38,6 +38,7 @@ void SceneEditor::Draw(Camera* camera) {
 
 			if (ImGui::Selectable((object->name + "(" + object->tag + ")" + "##" + std::to_string(object->GetID())).c_str(), selected)) {
 				selected_ = object;
+				gizmoCtx_.editingInstance = 0;
 			}
 		}
 		ImGui::End();

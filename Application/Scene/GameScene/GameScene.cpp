@@ -332,7 +332,8 @@ void GameScene::Draw() {
 	BaseScene::Draw();
 
 	auto& render = GameContext::GetInstance().Render();
-	render.SetPostEffectType(PostEffectType::Outline);
+	//render.SetPostEffectType(PostEffectType::Outline);
+	render.SetPostEffectType(PostEffectType::RandomNoise);
 
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
@@ -421,33 +422,17 @@ void GameScene::Reset() {
 	std::string enemyPath;
 	switch (currentFloor_) {
 	case 0:
-		// チュートリアルステージ
 		floorType = 0;
 
 		// プレイヤー位置
 		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
 
-		// その階の敵とアイテム
-		//itemPath = "Resources/MapData/Item" + std::to_string(floorType) + ".csv";
-		//itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
-		//enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
-		//enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
 		break;
 	case 1:
 		floorType = ctx.RandomInt(1, 2);
 
-		// マップを構築
-		//tilePath = "Resources/MapData/Floor" + std::to_string(floorType) + ".csv";
-		//mapTile_->LoadCSV(tilePath);
-
 		// プレイヤー位置
 		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
-
-		// その階の敵とアイテム
-		//itemPath = "Resources/MapData/Item" + std::to_string(floorType) + ".csv";
-		//itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
-		//enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
-		//enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
 
 		break;
 

@@ -9,6 +9,7 @@ enum class PostEffectType {
 	Outline,
 	RadialBlur,
 	Dissolve,
+	RandomNoise,
 
 	Count
 };
