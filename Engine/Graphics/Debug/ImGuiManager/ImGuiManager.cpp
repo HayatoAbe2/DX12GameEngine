@@ -119,13 +119,21 @@ void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT wind
 		Vector2 winSize = GameContext::GetInstance().GetWindowSize();
 		ImGuizmo::SetRect(0, 0, winSize.x, winSize.y);
 		ImGuizmo::SetDrawlist();
-		ImGuizmo::Manipulate(gizmoCtx_.view, gizmoCtx_.proj, gizmoCtx_.op, ImGuizmo::WORLD, gizmoCtx_.model);
+		ImGuizmo::Manipulate(
+			gizmoCtx_.view,
+			gizmoCtx_.proj,
+			gizmoCtx_.op,
+			ImGuizmo::WORLD,
+			gizmoCtx_.modelMatrix,
+			nullptr,
+			gizmoCtx_.useSnap ? gizmoCtx_.snap : nullptr
+		);
 
 		if (ImGuizmo::IsUsing()) {
 			if (auto* target = dynamic_cast<Model*>(gizmoCtx_.target)) {
-				Matrix4x4 m = (ToMatrix4x4(gizmoCtx_.model));
-
+				Matrix4x4 m = (ToMatrix4x4(gizmoCtx_.modelMatrix));
 				Transform t = target->GetTransform();
+
 				t.scale.x = Length(Vector3(m.m[0][0], m.m[0][1], m.m[0][2]));
 				t.scale.y = Length(Vector3(m.m[1][0], m.m[1][1], m.m[1][2]));
 				t.scale.z = Length(Vector3(m.m[2][0], m.m[2][1], m.m[2][2]));
@@ -147,9 +155,70 @@ void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT wind
 				t.translate.y = m.m[3][1];
 				t.translate.z = m.m[3][2];
 				target->SetTransform(t);
+
+			} else if (auto* target = dynamic_cast<InstancedModel*>(gizmoCtx_.target)) {
+				Matrix4x4 m = (ToMatrix4x4(gizmoCtx_.modelMatrix));
+				Transform t = target->GetTransforms()[gizmoCtx_.editingInstance];
+
+				if (!wasUsing_) {
+					beginTransform_ = target->GetTransforms()[gizmoCtx_.editingInstance];
+				}
+
+				// Matrix→Transform変換
+				t.scale.x = Length(Vector3(m.m[0][0], m.m[0][1], m.m[0][2]));
+				t.scale.y = Length(Vector3(m.m[1][0], m.m[1][1], m.m[1][2]));
+				t.scale.z = Length(Vector3(m.m[2][0], m.m[2][1], m.m[2][2]));
+
+				Matrix4x4 rot = m;
+				rot.m[0][0] /= t.scale.x;
+				rot.m[0][1] /= t.scale.x;
+				rot.m[0][2] /= t.scale.x;
+				rot.m[1][0] /= t.scale.y;
+				rot.m[1][1] /= t.scale.y;
+				rot.m[1][2] /= t.scale.y;
+				rot.m[2][0] /= t.scale.z;
+				rot.m[2][1] /= t.scale.z;
+				rot.m[2][2] /= t.scale.z;
+				t.rotate.y = asin(-rot.m[0][2]);
+				t.rotate.x = atan2(rot.m[1][2], rot.m[2][2]);
+				t.rotate.z = atan2(rot.m[0][1], rot.m[0][0]);
+				t.translate.x = m.m[3][0];
+				t.translate.y = m.m[3][1];
+				t.translate.z = m.m[3][2];
+
+				Vector3 deltaPos = t.translate - beginTransform_.translate;
+				Vector3 deltaRot = t.rotate - beginTransform_.rotate;
+				Vector3 deltaScale = t.scale - beginTransform_.scale; 
+				deltaTransform_ = { deltaScale, deltaRot, deltaPos };
+
+				target->SetTransforms(gizmoCtx_.editingInstance, t);
+			}
+		} else {
+			// 離したとき
+			if (gizmoCtx_.editAllInstances && wasUsing_) {
+
+				if (auto* target = dynamic_cast<InstancedModel*>(gizmoCtx_.target)) {
+					auto transforms = target->GetTransforms();
+
+					for (int i = 0; i < transforms.size(); i++) {
+
+						if (i == gizmoCtx_.editingInstance) continue;
+
+						transforms[i].translate += deltaTransform_.translate;
+						transforms[i].rotate += deltaTransform_.rotate;
+						transforms[i].scale += deltaTransform_.scale;
+
+						target->SetTransforms(i, transforms[i]);
+					}
+
+				}
 			}
 		}
+
 	}
-		ImGui::End();
+
+	wasUsing_ = ImGuizmo::IsUsing();
+
+	ImGui::End();
 #endif
-	}
+}

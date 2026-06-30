@@ -14,7 +14,7 @@ std::unique_ptr<InstancedModel> AssetContext::LoadInstancedModel(const std::stri
 
 std::unique_ptr<ParticleSystem> AssetContext::CreateParticleSystem(ParticleShape shape, std::unique_ptr<Material> material, int numInstance) {
 	std::unique_ptr<ParticleSystem> particleSystem = assetManager_->CreateParticle(numInstance);
-	particleSystem->name_ = material->name_;
+	particleSystem->name = material->name_;
 	particleSystem->Initialize(shape, std::move(material), numInstance);
 	return std::move(particleSystem);
 }

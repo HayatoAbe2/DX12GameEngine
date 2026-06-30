@@ -8,6 +8,10 @@ void MapCheck::Initialize(std::vector<std::vector<MapTile::Tile>> map, float til
 	tileSize_ = tileSize;
 }
 
+void MapCheck::Update(std::vector<std::vector<MapTile::Tile>> map) {
+	map_ = map;
+}
+
 bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 	bool isHit = false;
 	int mapH = static_cast<int>(map_.size());

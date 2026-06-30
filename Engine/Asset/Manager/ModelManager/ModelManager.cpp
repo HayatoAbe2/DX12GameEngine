@@ -186,6 +186,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 	Assimp::Importer importer;
 	// ファイルパス
 	std::string filePath = directoryPath + "/" + filename;
+	model->SetDirectoryPath(directoryPath);
 	// obj->DirectX12変換
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+class BaseScene;
 class SceneManager;
 class SceneContext {
 public:
@@ -8,7 +9,7 @@ public:
 	// シーン変更
 	void SceneChange(std::string nextSceneName);
 
-	bool IsEditMode();
+	BaseScene* GetCurrentScene();
 private:
 	SceneManager* sceneManager_ = nullptr;
 };

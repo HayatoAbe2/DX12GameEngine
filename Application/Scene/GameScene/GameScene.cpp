@@ -44,11 +44,12 @@ void GameScene::Initialize() {
 	// マップ
 	std::unique_ptr<InstancedModel> wall = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	std::unique_ptr<InstancedModel> wallShadow = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	std::unique_ptr<InstancedModel> floor = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<InstancedModel> floor = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 900);
 	std::unique_ptr<InstancedModel> barrier = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	std::unique_ptr<InstancedModel> enemySpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	std::unique_ptr<InstancedModel> weaponSpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	std::unique_ptr<Model> goal = asset.LoadModel("Resources/Tiles", "sphere.obj");
+	std::unique_ptr<InstancedModel> start = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
+	std::unique_ptr<InstancedModel> goal = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
 
 	auto matData = wall->GetMaterial(0)->GetData();
 	matData.useEnvironmentMap = true;
@@ -69,8 +70,21 @@ void GameScene::Initialize() {
 	weaponSpawn->GetMaterial(0)->SetData(matData);
 	weaponSpawn->GetMaterial(1)->SetData(matData);
 
+	wall->tag = "wall";
+	floor->tag = "floor";
+	barrier->tag = "barrier";
+	enemySpawn->tag = "enemySpawn";
+	weaponSpawn->tag = "weaponSpawn";
+	goal->tag = "goal";
+	this->AddObject(std::move(wall));
+	this->AddObject(std::move(floor));
+	this->AddObject(std::move(barrier));
+	this->AddObject(std::move(enemySpawn));
+	this->AddObject(std::move(weaponSpawn));
+	this->AddObject(std::move(goal));
+
 	mapTile_ = std::make_unique<MapTile>();
-	mapTile_->Initialize(std::move(wall), std::move(floor), std::move(barrier), std::move(enemySpawn), std::move(weaponSpawn), std::move(goal));
+	mapTile_->Initialize();
 
 	// 武器マネージャー
 	weaponManager_ = std::make_unique<WeaponManager>();
@@ -121,190 +135,197 @@ void GameScene::Initialize() {
 
 	// マップ判定
 	mapCheck_ = std::make_unique<MapCheck>();
-
+	mapTile_->UpdateMapChange(false);
 	Reset();
 
 	// dissolve用
 	dissolveMask_ = asset.LoadTexture("Resources/Debug/noise0.png");
+
+#ifdef USE_IMGUI
+	enableEditMode_ = true;
+#endif
 }
 
 void GameScene::Update() {
-	auto& ctx = GameContext::GetInstance();
-	auto& input = ctx.Input();
-	auto& audio = ctx.Audio();
-	auto& scene = ctx.Scene();
+	if (!enableEditMode_) {
+		auto& ctx = GameContext::GetInstance();
+		auto& input = ctx.Input();
+		auto& audio = ctx.Audio();
+		auto& scene = ctx.Scene();
+		if (!isShowResult_) {
+			if (isPause_) {
+				// ポーズ中
+				if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
+					isPause_ = false;
+				}
 
-	if (!isShowResult_) {
-		if (isPause_) {
-			// ポーズ中
-			if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
-				isPause_ = false;
+			} else {
+				// プレイヤー処理
+				if (!isFadeOut_) {
+					player_->Update(mapCheck_.get(), itemManager_.get(), camera_.get(), bulletManager_.get());
+				}
+
+				// ゲームオーバー
+				if (player_->IsDead() && !isFadeOut_) {
+					isFadeOut_ = true;
+					fadeTimer_ = 0;
+				}
+
+				// ゴール判定
+				Vector2 pos = { player_->GetTransform().translate.x,player_->GetTransform().translate.z };
+				if (mapCheck_->IsGoal(pos, player_->GetRadius(), enemyManager_->GetEnemies().size() == 0) && !isFadeOut_) {
+					isFadeOut_ = true;
+					fadeTimer_ = 0;
+					audio.SoundPlay(L"Resources/Sounds/SE/warp.mp3", false);
+				}
+
+				// カメラ追従
+				camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,30,-19 };
+
+				// 敵
+				if (!enableEditMode_) {
+					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), camera_.get());
+					mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
+				}
+
+				// 弾の処理
+				bulletManager_->Update(mapCheck_.get(), effectManager_.get());
+				for (const auto& bullet : bulletManager_->GetBullets()) {
+
+					// 当たり判定
+					collisionChecker_->Check(player_.get(), bullet, camera_.get());
+
+					for (auto enemy : enemyManager_->GetEnemies()) {
+						collisionChecker_->Check(enemy, bullet, camera_.get());
+
+						if (dynamic_cast<Spiker*>(enemy)) {
+							collisionChecker_->Check(player_.get(), enemy, camera_.get());
+						}
+					}
+				}
+
+				// アイテム
+				itemManager_->Update(player_.get());
+
+				// マップ
+				mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty());
+				mapTile_->Update(enemyManager_->GetEnemies().size() == 0);
+				mapCheck_->Update(mapTile_->GetMap());
+
+				effectManager_->Update();
+
+				uiDrawer_->Update();
+			}
+
+			if (isFadeIn_) {
+				fadeTimer_++;
+				fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f - (float)fadeTimer_ / (float)kMaxFadeinTimer_ });
+				if (fadeTimer_ >= kMaxFadeinTimer_) {
+					isFadeIn_ = false;
+					fadeTimer_ = 0;
+				}
+			} else if (isFadeOut_) {
+				fadeTimer_++;
+				fade_->SetColor({ 1.0f,1.0f,1.0f,(float)fadeTimer_ / (float)kMaxFadeoutTimer_ });
+				if (fadeTimer_ >= kMaxFadeoutTimer_) {
+					isFadeOut_ = false;
+
+					if (player_->IsDead() || currentFloor_ == 3) {
+						if (isShowResult_) {
+							scene.SceneChange("Game");
+						} else {
+							// ゲームオーバーまたはクリア
+							isShowResult_ = true;
+
+							fadeTimer_ = 0;
+							isFadeIn_ = true;
+						}
+					} else {
+						fadeTimer_ = 0;
+						isFadeIn_ = true;
+						// 次のフロア
+						currentFloor_++;
+						Reset();
+					}
+				}
+
+			} else {
+				// ポーズ(フェード中不可)
+			/*	if (input.IsRelease(DIK_ESCAPE)) {
+					isPause_ = true;
+				}*/
 			}
 
 		} else {
-			// プレイヤー処理
-			if (!isFadeOut_) {
-				player_->Update(mapCheck_.get(), itemManager_.get(), camera_.get(), bulletManager_.get());
+			// リザルト
+			if (resultArrowMove_ < 1.0f) {
+				resultArrowMove_ += ctx.GetDeltatime() * 1;
 			}
 
-			// ゲームオーバー
-			if (player_->IsDead() && !isFadeOut_) {
+			resultTime_ += ctx.GetDeltatime();
+			float endX = 0;
+			switch (currentFloor_) {
+			case 0:
+				endX = 205;
+				break;
+			case 1:
+				endX = 471;
+				break;
+			case 2:
+				endX = 765;
+				break;
+			case 3:
+				endX = 1033;
+				break;
+			case 4:
+				endX = 1300;
+				break;
+			}
+			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
+			resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
+
+			if (input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) {
 				isFadeOut_ = true;
 				fadeTimer_ = 0;
 			}
 
-			// ゴール判定
-			Vector2 pos = { player_->GetTransform().translate.x,player_->GetTransform().translate.z };
-			if (mapCheck_->IsGoal(pos, player_->GetRadius(), enemyManager_->GetEnemies().size() == 0) && !isFadeOut_) {
-				isFadeOut_ = true;
-				fadeTimer_ = 0;
-				audio.SoundPlay(L"Resources/Sounds/SE/warp.mp3", false);
-			}
-
-			// カメラ追従
-			camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,30,-19 };
-			camera_->Update(debugCamera_.get());
-			debugCamera_->Update();
-
-			// 敵
-			if (!isEditMode_) {
-				enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), camera_.get());
-				mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
-			}
-
-			// 弾の処理
-			bulletManager_->Update(mapCheck_.get(), effectManager_.get());
-			for (const auto& bullet : bulletManager_->GetBullets()) {
-
-				// 当たり判定
-				collisionChecker_->Check(player_.get(), bullet, camera_.get());
-
-				for (auto enemy : enemyManager_->GetEnemies()) {
-					collisionChecker_->Check(enemy, bullet, camera_.get());
-
-					if (dynamic_cast<Spiker*>(enemy)) {
-						collisionChecker_->Check(player_.get(), enemy, camera_.get());
-					}
+			if (isFadeIn_) {
+				fadeTimer_++;
+				fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f - (float)fadeTimer_ / (float)kMaxFadeinTimer_ });
+				if (fadeTimer_ >= kMaxFadeinTimer_) {
+					isFadeIn_ = false;
+					fadeTimer_ = 0;
 				}
-			}
+			} else if (isFadeOut_) {
+				fadeTimer_++;
+				fade_->SetColor({ 1.0f,1.0f,1.0f,(float)fadeTimer_ / (float)kMaxFadeoutTimer_ });
+				if (fadeTimer_ >= kMaxFadeoutTimer_) {
+					isFadeOut_ = false;
 
-			// アイテム
-			itemManager_->Update(player_.get());
+					if (player_->IsDead() || currentFloor_ == 3) {
+						if (isShowResult_) {
+							scene.SceneChange("Game");
+						} else {
+							// ゲームオーバーまたはクリア
+							isShowResult_ = true;
 
-			// マップ
-			mapTile_->Update(enemyManager_->GetEnemies().size() == 0);
-
-			effectManager_->Update();
-
-			uiDrawer_->Update();
-		}
-
-		if (isFadeIn_) {
-			fadeTimer_++;
-			fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f - (float)fadeTimer_ / (float)kMaxFadeinTimer_ });
-			if (fadeTimer_ >= kMaxFadeinTimer_) {
-				isFadeIn_ = false;
-				fadeTimer_ = 0;
-			}
-		} else if (isFadeOut_) {
-			fadeTimer_++;
-			fade_->SetColor({ 1.0f,1.0f,1.0f,(float)fadeTimer_ / (float)kMaxFadeoutTimer_ });
-			if (fadeTimer_ >= kMaxFadeoutTimer_) {
-				isFadeOut_ = false;
-
-				if (player_->IsDead() || currentFloor_ == 3) {
-					if (isShowResult_) {
-						scene.SceneChange("Game");
+							fadeTimer_ = 0;
+							isFadeIn_ = true;
+						}
 					} else {
-						// ゲームオーバーまたはクリア
-						isShowResult_ = true;
-
 						fadeTimer_ = 0;
 						isFadeIn_ = true;
+						// 次のフロア
+						currentFloor_++;
+						Reset();
 					}
-				} else {
-					fadeTimer_ = 0;
-					isFadeIn_ = true;
-					// 次のフロア
-					currentFloor_++;
-					Reset();
 				}
+
 			}
-
-		} else {
-			// ポーズ(フェード中不可)
-		/*	if (input.IsRelease(DIK_ESCAPE)) {
-				isPause_ = true;
-			}*/
-		}
-
-	} else {
-		// リザルト
-		if (resultArrowMove_ < 1.0f) {
-			resultArrowMove_ += ctx.GetDeltatime() * 1;
-		}
-
-		resultTime_ += ctx.GetDeltatime();
-		float endX = 0;
-		switch (currentFloor_) {
-		case 0:
-			endX = 205;
-			break;
-		case 1:
-			endX = 471;
-			break;
-		case 2:
-			endX = 765;
-			break;
-		case 3:
-			endX = 1033;
-			break;
-		case 4:
-			endX = 1300;
-			break;
-		}
-		float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
-		resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
-
-		if (input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) {
-			isFadeOut_ = true;
-			fadeTimer_ = 0;
-		}
-
-		if (isFadeIn_) {
-			fadeTimer_++;
-			fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f - (float)fadeTimer_ / (float)kMaxFadeinTimer_ });
-			if (fadeTimer_ >= kMaxFadeinTimer_) {
-				isFadeIn_ = false;
-				fadeTimer_ = 0;
-			}
-		} else if (isFadeOut_) {
-			fadeTimer_++;
-			fade_->SetColor({ 1.0f,1.0f,1.0f,(float)fadeTimer_ / (float)kMaxFadeoutTimer_ });
-			if (fadeTimer_ >= kMaxFadeoutTimer_) {
-				isFadeOut_ = false;
-
-				if (player_->IsDead() || currentFloor_ == 3) {
-					if (isShowResult_) {
-						scene.SceneChange("Game");
-					} else {
-						// ゲームオーバーまたはクリア
-						isShowResult_ = true;
-
-						fadeTimer_ = 0;
-						isFadeIn_ = true;
-					}
-				} else {
-					fadeTimer_ = 0;
-					isFadeIn_ = true;
-					// 次のフロア
-					currentFloor_++;
-					Reset();
-				}
-			}
-
 		}
 	}
+	camera_->Update(debugCamera_.get());
+	debugCamera_->Update();
 }
 
 void GameScene::Draw() {
@@ -315,7 +336,7 @@ void GameScene::Draw() {
 
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
-	mapTile_->Draw(camera_.get(), enemyManager_->GetEnemies().size() != 0);
+	mapTile_->Draw(camera_.get());
 	player_->Draw(camera_.get());
 	enemyManager_->Draw(camera_.get());
 	bulletManager_->Draw(camera_.get());
@@ -327,7 +348,9 @@ void GameScene::Draw() {
 	}
 
 	// ui
-	uiDrawer_->Draw();
+	if (!enableEditMode_) {
+		uiDrawer_->Draw();
+	}
 
 	// 結果(プレイ画面の上から)
 	if (isShowResult_) {
@@ -337,7 +360,9 @@ void GameScene::Draw() {
 		resultCursor_->ImGuiEdit();
 	}
 
-	render.DrawSprite(fade_.get());
+	if (!enableEditMode_) {
+		render.DrawSprite(fade_.get());
+	}
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Weapon");
@@ -372,6 +397,13 @@ void GameScene::Draw() {
 		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(9)));
 	};
 	ImGui::End();
+
+	ImGui::Begin("LoadScene");
+	if (ImGui::Button("Load")) {
+		itemManager_->Load(mapTile_->GetTileSize());
+		enemyManager_->Load(mapTile_->GetTileSize(), weaponManager_.get());
+	}
+	ImGui::End();
 #endif
 }
 
@@ -392,68 +424,46 @@ void GameScene::Reset() {
 		// チュートリアルステージ
 		floorType = 0;
 
-		// マップを構築
-		tilePath = "Resources/MapData/Floor" + std::to_string(floorType) + ".csv";
-		mapTile_->LoadCSV(tilePath);
-
 		// プレイヤー位置
 		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
 
 		// その階の敵とアイテム
-		itemPath = "Resources/MapData/Item" + std::to_string(floorType) + ".csv";
-		itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
-		enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
-		enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
+		//itemPath = "Resources/MapData/Item" + std::to_string(floorType) + ".csv";
+		//itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
+		//enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
+		//enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
 		break;
 	case 1:
 		floorType = ctx.RandomInt(1, 2);
 
 		// マップを構築
-		tilePath = "Resources/MapData/Floor" + std::to_string(floorType) + ".csv";
-		mapTile_->LoadCSV(tilePath);
+		//tilePath = "Resources/MapData/Floor" + std::to_string(floorType) + ".csv";
+		//mapTile_->LoadCSV(tilePath);
 
 		// プレイヤー位置
 		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
 
 		// その階の敵とアイテム
-		itemPath = "Resources/MapData/Item" + std::to_string(floorType) + ".csv";
-		itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
-		enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
-		enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
+		//itemPath = "Resources/MapData/Item" + std::to_string(floorType) + ".csv";
+		//itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
+		//enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
+		//enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
 
 		break;
 
 	case 2:
 		floorType = ctx.RandomInt(3, 4);
 
-		// マップを構築
-		tilePath = "Resources/MapData/Floor" + std::to_string(floorType) + ".csv";
-		mapTile_->LoadCSV(tilePath);
-
 		// プレイヤー位置
 		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
-
-		// その階の敵とアイテム
-		itemPath = "Resources/MapData/Item" + std::to_string(floorType) + ".csv";
-		itemManager_->LoadCSV(itemPath, mapTile_->GetTileSize());
-		enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
-		enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
 
 		break;
 
 	case 3:
 		floorType = ctx.RandomInt(10, 11);
 
-		// マップを構築
-		tilePath = "Resources/MapData/Floor" + std::to_string(floorType) + ".csv";
-		mapTile_->LoadCSV(tilePath);
-
 		// プレイヤー位置
 		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
-
-		// その階の敵
-		enemyPath = "Resources/MapData/Enemy" + std::to_string(floorType) + ".csv";
-		enemyManager_->LoadCSV(enemyPath, mapTile_->GetTileSize(), weaponManager_.get());
 
 		break;
 	}

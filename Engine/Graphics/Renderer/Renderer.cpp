@@ -64,7 +64,12 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, int blendMode
 	if (lightManager) { lightManager->Update(); }
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
+	ID3D12PipelineState* pso; 
+	if (model->GetData()->skinClusterData.empty()) {
+		pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
+	} else {
+		pso = dxContext_->GetPipelineStateManager()->GetSkinningPSO(blendMode);
+	}
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetStandardRootSignature().Get();
 
 	// PSO設定
@@ -218,12 +223,18 @@ void Renderer::DrawMesh(Model* model, Mesh* mesh) {
 		// マテリアルCBufferの場所を設定
 		cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
 
-		// スキニング用のVBVを設定
-		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-			subMesh.vertexBufferView_,
-			subMesh.skinCluster_.influenceBufferView
-		};
-		cmdList->IASetVertexBuffers(0, 2, vbvs);
+		if (subMesh.skinCluster_.paletteResource == nullptr) {
+			// VBVを設定
+			cmdList->IASetVertexBuffers(0, 1, &subMesh.vertexBufferView_);
+		} else {
+			// スキニング用のVBVを設定
+			D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+				subMesh.vertexBufferView_,
+				subMesh.skinCluster_.influenceBufferView
+			};
+			cmdList->IASetVertexBuffers(0, 2, vbvs);
+			cmdList->SetGraphicsRootDescriptorTable(6, subMesh.skinCluster_.paletteSrvHandle.second);
+		}
 
 		// IBV
 		cmdList->IASetIndexBuffer(&subMesh.ibv_);
@@ -231,7 +242,6 @@ void Renderer::DrawMesh(Model* model, Mesh* mesh) {
 		// SRVの設定
 		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
 		cmdList->SetGraphicsRootDescriptorTable(3, material->GetEnvironmentTextureSRVHandle());
-		cmdList->SetGraphicsRootDescriptorTable(6, subMesh.skinCluster_.paletteSrvHandle.second);
 
 		// ドローコール
 		cmdList->DrawIndexedInstanced(UINT(subMesh.indices_.size()), 1, 0, 0, 0);

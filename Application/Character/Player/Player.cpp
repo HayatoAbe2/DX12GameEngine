@@ -176,7 +176,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	instancingTransforms[0] = transform_;
 
 	for (int i = 0; i < 2; ++i) {
-		instancing_->SetInstanceTransforms(i, instancingTransforms[i]);
+		instancing_->SetTransforms(i, instancingTransforms[i]);
 	}
 }
 

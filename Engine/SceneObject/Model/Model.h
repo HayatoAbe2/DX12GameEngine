@@ -37,7 +37,7 @@ public:
 	// スケルトン設定
 	void SetSkeleton(const Skeleton& skeleton) { skeleton_ = skeleton; }
 
-	void SetDirectoryPath(std::string directoryPath) {directory_ = directoryPath;}
+	void SetDirectoryPath(std::string directoryPath) {directory_ = directoryPath; }
 
 	///
 	/// Getter

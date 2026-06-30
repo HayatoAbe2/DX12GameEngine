@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
+#include "Engine/Scene/BaseScene/BaseScene.h"
+#include "Engine/SceneObject/SceneObject.h"
 
 MapTile::~MapTile() {
 	auto& ctx = GameContext::GetInstance();
@@ -13,175 +15,71 @@ MapTile::~MapTile() {
 	light.RemoveSpotLight(lightIndex_);
 }
 
-void MapTile::Initialize(std::unique_ptr<InstancedModel> wall, std::unique_ptr<InstancedModel> floor, std::unique_ptr<InstancedModel> barrier, std::unique_ptr<InstancedModel> weaponSpawn, std::unique_ptr<InstancedModel> enemySpawn,  std::unique_ptr<Model> goal) {
+void MapTile::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
-
-	wall_ = std::move(wall);
-	floor_ = std::move(floor);
-	barrier_ = std::move(barrier);
-	weaponSpawn_ = std::move(weaponSpawn);
-	enemySpawn_ = std::move(enemySpawn);
-	goal_ = std::move(goal);
+	auto& light = ctx.Light();
 
 	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Goal/circle.png")), particleNum_);
 	particle_->SetLifeTime(40);
 	particle_->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+
+	lightIndex_ = light.AddSpotLight();
 }
 
-void MapTile::UpdateMapChange() {
+void MapTile::UpdateMapChange(bool isCombat) {
+	auto& ctx = GameContext::GetInstance();
+	auto& light = ctx.Light();
+	auto& scene = ctx.Scene();
+
+	std::vector<InstancedModel*> models;
+	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
+		if (dynamic_cast<InstancedModel*>(obj)) {
+			auto* model = dynamic_cast<InstancedModel*>(obj);
+			models.push_back(model);
+		}
+	}
+
 	map_.clear();
 	mapWidth_ = 64;
 	mapHeight_ = 64;
 	map_.assign(mapHeight_, std::vector<Tile>(mapWidth_, Tile::None));
 
-	for (auto& floor : floor_->GetTransforms()) {
-		int x = int(std::round(floor.translate.x / tileSize_));
-		int y = int(std::round(floor.translate.z / tileSize_));
-		map_[y][x] = Tile::Floor;
-	}
-	for (auto& wall : wall_->GetTransforms()) {
-		int x = int(std::round(wall.translate.x / tileSize_));
-		int y = int(std::round(wall.translate.z / tileSize_));
-		map_[y][x] = Tile::LeftWall;
-	}
-	for (auto& barrier : barrier_->GetTransforms()) {
-		int x = int(std::round(barrier.translate.x / tileSize_));
-		int y = int(std::round(barrier.translate.z / tileSize_));
-		map_[y][x] = Tile::CombatWall;
-	}
-	{
-		auto& ctx = GameContext::GetInstance();
-		auto& light = ctx.Light();
-		auto& goal = goal_->GetTransform();
-
-		int x = int(std::round(goal.translate.x / tileSize_));
-		int y = int(std::round(goal.translate.z / tileSize_));
-		map_[y][x] = Tile::Goal;
-
-		auto& spotLight = light.GetSpotLight(lightIndex_);
-		spotLight.position = goal.translate + Vector3{ 0.0f,3.0f,0.0f };
-		spotLight.direction = { 0,-1.0f,0 };
-		spotLight.intensity = 1.0f;
-		spotLight.color = { 1,1,0,0.3f };
-		spotLight.distance = 10.0f;
-		spotLight.decay = 0.9f;
-		spotLight.cosAngle = 0.32f;
-		spotLight.cosFalloffStart = 1.1f;
-
-		std::unique_ptr<ParticleField> particleField = std::make_unique<ParticleField>();
-		particleField->SetCheckArea(false);
-		particleField->SetRotateXZ(0.15f, { x * tileSize_ + tileSize_ / 2.0f, 0, y * tileSize_ + tileSize_ / 2.0f });
-		particle_->AddField(std::move(particleField));
-	}
-}
-
-void MapTile::LoadCSV(const std::string& filePath) {
-	auto& ctx = GameContext::GetInstance();
-	auto& light = ctx.Light();
-
-	soundPlayed_ = false;
-
-	if (lightIndex_ != -1) { light.RemoveSpotLight(lightIndex_); }
-	particle_->RemoveField();
-	map_.clear();
-	mapWidth_ = 0;
-	mapHeight_ = 0;
-
-	std::ifstream file(filePath);
-	std::string line;
-
-	if (!file.is_open()) {
-		assert(false);
-	}
-	assert(file.is_open());
-
-	// ファイル読む
-	while (std::getline(file, line)) {
-		std::vector<Tile> row;
-		std::stringstream ss(line);
-		std::string cell;
-
-		while (std::getline(ss, cell, ',')) {
-			int value = std::stoi(cell);
-			row.push_back(Tile(value));
+	for (auto& model : models) {
+		auto matData = model->GetMaterial(0)->GetData();
+		if (model->tag == "floor") {
+			for (Transform& t : model->GetTransforms()) {
+				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
+				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
+				map_[y][x] = Tile::Floor;
+			}
 		}
-
-		if (mapWidth_ == 0) { // 一度だけ
-			mapWidth_ = static_cast<int>(row.size());
+		if (model->tag == "wall") {
+			for (Transform& t : model->GetTransforms()) {
+				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
+				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
+				map_[y][x] = Tile::LeftWall;
+			}
 		}
-		map_.push_back(row);
-	}
-	mapHeight_ = static_cast<int>(map_.size());
-	std::reverse(map_.begin(), map_.end());
-
-	// トランスフォーム設定
-	std::vector<Transform> transformsFloor;
-	std::vector<Transform> transformsWall;
-	std::vector<Transform> transformsBarrier;
-	Transform transformGoal;
-	for (int x = 0; x < mapWidth_; ++x) {
-		for (int y = 0; y < mapHeight_; ++y) {
-			// 床
-			Transform transformFloor;
-			if (map_[y][x] == Tile::Floor) {
-				transformFloor.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
-				transformFloor.translate.y = -tileSize_ / 2.0f;
-				transformFloor.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
-				transformFloor.scale = { tileSize_,tileSize_ ,tileSize_ };
-			} else {
-				transformFloor.translate.y = 200.0f;
+		if (model->tag == "barrier") {
+			for (Transform& t : model->GetTransforms()) {
+				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
+				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
+				map_[y][x] = Tile::CombatWall;
 			}
-			transformsFloor.push_back(transformFloor);
+			matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
 
-			// 壁
-			Transform transformWall;
-			if (map_[y][x] == Tile::LeftWall ||
-				map_[y][x] == Tile::RightWall ||
-				map_[y][x] == Tile::UpWall ||
-				map_[y][x] == Tile::BottomWall) {
-				transformWall.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
-				transformWall.translate.y = tileSize_ / 2.0f;
-				transformWall.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
-				transformWall.scale = { tileSize_,tileSize_ ,tileSize_ };
+		}
+		if (model->tag == "goal") {
+			for (Transform& t : model->GetTransforms()) {
+				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
+				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
+				map_[y][x] = Tile::Goal;
 
-				
-			} else {
-				transformWall.translate.y = 200.0f;
-			}
-			transformsWall.push_back(transformWall);
-
-			// 壁
-			Transform transformBarrier;
-			if (map_[y][x] == Tile::CombatWall) {
-				transformBarrier.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
-				transformBarrier.translate.y = tileSize_ / 2.0f;
-				transformBarrier.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
-				transformBarrier.scale = { tileSize_,tileSize_ ,tileSize_ };
-
-				Transform floor;
-				floor.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
-				floor.translate.y = -tileSize_ / 2.0f;
-				floor.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
-				floor.scale = { tileSize_,tileSize_ ,tileSize_ };
-
-				transformsFloor.push_back(floor);
-			} else { 
-				transformBarrier.translate.y = 200.0f;
-			}
-			transformsBarrier.push_back(transformBarrier);
-
-
-			// ゴール
-			if (map_[y][x] == Tile::Goal) {
-				transformGoal.translate.x = float(x) * tileSize_ + tileSize_ / 2.0f;
-				transformGoal.translate.y = 0;
-				transformGoal.translate.z = float(y) * tileSize_ + tileSize_ / 2.0f;
-				transformGoal.scale = { tileSize_,tileSize_ ,tileSize_ };
-
-				lightIndex_ = light.AddSpotLight();
 				auto& spotLight = light.GetSpotLight(lightIndex_);
-				spotLight.position = transformGoal.translate + Vector3{ 0.0f,3.0f,0.0f };
+				spotLight.position = t.translate + Vector3{ 0.0f,3.0f,0.0f };
 				spotLight.direction = { 0,-1.0f,0 };
 				spotLight.intensity = 1.0f;
 				spotLight.color = { 1,1,0,0.3f };
@@ -192,33 +90,27 @@ void MapTile::LoadCSV(const std::string& filePath) {
 
 				std::unique_ptr<ParticleField> particleField = std::make_unique<ParticleField>();
 				particleField->SetCheckArea(false);
-				particleField->SetRotateXZ(0.15f, { x * tileSize_ + tileSize_ / 2.0f,0,y * tileSize_ + tileSize_ / 2.0f });
+				particleField->SetRotateXZ(0.15f, { x * tileSize_ + tileSize_ / 2.0f, 0, y * tileSize_ + tileSize_ / 2.0f });
+				particle_->RemoveField();
 				particle_->AddField(std::move(particleField));
+				particleTransform_.translate = Vector3{ x * tileSize_, 0, y * tileSize_ };
+			}
+		}
+
+		if (model->tag == "weaponSpawn") {
+			if (matData.color.w != 0) {
+				matData.color = { 0.3f, 1.0f, 0.3f, 0.5f };
+				model->GetMaterial(0)->SetData(matData);
+				model->GetMaterial(1)->SetData(matData);
+			}
+		} else if(model->tag == "enemySpawn") {
+			if (matData.color.w != 0) {
+				matData.color = { 1.0f, 0.3f, 0.3f, 0.5f };
+				model->GetMaterial(0)->SetData(matData);
+				model->GetMaterial(1)->SetData(matData);
 			}
 		}
 	}
-	int preSize = int(transformsWall.size());
-	transformsWall.resize(wall_->GetNumInstance());
-	for (int i = preSize; i < int(wall_->GetTransforms().size()); ++i) {
-		transformsWall[i].scale = {};
-	}
-
-	preSize = int(transformsFloor.size());
-	transformsFloor.resize(floor_->GetNumInstance());
-	for (int i = preSize; i < int(floor_->GetTransforms().size()); ++i) {
-		transformsFloor[i].scale = {};
-	}
-
-	preSize = int(transformsBarrier.size());
-	transformsBarrier.resize(barrier_->GetNumInstance());
-	for (int i = preSize; i < int(barrier_->GetTransforms().size()); ++i) {
-		transformsBarrier[i].scale = {};
-	}
-
-	floor_->SetInstanceTransforms(transformsFloor);
-	wall_->SetInstanceTransforms(transformsWall);
-	barrier_->SetInstanceTransforms(transformsBarrier);
-	goal_->SetTransform(transformGoal);
 }
 
 void MapTile::Update(bool canGoal) {
@@ -240,40 +132,22 @@ void MapTile::Update(bool canGoal) {
 			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f)
 				}) * particleRange_ / 2.0f;
 
-			Transform transform = goal_->GetTransform();
+			Transform transform = particleTransform_;
 			transform.translate += randomVector;
 			transform.scale = { 0.5f,4.0f,4.0f };
 			particle_->Emit(transform, { 0,0.5f,0 });
 
 			emitTimer_ = 0;
 		}
-
-		MaterialData materialData = goal_->GetData()->defaultMaterials_[0]->GetData();
-		materialData.color = { 1,1,1,1 };
-		goal_->GetData()->defaultMaterials_[0]->SetData(materialData);
-
 		light.GetSpotLight(lightIndex_).intensity = 1.0f;
-	} else {
-		MaterialData materialData = goal_->GetData()->defaultMaterials_[0]->GetData();
-		materialData.color = { 0.1f,0.1f,0.1f,1.0f };
-		goal_->GetData()->defaultMaterials_[0]->SetData(materialData);
-
-		light.GetSpotLight(lightIndex_).intensity = 0.0f;
 	}
 
 	particle_->Update();
 }
 
-void MapTile::Draw(Camera* camera, bool isCombat) {
+void MapTile::Draw(Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
-	auto& scene = ctx.Scene();
 	auto& render = ctx.Render();
 
-	render.DrawInstancedModel(wall_.get());
-	render.DrawInstancedModel(floor_.get());
-	if (isCombat || scene.IsEditMode()) {
-		render.DrawInstancedModel(barrier_.get());
-	}
-	render.DrawModel(goal_.get());
 	render.DrawParticle(particle_.get(), BlendMode::Add);
 }

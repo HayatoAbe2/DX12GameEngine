@@ -12,6 +12,8 @@
 #include "Character/Enemy/Enemies/Spiker.h"
 #include <fstream>
 #include <sstream>
+#include "Engine/Scene/BaseScene/BaseScene.h"
+#include "Engine/SceneObject/SceneObject.h"
 
 void EnemyManager::Initialize() {
 }
@@ -174,6 +176,35 @@ void EnemyManager::LoadCSV(std::string filePath, float tileSize, WeaponManager* 
 
 		Vector3 pos = Vector3{ x * tileSize, 0, z * tileSize };
 		Spawn(pos, weaponManager, enemyNum);
+	}
+}
+
+void EnemyManager::Load(float tileSize, WeaponManager* weaponManager) {
+	auto& ctx = GameContext::GetInstance();
+	auto& scene = ctx.Scene();
+
+	std::vector<InstancedModel*> models;
+	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
+		if (dynamic_cast<InstancedModel*>(obj)) {
+			auto* model = dynamic_cast<InstancedModel*>(obj);
+			models.push_back(model);
+		}
+	}
+
+	for (auto& model : models) {
+		if (model->tag == "enemySpawn") {
+			for (Transform& t : model->GetTransforms()) {
+				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+				int num = ctx.RandomInt(1, 3);
+				if (num == 3) num = 5;
+				if (!a) {
+					Spawn(pos, weaponManager, num);
+
+					a = true;
+				}
+
+			}
+		}
 	}
 }
 
