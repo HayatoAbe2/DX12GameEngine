@@ -32,6 +32,7 @@ void Renderer::Initialize(DirectXContext* dxContext) {
 
 	InitializePlane();
 	InitializeRing();
+	InitializeCylinder();
 	InitializeSkybox();
 }
 
@@ -64,7 +65,7 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, int blendMode
 	if (lightManager) { lightManager->Update(); }
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	ID3D12PipelineState* pso; 
+	ID3D12PipelineState* pso;
 	if (model->GetData()->skinClusterData.empty()) {
 		pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
 	} else {
@@ -134,20 +135,10 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, int blendMode) {
 	cmdList->SetGraphicsRootSignature(rootSig);
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	UINT indexCountPerInstance = 0;
-	// 各図形のVB・IB
-	switch (particleSys->GetShape()) {
-	case ParticleShape::Plane:
-		cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
-		cmdList->IASetIndexBuffer(&plane_.ibv);
-		indexCountPerInstance = 6;
-		break;
-	case ParticleShape::Ring:
-		cmdList->IASetVertexBuffers(0, 1, &ring_.vbv);
-		cmdList->IASetIndexBuffer(&ring_.ibv);
-		indexCountPerInstance = 6 * 32;
-		break;
-	}
+	UINT indexCountPerInstance = 6;
+	// planeのVB・IB
+	cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
+	cmdList->IASetIndexBuffer(&plane_.ibv);
 
 	// マテリアルCBufferの場所を設定
 	cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
@@ -160,6 +151,57 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, int blendMode) {
 	// ドローコール
 	cmdList->DrawIndexedInstanced(indexCountPerInstance, particleSys->GetNumInstance(), 0, 0, 0);
 }
+
+void Renderer::DrawPrimitive(Primitive* primitive, int blendMode) {
+	Material* material = primitive->GetMaterial();
+	// マテリアル更新
+	material->UpdateGPU();
+
+	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
+	auto pso = dxContext_->GetPipelineStateManager()->GetPrimitivePSO(blendMode);
+	auto rootSig = dxContext_->GetRootSignatureManager()->GetStandardRootSignature().Get();
+	cmdList->SetPipelineState(pso);
+	cmdList->SetGraphicsRootSignature(rootSig);
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// トランスフォーム
+	TransformationMatrix data;
+	data.World = MakeAffineMatrix(primitive->transform_);
+	data.WVP = data.World 
+		* camera_->viewMatrix_
+		* camera_->projectionMatrix_;
+	data.WorldInverseTranspose = Transpose(Inverse(data.World));
+
+	auto cbAddress = dxContext_->GetConstantBufferManager()->UploadTransform(data); // gpu送信
+	// トランスフォームCBV
+	cmdList->SetGraphicsRootConstantBufferView(1, cbAddress);
+	cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
+
+	UINT indexCount = 6;
+	switch (primitive->shape_) {
+	case PrimitiveShape::Plane:
+		cmdList->IASetVertexBuffers(0, 1, &plane_.vbv);
+		cmdList->IASetIndexBuffer(&plane_.ibv);
+		indexCount = 6;
+		break;
+	case PrimitiveShape::Ring:
+		cmdList->IASetVertexBuffers(0, 1, &ring_.vbv); 
+		cmdList->IASetIndexBuffer(&ring_.ibv);
+		indexCount = 6 * 32;
+		break;
+	case PrimitiveShape::Cylinder:
+		cmdList->IASetVertexBuffers(0, 1, &cylinder_.vbv);
+		cmdList->IASetIndexBuffer(&cylinder_.ibv);
+		indexCount = 6 * 32;
+		break;
+	}
+
+	// SRVの設定
+	cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
+
+	// ドローコール
+	cmdList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+};
 
 void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
@@ -334,7 +376,7 @@ void Renderer::InitializeRing() {
 	const float kInnerRadius = 0.2f; // 内側
 	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
 
-	UINT sizeInBytes = sizeof(VertexData) * kRingDivide * 4;
+	UINT sizeInBytes = sizeof(VertexData) * (kRingDivide + 1) * 2;
 	// 頂点リソース
 	ring_.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
 	// VBV
@@ -345,19 +387,18 @@ void Renderer::InitializeRing() {
 	VertexData* vertices = nullptr;
 	ring_.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
 
-	for (uint32_t index = 0; index < kRingDivide; ++index) {
-		float sin = std::sin(index * radianPerDivide);
-		float cos = std::cos(index * radianPerDivide);
-		float sinNext = std::sin((index + 1) * radianPerDivide);
-		float cosNext = std::cos((index + 1) * radianPerDivide);
+	for (uint32_t index = 0; index < kRingDivide + 1; ++index) {
+		float angle = index * radianPerDivide;
+		float s = std::sin(angle);
+		float c = std::cos(angle);
 		float u = float(index) / float(kRingDivide);
-		float uNext = float(index + 1) / float(kRingDivide);
 
-		vertices[index * 4 + 0] = { { -sin * kOuterRadius, cos * kOuterRadius, 0, 1}, {u, 0}, {0,0,-1},{1,1,1,1} };
-		vertices[index * 4 + 1] = { { -sinNext * kOuterRadius, cosNext * kOuterRadius, 0, 1}, {uNext, 0}, {0,0,-1},{1,1,1,1} };
-		vertices[index * 4 + 2] = { { -sin * kInnerRadius, cos * kInnerRadius, 0, 1}, {u, 1}, {0,0,-1},{1,1,1,1} };
-		vertices[index * 4 + 3] = { { -sinNext * kInnerRadius, cosNext * kInnerRadius, 0, 1}, {uNext, 1}, {0,0,-1},{1,1,1,1} };
+		vertices[index * 2 + 0] = { { -s * kOuterRadius, c * kOuterRadius, 0, 1}, {u, 0}, {0,0,-1},{1,1,1,1} };
+		vertices[index * 2 + 1] = { { -s * kInnerRadius, c * kInnerRadius, 0, 1}, {u, 1}, {0,0,-1},{1,1,1,1} };
 	}
+	// i周したところをきれいに補間する
+	vertices[kRingDivide * 2 + 0].texcoord.x = 1.0f;
+	vertices[kRingDivide * 2 + 1].texcoord.x = 1.0f;
 
 	// indexリソース
 	ring_.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * 6 * kRingDivide);
@@ -369,14 +410,75 @@ void Renderer::InitializeRing() {
 	uint32_t* indexData = nullptr;
 	ring_.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	for (uint32_t index = 0; index < kRingDivide; ++index) {
-		uint32_t start = index * 4;
+		uint32_t currentOuter = index * 2;
+		uint32_t currentInner = index * 2 + 1;
+		uint32_t nextOuter = (index + 1) * 2;
+		uint32_t nextInner = (index + 1) * 2 + 1;
+		uint32_t idx = index * 6;
+
+		indexData[idx + 0] = currentOuter;
+		indexData[idx + 1] = nextOuter;
+		indexData[idx + 2] = currentInner;
+
+		indexData[idx + 3] = nextOuter;
+		indexData[idx + 4] = nextInner;
+		indexData[idx + 5] = currentInner;
+	}
+}
+
+void Renderer::InitializeCylinder() {
+	auto bufferManager = dxContext_->GetBufferManager();
+
+	const uint32_t kCylinderDivide = 32;
+	const float kTopRadius = 1.0f;
+	const float kBottomRadius = 1.0f;
+	const float kHeight = 3.0f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kCylinderDivide);
+
+	UINT sizeInBytes = sizeof(VertexData) * (kCylinderDivide + 1) * 2;
+	// 頂点リソース
+	cylinder_.vertexResource = bufferManager->CreateUploadBuffer(sizeInBytes);
+	// VBV
+	cylinder_.vbv.BufferLocation = cylinder_.vertexResource->GetGPUVirtualAddress();
+	cylinder_.vbv.SizeInBytes = sizeInBytes;
+	cylinder_.vbv.StrideInBytes = sizeof(VertexData);
+
+	VertexData* vertices = nullptr;
+	cylinder_.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertices));
+
+	for (uint32_t index = 0; index < kCylinderDivide + 1; ++index) {
+		float sin = std::sin(index * radianPerDivide);
+		float cos = std::cos(index * radianPerDivide);
+		float u = float(index) / float(kCylinderDivide);
+
+		vertices[index * 2 + 0] = { { -sin * kTopRadius, kHeight, cos * kTopRadius, 1}, {u, 0}, {-sin, 0, cos},{1,1,1,1} };
+		vertices[index * 2 + 1] = { { -sin * kBottomRadius, 0, cos * kBottomRadius, 1}, {u, 1}, {-sin,0,cos},{1,1,1,1} };
+	}
+	vertices[kCylinderDivide * 2 + 0].texcoord.x = 1;
+	vertices[kCylinderDivide * 2 + 1].texcoord.x = 1;
+
+	// indexリソース
+	cylinder_.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * 6 * kCylinderDivide);
+	// IBV
+	cylinder_.ibv.BufferLocation = cylinder_.indexResource->GetGPUVirtualAddress();
+	cylinder_.ibv.SizeInBytes = sizeof(uint32_t) * 6 * kCylinderDivide;
+	cylinder_.ibv.Format = DXGI_FORMAT_R32_UINT;
+	// データ
+	uint32_t* indexData = nullptr;
+	cylinder_.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	for (uint32_t index = 0; index < kCylinderDivide; ++index) {
+		uint32_t currentTop = index * 2;
+		uint32_t currentBottom = index * 2 + 1;
+		uint32_t nextTop = (index + 1) * 2;
+		uint32_t nextBottom = (index + 1) * 2 + 1;
+
 		uint32_t i = index * 6;
-		indexData[i + 0] = start + 0;
-		indexData[i + 1] = start + 1;
-		indexData[i + 2] = start + 2;
-		indexData[i + 3] = start + 1;
-		indexData[i + 4] = start + 3;
-		indexData[i + 5] = start + 2;
+		indexData[i + 0] = currentTop;
+		indexData[i + 1] = nextTop;
+		indexData[i + 2] = currentBottom;
+		indexData[i + 3] = nextTop;
+		indexData[i + 4] = nextBottom;
+		indexData[i + 5] = currentBottom;
 	}
 }
 
@@ -616,7 +718,7 @@ void Renderer::SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
 }
 
 void Renderer::SetCamera(Camera* camera) {
-	camera_ = camera; 
+	camera_ = camera;
 	dxContext_->SetCamera(camera);
 }
 

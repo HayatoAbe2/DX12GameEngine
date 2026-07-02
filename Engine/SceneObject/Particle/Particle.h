@@ -9,8 +9,3 @@ struct Particle {
     int lifeTime;
     bool alive = false;
 };
-
-enum class ParticleShape {
-    Plane,
-    Ring,
-};

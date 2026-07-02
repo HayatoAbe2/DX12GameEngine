@@ -109,6 +109,10 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle.PS.hlsl", L"ps_6_0", logger_)
 	);
+	pipelineStateManager_->SetPrimitiveBlob(
+		shaderCompiler_->Compile(L"Resources/Shaders/Object3d.VS.hlsl", L"vs_6_0", logger_),
+		shaderCompiler_->Compile(L"Resources/Shaders/Object3d.PS.hlsl", L"ps_6_0", logger_)
+	);
 	pipelineStateManager_->SetSkyboxBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.PS.hlsl", L"ps_6_0", logger_)

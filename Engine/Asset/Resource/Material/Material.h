@@ -47,6 +47,7 @@ public:
 
 private:
     MaterialData data_;  // CPU側のデータ
+
     MaterialData* mappedPtr_ = nullptr; // GPUメモリに直接アクセスするためのポインタ
     Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_ = nullptr; // GPU側リソース
 	std::shared_ptr<Texture> texture_ = nullptr; // テクスチャ

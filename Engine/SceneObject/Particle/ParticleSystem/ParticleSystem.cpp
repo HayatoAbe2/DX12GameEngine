@@ -1,8 +1,7 @@
 #include "ParticleSystem.h"
 #include "Engine/Scene/Camera/Camera.h"
 
-void ParticleSystem::Initialize(const ParticleShape& shape, std::unique_ptr<Material> material, int numInstance) {
-	particleShape_ = shape;
+void ParticleSystem::Initialize(std::unique_ptr<Material> material, int numInstance) {
 	material_ = std::move(material);
 	particles_.resize(numInstance);
 }

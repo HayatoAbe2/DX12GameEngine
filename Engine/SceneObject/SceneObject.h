@@ -8,7 +8,10 @@ public:
 
 	uint32_t GetID() { return id_; }
 
+	// 名前(エディタで表示)
 	std::string name;
+
+	// タグ(ゲーム側で自由に利用可能)
 	std::string tag;
 protected:
 	uint32_t id_;

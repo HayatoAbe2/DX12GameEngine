@@ -283,6 +283,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Timer\Timer.cpp" />
     <ClCompile Include="Application\Bullet\OrbitBullet.cpp" />
     <ClCompile Include="Application\Weapon\Weapons\OrbitStaff.cpp" />
+    <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -554,6 +555,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Bullet\OrbitBullet.h" />
     <ClInclude Include="Application\Weapon\Weapons\OrbitStaff.h" />
     <ClInclude Include="Application\Weapon\Weapons\Sniper.h" />
+    <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

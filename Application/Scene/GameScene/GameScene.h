@@ -97,4 +97,6 @@ private:
 
 	// ポーズ
 	bool isPause_ = false;
+
+	std::unique_ptr<Primitive> cylinder_ = nullptr;
 };

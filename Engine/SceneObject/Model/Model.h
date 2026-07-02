@@ -5,8 +5,6 @@
 #include "Engine/SceneObject/Model/Skeleton.h"
 #include "Engine/SceneObject/Model/AnimationPlayer/AnimationPlayer.h"
 #include "Engine/SceneObject/SceneObject.h"
-#include <d3d12.h>
-#include <wrl.h>
 #include <vector>
 #include <string>
 
@@ -65,7 +63,7 @@ private:
 	std::unique_ptr<AnimationPlayer> animationPlayer_ = nullptr;
 
 	// トランスフォーム
-	Transform transform_ = { { 1,1,1 },{}, {} };
+	Transform transform_;
 
 	// モデルデータ
 	std::shared_ptr<ModelData> data_ = nullptr;

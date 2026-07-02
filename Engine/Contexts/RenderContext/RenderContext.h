@@ -15,9 +15,12 @@ public:
 	// モデルのインスタンシング描画
 	void DrawInstancedModel(InstancedModel* instancedModel, BlendMode blendMode = BlendMode::Normal);
 
-	// パーティクルシステムで管理してるパーティクルの描画
+	// パーティクルシステムで管理しているパーティクルの描画
 	void DrawParticle(ParticleSystem* particleSystem, BlendMode blendMode = BlendMode::Normal);
 	
+	// 図形
+	void DrawPrimitive(Primitive* primitive, BlendMode blendMode = BlendMode::Normal);
+
 	// Skybox描画
 	void DrawSkybox(Texture* skybox);
 

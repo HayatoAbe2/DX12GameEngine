@@ -6,11 +6,11 @@ void WaveBullet::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
+	particle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(2);
 	particle_->SetColor(data_.bulletColor);
 
-	hitParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
+	hitParticle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	hitParticle_->SetLifeTime(hitParticleLifeTime);
 	hitParticle_->SetColor(data_.bulletColor);
 	particleField_ = std::make_unique<ParticleField>();

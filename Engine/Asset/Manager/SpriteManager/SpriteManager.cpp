@@ -116,7 +116,7 @@ std::unique_ptr<Sprite> SpriteManager::Load(const std::string& texturePath, uint
 
 	// Sprite用のマテリアルリソースを作る
 	std::unique_ptr<Material> material = std::make_unique<Material>(materialId);
-	material->Initialize(bufferManager_, true, false); // テクスチャ座標情報がなければテクスチャ不使用
+	material->Initialize(bufferManager_, true, false);
 	material->SetTexture(texture);
 	sprite->SetMaterial(std::move(material));
 

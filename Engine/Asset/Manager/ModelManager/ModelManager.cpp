@@ -33,7 +33,7 @@ ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureMan
 	textureManager_ = textureManager;
 }
 
-std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, bool enableLighting) {
+std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename) {
 	std::unique_ptr<Model> model = std::make_unique<Model>(id); // 構築するModel
 	std::shared_ptr<ModelData> modelData = std::make_shared<ModelData>(); // データ
 
@@ -146,7 +146,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 			// マテリアル初期化
 			std::unique_ptr<Material> material = std::make_unique<Material>(materialId);
 			bool useTexture = !texture->GetMtlPath().empty();
-			material->Initialize(bufferManager_, useTexture, enableLighting); // テクスチャ座標情報がなければテクスチャ不使用
+			material->Initialize(bufferManager_, useTexture, true); // テクスチャ座標情報がなければテクスチャ不使用
 			material->SetTexture(texture);	// テクスチャ
 			material->SetEnvironmentTexture(environmentTexture);
 
@@ -176,7 +176,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 	return model;
 }
 
-std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting) {
+std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, const int numInstance) {
 	if (numInstance == 0) { assert(false); } // インスタンス数0の場合止める
 
 	std::unique_ptr<InstancedModel> model = std::make_unique<InstancedModel>(id); // 構築するModel
@@ -337,7 +337,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 		// マテリアル初期化
 		std::unique_ptr<Material> material = std::make_unique<Material>(materialId);
 		bool useTexture = !texture->GetMtlPath().empty();
-		material->Initialize(bufferManager_, useTexture, enableLighting); // テクスチャ座標情報がなければテクスチャ不使用
+		material->Initialize(bufferManager_, useTexture, true); // テクスチャ座標情報がなければテクスチャ不使用
 		material->SetTexture(texture);	// テクスチャ
 		material->SetEnvironmentTexture(environmentTexture);
 
@@ -538,7 +538,6 @@ std::unique_ptr<ParticleSystem> ModelManager::CreateParticleInstanceResource(int
 		transformData[i].World = MakeIdentity4x4();
 		transformData[i].WVP = MakeIdentity4x4();
 		transformData[i].WorldInverseTranspose = MakeIdentity4x4();
-		particleSystem->AddInstanceTransform();
 	}
 
 	particleSystem->SetInstanceResource(instanceTransformResource);
@@ -550,6 +549,11 @@ std::unique_ptr<ParticleSystem> ModelManager::CreateParticleInstanceResource(int
 	particleSystem->SetSRVHandle(srvManager_->GetGPUHandle(index));
 
 	return std::move(particleSystem);
+}
+
+std::unique_ptr<Primitive> ModelManager::CreatePrimitive(uint32_t id) {
+	std::unique_ptr<Primitive> primitive = std::make_unique<Primitive>(id);
+	return std::move(primitive);
 }
 
 std::unique_ptr<Material> ModelManager::LoadMaterial(std::shared_ptr<Texture> texture, uint32_t id, uint32_t textureId) {

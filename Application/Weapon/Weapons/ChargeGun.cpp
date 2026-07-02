@@ -1,7 +1,7 @@
 #include "ChargeGun.h"
 #include "Bullet/BulletManager.h"
 #include "Bullet/SpreadBullet.h"
-#include <Character/Enemy/Enemy.h>
+#include "Character/Enemy/Enemy.h"
 
 float ChargeGun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
 	auto& ctx = GameContext::GetInstance();
@@ -30,7 +30,7 @@ float ChargeGun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, C
 }
 
 void ChargeGun::Update() {
-	damageBonus_ = std::min(3.0f, damageBonus_ += 0.02f);
+	damageBonus_ = (std::min)(3.0f, damageBonus_ += 0.02f);
 	auto mat = model_->GetMaterial(1)->GetData();
 	mat.color = Vector4(damageBonus_ / 3.0f,0,0,1);
 	model_->GetMaterial(1)->SetData(mat);

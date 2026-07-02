@@ -18,9 +18,10 @@ public:
 	AssetManager(DirectXContext* dxContext, Logger* logger);
 
 	// 読み込み
-	std::unique_ptr<Model> LoadModelFile(const std::string& directoryPath, const std::string& filename, bool enableLighting = true);
-	std::unique_ptr<InstancedModel> LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting = true);
+	std::unique_ptr<Model> LoadModelFile(const std::string& directoryPath, const std::string& filename);
+	std::unique_ptr<InstancedModel> LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance);
 	std::unique_ptr<ParticleSystem> CreateParticle(int numInstance);
+	std::unique_ptr<Primitive> CreatePrimitive(PrimitiveShape shape);
 	std::unique_ptr<Sprite> LoadSprite(const std::string& filePath);
 	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
 	std::unique_ptr<Material> CreateMaterial(std::shared_ptr<Texture> texture);

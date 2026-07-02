@@ -7,20 +7,35 @@ AssetManager::AssetManager(DirectXContext* dxContext, Logger* logger) {
 	animationManager_ = std::make_unique<AnimationManager>();
 }
 
-std::unique_ptr<Model> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename, bool enableLighting) {
-	auto object = modelManager_->Load(GenerateID(), GenerateID(), GenerateID(), GenerateID(), directoryPath, filename, enableLighting);
+std::unique_ptr<Model> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename) {
+	auto object = modelManager_->Load(GenerateID(), GenerateID(), GenerateID(), GenerateID(), directoryPath, filename);
 	object->name = filename;
 	return std::move(object);
 }
 
-std::unique_ptr<InstancedModel> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance, bool enableLighting) {
-	auto object = modelManager_->Load(GenerateID(), GenerateID(), GenerateID(), GenerateID(), directoryPath, filename, numInstance, enableLighting);
+std::unique_ptr<InstancedModel> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance) {
+	auto object = modelManager_->Load(GenerateID(), GenerateID(), GenerateID(), GenerateID(), directoryPath, filename, numInstance);
 	object->name = filename;
 	return std::move(object);
 }
 
 std::unique_ptr<ParticleSystem> AssetManager::CreateParticle(int numInstance) {
 	return std::move(modelManager_->CreateParticleInstanceResource(numInstance, GenerateID()));
+}
+
+std::unique_ptr<Primitive> AssetManager::CreatePrimitive(PrimitiveShape shape) {
+	uint32_t id = GenerateID();
+	auto object = modelManager_->CreatePrimitive(id);
+
+	// 名前用配列
+	std::string names[] = {
+		"Plane",
+		"Ring",
+		"Cylinder"
+	};
+	object->name = names[int(shape)];
+
+	return std::move(object);
 }
 
 std::unique_ptr<Sprite> AssetManager::LoadSprite(const std::string& filePath) {

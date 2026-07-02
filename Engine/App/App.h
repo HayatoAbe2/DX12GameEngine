@@ -10,23 +10,14 @@
 #include "Engine/SceneObject/LightManager/LightManager.h"
 #include "Engine/Scene/SceneManager/SceneManager.h"
 #include "Engine/Editor/Scene/SceneEditor/SceneEditor.h"
+#include "Engine/Asset/Manager/AssetManager/AssetManager.h"
 
 #include <memory>
 #include <Windows.h>
-#include <cstdint>
-#include <format>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
-#include <dbghelp.h>
 #include <strsafe.h>
-#include <vector>
 #include <wrl.h>
-#include <mfapi.h>
-
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-#include "externals/DirectXTex/d3dx12.h"
 
 #pragma comment(lib,"d3d12.lib")	
 #pragma comment(lib,"dxgi.lib")

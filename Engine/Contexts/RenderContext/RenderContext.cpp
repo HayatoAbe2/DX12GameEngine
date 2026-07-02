@@ -23,6 +23,10 @@ void RenderContext::DrawParticle(ParticleSystem* particleSystem, BlendMode blend
 	renderer_->DrawParticles(particleSystem, static_cast<int>(blendMode));
 }
 
+void RenderContext::DrawPrimitive(Primitive* primitive, BlendMode blendMode) {
+	renderer_->DrawPrimitive(primitive, static_cast<int>(blendMode));
+}
+
 void RenderContext::DrawSkybox(Texture* skybox) {
 	renderer_->DrawSkybox(skybox);
 }

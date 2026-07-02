@@ -9,6 +9,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	instancingPSOData.rootSignature = rootSignatureManager->GetInstancingRootSignature();
 	spritePSOData.rootSignature = rootSignatureManager->GetStandardRootSignature();
 	particlePSOData.rootSignature = rootSignatureManager->GetParticleRootSignature();
+	primitivePSOData.rootSignature = rootSignatureManager->GetStandardRootSignature();
 	skyboxPSOData.rootSignature = rootSignatureManager->GetSkyboxRootSignature();
 	gridPSOData.rootSignature = rootSignatureManager->GetGridRootSignature();
 	fullscreenPSOData.rootSignature = rootSignatureManager->GetFullscreenRootSignature();
@@ -51,6 +52,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateInstancingPSO();
 	CreateSpritePSO();
 	CreateParticlePSO();
+	CreatePrimitivePSO();
 	CreateSkyboxPSO();
 	CreateGridPSO();
 	CreateFullscreenPSO();
@@ -83,7 +85,7 @@ void PipelineStateManager::CreateStandardPSO() {
 	baseDesc.BlendState = CreateNoneBlendDesc();
 
 	// ラスタライザ
-	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 
 	// DepthStencil
@@ -124,7 +126,7 @@ void PipelineStateManager::CreateSkinningPSO() {
 	baseDesc.BlendState = CreateNoneBlendDesc();
 
 	// ラスタライザ
-	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 
 	// DepthStencil
@@ -140,12 +142,12 @@ void PipelineStateManager::CreateSkinningPSO() {
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- 各ブレンドモードごとのPSO生成 ---
-	CreatePSO(baseDesc, CreateNoneBlendDesc(), &skinningPSO[static_cast<int>(BlendMode::None)]);			// ブレンドなし
-	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &skinningPSO[static_cast<int>(BlendMode::Normal)]);			// αブレンド
-	CreatePSO(baseDesc, CreateAddBlendDesc(), &skinningPSO[static_cast<int>(BlendMode::Add)]);				// 加算
-	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &skinningPSO[static_cast<int>(BlendMode::Subtract)]);	// 減算
-	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &skinningPSO[static_cast<int>(BlendMode::Multiply)]);	// 乗算
-	CreatePSO(baseDesc, CreateScreenBlendDesc(), &skinningPSO[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+	CreatePSO(baseDesc, CreateNoneBlendDesc(), &skinningPSO_[static_cast<int>(BlendMode::None)]);			// ブレンドなし
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &skinningPSO_[static_cast<int>(BlendMode::Normal)]);			// αブレンド
+	CreatePSO(baseDesc, CreateAddBlendDesc(), &skinningPSO_[static_cast<int>(BlendMode::Add)]);				// 加算
+	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &skinningPSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
+	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &skinningPSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
+	CreatePSO(baseDesc, CreateScreenBlendDesc(), &skinningPSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
 }
 
 void PipelineStateManager::CreateInstancingPSO() {
@@ -213,12 +215,12 @@ void PipelineStateManager::CreateSpritePSO() {
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 	// --- 各ブレンドモードごとのPSO生成 ---
-	CreatePSO(baseDesc, CreateNoneBlendDesc(), &spritePSO[static_cast<int>(BlendMode::None)]);			// ブレンドなし
-	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Normal)]);			// αブレンド
-	CreatePSO(baseDesc, CreateAddBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Add)]);				// 加算
-	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Subtract)]);	// 減算
-	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Multiply)]);	// 乗算
-	CreatePSO(baseDesc, CreateScreenBlendDesc(), &spritePSO[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+	CreatePSO(baseDesc, CreateNoneBlendDesc(), &spritePSO_[static_cast<int>(BlendMode::None)]);			// ブレンドなし
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &spritePSO_[static_cast<int>(BlendMode::Normal)]);			// αブレンド
+	CreatePSO(baseDesc, CreateAddBlendDesc(), &spritePSO_[static_cast<int>(BlendMode::Add)]);				// 加算
+	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &spritePSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
+	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &spritePSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
+	CreatePSO(baseDesc, CreateScreenBlendDesc(), &spritePSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
 }
 
 void PipelineStateManager::CreateParticlePSO() {
@@ -251,6 +253,47 @@ void PipelineStateManager::CreateParticlePSO() {
 	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &particlePSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
 	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &particlePSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
 	CreatePSO(baseDesc, CreateScreenBlendDesc(), &particlePSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+}
+
+void PipelineStateManager::CreatePrimitivePSO() {
+	assert(primitivePSOData.rootSignature);
+	assert(primitivePSOData.vertexShaderBlob);
+	assert(primitivePSOData.pixelShaderBlob);
+	assert(inputLayoutDesc_.pInputElementDescs != nullptr);
+
+	// 共通部分作成
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
+	baseDesc.pRootSignature = primitivePSOData.rootSignature.Get();
+	baseDesc.InputLayout = inputLayoutDesc_;
+	baseDesc.VS = { primitivePSOData.vertexShaderBlob->GetBufferPointer(), primitivePSOData.vertexShaderBlob->GetBufferSize() };
+	baseDesc.PS = { primitivePSOData.pixelShaderBlob->GetBufferPointer(), primitivePSOData.pixelShaderBlob->GetBufferSize() };
+
+	// ブレンド
+	baseDesc.BlendState = CreateNoneBlendDesc();
+
+	// ラスタライザ
+	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+
+	// DepthStencil
+	baseDesc.DepthStencilState.DepthEnable = TRUE;
+	baseDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	baseDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+	baseDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	baseDesc.NumRenderTargets = 1;
+	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	baseDesc.SampleDesc.Count = 1;
+	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	// --- 各ブレンドモードごとのPSO生成 ---
+	CreatePSO(baseDesc, CreateNoneBlendDesc(), &primitivePSO_[static_cast<int>(BlendMode::None)]);			// ブレンドなし
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &primitivePSO_[static_cast<int>(BlendMode::Normal)]);			// αブレンド
+	CreatePSO(baseDesc, CreateAddBlendDesc(), &primitivePSO_[static_cast<int>(BlendMode::Add)]);				// 加算
+	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &primitivePSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
+	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &primitivePSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
+	CreatePSO(baseDesc, CreateScreenBlendDesc(), &primitivePSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
 }
 
 void PipelineStateManager::CreateSkyboxPSO() {

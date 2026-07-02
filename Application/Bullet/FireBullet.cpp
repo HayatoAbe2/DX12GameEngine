@@ -7,11 +7,11 @@ void FireBullet::Initialize() {
 	auto& asset = ctx.Asset();
 	auto& light = ctx.Light();
 
-	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
+	particle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(10);
 	particle_->SetColor(data_.bulletColor);
 
-	explosionParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
+	explosionParticle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	explosionParticle_->SetLifeTime(10);
 	explosionParticle_->SetColor(data_.bulletColor);
 

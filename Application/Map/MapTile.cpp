@@ -20,7 +20,7 @@ void MapTile::Initialize() {
 	auto& asset = ctx.Asset();
 	auto& light = ctx.Light();
 
-	particle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Goal/circle.png")), particleNum_);
+	particle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Goal/circle.png")), particleNum_);
 	particle_->SetLifeTime(40);
 	particle_->SetColor({ 1.0f, 1.0f, 0.0f, 1.0f });
 

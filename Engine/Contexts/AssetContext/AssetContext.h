@@ -1,19 +1,26 @@
 #pragma once
-#include "Engine/Asset/Manager/AssetManager/AssetManager.h"
+#include "Engine/SceneObject/Model/Model.h"
+#include "Engine/SceneObject/Model/InstancedModel.h"
+#include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
+#include "Engine/SceneObject/Primitive/Primitive.h"
+#include "Engine/SceneObject/Sprite/Sprite.h"
+class AssetManager;
 
-// モデル
 class AssetContext {
 public:
 	AssetContext(AssetManager* assetManager);
 
 	// モデル読み込み
-	std::unique_ptr<Model> LoadModel(const std::string& directoryPath, const std::string& filename, bool enableLighting = true);
+	std::unique_ptr<Model> LoadModel(const std::string& directoryPath, const std::string& filename);
 
 	// モデル読み込み(インスタンシング描画)
 	std::unique_ptr<InstancedModel> LoadInstancedModel(const std::string& directoryPath, const std::string& filename, const int num);
 
 	// パーティクル
-	std::unique_ptr<ParticleSystem> CreateParticleSystem(ParticleShape shape, std::unique_ptr<Material> material, int instanceNum);
+	std::unique_ptr<ParticleSystem> CreateParticleSystem(std::unique_ptr<Material> material, int instanceNum);
+
+	// Primitive
+	std::unique_ptr<Primitive> CreatePrimitive(std::unique_ptr<Material> material, PrimitiveShape shape = PrimitiveShape::Plane);
 
 	// スプライト読み込み
 	std::unique_ptr<Sprite> LoadSprite(const std::string& texturePath);

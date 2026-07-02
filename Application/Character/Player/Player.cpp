@@ -44,7 +44,7 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	direction_->GetMaterial(0)->SetData(data);
 
 	// 移動時パーティクル
-	moveParticle_ = asset.CreateParticleSystem(ParticleShape::Plane, asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), moveParticleNum_);
+	moveParticle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), moveParticleNum_);
 	moveParticle_->SetLifeTime(10);
 	moveParticle_->SetColor({ 0.6f, 0.6f, 0.6f, 1.0f });
 

@@ -2,6 +2,7 @@
 #include "Engine/SceneObject/Model/Model.h"
 #include "Engine/SceneObject/Model/InstancedModel.h"
 #include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
+#include "Engine/SceneObject/Primitive/Primitive.h"
 
 #include <unordered_map>
 #include <string>
@@ -26,9 +27,10 @@ class TextureManager;
 class ModelManager {
 public:
 	ModelManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager);
-	std::unique_ptr<Model> Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, bool enableLighting = true);
-	std::unique_ptr<InstancedModel> Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, const int numInstance_, bool enableLighting = true);
+	std::unique_ptr<Model> Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename);
+	std::unique_ptr<InstancedModel> Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename, const int numInstance_);
 	std::unique_ptr<ParticleSystem> CreateParticleInstanceResource(int numInstance, uint32_t id);
+	std::unique_ptr<Primitive> CreatePrimitive(uint32_t id);
 	std::unique_ptr<Material> LoadMaterial(std::shared_ptr<Texture> texture, uint32_t id, uint32_t textureId);
 
 private:

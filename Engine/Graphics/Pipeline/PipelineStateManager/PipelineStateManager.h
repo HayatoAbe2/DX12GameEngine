@@ -13,10 +13,11 @@ public:
 	void Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, RootSignatureManager* rootSignatureManager);
 
 	ID3D12PipelineState* GetStandardPSO(int index) { return standardPSO[index].Get(); }
-	ID3D12PipelineState* GetSkinningPSO(int index) { return skinningPSO[index].Get(); }
+	ID3D12PipelineState* GetSkinningPSO(int index) { return skinningPSO_[index].Get(); }
 	ID3D12PipelineState* GetInstancingPSO(int index) { return instancingPSO_[index].Get(); }
-	ID3D12PipelineState* GetSpritePSO(int index) { return spritePSO[index].Get(); }
+	ID3D12PipelineState* GetSpritePSO(int index) { return spritePSO_[index].Get(); }
 	ID3D12PipelineState* GetParticlePSO(int index) { return particlePSO_[index].Get(); }
+	ID3D12PipelineState* GetPrimitivePSO(int index) { return primitivePSO_[index].Get(); }
 	ID3D12PipelineState* GetSkyboxPSO(int index) { return skyboxPSO_[index].Get(); }
 	ID3D12PipelineState* GetGridPSO() { return gridPSO_.Get(); }
 	ID3D12PipelineState* GetCopyImagePSO() { return copyImagePSO_.Get(); }
@@ -28,6 +29,7 @@ public:
 	void SetInstancingBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { instancingPSOData.vertexShaderBlob = vsBlob; instancingPSOData.pixelShaderBlob = psBlob; }
 	void SetSpriteBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { spritePSOData.vertexShaderBlob = vsBlob; spritePSOData.pixelShaderBlob = psBlob; }
 	void SetParticleBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { particlePSOData.vertexShaderBlob = vsBlob; particlePSOData.pixelShaderBlob = psBlob; }
+	void SetPrimitiveBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { primitivePSOData.vertexShaderBlob = vsBlob; primitivePSOData.pixelShaderBlob = psBlob; }
 	void SetSkyboxBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { skyboxPSOData.vertexShaderBlob = vsBlob; skyboxPSOData.pixelShaderBlob = psBlob; }
 	void SetGridBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { gridPSOData.vertexShaderBlob = vsBlob; gridPSOData.pixelShaderBlob = psBlob; }
 	
@@ -53,6 +55,7 @@ private:
 	PSOData instancingPSOData;
 	PSOData spritePSOData;
 	PSOData particlePSOData;
+	PSOData primitivePSOData;
 	PSOData skyboxPSOData;
 	PSOData gridPSOData;
 	PSOData fullscreenPSOData;
@@ -64,6 +67,7 @@ private:
 	void CreateInstancingPSO();
 	void CreateSpritePSO();
 	void CreateParticlePSO();
+	void CreatePrimitivePSO();
 	void CreateSkyboxPSO();
 	void CreateGridPSO();
 	void CreateFullscreenPSO();
@@ -85,10 +89,11 @@ private:
 
 	// PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> standardPSO[6]{};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningPSO[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningPSO_[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> instancingPSO_[6]{};
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> spritePSO[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> spritePSO_[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> particlePSO_[6]{};
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> primitivePSO_[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> skyboxPSO_[6]{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> gridPSO_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> copyImagePSO_ = nullptr;

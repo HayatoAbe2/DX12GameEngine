@@ -5,6 +5,7 @@
 #include "Engine/Graphics/GPUData/CameraForGPU.h"
 #include "Engine/SceneObject/Model/Node.h"
 #include "Engine/SceneObject/Model/Mesh.h"
+#include "Engine/SceneObject/Primitive/Primitive.h"
 
 #include "Engine/Graphics/Renderer/PostEffectType.h"
 #include "Engine/Graphics/GPUData/TransformationMatrix.h"
@@ -52,7 +53,7 @@ public:
 	void DrawModelInstance(InstancedModel* model, LightManager* lightManager, int blendMode);
 
 	void DrawParticles(ParticleSystem* particleSys, int blendMode);
-
+	void DrawPrimitive(Primitive* primitive, int blendMode);
 	void DrawSprite(Sprite* sprite, int blendMode);
 
 	// ノードごとに描画
@@ -96,6 +97,7 @@ public:
 private:
 	void InitializePlane();
 	void InitializeRing();
+	void InitializeCylinder();
 	void InitializeLine();
 	void InitializeSphere();
 	void InitializeSkybox();
@@ -121,6 +123,7 @@ private:
 	};
 	ShapeData plane_;
 	ShapeData ring_;
+	ShapeData cylinder_;
 	ShapeData line_;
 	ShapeData sphere_;
 

@@ -144,6 +144,12 @@ void GameScene::Initialize() {
 #ifdef USE_IMGUI
 	enableEditMode_ = true;
 #endif
+
+	cylinder_ = asset.CreatePrimitive(asset.CreateMaterial(asset.LoadTexture("Resources/Debug/gradationLine.png")), PrimitiveShape::Cylinder);
+	cylinder_->transform_.translate.x = 2.0f;
+	data = cylinder_->GetMaterial()->GetData();
+	data.uvTransform = data.uvTransform * MakeScaleMatrix({ 1,-1, 1 });
+	cylinder_->GetMaterial()->SetData(data);
 }
 
 void GameScene::Update() {
@@ -332,9 +338,7 @@ void GameScene::Draw() {
 	BaseScene::Draw();
 
 	auto& render = GameContext::GetInstance().Render();
-	//render.SetPostEffectType(PostEffectType::Outline);
-	render.SetPostEffectType(PostEffectType::RandomNoise);
-
+	render.SetPostEffectType(PostEffectType::Outline);
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
 	mapTile_->Draw(camera_.get());
@@ -343,6 +347,8 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
+
+	render.DrawPrimitive(cylinder_.get());
 
 	if (currentFloor_ == 0) {
 		// チュートリアル表示
