@@ -24,6 +24,7 @@ void AccelBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 		Vector3 dir = Normalize(velocity_);
 		float length = Length(velocity_);
 		velocity_ = dir * (length * 1.05f);
+		data_.stats.knockback *= 1.02f;
 
 		prePos_ = model_->GetTransform().translate;
 		model_->SetTranslate(model_->GetTransform().translate + velocity_);

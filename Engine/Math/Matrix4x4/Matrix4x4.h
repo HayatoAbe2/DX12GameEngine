@@ -131,6 +131,8 @@ Matrix4x4 MakeViewProjectionMatrix(Transform cameraTransform, Vector2 windowSize
 /// <returns>viewProjection行列</returns>
 Matrix4x4 MakeViewProjectionMatrix(Transform cameraTransform, Matrix4x4 projectionMatrix);
 
+Matrix4x4 MakeLookAtMatrix(const Vector3& eye, const Vector3& target, const Vector3& up);
+
 DirectX::XMMATRIX ToXMMATRIX(const Matrix4x4& mat);
 
 // 演算子オーバーロード

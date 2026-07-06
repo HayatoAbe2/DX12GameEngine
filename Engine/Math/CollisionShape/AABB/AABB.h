@@ -7,8 +7,8 @@ struct AABB2D {
 	Vector3 max;
 };
 
-bool IsCollision(const AABB2D& aabb1, const AABB2D& aabb2);
-bool IsCollision(const AABB2D& aabb, const Vector2& point);
+bool CheckCollision(const AABB2D& aabb1, const AABB2D& aabb2);
+bool CheckCollision(const AABB2D& aabb, const Vector2& point);
 
 
 struct AABB3D {	
@@ -16,5 +16,5 @@ struct AABB3D {
 	Vector3 max; // 最大点
 };
 
-bool IsCollision(const AABB3D& aabb1, const AABB3D& aabb2);
-bool IsCollision(const AABB3D& aabb, const Vector3& point);
+bool CheckCollision(const AABB3D& aabb1, const AABB3D& aabb2);
+bool CheckCollision(const AABB3D& aabb, const Vector3& point);

@@ -7,6 +7,4 @@
 #include "Matrix4x4/Matrix4x4.h"
 #include "Quaternion/Quaternion.h"
 #include "Lerp/Lerp.h"
-#include "CollisionShape/AABB/AABB.h"
-#include "CollisionShape/Ray/Ray.h"
-#include "CollisionShape/Sphere/Sphere.h"
+#include "CollisionShape/Collisions/Collisions.h"

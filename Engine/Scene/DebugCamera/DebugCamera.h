@@ -1,5 +1,4 @@
 #pragma once
-#define DIRECTINPUT_VERSION 0x0800
 #include "Engine/Math/MathUtils.h"
 class InputContext;
 
@@ -43,12 +42,9 @@ private:
 	bool isEnable_ = false;
 
 	// カメラ移動速度
-	const float kMoveSpeed_ = 0.015f;
+	const float kMoveSpeed_ = 0.025f;
 	// カメラ回転速度
 	const float kRotateSpeed_ = 0.003f;
-
-	// 累積回転行列
-	Matrix4x4 matRot_;
 
 	// 注視点（ワールド原点スタート）
 	Vector3 target_ = { 0, 0, 0 };
@@ -66,6 +62,6 @@ private:
 	Matrix4x4 orthographicMatrix_;
 
 	// 操作用入力
-	InputContext* inputCtx_;
+	InputContext* input_;
 };
 

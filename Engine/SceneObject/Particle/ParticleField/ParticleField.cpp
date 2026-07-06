@@ -2,7 +2,7 @@
 #include "Engine/SceneObject/Particle/Particle.h"
 
 void ParticleField::Update(Particle* particle) {
-	if (!useArea_ || (useArea_ && IsCollision(area_, particle->transform.translate))) {
+	if (!useArea_ || (useArea_ && CheckCollision(area_, particle->transform.translate))) {
 		particle->transform.translate += acceleration_;
 
 		// 重力

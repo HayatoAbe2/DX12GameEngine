@@ -26,6 +26,12 @@ void SceneEditor::Update() {
 	if (scene_) {
 		scene_->FlushDelete();
 	}
+
+	// クリックで選択
+	if (!ImGuizmo::IsUsing() &&
+		GameContext::GetInstance().Input().mouse.IsRelease(MouseButton::Left)) { 
+		ClickSelect();
+	}
 }
 
 void SceneEditor::Draw(Camera* camera) {
@@ -72,13 +78,21 @@ void SceneEditor::Draw(Camera* camera) {
 				}
 			}
 			ImGui::Separator();
-			
+
 			// 削除
 			if (ImGui::Button("Delete")) {
 				PushUndo();
 				scene_->RemoveObject(selected_);
 				selected_ = nullptr;
 			}
+		}
+		ImGui::End();
+
+		// 編集中切り替え
+		ImGui::Begin("Mode");
+		bool editMode = scene_->IsEditMode();
+		if (ImGui::Checkbox("EditMode", &editMode)) {
+			scene_->SetEditMode(editMode);
 		}
 		ImGui::End();
 
@@ -131,7 +145,7 @@ void SceneEditor::Draw(Camera* camera) {
 				float modelMat[16];
 				ToFloat16(modelMat, (MakeAffineMatrix(model->GetTransform())));
 
-				
+
 				if (ImGui::RadioButton("Move", gizmoMode_ == 0)) gizmoMode_ = 0;
 				ImGui::SameLine();
 				if (ImGui::RadioButton("Rotate", gizmoMode_ == 1)) gizmoMode_ = 1;
@@ -156,7 +170,7 @@ void SceneEditor::Draw(Camera* camera) {
 
 				ImGuizmo::OPERATION op;
 				switch (gizmoMode_) {
-				case 0: 
+				case 0:
 					op = ImGuizmo::TRANSLATE;
 					gizmoCtx_.snap[0] = moveSnap_;
 					gizmoCtx_.snap[1] = moveSnap_;
@@ -181,7 +195,7 @@ void SceneEditor::Draw(Camera* camera) {
 				};
 				gizmoCtx_.useSnap = useSnap_;
 
-			}else if (auto* model = dynamic_cast<InstancedModel*>(selected_)) {
+			} else if (auto* model = dynamic_cast<InstancedModel*>(selected_)) {
 				auto transforms = model->GetTransforms();
 
 				float modelMat[16];
@@ -212,18 +226,18 @@ void SceneEditor::Draw(Camera* camera) {
 
 				ImGuizmo::OPERATION op;
 				switch (gizmoMode_) {
-				case 0: 
+				case 0:
 					op = ImGuizmo::TRANSLATE;
-					gizmoCtx_.snap[0] = moveSnap_; 
-					gizmoCtx_.snap[1] = moveSnap_; 
-					gizmoCtx_.snap[2] = moveSnap_; 
+					gizmoCtx_.snap[0] = moveSnap_;
+					gizmoCtx_.snap[1] = moveSnap_;
+					gizmoCtx_.snap[2] = moveSnap_;
 					break;
 				case 1:
-					op = ImGuizmo::ROTATE; 
+					op = ImGuizmo::ROTATE;
 					gizmoCtx_.snap[1] = rotateSnap_;
 					break;
 				case 2:
-					op = ImGuizmo::SCALE; 
+					op = ImGuizmo::SCALE;
 					gizmoCtx_.snap[2] = scaleSnap_;
 					break;
 				}
@@ -254,6 +268,8 @@ void SceneEditor::Draw(Camera* camera) {
 
 void SceneEditor::DrawInspector(SceneObject* object) {
 #ifdef USE_IMGUI
+	auto& input = GameContext::GetInstance().Input();
+
 	// トランスフォーム等
 	if (ImGui::CollapsingHeader("Transform") && !ImGuizmo::IsUsing()) {
 		// モデル
@@ -267,14 +283,12 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 
 		// インスタンシング描画モデル
 		if (auto* model = dynamic_cast<InstancedModel*>(object)) {
-			int count = model->GetNumInstance();
+			if (input.keyboard.IsTrigger(DIK_LEFT)) editingInstance_--;
+			if (input.keyboard.IsTrigger(DIK_RIGHT)) editingInstance_++;
 
-			ImGui::DragInt(
-				"Instance",
-				&editingInstance_,
-				1,
-				0,
-				count - 1);
+			int count = model->GetNumInstance();
+			ImGui::DragInt("Instance", &editingInstance_, 1, 0, count - 1);
+
 			gizmoCtx_.editingInstance = editingInstance_;
 
 			auto transforms = model->GetTransforms();
@@ -343,7 +357,7 @@ void SceneEditor::Save() {
 			};
 
 			root["objects"].push_back(object);
-		}else if (auto* model = dynamic_cast<InstancedModel*>(object)) {
+		} else if (auto* model = dynamic_cast<InstancedModel*>(object)) {
 
 			nlohmann::json object;
 			object["type"] = "InstancedModel";
@@ -418,7 +432,7 @@ void SceneEditor::Load(const std::string& path) {
 			model->SetTransform({ scale, rotate, translate });
 
 			scene_->AddObject(std::move(model));
-		}else if (type == "InstancedModel") {
+		} else if (type == "InstancedModel") {
 			auto model = asset.LoadInstancedModel(objectJson["path"], objectJson["name"], int(objectJson["transforms"].size()));
 			model->tag = objectJson["tag"];
 
@@ -488,7 +502,7 @@ std::string SceneEditor::SerializeScene() {
 			};
 
 			root["objects"].push_back(object);
-		}else if (auto* model = dynamic_cast<InstancedModel*>(object)) {
+		} else if (auto* model = dynamic_cast<InstancedModel*>(object)) {
 			nlohmann::json object;
 			object["type"] = "InstancedModel";
 			object["name"] = model->name;
@@ -559,7 +573,7 @@ void SceneEditor::DeserializeScene(const std::string& jsonText) {
 			model->SetTransform({ scale, rotate, translate });
 
 			scene_->AddObject(std::move(model));
-		}else if (type == "InstancedModel") {
+		} else if (type == "InstancedModel") {
 
 			auto& asset = GameContext::GetInstance().Asset();
 			int count = static_cast<int>(objectJson["transforms"].size());
@@ -645,4 +659,73 @@ void SceneEditor::Redo() {
 
 	DeserializeScene(snapshot);
 #endif
+}
+
+void SceneEditor::ClickSelect() {
+	auto& ctx = GameContext::GetInstance();
+	auto& input = ctx.Input();
+	Camera* camera = ctx.Render().GetCamera();
+
+	Vector2 windowSize = ctx.GetWindowSize();
+	Vector2 mousePos = input.mouse.GetPosition();
+
+	float ndcX = (mousePos.x / windowSize.x) * 2.0f - 1.0f;
+	float ndcY = 1.0f - (mousePos.y / windowSize.y) * 2.0f;
+
+	Vector4 nearPoint = { ndcX, ndcY, 0, 1 };
+	Vector4 farPoint = { ndcX, ndcY, 1, 1 };
+
+	Matrix4x4 inverseVP = Inverse(camera->viewMatrix_ * camera->projectionMatrix_);
+
+	nearPoint = TransformVector(nearPoint, inverseVP);
+	farPoint = TransformVector(farPoint, inverseVP);
+	nearPoint /= nearPoint.w;
+	farPoint /= farPoint.w;
+
+	// マウス位置に向けたレイ
+	Ray ray;
+	ray.origin = { nearPoint.x, nearPoint.y, nearPoint.z };
+	ray.diff = Normalize(Vector3{ {farPoint.x - nearPoint.x},{farPoint.y - nearPoint.y},{farPoint.z - nearPoint.z} }); // 方向ベクトル
+
+	float nearest = FLT_MAX;
+
+	auto objects = scene_->GetObjects();
+	for (auto& object : objects) {
+		if (auto* model = dynamic_cast<Model*>(object)) {
+			Vector3 pos = model->GetTransform().translate;
+			Vector3 size = model->GetTransform().scale;
+			AABB3D aabb = { pos - size / 2.0f, pos + size / 2.0f };
+			if (CheckCollision(aabb, ray)) {
+				float  distance = Length(pos - ray.origin);
+				if (nearest > distance) {
+					nearest = distance;
+
+					selected_ = model;
+				}
+			}
+
+		} else if (auto* model = dynamic_cast<InstancedModel*>(object)) {
+			std::vector<Transform> transforms;
+
+			// 全インスタンスのトランスフォーム追加
+			for (auto& transform : model->GetTransforms()) {
+				transforms.push_back(transform);
+			}
+
+			for (int i = 0; i < transforms.size(); ++i) {
+				Vector3 pos = transforms[i].translate;
+				Vector3 size = transforms[i].scale;
+				AABB3D aabb = { pos - size / 2.0f, pos + size / 2.0f };
+				if (CheckCollision(aabb, ray)) {
+					float  distance = Length(transforms[i].translate - ray.origin);
+					if (nearest > distance) {
+						nearest = distance;
+
+						selected_ = model;
+						editingInstance_ = i;
+					}
+				}
+			}
+		}
+	}
 }

@@ -145,6 +145,11 @@ void GameScene::Initialize() {
 	enableEditMode_ = true;
 #endif
 
+#ifndef USE_IMGUI 
+	isLoad_ = true;
+#endif
+
+
 	cylinder_ = asset.CreatePrimitive(asset.CreateMaterial(asset.LoadTexture("Resources/Debug/gradationLine.png")), PrimitiveShape::Cylinder);
 	cylinder_->transform_.translate.x = 2.0f;
 	data = cylinder_->GetMaterial()->GetData();
@@ -330,6 +335,8 @@ void GameScene::Update() {
 			}
 		}
 	}
+
+	mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty());
 	camera_->Update(debugCamera_.get());
 	debugCamera_->Update();
 }
@@ -348,7 +355,7 @@ void GameScene::Draw() {
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
 
-	render.DrawPrimitive(cylinder_.get());
+	//render.DrawPrimitive(cylinder_.get());
 
 	if (currentFloor_ == 0) {
 		// チュートリアル表示
@@ -406,9 +413,10 @@ void GameScene::Draw() {
 	ImGui::End();
 
 	ImGui::Begin("LoadScene");
-	if (ImGui::Button("Load")) {
-		itemManager_->Load(mapTile_->GetTileSize());
-		enemyManager_->Load(mapTile_->GetTileSize(), weaponManager_.get());
+	ImGui::Checkbox("Load", &isLoad_);
+	if (isLoad_){
+		itemManager_->Load();
+		enemyManager_->Load(weaponManager_.get(), player_->GetTransform().translate, mapCheck_.get());
 	}
 	ImGui::End();
 #endif

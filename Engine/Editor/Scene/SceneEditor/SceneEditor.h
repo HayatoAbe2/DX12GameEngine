@@ -25,6 +25,9 @@ public:
 	void Undo();
 	void Redo();
 
+	// 選択
+	void ClickSelect();
+
 	std::vector<std::unique_ptr<Resource>> resources_;
 	BaseScene* scene_;
 	SceneObject* selected_;

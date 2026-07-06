@@ -4,6 +4,7 @@
 #include "Weapon/WeaponManager.h"
 #include "Bullet/BulletManager.h"
 #include "EnemyStatus.h"
+#include "Map/MapCheck.h"
 
 #include "Character/Enemy/Enemies/Bat.h"
 #include "Character/Enemy/Enemies/Knight.h"
@@ -152,6 +153,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 
 void EnemyManager::Reset() {
 	enemies_.clear();
+	isSpawned_.clear();
 }
 
 void EnemyManager::LoadCSV(std::string filePath, float tileSize, WeaponManager* weaponManager) {
@@ -179,7 +181,7 @@ void EnemyManager::LoadCSV(std::string filePath, float tileSize, WeaponManager* 
 	}
 }
 
-void EnemyManager::Load(float tileSize, WeaponManager* weaponManager) {
+void EnemyManager::Load(WeaponManager* weaponManager, const Vector3& playerPos, MapCheck* mapCheck) {
 	auto& ctx = GameContext::GetInstance();
 	auto& scene = ctx.Scene();
 
@@ -191,21 +193,47 @@ void EnemyManager::Load(float tileSize, WeaponManager* weaponManager) {
 		}
 	}
 
+	std::vector<AABB2D> spawnArea;
+	std::vector<Vector3> spawnPos;
 	for (auto& model : models) {
 		if (model->tag == "enemySpawn") {
-			for (Transform& t : model->GetTransforms()) {
-				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-				int num = ctx.RandomInt(1, 3);
-				if (num == 3) num = 5;
-				if (!a) {
-					Spawn(pos, weaponManager, num);
+			if (isSpawned_.size() < model->GetTransforms().size()) {
+				isSpawned_.resize(model->GetTransforms().size());
+			}
 
-					a = true;
-				}
+			for (int i = 0; i < model->GetTransforms().size(); ++i) {
+				Transform t = model->GetTransforms()[i];
+				AABB2D aabb = { {t.translate.x - t.scale.x / 2.0f, t.translate.z - t.scale.z / 2.0f }, {t.translate.x + t.scale.x / 2.0f, t.translate.z + t.scale.z / 2.0f} };
+				spawnArea.push_back(aabb);
+			}
 
+		} else if (model->tag == "enemySpawnPoint") {
+			for (int i = 0; i < model->GetTransforms().size(); ++i) {
+				Transform t = model->GetTransforms()[i];
+				spawnPos.push_back(t.translate);
 			}
 		}
 	}
+
+	for (int i = 0; i < isSpawned_.size(); ++i) {
+		if (!isSpawned_[i]) {
+			// 入ったら出現
+			if (CheckCollision(spawnArea[i], Vector2{ playerPos.x, playerPos.z })) {
+
+				for (Vector3 pos : spawnPos) {
+					// 範囲内の出現ポイント
+					if (CheckCollision(spawnArea[i], Vector2{ pos.x, pos.z })) {
+						int num = ctx.RandomInt(1, 3);
+						if (num == 3) num = 5;
+
+						Spawn(pos, weaponManager, num);
+					}
+				}
+				isSpawned_[i] = true;
+			}
+		}
+	}
+
 }
 
 std::vector<Enemy*> EnemyManager::GetEnemies() {

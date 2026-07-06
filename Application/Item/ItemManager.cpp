@@ -126,6 +126,7 @@ void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
 
 void ItemManager::Reset() {
 	items_.clear();
+	spawned_ = false;
 }
 
 void ItemManager::LoadCSV(const std::string& filePath, const float tileSize) {
@@ -153,7 +154,7 @@ void ItemManager::LoadCSV(const std::string& filePath, const float tileSize) {
 	}
 }
 
-void ItemManager::Load(const float tileSize) {
+void ItemManager::Load() {
 	auto& ctx = GameContext::GetInstance();
 	auto& scene = ctx.Scene();
 
@@ -172,10 +173,10 @@ void ItemManager::Load(const float tileSize) {
 				if (t.translate == Vector3{ 0,0,0 }) continue;
 				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
 				auto matData = model->GetMaterial(0)->GetData();
-				if (!a) {
+				if (!spawned_) {
 					Spawn(pos, -1);
 
-					a = true;
+					spawned_ = true;
 				}
 			}
 		}

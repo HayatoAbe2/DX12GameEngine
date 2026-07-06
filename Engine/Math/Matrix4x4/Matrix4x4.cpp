@@ -414,6 +414,43 @@ Matrix4x4 MakeViewProjectionMatrix(Transform cameraTransform, Matrix4x4 projecti
 	return Multiply(viewMatrix, projectionMatrix);
 }
 
+/// <summary>
+/// LookAt行列
+/// </summary>
+/// <param name="eye">視点位置</param>
+/// <param name="target">向く座標</param>
+/// <param name="up">上方向(正規化済み)ベクトル</param>
+/// <returns></returns>
+Matrix4x4 MakeLookAtMatrix(
+	const Vector3& eye,
+	const Vector3& target,
+	const Vector3& up) {
+	Vector3 z = Normalize(target - eye);
+	Vector3 x = Normalize(Cross(up, z));
+	Vector3 y = Cross(z, x);
+
+	Matrix4x4 m = MakeIdentity4x4();
+
+	m.m[0][0] = x.x;
+	m.m[0][1] = y.x;
+	m.m[0][2] = z.x;
+
+	m.m[1][0] = x.y;
+	m.m[1][1] = y.y;
+	m.m[1][2] = z.y;
+
+	m.m[2][0] = x.z;
+	m.m[2][1] = y.z;
+	m.m[2][2] = z.z;
+
+	m.m[3][0] = -Dot(x, eye);
+	m.m[3][1] = -Dot(y, eye);
+	m.m[3][2] = -Dot(z, eye);
+	m.m[3][3] = 1.0f;
+
+	return m;
+}
+
 XMMATRIX ToXMMATRIX(const Matrix4x4& mat) {
 	return XMMATRIX(
 		mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[0][3],

@@ -261,6 +261,8 @@
     <ClCompile Include="Application\Weapon\Weapons\Sniper.cpp" />
     <ClCompile Include="Application\Weapon\Weapons\Burstgun.cpp" />
     <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
+    <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
+    <ClCompile Include="Engine\Math\CollisionShape\Circle\Circle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -573,6 +575,7 @@
     <ClInclude Include="Application\Weapon\Weapons\Sniper.h" />
     <ClInclude Include="Application\Weapon\Weapons\Burstgun.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

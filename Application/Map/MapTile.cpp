@@ -98,17 +98,17 @@ void MapTile::UpdateMapChange(bool isCombat) {
 		}
 
 		if (model->tag == "weaponSpawn") {
-			if (matData.color.w != 0) {
-				matData.color = { 0.3f, 1.0f, 0.3f, 0.5f };
-				model->GetMaterial(0)->SetData(matData);
-				model->GetMaterial(1)->SetData(matData);
-			}
-		} else if(model->tag == "enemySpawn") {
-			if (matData.color.w != 0) {
-				matData.color = { 1.0f, 0.3f, 0.3f, 0.5f };
-				model->GetMaterial(0)->SetData(matData);
-				model->GetMaterial(1)->SetData(matData);
-			}
+			matData.color = { 0.3f, 1.0f, 0.3f, 0.5f };
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
+		} else if (model->tag == "enemySpawn") {
+			matData.color = { 1.0f, 0.3f, 0.3f, 0.5f };
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
+		} else if (model->tag == "enemySpawnPoint") {
+			matData.color = { 0.7f, 0.7f, 0.0f, 0.5f };
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
 		}
 	}
 }

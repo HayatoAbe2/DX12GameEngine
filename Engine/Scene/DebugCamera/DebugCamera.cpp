@@ -1,13 +1,8 @@
 #include "DebugCamera.h"
 #include "Engine/Contexts/GameContext/GameContext.h"
 
-#include "numbers"
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
 void DebugCamera::Initialize() {
 	translation_ = { 0, 0, -50 };
-	matRot_ = MakeIdentity4x4();
 	target_ = { 0, 0, 0 };
 	distance_ = 50.0f;
 	yaw_ = 0.0f;
@@ -16,11 +11,11 @@ void DebugCamera::Initialize() {
 	isEnable_ = false;
 
 	auto& ctx = GameContext::GetInstance();
-	inputCtx_ = &ctx.Input();
+	input_ = &ctx.Input();
 }
 
 void DebugCamera::Update() {
-	if (inputCtx_->keyboard.IsTrigger(DIK_RSHIFT)) {
+	if (input_->keyboard.IsTrigger(DIK_RSHIFT)) {
 		// デバッグカメラの切り替え
 		isEnable_ = !isEnable_;
 	}
@@ -31,57 +26,48 @@ void DebugCamera::Update() {
 	}
 }
 
-void DebugCamera::ControlCamera() { // 球面座標系での移動
-	// カメラ前方向（ローカルZ+）をワールドに
-	Vector3 forward = { 0,0,1 };
-	Vector3 right = { 1,0,0 };
-	Vector3 up = { 0,1,0 };
-	right = TransformNormal({ 1,0,0 }, matRot_);
-	up = TransformNormal({ 0,1,0 }, matRot_);
+void DebugCamera::ControlCamera() {
+	Vector3 forward = Normalize(target_ - translation_);
+	Vector3 worldUp = { 0,1,0 };
+	Vector3 right = Normalize(Cross(worldUp, forward));
+	Vector3 up = Cross(forward, right);
 
 	// shift+マウスホイール押し込み中,ドラッグで視点移動
-	if (inputCtx_->keyboard.IsPress(DIK_LSHIFT) && inputCtx_->mouse.IsPress(MouseButton::Middle)) {
+	if (input_->keyboard.IsPress(DIK_LSHIFT) && input_->mouse.IsPress(MouseButton::Middle)) {
 
-		float moveX = inputCtx_->mouse.GetMouseMove().x * kMoveSpeed_;
-		float moveY = inputCtx_->mouse.GetMouseMove().y * kMoveSpeed_;
-
-		target_ = target_ + moveX * -right;
-		target_ = target_+ moveY * up;
+		float moveX = input_->mouse.GetMouseMove().x * kMoveSpeed_;
+		float moveY = input_->mouse.GetMouseMove().y * kMoveSpeed_;
+		float speed = distance_ * 0.02f; // 距離に比例して移動量変更
+		
+		target_ -= moveX * right * speed;
+		target_ += moveY * up * speed;
 
 	} else {
 
 		// マウスホイール押し込み中,ドラッグで視点回転
-		if (inputCtx_->mouse.IsPress(MouseButton::Middle)) {
+		if (input_->mouse.IsPress(MouseButton::Middle)) {
 			// マウスの移動量に回転速度を掛ける
-			float deltaYaw = inputCtx_->mouse.GetMouseMove().x * kRotateSpeed_;   // マウスXでY軸回転（左右）
-			float deltaPitch = inputCtx_->mouse.GetMouseMove().y * kRotateSpeed_; // マウスYでX軸回転（上下）
+			float deltaYaw = input_->mouse.GetMouseMove().x * kRotateSpeed_;   // マウスXでY軸回転（左右）
+			float deltaPitch = input_->mouse.GetMouseMove().y * kRotateSpeed_; // マウスYでX軸回転（上下）
 
-			Matrix4x4 matRotDelta = MakeIdentity4x4();
-			matRotDelta = Multiply(MakeRotateYMatrix(deltaYaw), matRotDelta);
-			matRotDelta = Multiply(matRotDelta, MakeRotateXMatrix(deltaPitch));
+			yaw_ += deltaYaw;
+			pitch_ += deltaPitch;
 
-			matRot_ = Multiply(matRotDelta, matRot_);
+			const float limit = 1.55f;
+			pitch_ = std::clamp(pitch_, -limit, limit);
 		}
 	}
 
 	// マウスホイールでズームイン・ズームアウト
-	float moveZ = inputCtx_->mouse.GetMouseMove().z * kMoveSpeed_;
+	float moveZ = input_->mouse.GetMouseMove().z * kMoveSpeed_;
 	distance_ += -moveZ;
 
-	// カメラは注視点から後ろ向きにdistance_移動した位置
-	Vector3 back = { 0,0,-distance_ };
-	back = TransformNormal(back, matRot_);
-	translation_ = target_ + back;
+	// 中心地点計算
+	translation_.x = target_.x - distance_ * cosf(pitch_) * sinf(yaw_);
+	translation_.y = target_.y + distance_ * sinf(pitch_);
+	translation_.z = target_.z - distance_ * cosf(pitch_) * cosf(yaw_);
 }
 
 void DebugCamera::UpdateView() {
-
-	// 座標から平行移動行列を計算する
-	Matrix4x4 translateMatrix = MakeTranslateMatrix(translation_);
-
-	// ワールド行列を計算
-	Matrix4x4 worldMatrix = Multiply(matRot_, translateMatrix);
-
-	// ワールド行列の逆行列をビュー行列に代入
-	viewMatrix_ = Inverse(worldMatrix);
+	viewMatrix_ = MakeLookAtMatrix(translation_, target_, { 0.0f,1.0f,0.0f });
 }

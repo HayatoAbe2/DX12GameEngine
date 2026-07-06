@@ -5,6 +5,8 @@
 #include <wrl.h>
 #include <Xinput.h>
 #pragma comment(lib, "Xinput.lib")
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
 #include "Engine/Math/MathUtils.h"
 
 enum class MouseButton {

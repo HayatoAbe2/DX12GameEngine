@@ -18,7 +18,7 @@ public:
 	void Drop(Vector3 pos,std::unique_ptr<Weapon> weapon);
 	void Reset();
 	void LoadCSV(const std::string& filePath,const float tileSize);
-	void Load(const float tileSize);
+	void Load();
 	
 private:
 	std::unique_ptr<Sprite> controlKey_ = nullptr;
@@ -27,6 +27,6 @@ private:
 	std::vector<std::unique_ptr<Item>> items_;
 	bool canInteract_ = true;
 
-	bool a = false;
+	bool spawned_ = false;
 };
 

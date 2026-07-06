@@ -99,4 +99,5 @@ private:
 	bool isPause_ = false;
 
 	std::unique_ptr<Primitive> cylinder_ = nullptr;
+	bool isLoad_ = false;
 };
