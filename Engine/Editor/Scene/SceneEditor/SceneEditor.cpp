@@ -27,11 +27,13 @@ void SceneEditor::Update() {
 		scene_->FlushDelete();
 	}
 
+#ifdef USE_IMGUI
 	// クリックで選択
 	if (!ImGuizmo::IsUsing() &&
 		GameContext::GetInstance().Input().mouse.IsRelease(MouseButton::Left)) { 
 		ClickSelect();
 	}
+#endif
 }
 
 void SceneEditor::Draw(Camera* camera) {
