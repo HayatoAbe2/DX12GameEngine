@@ -51,6 +51,12 @@ void EquipmentUI::Initialize(Player* player) {
 	swapUIPad->SetPosition(swapUIData_.pos);
 	swapUIPad->SetTextureRect(64 * 4, 64 * 8, 64, 64);
 
+	ammo_ = asset.LoadSprite("Resources/Debug/White1x1.png");
+	ammo_->SetSize({150, 150});
+	ammo_->SetPosition({1100, 530});
+	ammo2_ = asset.LoadSprite("Resources/Debug/White1x1.png");
+	ammo2_->SetSize({85, 85});
+	ammo2_->SetPosition({1165, 433 });
 }
 
 void EquipmentUI::Update() {
@@ -140,7 +146,14 @@ void EquipmentUI::Update() {
 
 			equipment2_->SetSize({ 85, 85 });
 			equipment2_->SetPosition({ 1165, 433 }); 
+
+			ammo2_->SetSize({ 85 * weapon2->GetCharge() / weapon2->GetData().stats.maxCharge, 85 });
+			ammo2_->SetColor({ 1,1,1,0.5f });
 		}
+
+		
+		ammo_->SetSize({ 150 * weapon->GetCharge() / weapon->GetData().stats.maxCharge, 150 });
+		ammo_->SetColor({ 1,1,1,0.5f });
 	}
 }
 
@@ -163,6 +176,7 @@ void EquipmentUI::Draw() {
 			render.DrawSprite(shootUIKey.get());
 		}
 		render.DrawSprite(equipment_);
+		render.DrawSprite(ammo_.get());
 	}
 
 	auto subWeapon = player_->GetSubWeapon();
@@ -178,5 +192,6 @@ void EquipmentUI::Draw() {
 			render.DrawSprite(swapUIKey.get());
 		}
 		render.DrawSprite(equipment2_);
+		render.DrawSprite(ammo2_.get());
 	}
 }

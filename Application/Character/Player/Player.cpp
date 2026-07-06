@@ -165,6 +165,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 			}
 
 			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / shootCooldownTimer_->GetStartTime()), scSize_.y });
+			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / shootCooldownTimer_->GetStartTime()), scSize_.y });
 		}
 
 		if (stunTimer_->IsActive()) {

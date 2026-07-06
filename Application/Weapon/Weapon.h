@@ -19,10 +19,13 @@ public:
 	// データ(基礎数値)
 	const WeaponData& GetData() const { return data_; }
 	
+	float GetCharge() { return charge_; }
 protected:
 	WeaponData data_;
 	WeaponModifier modifier_{};
 	std::unique_ptr<Model> model_;
 	std::unique_ptr<Model> shadowModel_;
+
+	float charge_;
 };
 

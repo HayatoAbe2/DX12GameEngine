@@ -31,6 +31,9 @@ private:
 	std::unique_ptr<Sprite> equipFireBall2_ = nullptr;
 	std::unique_ptr<Sprite> equipWavegun2_ = nullptr;
 
+	std::unique_ptr<Sprite> ammo_ = nullptr;
+	std::unique_ptr<Sprite> ammo2_ = nullptr;
+
 	// 操作
 	std::unique_ptr<Sprite> shootUIKey = nullptr;
 	std::unique_ptr<Sprite> shootUIPad = nullptr;

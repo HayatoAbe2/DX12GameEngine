@@ -177,6 +177,9 @@ void WeaponManager::LoadJson(const std::string& path) {
 
 		wd.stats.knockback = data["knockback"];
 
+		wd.stats.maxCharge = data["maxCharge"];
+		wd.stats.chargeTime = data["chargeTime"];
+
 		auto color = data["bulletColor"];
 		wd.bulletColor.x = color[0];
 		wd.bulletColor.y = color[1];

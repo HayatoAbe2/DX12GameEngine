@@ -28,6 +28,10 @@ struct WeaponStats {
 	int bulletLifeTime;
 	// ノックバック
 	float knockback;
+	// 最大チャージ(弾数)
+	float maxCharge;
+	// 1発分のチャージ時間
+	float chargeTime;
 };
 
 struct WeaponData {

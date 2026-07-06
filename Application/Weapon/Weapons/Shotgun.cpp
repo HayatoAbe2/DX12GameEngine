@@ -2,9 +2,14 @@
 #include "Bullet/BulletManager.h"
 #include "Bullet/SpreadBullet.h"
 #include <Character/Enemy/Enemy.h>
+#include <Character/Player/Player.h>
 #include <numbers>
 
 float Shotgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
+	if (dynamic_cast<Player*>(from) && charge_ < 1.0f) {
+		return 0;
+	}
+
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	auto& audio = ctx.Audio();
@@ -24,11 +29,16 @@ float Shotgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Cam
 	if (dynamic_cast<Enemy*>(from)) {
 		return data_.stats.shootCoolTime * 2;
 	} else {
+		charge_--;
+		charge_ = (std::max)(charge_, 0.0f);
+
 		camera->StartShake(1.5f, 5);
 		return data_.stats.shootCoolTime;
 	}
 }
 
 void Shotgun::Update() {
+	float deltatime = GameContext::GetInstance().GetDeltatime();
+	charge_ = (std::min)(data_.stats.maxCharge, charge_ + data_.stats.chargeTime * deltatime);
 }
 

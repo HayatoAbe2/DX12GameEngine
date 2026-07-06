@@ -2,8 +2,13 @@
 #include "Bullet/BulletManager.h"
 #include "Bullet/SpreadBullet.h"
 #include <Character/Enemy/Enemy.h>
+#include <Character/Player/Player.h>
 
 float Burstgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
+	if (dynamic_cast<Player*>(from) && charge_ < 1.0f) {
+		return 0;
+	}
+
 	bulletManager_ = bulletManager;
 	from_ = from;
 	auto& ctx = GameContext::GetInstance();
@@ -28,12 +33,18 @@ float Burstgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Ca
 	if (dynamic_cast<Enemy*>(from)) {
 		return data_.stats.shootCoolTime * 2;
 	} else {
+		charge_--;
+		charge_ = (std::max)(charge_, 0.0f);
+
 		camera->StartShake(0.2f, 2);
 		return data_.stats.shootCoolTime;
 	}
 }
 
 void Burstgun::Update() {
+	float deltatime = GameContext::GetInstance().GetDeltatime();
+	charge_ = (std::min)(data_.stats.maxCharge, charge_ + data_.stats.chargeTime * deltatime);
+
 	for (int i = 0; i < 2; ++i) {
 		if (burstTimer_[i]->IsActive()) {
 			burstTimer_[i]->Update();
