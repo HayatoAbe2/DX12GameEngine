@@ -46,8 +46,9 @@ void GameScene::Initialize() {
 	std::unique_ptr<InstancedModel> wallShadow = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	std::unique_ptr<InstancedModel> floor = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 900);
 	std::unique_ptr<InstancedModel> barrier = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	std::unique_ptr<InstancedModel> enemySpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	std::unique_ptr<InstancedModel> weaponSpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
+	std::unique_ptr<InstancedModel> enemySpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 30);
+	std::unique_ptr<InstancedModel> enemySpawnPoint = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 100);
+	std::unique_ptr<InstancedModel> weaponSpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 30);
 	std::unique_ptr<InstancedModel> start = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
 	std::unique_ptr<InstancedModel> goal = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
 
@@ -74,12 +75,14 @@ void GameScene::Initialize() {
 	floor->tag = "floor";
 	barrier->tag = "barrier";
 	enemySpawn->tag = "enemySpawn";
+	enemySpawnPoint->tag = "weaponSpawnPoint";
 	weaponSpawn->tag = "weaponSpawn";
 	goal->tag = "goal";
 	this->AddObject(std::move(wall));
 	this->AddObject(std::move(floor));
 	this->AddObject(std::move(barrier));
 	this->AddObject(std::move(enemySpawn));
+	this->AddObject(std::move(enemySpawnPoint));
 	this->AddObject(std::move(weaponSpawn));
 	this->AddObject(std::move(goal));
 

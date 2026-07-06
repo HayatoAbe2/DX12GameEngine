@@ -1,6 +1,6 @@
 #include "AssaultRifle.h"
 #include "Bullet/BulletManager.h"
-#include "Bullet/NormalBullet.h"
+#include "Bullet/RapidBullet.h"
 #include <Character/Enemy/Enemy.h>
 
 float AssaultRifle::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
@@ -10,7 +10,7 @@ float AssaultRifle::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager
 
 	auto bullet = asset.LoadModel("Resources/Bullets", "gunBullet.obj");
 	bullet->SetTranslate(pos);
-	std::unique_ptr<NormalBullet> newBullet = std::make_unique<NormalBullet>(std::move(bullet), dir, data_, from);
+	std::unique_ptr<RapidBullet> newBullet = std::make_unique<RapidBullet>(std::move(bullet), dir, data_, from);
 	newBullet->Initialize();
 	bulletManager->AddBullet(std::move(newBullet));
 

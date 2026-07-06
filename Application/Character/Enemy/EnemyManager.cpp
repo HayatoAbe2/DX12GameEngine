@@ -75,7 +75,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight.obj");
 		enemyModel->SetTranslate(pos);
 		enemyShadowModel->SetTranslate(pos);
-		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Pistol)));
 		status.hp = 20;
 		status.radius = 0.9f;
 		status.moveSpeed = 3.5f;
@@ -93,8 +93,8 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight2.obj");
 		enemyModel->SetTranslate(pos);
 		enemyShadowModel->SetTranslate(pos);
-		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
-		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Pistol)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Pistol)));
 		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
 		status.hp = 150;
 		status.radius = 1.5f;
@@ -115,7 +115,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		enemyModel->SetTranslate(pos);
 		enemyShadowModel->SetTranslate(pos);
 		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
-		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Pistol)));
+		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::AssaultRifle)));
 		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Wavegun)));
 		status.hp = 110;
 		status.radius = 0.75f;
