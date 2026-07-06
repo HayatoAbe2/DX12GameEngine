@@ -126,7 +126,7 @@ void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
 
 void ItemManager::Reset() {
 	items_.clear();
-	spawned_ = false;
+	spawned_.clear();
 }
 
 void ItemManager::LoadCSV(const std::string& filePath, const float tileSize) {
@@ -167,16 +167,18 @@ void ItemManager::Load() {
 	}
 
 	for (auto& model : models) {
-		auto matData = model->GetMaterial(0)->GetData();
 		if (model->tag == "weaponSpawn") {
-			for (Transform& t : model->GetTransforms()) {
-				if (t.translate == Vector3{ 0,0,0 }) continue;
-				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-				auto matData = model->GetMaterial(0)->GetData();
-				if (!spawned_) {
-					Spawn(pos, -1);
+			int size = int(model->GetTransforms().size());
+			if (int(spawned_.size()) < size) spawned_.resize(size);
 
-					spawned_ = true;
+			for (int i = 0; i < model->GetTransforms().size(); ++i) {
+				Transform t = model->GetTransforms()[i];
+				if (t.translate == Vector3{ 0,0,0 }) continue;
+				
+				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+				if (!spawned_[i]) {
+					Spawn(pos, -1);
+					spawned_[i] = true;
 				}
 			}
 		}

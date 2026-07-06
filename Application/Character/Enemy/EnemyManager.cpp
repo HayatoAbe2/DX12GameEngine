@@ -226,6 +226,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, const Vector3& playerPos, 
 						int num = ctx.RandomInt(1, 3);
 						if (num == 3) num = 5;
 
+						pos.y = 0;
 						Spawn(pos, weaponManager, num);
 					}
 				}

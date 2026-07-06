@@ -30,8 +30,11 @@ void SceneEditor::Update() {
 #ifdef USE_IMGUI
 	// クリックで選択
 	if (!ImGuizmo::IsUsing() &&
-		GameContext::GetInstance().Input().mouse.IsRelease(MouseButton::Left)) { 
+		GameContext::GetInstance().Input().mouse.IsRelease(MouseButton::Left) &&
+		scene_->IsEditMode()) {
 		ClickSelect();
+	} else if (scene_ && !scene_->IsEditMode()) {
+		selected_ = nullptr;
 	}
 #endif
 }
@@ -224,6 +227,11 @@ void SceneEditor::Draw(Camera* camera) {
 					ImGui::DragFloat("Scale Snap", &scaleSnap_, 0.01f, 0.01f, 10.0f);
 					break;
 				}
+				ImGui::Checkbox("UseRangeSelect", &gizmoCtx_.useRangeSelect);
+				if (gizmoCtx_.useRangeSelect) {
+					ImGui::DragInt("Min", &gizmoCtx_.minRange, 1, 0, int(transforms.size()));
+					ImGui::DragInt("Max", &gizmoCtx_.maxRange, 1, 0, int(transforms.size()));
+				}
 				ImGui::Checkbox("EditAllInstances", &gizmoCtx_.editAllInstances);
 
 				ImGuizmo::OPERATION op;
@@ -285,15 +293,40 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 
 		// インスタンシング描画モデル
 		if (auto* model = dynamic_cast<InstancedModel*>(object)) {
-			if (input.keyboard.IsTrigger(DIK_LEFT)) editingInstance_--;
-			if (input.keyboard.IsTrigger(DIK_RIGHT)) editingInstance_++;
+			auto transforms = model->GetTransforms();
+
+			if (input.keyboard.IsTrigger(DIK_LEFT)) {
+				editingInstance_--;
+			}
+			if (input.keyboard.IsTrigger(DIK_RIGHT)) {
+				editingInstance_++;
+				if (transforms.size() > editingInstance_ && input.keyboard.IsPress(DIK_LSHIFT)) {
+					if (gizmoCtx_.useRangeSelect) {
+
+						int r = gizmoCtx_.maxRange + 1 - gizmoCtx_.minRange;
+						for (int i = gizmoCtx_.minRange; i <= gizmoCtx_.maxRange; i++) {
+							// transformコピー
+							if (i + r < transforms.size()) {
+								model->SetTransforms(i + r, transforms[i]);
+							}
+						}
+						
+						if (gizmoCtx_.minRange + r < transforms.size()) {
+							gizmoCtx_.minRange += r;
+							gizmoCtx_.maxRange += r;
+						}
+					} else {
+
+						// transformコピー
+						transforms[editingInstance_] = transforms[editingInstance_ - 1];
+					}
+				}
+			}
 
 			int count = model->GetNumInstance();
 			ImGui::DragInt("Instance", &editingInstance_, 1, 0, count - 1);
 
 			gizmoCtx_.editingInstance = editingInstance_;
-
-			auto transforms = model->GetTransforms();
 
 			Transform t = transforms[editingInstance_];
 
@@ -585,9 +618,6 @@ void SceneEditor::DeserializeScene(const std::string& jsonText) {
 			model->tag = objectJson["tag"];
 
 			for (int i = 0; i < count; i++) {
-
-				model->AddInstanceTransform();
-
 				Transform t;
 
 				auto& json = objectJson["transforms"][i];

@@ -139,7 +139,7 @@ void EquipmentUI::Update() {
 			}
 
 			equipment2_->SetSize({ 85, 85 });
-			equipment2_->SetPosition({ 1165, 433 });
+			equipment2_->SetPosition({ 1165, 433 }); 
 		}
 	}
 }

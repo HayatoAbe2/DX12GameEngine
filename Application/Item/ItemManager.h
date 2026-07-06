@@ -27,6 +27,6 @@ private:
 	std::vector<std::unique_ptr<Item>> items_;
 	bool canInteract_ = true;
 
-	bool spawned_ = false;
+	std::vector<bool> spawned_;
 };
 

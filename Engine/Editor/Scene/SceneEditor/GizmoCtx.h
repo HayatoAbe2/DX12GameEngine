@@ -14,5 +14,9 @@ struct GizmoCtx {
 	SceneObject* target;
 	int editingInstance;
 	bool editAllInstances;
+
+	bool useRangeSelect = false;
+	int minRange = 0;
+	int maxRange = 0;
 };
 #endif

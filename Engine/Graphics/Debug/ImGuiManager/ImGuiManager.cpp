@@ -195,7 +195,7 @@ void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT wind
 			}
 		} else {
 			// 離したとき
-			if (gizmoCtx_.editAllInstances && wasUsing_) {
+			if ((gizmoCtx_.editAllInstances || gizmoCtx_.useRangeSelect) && wasUsing_) {
 
 				if (auto* target = dynamic_cast<InstancedModel*>(gizmoCtx_.target)) {
 					auto transforms = target->GetTransforms();
@@ -204,11 +204,20 @@ void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT wind
 
 						if (i == gizmoCtx_.editingInstance) continue;
 
-						transforms[i].translate += deltaTransform_.translate;
-						transforms[i].rotate += deltaTransform_.rotate;
-						transforms[i].scale += deltaTransform_.scale;
+						if (gizmoCtx_.editAllInstances) {
+							transforms[i].translate += deltaTransform_.translate;
+							transforms[i].rotate += deltaTransform_.rotate;
+							transforms[i].scale += deltaTransform_.scale;
+							target->SetTransforms(i, transforms[i]);
 
-						target->SetTransforms(i, transforms[i]);
+						} else if(gizmoCtx_.useRangeSelect) {
+							if (gizmoCtx_.minRange <= i && gizmoCtx_.maxRange >= i) {
+								transforms[i].translate += deltaTransform_.translate;
+								transforms[i].rotate += deltaTransform_.rotate;
+								transforms[i].scale += deltaTransform_.scale;
+								target->SetTransforms(i, transforms[i]);
+							}
+						}
 					}
 
 				}

@@ -62,6 +62,7 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 
 	attackDirection_ = Normalize(Vector3(1, 0, 0));
 	transform_.rotate.y = -std::atan2(attackDirection_.z, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
+	transform_.translate.x = 5;
 }
 
 void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera, BulletManager* bulletManager) {
@@ -131,9 +132,13 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		if (weapon_) {
 			weapon_->Update();
 
-			// 入れ替え
-			if ((input.keyboard.IsTrigger(DIK_TAB) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_B)) && subWeapon_) {
-				weapon_.swap(subWeapon_);
+			if (subWeapon_) {
+				subWeapon_->Update();
+
+				// 入れ替え
+				if ((input.keyboard.IsTrigger(DIK_TAB) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_B))) {
+					weapon_.swap(subWeapon_);
+				}
 			}
 
 			// 武器のトランスフォーム

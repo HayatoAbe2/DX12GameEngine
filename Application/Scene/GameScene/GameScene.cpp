@@ -47,7 +47,7 @@ void GameScene::Initialize() {
 	std::unique_ptr<InstancedModel> floor = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 900);
 	std::unique_ptr<InstancedModel> barrier = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
 	std::unique_ptr<InstancedModel> enemySpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 30);
-	std::unique_ptr<InstancedModel> enemySpawnPoint = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 100);
+	std::unique_ptr<InstancedModel> enemySpawnPoint = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 300);
 	std::unique_ptr<InstancedModel> weaponSpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 30);
 	std::unique_ptr<InstancedModel> start = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
 	std::unique_ptr<InstancedModel> goal = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
@@ -75,7 +75,7 @@ void GameScene::Initialize() {
 	floor->tag = "floor";
 	barrier->tag = "barrier";
 	enemySpawn->tag = "enemySpawn";
-	enemySpawnPoint->tag = "weaponSpawnPoint";
+	enemySpawnPoint->tag = "enemySpawnPoint";
 	weaponSpawn->tag = "weaponSpawn";
 	goal->tag = "goal";
 	this->AddObject(std::move(wall));
@@ -342,6 +342,14 @@ void GameScene::Update() {
 	mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty());
 	camera_->Update(debugCamera_.get());
 	debugCamera_->Update();
+
+	if (!enableEditMode_) {
+		itemManager_->Load();
+		enemyManager_->Load(weaponManager_.get(), player_->GetTransform().translate, mapCheck_.get());
+
+	} else {
+		isLoad_ = false;
+	}
 }
 
 void GameScene::Draw() {
@@ -357,8 +365,6 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
-
-	//render.DrawPrimitive(cylinder_.get());
 
 	if (currentFloor_ == 0) {
 		// チュートリアル表示
@@ -415,13 +421,7 @@ void GameScene::Draw() {
 	};
 	ImGui::End();
 
-	ImGui::Begin("LoadScene");
-	ImGui::Checkbox("Load", &isLoad_);
-	if (isLoad_){
-		itemManager_->Load();
-		enemyManager_->Load(weaponManager_.get(), player_->GetTransform().translate, mapCheck_.get());
-	}
-	ImGui::End();
+
 #endif
 }
 
