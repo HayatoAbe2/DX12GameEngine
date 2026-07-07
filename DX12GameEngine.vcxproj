@@ -169,8 +169,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
     <ClCompile Include="Application\Weapon\Weapons\ChargeGun.cpp" />
     <ClCompile Include="Application\Weapon\Weapons\Burstgun.cpp" />
-    <ClCompile Include="Engine\Math\CollisionShape\Circle\Circle.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
+    <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Bullet\Bullet.cpp" />
@@ -212,7 +212,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Graphics\Core\DeviceManager\DeviceManager.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.cpp" />
-    <ClCompile Include="Engine\Math\CollisionShape\AABB\AABB.cpp" />
     <ClCompile Include="Engine\App\App.cpp" />
     <ClCompile Include="Engine\Io\AudioSystem\AudioSystem.cpp" />
     <ClCompile Include="Engine\Math\Vector2\Vector2.cpp" />
@@ -423,7 +422,10 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Weapon\Weapons\Burstgun.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\GizmoCtx.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />
+    <ClInclude Include="Engine\Math\VectorConvert\VectorConvert.h" />
     <ClInclude Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.h" />
     <ClInclude Include="Engine\Asset\Manager\AnimationManager\AnimationManager.h" />
     <ClInclude Include="Engine\Asset\Resource\Animation.h" />
@@ -475,11 +477,11 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\SceneObject\Model\Node.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.h" />
-    <ClInclude Include="Engine\Math\CollisionShape\AABB\AABB.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\AABB.h" />
     <ClInclude Include="Engine\App\App.h" />
     <ClInclude Include="Engine\Io\AudioSystem\AudioSystem.h" />
-    <ClInclude Include="Engine\Math\CollisionShape\Circle\Circle.h" />
-    <ClInclude Include="Engine\Math\CollisionShape\Sphere\Sphere.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Circle.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Sphere.h" />
     <ClInclude Include="Engine\Graphics\GPUData\LightsForGPU.h" />
     <ClInclude Include="Engine\SceneObject\Lights\SpotLight.h" />
     <ClInclude Include="Engine\Graphics\GPUData\MaterialData.h" />
@@ -539,7 +541,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\SceneObject\Particle\ParticleField\ParticleField.h" />
     <ClInclude Include="Engine\SceneObject\LightManager\LightManager.h" />
     <ClInclude Include="Engine\SceneObject\Model\ModelData.h" />
-    <ClInclude Include="Engine\Math\CollisionShape\Ray\Ray.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Ray.h" />
     <ClInclude Include="Engine\Asset\Manager\ModelManager\ModelManager.h" />
     <ClInclude Include="Engine\Asset\Manager\TextureManager\TextureManager.h" />
     <ClInclude Include="Engine\Contexts\RenderContext\RenderContext.h" />

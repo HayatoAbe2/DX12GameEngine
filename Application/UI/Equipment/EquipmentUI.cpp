@@ -147,12 +147,12 @@ void EquipmentUI::Update() {
 			equipment2_->SetSize({ 85, 85 });
 			equipment2_->SetPosition({ 1165, 433 }); 
 
-			ammo2_->SetSize({ 85 * weapon2->GetCharge() / weapon2->GetData().stats.maxCharge, 85 });
+			ammo2_->SetSize({ 85 * (1.0f - weapon2->GetCharge() / weapon2->GetData().stats.maxCharge), 85 });
 			ammo2_->SetColor({ 1,1,1,0.5f });
 		}
 
 		
-		ammo_->SetSize({ 150 * weapon->GetCharge() / weapon->GetData().stats.maxCharge, 150 });
+		ammo_->SetSize({ 150 * (1.0f - weapon->GetCharge() / weapon->GetData().stats.maxCharge), 150 });
 		ammo_->SetColor({ 1,1,1,0.5f });
 	}
 }

@@ -28,7 +28,7 @@ void WaveBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 		float sinWave_ = sinf(0.4f * float(std::numbers::pi) * time_ - 0.5f);
 		currentVel = TransformVector(velocity_, MakeRotateYMatrix(float(std::numbers::pi) / 5.0f * sinWave_));
 
-		prePos_ = model_->GetTransform().translate;
+		prePos_ = ToXZ(model_->GetTransform().translate);
 		model_->SetTranslate(model_->GetTransform().translate + currentVel);
 
 		// マップ当たり判定

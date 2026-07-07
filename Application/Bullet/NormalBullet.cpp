@@ -20,7 +20,7 @@ void NormalBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 	auto& ctx = GameContext::GetInstance();
 
 	if (!isDead_) {
-		prePos_ = model_->GetTransform().translate;
+		prePos_ = ToXZ(model_->GetTransform().translate);
 		model_->SetTranslate(model_->GetTransform().translate + Vector3{velocity_.x,0,0});
 		// マップ当たり判定
 		Vector2 pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };

@@ -95,7 +95,7 @@ void Enemy::Stun(MapCheck* mapCheck) {
 	for (int i = 0; i < 3; ++i) { // 3回に分ける
 		pos.x += knockbackVelocity_.x / 3.0f;
 		mapCheck->ResolveCollisionX(pos, status_.radius, true);
-		pos.y += knockbackVelocity_.z / 3.0f;
+		pos.y += knockbackVelocity_.y / 3.0f;
 		mapCheck->ResolveCollisionY(pos, status_.radius, true);
 	}
 
@@ -129,7 +129,7 @@ void Enemy::Draw(Camera* camera) {
 	render.DrawModel(model_.get());
 }
 
-void Enemy::Hit(float damage, Vector3 from, const float knockback) {
+void Enemy::Hit(float damage, const Vector2& from, const float knockback) {
 
 	status_.hp -= damage;
 	if (status_.hp <= 0) { isDead_ = true; }
@@ -139,7 +139,7 @@ void Enemy::Hit(float damage, Vector3 from, const float knockback) {
 		stunTimer_->Start(float(10 - status_.stunResist) / 60);
 
 		// ノックバック
-		knockbackVelocity_ = Normalize(model_->GetTransform().translate - from) * knockback;
+		knockbackVelocity_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * knockback;
 	}
 
 	// 待機状態なら発見させる

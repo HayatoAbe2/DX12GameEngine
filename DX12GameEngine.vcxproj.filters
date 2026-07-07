@@ -93,9 +93,6 @@
     <ClCompile Include="Engine\Math\Lerp\Lerp.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\CollisionShape\AABB\AABB.cpp">
-      <Filter>Engine\Math</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
@@ -262,7 +259,7 @@
     <ClCompile Include="Application\Weapon\Weapons\Burstgun.cpp" />
     <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
-    <ClCompile Include="Engine\Math\CollisionShape\Circle\Circle.cpp" />
+    <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -344,7 +341,7 @@
     <ClInclude Include="Engine\Math\Lerp\Lerp.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\CollisionShape\AABB\AABB.h">
+    <ClInclude Include="Engine\Math\CollisionShape\AABB.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Pipeline\ShaderCompiler\ShaderCompiler.h">
@@ -413,7 +410,7 @@
     <ClInclude Include="Engine\Graphics\GPUData\MaterialData.h">
       <Filter>Engine\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\CollisionShape\Sphere\Sphere.h">
+    <ClInclude Include="Engine\Math\CollisionShape\Sphere.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\SceneObject\Transform.h">
@@ -494,7 +491,7 @@
     <ClInclude Include="Application\Scene\GameScene\GameScene.h">
       <Filter>Application\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\CollisionShape\Ray\Ray.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Ray.h" />
     <ClInclude Include="Engine\Asset\Manager\AssetManager\AssetManager.h" />
     <ClInclude Include="Engine\Asset\Manager\ModelManager\ModelManager.h" />
     <ClInclude Include="Engine\Asset\Manager\TextureManager\TextureManager.h" />
@@ -550,7 +547,7 @@
     <ClInclude Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.h" />
     <ClInclude Include="Externals\nlohmann\json.hpp" />
     <ClInclude Include="Engine\SceneObject\Model\Skeleton.h" />
-    <ClInclude Include="Engine\Math\CollisionShape\Circle\Circle.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Circle.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
@@ -576,6 +573,9 @@
     <ClInclude Include="Application\Weapon\Weapons\Burstgun.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />
+    <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
+    <ClInclude Include="Engine\Math\VectorConvert\VectorConvert.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

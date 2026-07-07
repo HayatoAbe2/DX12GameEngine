@@ -244,7 +244,7 @@ void Player::Draw(Camera* camera) {
 #endif
 }
 
-void Player::Hit(float damage, Vector3 from) {
+void Player::Hit(float damage, const Vector2& from) {
 	auto& ctx = GameContext::GetInstance();
 
 	if (invincibleTimer_->IsFinished()) {
@@ -261,7 +261,7 @@ void Player::Hit(float damage, Vector3 from) {
 				stunTimer_->Start(stunTime_);
 
 				// ノックバック
-				knockbackVel_ = Normalize(model_->GetTransform().translate - from) * 15.0f;
+				knockbackVel_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * 15.0f;
 
 				// ダメージを受けると色変更
 				auto data = model_->GetMaterial(0)->GetData();
@@ -443,7 +443,7 @@ void Player::Stun(MapCheck* mapCheck) {
 		for (int i = 0; i < 3; ++i) { // 3回に分ける
 			pos.x += knockbackVel_.x / 3.0f;
 			mapCheck->ResolveCollisionX(pos, radius_, true);
-			pos.y += knockbackVel_.z / 3.0f;
+			pos.y += knockbackVel_.y / 3.0f;
 			mapCheck->ResolveCollisionY(pos, radius_, true);
 		}
 

@@ -32,7 +32,7 @@ public:
 	void Draw(Camera* camera);
 
 	// 被ダメージ時
-	void Hit(float damage,Vector3 from, const float knockback);
+	void Hit(float damage, const Vector2& from, const float knockback);
 
 	// 敵ごとの関数
 	virtual void Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) = 0;
@@ -56,7 +56,7 @@ protected:
 
 	// 移動
 	Vector3 velocity_{};
-	Vector3 knockbackVelocity_{};
+	Vector2 knockbackVelocity_{};
 
 	// モデル
 	std::unique_ptr<Model> model_ = nullptr;

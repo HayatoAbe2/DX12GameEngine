@@ -421,7 +421,6 @@ void GameScene::Draw() {
 	};
 	ImGui::End();
 
-
 #endif
 }
 

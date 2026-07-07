@@ -24,7 +24,7 @@ void OrbitBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 	auto& ctx = GameContext::GetInstance();
 
 	if (!isDead_) {
-		prePos_ = model_->GetTransform().translate;
+		prePos_ = ToXZ(model_->GetTransform().translate);
 		model_->SetTranslate(user_->GetTransform().translate + 1.5f * Vector3(std::sin(angle_), 0.0f, std::cos(angle_)));
 		angle_ += 0.06f;
 		// マップ当たり判定

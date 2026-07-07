@@ -2,7 +2,7 @@
 #include "Bullet.h"
 #include "GameCommon.h"
 
-class AccelBullet :public Bullet {
+class AccelBullet : public Bullet {
 public:
 	AccelBullet(std::unique_ptr<Model> model, const Vector3& direction, const WeaponData& data, Character* from) :
 		Bullet(std::move(model), direction, data, from) {

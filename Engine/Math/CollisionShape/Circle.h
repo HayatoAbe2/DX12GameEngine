@@ -4,6 +4,4 @@
 struct Circle {
     float radius;
     Vector2 center;
-
-    bool CheckCollision(const Circle& other);
 };

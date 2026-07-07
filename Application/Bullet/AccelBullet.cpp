@@ -26,7 +26,7 @@ void AccelBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 		velocity_ = dir * (length * 1.05f);
 		data_.stats.knockback *= 1.02f;
 
-		prePos_ = model_->GetTransform().translate;
+		prePos_ = ToXZ(model_->GetTransform().translate);
 		model_->SetTranslate(model_->GetTransform().translate + velocity_);
 
 		// マップ当たり判定

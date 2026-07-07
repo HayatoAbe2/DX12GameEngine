@@ -33,7 +33,7 @@ public:
 	void Draw(Camera* camera);
 
 	// 被弾
-	void Hit(float damage, Vector3 from);
+	void Hit(float damage, const Vector2& from);
 
 	void Move(MapCheck* mapCheck);
 	void Shoot(BulletManager* bulletManager, Camera* camera);
@@ -89,7 +89,7 @@ private:
 	// スタン時間
 	std::unique_ptr<Timer> stunTimer_ = nullptr;
 	float stunTime_ = 0.25f;
-	Vector3 knockbackVel_{};
+	Vector2 knockbackVel_{};
 
 	bool isFall_ = false;
 	Vector3 landPos_{};

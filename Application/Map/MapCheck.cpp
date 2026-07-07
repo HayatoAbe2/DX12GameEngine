@@ -248,8 +248,8 @@ bool MapCheck::IsGoal(const Vector2& pos, float radius, bool canGoal) {
 }
 
 bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerPos) {
-	Ray ray = { enemyPos, playerPos - enemyPos };
-	ray.diff.y = 0.0001f;
+	Ray3D ray = { enemyPos, playerPos - enemyPos };
+	ray.direction.y = 0.0001f;
 
 	int mapH = static_cast<int>(map_.size());
 	int mapW = static_cast<int>(map_[0].size());
@@ -268,16 +268,16 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 
 			Vector3 tMin =
 			{
-				(aabb.min.x - ray.origin.x) / ray.diff.x,
-				(aabb.min.y - ray.origin.y) / ray.diff.y,
-				(aabb.min.z - ray.origin.z) / ray.diff.z
+				(aabb.min.x - ray.origin.x) / ray.direction.x,
+				(aabb.min.y - ray.origin.y) / ray.direction.y,
+				(aabb.min.z - ray.origin.z) / ray.direction.z
 			};
 
 			Vector3 tMax =
 			{
-				(aabb.max.x - ray.origin.x) / ray.diff.x,
-				(aabb.max.y - ray.origin.y) / ray.diff.y,
-				(aabb.max.z - ray.origin.z) / ray.diff.z
+				(aabb.max.x - ray.origin.x) / ray.direction.x,
+				(aabb.max.y - ray.origin.y) / ray.direction.y,
+				(aabb.max.z - ray.origin.z) / ray.direction.z
 			};
 
 			Vector3 tNear =
@@ -297,7 +297,7 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 			float tmin = std::max(std::max(tNear.x, tNear.y), tNear.z);
 			float tmax = std::min(std::min(tFar.x, tFar.y), tFar.z);
 
-			if (tmax >= 0.0f && tmin <= tmax && tmin <= Length(ray.diff)) {
+			if (tmax >= 0.0f && tmin <= tmax && tmin <= Length(ray.direction)) {
 				return false;
 			}
 		}

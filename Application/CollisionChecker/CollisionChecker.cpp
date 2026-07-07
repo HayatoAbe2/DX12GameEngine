@@ -7,7 +7,6 @@
 #include <Bullet/WaveBullet.h>
 #include <Bullet/FireBullet.h>
 #include <Bullet/OrbitBullet.h>
-#include <Engine/Math/CollisionShape/Circle/Circle.h>
 
 void CollisionChecker::Initialize(EffectManager* effectManager) {
 	effectManager_ = effectManager;
@@ -18,10 +17,15 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera) {
 	auto& audio = ctx.Audio();
 
 	// 敵の弾でなかったらor無敵時間なら判定しない
-	if (!bullet->IsEnemyBullet() || bullet->IsDead() || player->IsBoosting()) { return; }
+	if (!bullet->IsEnemyBullet() ||
+		bullet->IsDead() ||
+		player->IsBoosting()) {
+		return;
+	}
 
-	if (Length(player->GetTransform().translate - bullet->GetTransform().translate) <=
-		player->GetRadius() + bullet->GetTransform().scale.x / 2.0f) {
+	Segment2D segment = { bullet->GetPrePos(), ToXZ(bullet->GetTransform().translate) };
+	Circle circle = { player->GetRadius() + bullet->GetTransform().scale.x / 2.0f, ToXZ(player->GetTransform().translate) };
+	if (CheckCollision(segment, circle)) {
 		player->Hit(bullet->GetDamage(), bullet->GetPrePos());
 		bullet->Hit();
 		camera->StartShake(1.0f, 3);
@@ -42,10 +46,11 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 	// 敵の弾だったら判定しない
 	if (bullet->IsEnemyBullet() || bullet->IsDead() || !bullet->CanHit()) { return; }
 
-	if (Length(enemy->GetTransform().translate - bullet->GetTransform().translate) <=
-		enemy->GetRadius() + bullet->GetTransform().scale.x / 2.0f) {
+	Segment2D segment = { bullet->GetPrePos(), ToXZ(bullet->GetTransform().translate) };
+	Circle circle = { enemy->GetRadius() + bullet->GetTransform().scale.x / 2.0f, ToXZ(enemy->GetTransform().translate) };
+	if (CheckCollision(segment, circle)) {
 		enemy->Hit(bullet->GetDamage(), bullet->GetPrePos(), bullet->GetKnockback());
-		if (dynamic_cast<WaveBullet*>(bullet)) {
+		if (dynamic_cast<WaveBullet*>(bullet)) { 
 			enemy->Slow();
 			bullet->Hit();
 		} else if (dynamic_cast<OrbitBullet*>(bullet)) {
@@ -65,7 +70,8 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 void CollisionChecker::Check(Player* player, Enemy* enemy, Camera* camera) {
 	Circle p = { player->GetRadius(), {player->GetTransform().translate.x, player->GetTransform().translate.z} };
 	Circle e = { enemy->GetRadius(), {enemy->GetTransform().translate.x, enemy->GetTransform().translate.z} };
-	if (p.CheckCollision(e)) {
-		player->Hit(3.0f, enemy->GetTransform().translate);
+	if (CheckCollision(p, e)) {
+		player->Hit(3.0f, ToXZ(enemy->GetTransform().translate));
 	}
 }
+

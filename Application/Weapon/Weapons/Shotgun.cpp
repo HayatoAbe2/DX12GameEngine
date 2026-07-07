@@ -31,6 +31,7 @@ float Shotgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Cam
 	} else {
 		charge_--;
 		charge_ = (std::max)(charge_, 0.0f);
+		SetChargeStartTimer();
 
 		camera->StartShake(1.5f, 5);
 		return data_.stats.shootCoolTime;
@@ -38,7 +39,6 @@ float Shotgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Cam
 }
 
 void Shotgun::Update() {
-	float deltatime = GameContext::GetInstance().GetDeltatime();
-	charge_ = (std::min)(data_.stats.maxCharge, charge_ + data_.stats.chargeTime * deltatime);
+	Weapon::Update();
 }
 

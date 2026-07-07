@@ -22,12 +22,12 @@ public:
 	float GetKnockback() { return data_.stats.knockback; }
 	bool IsDead() { return isDead_; }
 	bool CanErase() { return canErase_; }
-	Vector3 GetPrePos() { return prePos_; }
+	Vector2 GetPrePos() { return prePos_; }
 	bool CanHit() { return noHitTimer_->IsFinished(); }
 	
 protected:
 	// 前フレーム場所
-	Vector3 prePos_{};
+	Vector2 prePos_{};
 
 	// 速度
 	Vector3 velocity_{};

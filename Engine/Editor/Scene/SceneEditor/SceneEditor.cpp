@@ -715,9 +715,9 @@ void SceneEditor::ClickSelect() {
 	farPoint /= farPoint.w;
 
 	// マウス位置に向けたレイ
-	Ray ray;
+	Ray3D ray;
 	ray.origin = { nearPoint.x, nearPoint.y, nearPoint.z };
-	ray.diff = Normalize(Vector3{ {farPoint.x - nearPoint.x},{farPoint.y - nearPoint.y},{farPoint.z - nearPoint.z} }); // 方向ベクトル
+	ray.direction = Normalize(Vector3{ {farPoint.x - nearPoint.x},{farPoint.y - nearPoint.y},{farPoint.z - nearPoint.z} }); // 方向ベクトル
 
 	float nearest = FLT_MAX;
 

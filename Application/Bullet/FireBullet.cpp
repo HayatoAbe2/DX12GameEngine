@@ -29,7 +29,7 @@ void FireBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 	auto& light = ctx.Light();
 
 	if (!isDead_) {
-		prePos_ = model_->GetTransform().translate;
+		prePos_ = ToXZ(model_->GetTransform().translate);
 		model_->SetTranslate(model_->GetTransform().translate + velocity_);
 
 		// マップ当たり判定

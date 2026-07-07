@@ -8,8 +8,8 @@
         "shootCoolTime": 0.4,
         "bulletLifeTime": 90,
         "knockback": 0.3,
-        "maxCharge": 10.0,
-        "chargeTime": 0.5,
+        "maxCharge": 12.0,
+        "chargeTime": 0.25,
         "bulletColor": [0.6, 0.6, 0.0, 1.0],
         "rarity": "Rare"
   }
