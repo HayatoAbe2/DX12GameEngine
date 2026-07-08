@@ -49,5 +49,8 @@ public:
 	float scaleSnap_ = 0.1f;
 
 	int editingInstance_ = 0;
+
+	bool undoRequest_ = false;
+	bool redoRequest_ = false;
 };
 

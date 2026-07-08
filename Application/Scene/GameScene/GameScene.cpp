@@ -390,34 +390,34 @@ void GameScene::Draw() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Weapon");
 	if (ImGui::Button("Pistol")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(0)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 0);
 	};
 	if (ImGui::Button("AssaultRifle")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(1)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 1);
 	};
 	if (ImGui::Button("Shotgun")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(2)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 2);
 	};
 	if (ImGui::Button("Flame")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(3)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 3);
 	};
 	if (ImGui::Button("Wave")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(4)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 4);
 	};
 	if (ImGui::Button("Orbit")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(5)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 5);
 	};
 	if (ImGui::Button("Charge")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(6)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 6);
 	};
 	if (ImGui::Button("Accel")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(7)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 7);
 	};
 	if (ImGui::Button("Sniper")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(8)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 8);
 	};
 	if (ImGui::Button("Burst")) {
-		itemManager_->Drop(player_->GetTransform().translate, std::move(weaponManager_->GetWeapon(9)));
+		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 9);
 	};
 	ImGui::End();
 

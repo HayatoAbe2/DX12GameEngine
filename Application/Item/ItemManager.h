@@ -16,6 +16,7 @@ public:
 	void Spawn(Vector3 pos,int index);
 	void Spawn(Vector3 pos,int index,Rarity rarity);
 	void Drop(Vector3 pos,std::unique_ptr<Weapon> weapon);
+	void SpawnAndDrop(Vector3 pos, int index);
 	void Reset();
 	void LoadCSV(const std::string& filePath,const float tileSize);
 	void Load();
@@ -28,5 +29,7 @@ private:
 	bool canInteract_ = true;
 
 	std::vector<bool> spawned_;
+	int nextSpawnIndex_ = -1;
+	Vector3 nextSpawnPos_{};
 };
 

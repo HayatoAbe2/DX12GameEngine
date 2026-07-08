@@ -45,7 +45,6 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-
 	std::vector<std::unique_ptr<Weapon>> weapons;
 	EnemyStatus status;
 
@@ -137,6 +136,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.stunResist = 0;
 		status.canFly = false;
 		status.attackRadius = -1;
+
 		for (int i = 0; i < 5; ++i) {
 			auto enemyModel = asset.LoadModel("Resources/Enemy", "hedgehog.obj");
 			auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "hedgehog.obj");
@@ -197,19 +197,18 @@ void EnemyManager::Load(WeaponManager* weaponManager, const Vector3& playerPos, 
 	std::vector<Vector3> spawnPos;
 	for (auto& model : models) {
 		if (model->tag == "enemySpawn") {
-			if (isSpawned_.size() < model->GetTransforms().size()) {
-				isSpawned_.resize(model->GetTransforms().size());
+			size_t size = model->GetTransforms().size();
+			if (isSpawned_.size() < size) {
+				isSpawned_.resize(size);
 			}
 
-			for (int i = 0; i < model->GetTransforms().size(); ++i) {
-				Transform t = model->GetTransforms()[i];
+			for (auto& t : model->GetTransforms()) {
 				AABB2D aabb = { {t.translate.x - t.scale.x / 2.0f, t.translate.z - t.scale.z / 2.0f }, {t.translate.x + t.scale.x / 2.0f, t.translate.z + t.scale.z / 2.0f} };
 				spawnArea.push_back(aabb);
 			}
 
 		} else if (model->tag == "enemySpawnPoint") {
-			for (int i = 0; i < model->GetTransforms().size(); ++i) {
-				Transform t = model->GetTransforms()[i];
+			for (auto& t : model->GetTransforms()) {
 				spawnPos.push_back(t.translate);
 			}
 		}
@@ -234,7 +233,6 @@ void EnemyManager::Load(WeaponManager* weaponManager, const Vector3& playerPos, 
 			}
 		}
 	}
-
 }
 
 std::vector<Enemy*> EnemyManager::GetEnemies() {

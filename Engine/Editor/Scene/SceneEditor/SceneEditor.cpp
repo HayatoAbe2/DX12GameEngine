@@ -36,6 +36,19 @@ void SceneEditor::Update() {
 	} else if (scene_ && !scene_->IsEditMode()) {
 		selected_ = nullptr;
 	}
+
+	if (undoRequest_) {
+		auto snapshot = undoStack_.back();
+		undoStack_.pop_back();
+		DeserializeScene(snapshot);
+		undoRequest_ = false;
+	}
+	if (redoRequest_) {
+		auto snapshot = redoStack_.back();
+		redoStack_.pop_back();
+		DeserializeScene(snapshot);
+		redoRequest_ = false;
+	}
 #endif
 }
 
@@ -62,25 +75,6 @@ void SceneEditor::Draw(Camera* camera) {
 			ImGui::Separator();
 			// 追加
 			if (auto* model = dynamic_cast<Model*>(selected_)) {
-
-				if (ImGui::Button("Duplicate")) {
-
-					PushUndo();
-
-					auto& asset = GameContext::GetInstance().Asset();
-
-					auto newModel = asset.LoadModel(
-						model->GetDirectoryPath(),
-						model->name);
-
-					newModel->SetTransform(model->GetTransform());
-
-					auto* ptr = newModel.get();
-
-					scene_->AddObject(std::move(newModel));
-
-					selected_ = ptr;
-				}
 			}
 			ImGui::Separator();
 
@@ -114,22 +108,6 @@ void SceneEditor::Draw(Camera* camera) {
 		// アセットブラウザ
 		ImGui::Begin("Asset Brouser");
 
-		const char* items[]
-		{
-			"Human",
-			"Floor",
-		};
-		ImGui::Combo(
-			"Model",
-			&selectedAssetIndex_,
-			items,
-			IM_ARRAYSIZE(items));
-
-		if (ImGui::Button("Add")) {
-			auto& asset = GameContext::GetInstance().Asset();
-			PushUndo();
-			scene_->AddObject(asset.LoadModel(selectedAssetDir_[selectedAssetIndex_], selectedAssetPath_[selectedAssetIndex_]));
-		}
 		ImGui::End();
 
 		// ギズモ
@@ -334,9 +312,7 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 			ImGui::DragFloat3("Rotate", &t.rotate.x, gizmoCtx_.snap[1]);
 			ImGui::DragFloat3("Translate", &t.translate.x, gizmoCtx_.snap[0]);
 
-			model->SetTransforms(
-				editingInstance_,
-				t);
+			model->SetTransforms(editingInstance_, t);
 		}
 
 		// スプライト
@@ -669,10 +645,7 @@ void SceneEditor::Undo() {
 		SerializeScene()
 		});
 
-	auto snapshot = undoStack_.back();
-	undoStack_.pop_back();
-
-	DeserializeScene(snapshot);
+	undoRequest_ = true;
 #endif
 }
 
@@ -686,10 +659,7 @@ void SceneEditor::Redo() {
 		SerializeScene()
 		});
 
-	auto snapshot = redoStack_.back();
-	redoStack_.pop_back();
-
-	DeserializeScene(snapshot);
+	redoRequest_ = true;
 #endif
 }
 

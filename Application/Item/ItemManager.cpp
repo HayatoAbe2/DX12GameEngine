@@ -25,6 +25,12 @@ void ItemManager::Initialize(WeaponManager* weaponManager) {
 }
 
 void ItemManager::Update(Player* player) {
+	// 配置予約があれば出現
+	if (nextSpawnIndex_ > 0) {
+		Drop(nextSpawnPos_, weaponManager_->GetWeapon(nextSpawnIndex_));
+		nextSpawnIndex_ = -1;
+	}
+
 	items_.erase(
 		std::remove_if(items_.begin(), items_.end(),
 			[](const std::unique_ptr<Item>& item) {
@@ -122,6 +128,11 @@ void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
 		auto newItem = std::make_unique<Item>(std::move(weapon), pos + Vector3{0,0.5f,0}, weapon->GetData().rarity);
 		items_.push_back(std::move(newItem));
 	}
+}
+
+void ItemManager::SpawnAndDrop(Vector3 pos, int index) {
+	nextSpawnPos_ = pos;
+	nextSpawnIndex_ = index;
 }
 
 void ItemManager::Reset() {
