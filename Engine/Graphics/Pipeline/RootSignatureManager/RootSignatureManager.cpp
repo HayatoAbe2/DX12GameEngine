@@ -15,6 +15,7 @@ void RootSignatureManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateSkyboxRootSignature();
 	CreateGridRootSignature();
 	CreateFullscreenRootSignature();
+	CreateSkinningComputeRootSignature();
 }
 
 void RootSignatureManager::CreateStandardRootSignature() {
@@ -98,17 +99,20 @@ void RootSignatureManager::CreateStandardRootSignature() {
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
 	// シリアライズしてバイナリにする
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
 	standardRootSignature_ = nullptr;
 	hr = device_->CreateRootSignature(0,
-		signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(),
+		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&standardRootSignature_));
 	assert(SUCCEEDED(hr));
 
@@ -189,14 +193,16 @@ void RootSignatureManager::CreateInstancingRootSignature() {
 	desc.NumStaticSamplers = _countof(sampler);
 	desc.pStaticSamplers = sampler;
 
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 
-	HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlobInstancing_, &errorBlobInstancing_);
+	HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlobInstancing_->GetBufferPointer()));
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
-	hr = device_->CreateRootSignature(0, signatureBlobInstancing_->GetBufferPointer(), signatureBlobInstancing_->GetBufferSize(), IID_PPV_ARGS(&instancingRootSignature_));
+	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&instancingRootSignature_));
 	assert(SUCCEEDED(hr));
 }
 
@@ -256,14 +262,16 @@ void RootSignatureManager::CreateParticleRootSignature() {
 	desc.NumStaticSamplers = _countof(sampler);
 	desc.pStaticSamplers = sampler;
 
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 
-	HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlobParticle_, &errorBlobParticle_);
+	HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlobParticle_->GetBufferPointer()));
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
-	hr = device_->CreateRootSignature(0, signatureBlobParticle_->GetBufferPointer(), signatureBlobParticle_->GetBufferSize(), IID_PPV_ARGS(&particleRootSignature_));
+	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&particleRootSignature_));
 	assert(SUCCEEDED(hr));
 }
 
@@ -323,25 +331,27 @@ void RootSignatureManager::CreateSkyboxRootSignature() {
 	desc.NumStaticSamplers = _countof(sampler);
 	desc.pStaticSamplers = sampler;
 
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 	// Serialize
 	HRESULT hr = D3D12SerializeRootSignature(
 		&desc,
 		D3D_ROOT_SIGNATURE_VERSION_1,
-		&signatureBlobSkybox_,
-		&errorBlobSkybox_);
+		&signatureBlob,
+		&errorBlob);
 
 	if (FAILED(hr)) {
 		logger_->Log(
 			logger_->GetStream(),
-			reinterpret_cast<char*>(errorBlobSkybox_->GetBufferPointer()));
+			reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 
 
 	hr = device_->CreateRootSignature(
 		0,
-		signatureBlobSkybox_->GetBufferPointer(),
-		signatureBlobSkybox_->GetBufferSize(),
+		signatureBlob->GetBufferPointer(),
+		signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&skyboxRootSignature_));
 
 	assert(SUCCEEDED(hr));
@@ -372,17 +382,20 @@ void RootSignatureManager::CreateGridRootSignature() {
 	descriptionRootSignature.pParameters = rootParameters;				// ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);		// 配列の長さ
 
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
 	// シリアライズしてバイナリにする
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
 	gridRootSignature_ = nullptr;
 	hr = device_->CreateRootSignature(0,
-		signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(),
+		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&gridRootSignature_));
 	assert(SUCCEEDED(hr));
 }
@@ -450,17 +463,99 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
 	// シリアライズしてバイナリにする
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
 	if (FAILED(hr)) {
-		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
 		assert(false);
 	}
 	// バイナリを元に生成
 	fullscreenRootSignature_ = nullptr;
 	hr = device_->CreateRootSignature(0,
-		signatureBlob_->GetBufferPointer(), signatureBlob_->GetBufferSize(),
+		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&fullscreenRootSignature_));
+	assert(SUCCEEDED(hr));
+}
+
+void RootSignatureManager::CreateSkinningComputeRootSignature() {
+	HRESULT hr;
+
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	D3D12_DESCRIPTOR_RANGE srvRange[3] = {};
+	// t0
+	srvRange[0].BaseShaderRegister = 0;
+	srvRange[0].NumDescriptors = 1;
+	srvRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	srvRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	// t1
+	srvRange[1].BaseShaderRegister = 1;
+	srvRange[1].NumDescriptors = 1;
+	srvRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	srvRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	// t2
+	srvRange[2].BaseShaderRegister = 2;
+	srvRange[2].NumDescriptors = 1;
+	srvRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	srvRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_DESCRIPTOR_RANGE uavRange{};
+	uavRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	uavRange.BaseShaderRegister = 0;
+	uavRange.NumDescriptors = 1;
+	uavRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	// RootParameter
+	D3D12_ROOT_PARAMETER rootParameters[5] = {};
+
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &srvRange[0];
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &srvRange[1];
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &srvRange[2];
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[3].Descriptor.ShaderRegister = 0;
+
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[4].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[4].DescriptorTable.pDescriptorRanges = &uavRange;
+
+	// -------------------------
+
+	descriptionRootSignature.pParameters = rootParameters;				// ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters);		// 配列の長さ
+
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
+	// シリアライズしてバイナリにする
+	hr = D3D12SerializeRootSignature(&descriptionRootSignature,
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+	// バイナリを元に生成
+	skinningComputeRootSignature_ = nullptr;
+	hr = device_->CreateRootSignature(0,
+		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&skinningComputeRootSignature_));
 	assert(SUCCEEDED(hr));
 }

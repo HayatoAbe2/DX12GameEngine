@@ -13,6 +13,10 @@ class Camera;
 class BufferManager;
 class Model : public SceneObject {
 public:
+	struct CreateInfo {
+
+	};
+
 	Model(uint32_t id) : SceneObject(id) {};
 	void Update();
 

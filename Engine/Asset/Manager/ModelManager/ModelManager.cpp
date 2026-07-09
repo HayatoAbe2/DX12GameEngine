@@ -453,6 +453,18 @@ SubMesh ModelManager::CreateSubMesh(aiMesh* aiMesh) {
 	memcpy(dst, subMesh.vertices_.data(), size);
 	subMesh.vertexBuffer_->Unmap(0, nullptr);
 
+	subMesh.inputVertexSRVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredBufferSRV(subMesh.inputVertexSRVIndex, subMesh.vertexBuffer_.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexData));
+
+	// ComputeShader出力
+	subMesh.outputVertexBuffer_ = bufferManager_->CreateDefaultBuffer(size, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	subMesh.outputVBV_.BufferLocation = subMesh.outputVertexBuffer_->GetGPUVirtualAddress();
+	subMesh.outputVBV_.SizeInBytes = UINT(size);
+	subMesh.outputVBV_.StrideInBytes = sizeof(VertexData);
+
+	subMesh.outputVertexUAVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredBufferUAV(subMesh.outputVertexUAVIndex, subMesh.outputVertexBuffer_.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexData));
+
 	// VBV
 	subMesh.vertexBufferView_.BufferLocation = subMesh.vertexBuffer_->GetGPUVirtualAddress();
 	subMesh.vertexBufferView_.SizeInBytes = UINT(size);
@@ -618,7 +630,7 @@ void ModelManager::CreateSkinCluster(const Skeleton& skeleton, const ModelData& 
 			skinCluster.mappedPalette = { mappedPalette, skeleton.joints.size() };
 			skinCluster.paletteSrvHandle.first = srvManager_->GetCPUHandle(index);
 			skinCluster.paletteSrvHandle.second = srvManager_->GetGPUHandle(index);
-			srvManager_->CreateMatrixPalletteSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
+			srvManager_->CreateStructuredBufferSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
 
 			// Influence
 			skinCluster.influenceResource = bufferManager_->CreateUploadBuffer(sizeof(VertexInfluence) * primitive.vertices_.size());
@@ -655,6 +667,21 @@ void ModelManager::CreateSkinCluster(const Skeleton& skeleton, const ModelData& 
 					}
 				}
 			}
+			skinCluster.paletteSRVIndex = srvManager_->Allocate();
+			srvManager_->CreateStructuredBufferSRV(skinCluster.paletteSRVIndex, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
+
+			skinCluster.influenceSRVIndex = srvManager_->Allocate();
+			srvManager_->CreateStructuredBufferSRV(skinCluster.influenceSRVIndex, skinCluster.influenceResource.Get(), UINT(primitive.vertices_.size()), sizeof(VertexInfluence));
+
+			primitive.skinningInformationBuffer = bufferManager_->CreateUploadBuffer(sizeof(SkinningInformation));
+			SkinningInformation skinningInformation;
+			skinningInformation.numVertices = uint32_t(primitive.vertices_.size());
+			
+			void* mapped = nullptr;
+			primitive.skinningInformationBuffer->Map(0, nullptr, &mapped);
+			memcpy(mapped, &skinningInformation, sizeof(skinningInformation));
+			primitive.skinningInformationBuffer->Unmap(0, nullptr);
+
 			primitive.skinCluster_ = skinCluster;
 		}
 	}

@@ -14,8 +14,6 @@ public:
 	// 描画前
 	void PreDraw(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList);
 
-	void SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList);
-
 	// メモリ確保
 	uint32_t Allocate();
 	// 解放
@@ -23,10 +21,12 @@ public:
 
 	// SRV生成
 	void CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT mipLevels, bool isCubemap);
-	void CreateStructuredBufferSRV(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structuredByteStride);
+	void CreateStructuredBufferSRV(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
 	void CreateRenderTextureSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource);
 	void CreateDepthSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource);
-	void CreateMatrixPalletteSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> resource, UINT numElements, UINT structureByteStride);
+	
+	// UAV生成
+	void CreateStructuredBufferUAV(uint32_t index, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t index);

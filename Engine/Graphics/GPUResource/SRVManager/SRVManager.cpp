@@ -19,10 +19,6 @@ void SRVManager::PreDraw(const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>
 	commandList->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
-void SRVManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList) {
-	commandList->SetGraphicsRootDescriptorTable(rootParameterIndex, descHeapManager_->GetGPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
-}
-
 uint32_t SRVManager::Allocate() {
 	// フリーリストに空きがあれば再利用
 	if (!freeList_.empty()) {
@@ -66,18 +62,18 @@ void SRVManager::CreateTextureSRV(uint32_t srvIndex, ID3D12Resource* pResource, 
 	device_->CreateShaderResourceView(pResource, &srvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
 }
 
-void SRVManager::CreateStructuredBufferSRV(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structuredByteStride) {
-	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
-	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	instancingSrvDesc.Buffer.FirstElement = 0;
-	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	instancingSrvDesc.Buffer.NumElements = numElements;
-	instancingSrvDesc.Buffer.StructureByteStride = structuredByteStride;
+void SRVManager::CreateStructuredBufferSRV(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride) {
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	srvDesc.Buffer.NumElements = numElements;
+	srvDesc.Buffer.StructureByteStride = structureByteStride;
 
 	// SRVの生成
-	device_->CreateShaderResourceView(pResource, &instancingSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
+	device_->CreateShaderResourceView(pResource, &srvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
 }
 
 void SRVManager::CreateRenderTextureSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource) {
@@ -100,16 +96,17 @@ void SRVManager::CreateDepthSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12
 	device_->CreateShaderResourceView(depthStencilResource.Get(), &depthTextureSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
 }
 
-void SRVManager::CreateMatrixPalletteSRV(uint32_t srvIndex, Microsoft::WRL::ComPtr<ID3D12Resource> resource, UINT numElements, UINT structureByteStride) {
-	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
-	paletteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	paletteSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	paletteSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	paletteSrvDesc.Buffer.FirstElement = 0;
-	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	paletteSrvDesc.Buffer.NumElements = numElements;
-	paletteSrvDesc.Buffer.StructureByteStride = structureByteStride;
-	device_->CreateShaderResourceView(resource.Get(), &paletteSrvDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, srvIndex));
+void SRVManager::CreateStructuredBufferUAV(uint32_t index, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride) {
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = numElements;
+	uavDesc.Buffer.CounterOffsetInBytes = 0;
+	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+	uavDesc.Buffer.StructureByteStride = structureByteStride;
+
+	device_->CreateUnorderedAccessView(pResource, nullptr, &uavDesc, descHeapManager_->GetCPUDescriptorHandle(descriptorHeap_.Get(), descriptorSize_, index));
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUHandle(uint32_t index) {

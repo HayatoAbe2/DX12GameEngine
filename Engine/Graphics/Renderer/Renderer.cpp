@@ -30,6 +30,8 @@ void Renderer::Initialize(DirectXContext* dxContext) {
 	dummyLightBuffer_ = dxContext_->GetBufferManager()->CreateUploadBuffer(sizeof(LightsForGPU));
 	dummyLightBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dummyLight_));
 
+	skinningSystem_ = std::make_unique<SkinningSystem>();
+
 	InitializePlane();
 	InitializeRing();
 	InitializeCylinder();
@@ -65,13 +67,16 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, int blendMode
 	if (lightManager) { lightManager->Update(); }
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	ID3D12PipelineState* pso;
-	if (model->GetData()->skinClusterData.empty()) {
-		pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
-	} else {
-		pso = dxContext_->GetPipelineStateManager()->GetSkinningPSO(blendMode);
-	}
+	auto pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetStandardRootSignature().Get();
+	if (!model->GetData()->skinClusterData.empty()) {
+		// GPUでのスキニング処理
+		auto computePSO = dxContext_->GetPipelineStateManager()->GetSkinningComputePSO();
+		auto computeRootSignature = dxContext_->GetRootSignatureManager()->GetSkinningComputeRootSignature().Get();
+		skinningSystem_->TransitionOutputBufferToUAV(cmdList.Get(), model);
+		skinningSystem_->Dispatch(cmdList.Get(), model, computePSO, computeRootSignature, dxContext_->GetSRVManager());
+		skinningSystem_->TransitionOutputBufferToVB(cmdList.Get(), model);
+	}
 
 	// PSO設定
 	cmdList->SetPipelineState(pso);
@@ -167,7 +172,7 @@ void Renderer::DrawPrimitive(Primitive* primitive, int blendMode) {
 	// トランスフォーム
 	TransformationMatrix data;
 	data.World = MakeAffineMatrix(primitive->transform_);
-	data.WVP = data.World 
+	data.WVP = data.World
 		* camera_->viewMatrix_
 		* camera_->projectionMatrix_;
 	data.WorldInverseTranspose = Transpose(Inverse(data.World));
@@ -185,7 +190,7 @@ void Renderer::DrawPrimitive(Primitive* primitive, int blendMode) {
 		indexCount = 6;
 		break;
 	case PrimitiveShape::Ring:
-		cmdList->IASetVertexBuffers(0, 1, &ring_.vbv); 
+		cmdList->IASetVertexBuffers(0, 1, &ring_.vbv);
 		cmdList->IASetIndexBuffer(&ring_.ibv);
 		indexCount = 6 * 32;
 		break;
@@ -269,13 +274,19 @@ void Renderer::DrawMesh(Model* model, Mesh* mesh) {
 			// VBVを設定
 			cmdList->IASetVertexBuffers(0, 1, &subMesh.vertexBufferView_);
 		} else {
-			// スキニング用のVBVを設定
-			D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-				subMesh.vertexBufferView_,
-				subMesh.skinCluster_.influenceBufferView
-			};
-			cmdList->IASetVertexBuffers(0, 2, vbvs);
-			cmdList->SetGraphicsRootDescriptorTable(6, subMesh.skinCluster_.paletteSrvHandle.second);
+			cmdList->IASetVertexBuffers(0, 1, &subMesh.outputVBV_);
+			//// スキニング用のVBVを設定
+			//D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+			//	subMesh.vertexBufferView_,
+			//	subMesh.skinCluster_.influenceBufferView
+			//};
+			//cmdList->IASetVertexBuffers(0, 2, vbvs);
+			//cmdList->SetGraphicsRootDescriptorTable(6, subMesh.skinCluster_.paletteSrvHandle.second);
+
+			assert(
+				subMesh.outputVBV_.BufferLocation ==
+				subMesh.outputVertexBuffer_->GetGPUVirtualAddress()
+			);
 		}
 
 		// IBV

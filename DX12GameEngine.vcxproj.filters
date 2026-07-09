@@ -260,6 +260,7 @@
     <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
+    <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -294,6 +295,7 @@
     <FxCompile Include="Resources\Shaders\Dissolve\Dissolve.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Skinning\SkinningObject3d.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Random\RandomNoise.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Skinning\Skinning.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -576,6 +578,7 @@
     <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
     <ClInclude Include="Engine\Math\VectorConvert\VectorConvert.h" />
+    <ClInclude Include="Engine\Graphics\SkinningSystem\SkinningSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

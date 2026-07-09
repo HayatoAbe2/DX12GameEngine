@@ -93,10 +93,6 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3d.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
 	);
-	pipelineStateManager_->SetSkinningBlob(
-		shaderCompiler_->Compile(L"Resources/Shaders/Skinning/SkinningObject3d.VS.hlsl", L"vs_6_0", logger_),
-		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
-	);
 	pipelineStateManager_->SetInstancingBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Instance.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Instance.PS.hlsl", L"ps_6_0", logger_)
@@ -139,6 +135,11 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::RadialBlur), shaderCompiler_->Compile(L"Resources/Shaders/RadialBlur/RadialBlur.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::Dissolve), shaderCompiler_->Compile(L"Resources/Shaders/Dissolve/Dissolve.PS.hlsl", L"ps_6_0", logger_));
 	pipelineStateManager_->SetPostEffectPSBlob(int(PostEffectType::RandomNoise), shaderCompiler_->Compile(L"Resources/Shaders/Random/RandomNoise.PS.hlsl", L"ps_6_0", logger_));
+	// CS
+	pipelineStateManager_->SetSkinningComputeBlob(
+		shaderCompiler_->Compile(L"Resources/Shaders/Skinning/Skinning.CS.hlsl", L"cs_6_0", logger_)
+	);
+
 
 	// Outline用リソース
 	outlineResource_ = bufferManager_->CreateUploadBuffer(sizeof(OutlineData));
@@ -171,7 +172,6 @@ void DirectXContext::Finalize() {
 	descriptorHeapManager_.reset();
 	deviceManager_.reset();
 
-	if (rootSignatureManager_->GetErrorBlob()) rootSignatureManager_->GetErrorBlob()->Release();
 	imGuiManager_->Finalize();
 }
 

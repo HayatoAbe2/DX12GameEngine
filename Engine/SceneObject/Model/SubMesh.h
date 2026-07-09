@@ -6,6 +6,10 @@
 #include "Engine/Graphics/GPUData/VertexData.h"
 #include "Skeleton.h"
 
+struct SkinningInformation {
+	uint32_t numVertices;
+};
+
 struct SubMesh {
 	std::vector<VertexData> vertices_{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_ = nullptr;
@@ -18,4 +22,13 @@ struct SubMesh {
 
 	// SkinCluster
 	SkinCluster skinCluster_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> outputVertexBuffer_;
+	D3D12_VERTEX_BUFFER_VIEW outputVBV_;
+
+	uint32_t inputVertexSRVIndex;
+	uint32_t outputVertexUAVIndex;
+	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformationBuffer;
+
+	D3D12_RESOURCE_STATES outputVertexBufferState = D3D12_RESOURCE_STATE_COMMON;
 };

@@ -14,6 +14,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
+#include "Engine/Graphics/SkinningSystem/SkinningSystem.h"
 
 class Model;
 class InstancedModel;
@@ -140,4 +141,6 @@ private:
 	SkyboxData skybox;
 
 	Camera* camera_;
+
+	std::unique_ptr<SkinningSystem> skinningSystem_;
 };
