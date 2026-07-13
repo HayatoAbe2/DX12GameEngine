@@ -292,7 +292,7 @@ void Renderer::DrawMesh(Model* model, const MeshData& meshData, const MeshRuntim
 }
 
 void Renderer::DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {
-	Matrix4x4 nodeWorld = node->localMatrix * parentWorld;
+	Matrix4x4 nodeWorld = parentWorld * node->localMatrix;
 
 	// トランスフォーム更新
 	std::vector<Vector4> colors;
@@ -325,13 +325,15 @@ void Renderer::DrawMeshInstance(InstancedModel* model, const MeshData& mesh) {
 
 		// マテリアルCBufferの場所を設定
 		cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
-		// モデル描画
+		// VBV
 		cmdList->IASetVertexBuffers(0, 1, &subMesh.vertexBufferView_);	// VBVを設定
+		// IBV
+		cmdList->IASetIndexBuffer(&subMesh.ibv_);
 		// SRVの設定
 		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
 		cmdList->SetGraphicsRootDescriptorTable(3, material->GetEnvironmentTextureSRVHandle());
 		// ドローコール
-		cmdList->DrawInstanced(UINT(subMesh.vertices_.size()), model->GetNumInstance(), 0, 0);
+		cmdList->DrawIndexedInstanced(UINT(subMesh.indices_.size()), model->GetNumInstance(), 0, 0, 0);
 	}
 }
 
