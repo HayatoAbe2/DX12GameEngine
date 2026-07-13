@@ -9,3 +9,12 @@ struct Particle {
     int lifeTime;
     bool alive = false;
 };
+
+struct GPUParticle {
+    Vector3 scale;
+    Vector3 translate;
+    float lifeTime;
+    Vector3 velocity;
+    float currentTime;
+    Vector4 color;
+};

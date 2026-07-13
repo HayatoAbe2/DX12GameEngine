@@ -69,7 +69,7 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, int blendMode
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetStandardRootSignature().Get();
-	if (!model->GetData()->skinClusterData.empty()) {
+	if (!model->GetData()->JointWeights.empty()) {
 		// GPUでのスキニング処理
 		auto computePSO = dxContext_->GetPipelineStateManager()->GetSkinningComputePSO();
 		auto computeRootSignature = dxContext_->GetRootSignatureManager()->GetSkinningComputeRootSignature().Get();
@@ -249,7 +249,7 @@ void Renderer::DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsComma
 
 	// メッシュを描画
 	for (uint32_t meshIndex : node->meshIndices) {
-		DrawMesh(model, model->GetData()->meshes[meshIndex].get());
+		DrawMesh(model, model->GetData()->meshes[meshIndex], model->GetMesh()[meshIndex]);
 	}
 
 	// 子ノード
@@ -258,11 +258,13 @@ void Renderer::DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsComma
 	}
 }
 
-void Renderer::DrawMesh(Model* model, Mesh* mesh) {
+void Renderer::DrawMesh(Model* model, const MeshData& meshData, const MeshRuntime& meshRuntime) {
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 
-	for (const auto& subMesh : mesh->GetPrimitives()) {
-		Material* material = model->GetMaterial(subMesh.materialIndex_);
+	auto& data = meshData.subMeshes;
+	auto& runtime = meshRuntime.subMeshes;
+	for (int i = 0; i < data.size(); ++i) {
+		Material* material = model->GetMaterial(data[i].materialIndex_);
 
 		// マテリアル更新
 		material->UpdateGPU();
@@ -270,39 +272,27 @@ void Renderer::DrawMesh(Model* model, Mesh* mesh) {
 		// マテリアルCBufferの場所を設定
 		cmdList->SetGraphicsRootConstantBufferView(0, material->GetCBV()->GetGPUVirtualAddress());
 
-		if (subMesh.skinCluster_.paletteResource == nullptr) {
+		if (!model->IsUseAnimation()) {
 			// VBVを設定
-			cmdList->IASetVertexBuffers(0, 1, &subMesh.vertexBufferView_);
+			cmdList->IASetVertexBuffers(0, 1, &data[i].vertexBufferView_);
 		} else {
-			cmdList->IASetVertexBuffers(0, 1, &subMesh.outputVBV_);
-			//// スキニング用のVBVを設定
-			//D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-			//	subMesh.vertexBufferView_,
-			//	subMesh.skinCluster_.influenceBufferView
-			//};
-			//cmdList->IASetVertexBuffers(0, 2, vbvs);
-			//cmdList->SetGraphicsRootDescriptorTable(6, subMesh.skinCluster_.paletteSrvHandle.second);
-
-			assert(
-				subMesh.outputVBV_.BufferLocation ==
-				subMesh.outputVertexBuffer_->GetGPUVirtualAddress()
-			);
+			cmdList->IASetVertexBuffers(0, 1, &runtime[i].outputVBV_);
 		}
 
 		// IBV
-		cmdList->IASetIndexBuffer(&subMesh.ibv_);
+		cmdList->IASetIndexBuffer(&data[i].ibv_);
 
 		// SRVの設定
 		cmdList->SetGraphicsRootDescriptorTable(2, material->GetTextureSRVHandle());
 		cmdList->SetGraphicsRootDescriptorTable(3, material->GetEnvironmentTextureSRVHandle());
 
 		// ドローコール
-		cmdList->DrawIndexedInstanced(UINT(subMesh.indices_.size()), 1, 0, 0, 0);
+		cmdList->DrawIndexedInstanced(UINT(data[i].indices_.size()), 1, 0, 0, 0);
 	}
 }
 
 void Renderer::DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {
-	Matrix4x4 nodeWorld = parentWorld * node->localMatrix;
+	Matrix4x4 nodeWorld = node->localMatrix * parentWorld;
 
 	// トランスフォーム更新
 	std::vector<Vector4> colors;
@@ -314,7 +304,7 @@ void Renderer::DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID
 
 	// メッシュを描画
 	for (uint32_t meshIndex : node->meshIndices) {
-		DrawMeshInstance(model, model->GetData()->meshes[meshIndex].get());
+		DrawMeshInstance(model, model->GetData()->meshes[meshIndex]);
 	}
 
 	// 子ノード
@@ -323,11 +313,11 @@ void Renderer::DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID
 	}
 }
 
-void Renderer::DrawMeshInstance(InstancedModel* model, Mesh* mesh) {
+void Renderer::DrawMeshInstance(InstancedModel* model, const MeshData& mesh) {
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 
 	// 各メッシュを描画
-	for (const auto& subMesh : mesh->GetPrimitives()) {
+	for (const auto& subMesh : mesh.subMeshes) {
 		Material* material = model->GetMaterial(subMesh.materialIndex_);
 
 		// マテリアル更新
@@ -343,9 +333,7 @@ void Renderer::DrawMeshInstance(InstancedModel* model, Mesh* mesh) {
 		// ドローコール
 		cmdList->DrawInstanced(UINT(subMesh.vertices_.size()), model->GetNumInstance(), 0, 0);
 	}
-
 }
-
 
 void Renderer::InitializePlane() {
 	auto bufferManager = dxContext_->GetBufferManager();

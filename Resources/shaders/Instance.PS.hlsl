@@ -1,7 +1,6 @@
 #include "Instance.hlsli"
 
-struct Material
-{
+struct Material {
     float32_t4 color;
     int32_t enableLighting;
     float32_t4x4 uvTransform;
@@ -11,20 +10,17 @@ struct Material
     float32_t environmentIntensity;
 };
 
-struct Camera
-{
+struct Camera {
     float32_t3 worldPosition;
 };
 
-struct DirectionalLight
-{
+struct DirectionalLight {
     float32_t4 color;
     float32_t3 direction;
     float intensity;
 };
 
-struct PointLight
-{
+struct PointLight {
     float32_t4 color;
     float32_t3 position;
     float intensity;
@@ -32,8 +28,7 @@ struct PointLight
     float decay;
 };
 
-struct SpotLight
-{
+struct SpotLight {
     float32_t4 color;
     float32_t3 position;
     float32_t intensity;
@@ -44,8 +39,7 @@ struct SpotLight
     float32_t cosFalloffStart;
 };
 
-struct Light
-{
+struct Light {
     DirectionalLight directionalLight;
     PointLight pointLights[32];
     SpotLight spotLights[16];
@@ -58,42 +52,35 @@ SamplerState gSampler : register(s0);
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<Camera> gCamera : register(b1);
 ConstantBuffer<Light> gLight : register(b2);
-struct PixelShaderOutput
-{
+struct PixelShaderOutput {
     float32_t4 color : SV_TARGET0;
 };
 
-PixelShaderOutput main(VertexShaderOutput input)
-{
+PixelShaderOutput main(VertexShaderOutput input) {
     PixelShaderOutput output;
   
     // マテリアル
     float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    if (gMaterial.useTexture != 0)
-    {
+    if (gMaterial.useTexture != 0) {
         float32_t4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
         
-        if (textureColor.a < 0.1f)
-        {
+        if (textureColor.a < 0.1f) {
             discard;
         }
         
         output.color = gMaterial.color * textureColor * input.color;
     }
-    else
-    {
+    else {
         output.color = gMaterial.color * input.color;
     }
     
-    if (output.color.a == 0.0f)
-    {
+    if (output.color.a == 0.0f) {
         discard;
     }
     
     // ライティング
     float32_t3 lighting;
-    if (gMaterial.enableLighting != 0)
-    {
+    if (gMaterial.enableLighting != 0) {
         // directionalLight
         float NdotL = dot(normalize(input.normal), -gLight.directionalLight.direction);
         float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
@@ -108,10 +95,8 @@ PixelShaderOutput main(VertexShaderOutput input)
         lighting = diffuseDirectionalLight + specularDirectionalLight;
         
         // pointLight
-        for (int i = 0; i < 32; i++)
-        {
-            if (gLight.pointLights[i].intensity == 0)
-            {
+        for (int i = 0; i < 32; i++) {
+            if (gLight.pointLights[i].intensity == 0) {
                 continue;
             }
             
@@ -133,10 +118,8 @@ PixelShaderOutput main(VertexShaderOutput input)
         }
         
         // spotLight
-        for (int i = 0; i < 16; i++)
-        {
-            if (gLight.spotLights[i].intensity == 0)
-            {
+        for (int i = 0; i < 16; i++) {
+            if (gLight.spotLights[i].intensity == 0) {
                 continue;
             }
             
@@ -169,8 +152,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     }
 
     // 環境マップ
-    if (gMaterial.useEnvironmentMap)
-    {
+    if (gMaterial.useEnvironmentMap) {
     // 入射光の計算
         float32_t3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
         float32_t3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));

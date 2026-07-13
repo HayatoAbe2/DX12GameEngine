@@ -13,7 +13,7 @@
 
 class ModelData;
 struct ModelNode;
-struct SubMesh;
+struct SubMeshRuntime;
 
 class DirectXContext;
 class Logger;
@@ -36,12 +36,13 @@ public:
 private:
 	// 関数内で使う関数
 	std::unique_ptr<ModelNode> ReadNode(aiNode* node);
-	SubMesh CreateSubMesh(aiMesh* aiMesh);
+	SubMeshRuntime CreateSubMesh(aiMesh* aiMesh);
+	SubMeshData CreateSubMeshData(aiMesh* aiMesh);
 	void CreateInstancingSRV(InstancedModel* model, const int numInstance_);
 	Matrix4x4 ConvertAssimpMatrixToLHRow(const aiMatrix4x4& m);
 	Skeleton CreateSkeleton(const ModelNode& rootNode);
 	int32_t CreateJoint(const ModelNode & node, const std::optional<int32_t>&parent, std::vector<Joint>&joints);
-	void CreateSkinCluster(const Skeleton& skeleton, const ModelData& data);
+	SkinClusterRuntime CreateSkinCluster(const Skeleton& skeleton, ModelData* data);
 
 	// デバイス
 	ID3D12Device* device_ = nullptr;

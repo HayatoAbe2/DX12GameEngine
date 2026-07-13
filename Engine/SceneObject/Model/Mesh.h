@@ -2,15 +2,13 @@
 #include <vector>
 #include "SubMesh.h"
 
-class Mesh {
-public:
-	// submeshを取得
-	const std::vector<SubMesh>& GetPrimitives() const { return primitives_; }
-	std::vector<SubMesh>& GetPrimitives() { return primitives_; }
-
-private:
-
+struct MeshRuntime {
 	// サブメッシュ
-	std::vector<SubMesh> primitives_{};
+	std::vector<SubMeshRuntime> subMeshes{};
 };
 
+
+struct MeshData {
+	// サブメッシュ
+	std::vector<SubMeshData> subMeshes{};
+};

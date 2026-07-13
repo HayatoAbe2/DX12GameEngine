@@ -52,5 +52,4 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> constantBuffer_ = nullptr; // GPU側リソース
 	std::shared_ptr<Texture> texture_ = nullptr; // テクスチャ
 	std::shared_ptr<Texture> environmentTexture_ = nullptr; // テクスチャ
-	D3D12_GPU_DESCRIPTOR_HANDLE textureTableHandle_;
 };

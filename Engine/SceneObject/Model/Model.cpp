@@ -34,10 +34,10 @@ void Model::UpdateSkinCluster() {
 	for (size_t jointIndex = 0; jointIndex < skeleton_.joints.size(); ++jointIndex) {
 		assert(jointIndex < skeleton_.joints.size());
 
-		for (auto& mesh : data_->meshes) {
-			for (auto& primitive : mesh->GetPrimitives()) {
-				primitive.skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix = primitive.skinCluster_.inverseBindPoseMatrices[jointIndex] * skeleton_.joints[jointIndex].skeletonSpaceMatrix;
-				primitive.skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(primitive.skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix));
+		for (auto& mesh : meshes_) {
+			for (auto& primitive : mesh.subMeshes) {
+				skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix = data_->skinClusterData_.inverseBindPoseMatrices[jointIndex] * skeleton_.joints[jointIndex].skeletonSpaceMatrix;
+				skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix));
 			}
 		}
 	}
@@ -53,6 +53,6 @@ void Model::CopyModelData(std::shared_ptr<ModelData> data, BufferManager* buffer
 		newMat->Initialize(bufferManager, data->defaultMaterials_[i]->GetData().useTexture, data->defaultMaterials_[i]->GetData().enableLighting);
 		newMat->SetData(data->defaultMaterials_[i]->GetData());
 		newMat->SetTexture(data->defaultMaterials_[i]->GetTexture());
-		material_.push_back(std::move(newMat));
+		materials_.push_back(std::move(newMat));
 	}
 }

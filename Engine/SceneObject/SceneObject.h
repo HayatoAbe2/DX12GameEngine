@@ -14,7 +14,6 @@ public:
 	// タグ(ゲーム側で自由に利用可能)
 	std::string tag;
 
-	int groupID;
 protected:
 	uint32_t id_;
 };

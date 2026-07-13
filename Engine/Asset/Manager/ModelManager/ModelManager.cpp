@@ -67,10 +67,11 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 		auto cacheData = it->second;
 		model->CopyModelData(cacheData, bufferManager_);
 
-	} else {
 		// メッシュ数設定
-		modelData->meshes.resize(scene->mNumMeshes);
+		std::vector<MeshRuntime> meshes;
+		meshes.resize(scene->mNumMeshes);
 
+		// メッシュ
 		for (uint32_t aiMeshIndex = 0; aiMeshIndex < scene->mNumMeshes; ++aiMeshIndex) {
 			aiMesh* aiMesh = scene->mMeshes[aiMeshIndex];
 
@@ -78,7 +79,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 			for (uint32_t boneIndex = 0; boneIndex < aiMesh->mNumBones; ++boneIndex) {
 				aiBone* bone = aiMesh->mBones[boneIndex];
 				std::string jointName = bone->mName.C_Str();
-				JointWeightData& jointWeightData = modelData->skinClusterData[jointName];
+				JointWeightData& jointWeightData = modelData->JointWeights[jointName];
 
 				aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
 				aiVector3D scale, translate;
@@ -95,28 +96,56 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 				}
 			}
 
-			// Mesh がまだ無ければ作る
-			if (!modelData->meshes[aiMeshIndex]) {
-				modelData->meshes[aiMeshIndex] = std::make_unique<Mesh>();
+			// subMesh生成
+			SubMeshRuntime subMeshRuntime = CreateSubMesh(aiMesh);
+
+			// メッシュにsubMeshを追加
+			meshes[aiMeshIndex].subMeshes.push_back(subMeshRuntime);
+		}
+		model->SetSkinCluster(CreateSkinCluster(skeleton, cacheData.get()));
+		model->SetMeshes(meshes);
+	} else {
+		// メッシュ数設定
+		std::vector<MeshRuntime> meshes;
+		meshes.resize(scene->mNumMeshes);
+		modelData->meshes.resize(scene->mNumMeshes);
+
+		// メッシュ
+		for (uint32_t aiMeshIndex = 0; aiMeshIndex < scene->mNumMeshes; ++aiMeshIndex) {
+			aiMesh* aiMesh = scene->mMeshes[aiMeshIndex];
+
+			// skinCluster用jointWeight
+			for (uint32_t boneIndex = 0; boneIndex < aiMesh->mNumBones; ++boneIndex) {
+				aiBone* bone = aiMesh->mBones[boneIndex];
+				std::string jointName = bone->mName.C_Str();
+				JointWeightData& jointWeightData = modelData->JointWeights[jointName];
+
+				aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+				aiVector3D scale, translate;
+				aiQuaternion rotate;
+				bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+				// 左手系へ変換
+				Matrix4x4 binePoseMatrix = MakeAffineMatrix({ scale.x, scale.y, scale.z },
+					{ rotate.x, -rotate.y, -rotate.z, rotate.w }, { -translate.x, translate.y, translate.z });
+				jointWeightData.InverseBindPoseMatrix = Inverse(binePoseMatrix);
+
+				// 頂点Weightを取得
+				for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+					jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
+				}
 			}
 
 			// subMesh生成
-			SubMesh primitive = CreateSubMesh(aiMesh);
+			SubMeshRuntime subMeshRuntime = CreateSubMesh(aiMesh);
+			SubMeshData subMeshData = CreateSubMeshData(aiMesh);
 
 			// メッシュにsubMeshを追加
-			modelData->meshes[aiMeshIndex]->GetPrimitives().push_back(primitive);
+			meshes[aiMeshIndex].subMeshes.push_back(subMeshRuntime);
+			modelData->meshes[aiMeshIndex].subMeshes.push_back(subMeshData);
 		}
-		CreateSkinCluster(skeleton, *modelData.get());
+		model->SetSkinCluster(CreateSkinCluster(skeleton, modelData.get()));
 
-		for (auto& mesh : modelData->meshes) {
-			for (auto& subMesh : mesh->GetPrimitives()) {
-				if (subMesh.skinCluster_.influenceResource) {
-					subMesh.skinCluster_.influenceBufferView.BufferLocation = subMesh.skinCluster_.influenceResource->GetGPUVirtualAddress();
-					subMesh.skinCluster_.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence) * subMesh.vertices_.size());
-					subMesh.skinCluster_.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
-				}
-			}
-		}
+		model->SetMeshes(meshes);
 
 		///
 		/// マテリアルの設定
@@ -223,89 +252,26 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 		return model; // キャッシュにあったのでそれを返す 
 	}
 
+	// メッシュ数設定
+	std::vector<MeshRuntime> meshes;
+	meshes.resize(scene->mNumMeshes);
+	modelData->meshes.resize(scene->mNumMeshes);
+
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		// 新規メッシュ
-		std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>();
+		std::unique_ptr<MeshRuntime> mesh = std::make_unique<MeshRuntime>();
 
 		aiMesh* aiMesh = scene->mMeshes[meshIndex];
 		assert(aiMesh->HasNormals());
 		assert(aiMesh->HasTextureCoords(0));
 
 		// subMesh
-		SubMesh subMesh;
-		subMesh.materialIndex_ = aiMesh->mMaterialIndex;
-
-		for (uint32_t faceIndex = 0; faceIndex < aiMesh->mNumFaces; ++faceIndex) {
-			aiFace& face = aiMesh->mFaces[faceIndex];
-
-			assert(face.mNumIndices == 3); // 三角形
-			for (uint32_t i = 0; i < face.mNumIndices; ++i) {
-
-				///
-				/// メッシュ頂点の設定
-				/// 
-
-				uint32_t vertexIndex = face.mIndices[i];
-				aiVector3D& position = aiMesh->mVertices[vertexIndex];
-				aiVector3D& normal = aiMesh->mNormals[vertexIndex];
-				aiVector3D& texcoord = aiMesh->mTextureCoords[0][vertexIndex];
-
-				// 頂点データ
-				VertexData vertex;
-				vertex.position = { position.x,position.y,position.z, 1.0f };
-				vertex.normal = { normal.x,normal.y,normal.z };
-				vertex.texcoord = { texcoord.x, texcoord.y };
-				vertex.position.x *= -1.0f; // 左手系
-				vertex.normal.x *= -1.0f;
-				if (aiMesh->HasVertexColors(0)) {
-					// 頂点カラー
-					aiColor4D& color = aiMesh->mColors[0][vertexIndex];
-					vertex.color = { color.r, color.g, color.b, color.a };
-				} else {
-					// なかったら白色
-					vertex.color = { 1.0f,1.0f,1.0f,1.0f };
-				}
-
-				subMesh.vertices_.push_back(vertex);
-			}
-		}
-
-		// VertexBuffers
-		size_t size = sizeof(VertexData) * subMesh.vertices_.size();
-		subMesh.vertexBuffer_ = bufferManager_->CreateUploadBuffer(size);
-		VertexData* dst = nullptr;
-		subMesh.vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dst));
-		memcpy(dst, subMesh.vertices_.data(), size);
-		subMesh.vertexBuffer_->Unmap(0, nullptr);
-
-		// VBV
-		subMesh.vertexBufferView_.BufferLocation = subMesh.vertexBuffer_->GetGPUVirtualAddress();
-		subMesh.vertexBufferView_.SizeInBytes = UINT(size);
-		subMesh.vertexBufferView_.StrideInBytes = sizeof(VertexData);
-
-		// メッシュに追加
-		mesh->GetPrimitives().push_back(subMesh);
-
-		// モデルデータにメッシュ追加
-		modelData->meshes.push_back(std::move(mesh));
-	}
-
-	// メッシュ
-	modelData->meshes.resize(scene->mNumMeshes);
-
-	for (uint32_t aiMeshIndex = 0; aiMeshIndex < scene->mNumMeshes; ++aiMeshIndex) {
-		aiMesh* aiMesh = scene->mMeshes[aiMeshIndex];
-
-		// subMesh生成
-		SubMesh primitive = CreateSubMesh(aiMesh);
-
-		// Mesh がまだ無ければ作る
-		if (!modelData->meshes[aiMeshIndex]) {
-			modelData->meshes[aiMeshIndex] = std::make_unique<Mesh>();
-		}
+		SubMeshRuntime subMesh = CreateSubMesh(aiMesh);
+		SubMeshData subMeshData = CreateSubMeshData(aiMesh);
 
 		// メッシュにsubMeshを追加
-		modelData->meshes[aiMeshIndex]->GetPrimitives().push_back(primitive);
+		meshes[meshIndex].subMeshes.push_back(subMesh);
+		modelData->meshes[meshIndex].subMeshes.push_back(subMeshData);
 	}
 
 	///
@@ -387,9 +353,25 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 	return model;
 }
 
-SubMesh ModelManager::CreateSubMesh(aiMesh* aiMesh) {
-	SubMesh subMesh{};
-	subMesh.materialIndex_ = aiMesh->mMaterialIndex;
+SubMeshRuntime ModelManager::CreateSubMesh(aiMesh* aiMesh) {
+	SubMeshRuntime subMesh{};
+
+	size_t size = sizeof(VertexData) * aiMesh->mNumVertices;
+
+	// ComputeShader出力用VB
+	subMesh.outputVertexBuffer_ = bufferManager_->CreateDefaultBuffer(size, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	subMesh.outputVertexUAVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredBufferUAV(subMesh.outputVertexUAVIndex, subMesh.outputVertexBuffer_.Get(), UINT(aiMesh->mNumVertices), sizeof(VertexData));
+	subMesh.outputVBV_.BufferLocation = subMesh.outputVertexBuffer_->GetGPUVirtualAddress();
+	subMesh.outputVBV_.SizeInBytes = UINT(size);
+	subMesh.outputVBV_.StrideInBytes = sizeof(VertexData);
+
+	return subMesh;
+}
+
+SubMeshData ModelManager::CreateSubMeshData(aiMesh* aiMesh) {
+	SubMeshData data;
+	data.materialIndex_ = aiMesh->mMaterialIndex;
 
 	///
 	/// index
@@ -399,15 +381,28 @@ SubMesh ModelManager::CreateSubMesh(aiMesh* aiMesh) {
 
 		assert(face.mNumIndices == 3); // 三角形
 		for (uint32_t i = 0; i < face.mNumIndices; ++i) {
-			subMesh.indices_.push_back(face.mIndices[i]);
+			data.indices_.push_back(face.mIndices[i]);
 		}
 	}
+
+	// IBV
+	size_t indexSize = sizeof(uint32_t) * data.indices_.size();
+	data.indexBuffer_ = bufferManager_->CreateUploadBuffer(indexSize);
+
+	uint32_t* dst = nullptr;
+	data.indexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dst));
+	memcpy(dst, data.indices_.data(), indexSize);
+	data.indexBuffer_->Unmap(0, nullptr);
+
+	data.ibv_.BufferLocation = data.indexBuffer_->GetGPUVirtualAddress();
+	data.ibv_.SizeInBytes = UINT(indexSize);
+	data.ibv_.Format = DXGI_FORMAT_R32_UINT;
 
 	///
 	/// メッシュ頂点の設定
 	/// 
 
-	subMesh.vertices_.resize(aiMesh->mNumVertices);
+	data.vertices_.resize(aiMesh->mNumVertices);
 	for (uint32_t v = 0; v < aiMesh->mNumVertices; ++v) {
 		aiVector3D& position = aiMesh->mVertices[v];
 		// 頂点データ
@@ -442,48 +437,26 @@ SubMesh ModelManager::CreateSubMesh(aiMesh* aiMesh) {
 			vertex.color = { 1.0f,1.0f,1.0f,1.0f };
 		}
 
-		subMesh.vertices_[v] = vertex;
+		data.vertices_[v] = vertex;
 	}
 
-	// VertexBuffers
-	size_t size = sizeof(VertexData) * subMesh.vertices_.size();
-	subMesh.vertexBuffer_ = bufferManager_->CreateUploadBuffer(size);
-	VertexData* dst = nullptr;
-	subMesh.vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dst));
-	memcpy(dst, subMesh.vertices_.data(), size);
-	subMesh.vertexBuffer_->Unmap(0, nullptr);
+	size_t size = sizeof(VertexData) * data.vertices_.size();
 
-	subMesh.inputVertexSRVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredBufferSRV(subMesh.inputVertexSRVIndex, subMesh.vertexBuffer_.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexData));
-
-	// ComputeShader出力
-	subMesh.outputVertexBuffer_ = bufferManager_->CreateDefaultBuffer(size, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-	subMesh.outputVBV_.BufferLocation = subMesh.outputVertexBuffer_->GetGPUVirtualAddress();
-	subMesh.outputVBV_.SizeInBytes = UINT(size);
-	subMesh.outputVBV_.StrideInBytes = sizeof(VertexData);
-
-	subMesh.outputVertexUAVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredBufferUAV(subMesh.outputVertexUAVIndex, subMesh.outputVertexBuffer_.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexData));
+	// 入力VertexBuffer
+	data.vertexBuffer_ = bufferManager_->CreateUploadBuffer(size);
+	VertexData* dst2 = nullptr;
+	data.vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dst2));
+	memcpy(dst2, data.vertices_.data(), size);
+	data.vertexBuffer_->Unmap(0, nullptr);
+	data.inputVertexSRVIndex = srvManager_->Allocate();
+	srvManager_->CreateStructuredBufferSRV(data.inputVertexSRVIndex, data.vertexBuffer_.Get(), UINT(data.vertices_.size()), sizeof(VertexData));
 
 	// VBV
-	subMesh.vertexBufferView_.BufferLocation = subMesh.vertexBuffer_->GetGPUVirtualAddress();
-	subMesh.vertexBufferView_.SizeInBytes = UINT(size);
-	subMesh.vertexBufferView_.StrideInBytes = sizeof(VertexData);
+	data.vertexBufferView_.BufferLocation = data.vertexBuffer_->GetGPUVirtualAddress();
+	data.vertexBufferView_.SizeInBytes = UINT(size);
+	data.vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
-	// IBV
-	size_t indexSize = sizeof(uint32_t) * subMesh.indices_.size();
-	subMesh.indexBuffer_ = bufferManager_->CreateUploadBuffer(indexSize);
-
-	uint32_t* dst2 = nullptr;
-	subMesh.indexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dst2));
-	memcpy(dst2, subMesh.indices_.data(), indexSize);
-	subMesh.indexBuffer_->Unmap(0, nullptr);
-
-	subMesh.ibv_.BufferLocation = subMesh.indexBuffer_->GetGPUVirtualAddress();
-	subMesh.ibv_.SizeInBytes = UINT(indexSize);
-	subMesh.ibv_.Format = DXGI_FORMAT_R32_UINT;
-
-	return subMesh;
+	return data;
 }
 
 void ModelManager::CreateInstancingSRV(InstancedModel* model, const int numInstance_) {
@@ -619,45 +592,42 @@ int32_t ModelManager::CreateJoint(const ModelNode& node,
 	return joint.index;
 }
 
-void ModelManager::CreateSkinCluster(const Skeleton& skeleton, const ModelData& data) {
-	for (auto& mesh : data.meshes) {
-		for (auto& primitive : mesh->GetPrimitives()) {
-			auto index = srvManager_->Allocate();
-			SkinCluster skinCluster;
-			skinCluster.paletteResource = bufferManager_->CreateUploadBuffer(sizeof(WellForGPU) * skeleton.joints.size());
-			WellForGPU* mappedPalette = nullptr;
-			skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
-			skinCluster.mappedPalette = { mappedPalette, skeleton.joints.size() };
-			skinCluster.paletteSrvHandle.first = srvManager_->GetCPUHandle(index);
-			skinCluster.paletteSrvHandle.second = srvManager_->GetGPUHandle(index);
-			srvManager_->CreateStructuredBufferSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
+SkinClusterRuntime ModelManager::CreateSkinCluster(const Skeleton& skeleton, ModelData* data) {
+	auto index = srvManager_->Allocate();
+	SkinClusterRuntime skinCluster;
+	skinCluster.paletteResource = bufferManager_->CreateUploadBuffer(sizeof(WellForGPU) * skeleton.joints.size());
+	WellForGPU* mappedPalette = nullptr;
+	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
+	skinCluster.mappedPalette = { mappedPalette, skeleton.joints.size() };
+	skinCluster.paletteSrvHandle.first = srvManager_->GetCPUHandle(index);
+	skinCluster.paletteSrvHandle.second = srvManager_->GetGPUHandle(index);
+	srvManager_->CreateStructuredBufferSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
 
+	for (auto& mesh : data->meshes) {
+		for (auto& subMesh : mesh.subMeshes) {
 			// Influence
-			skinCluster.influenceResource = bufferManager_->CreateUploadBuffer(sizeof(VertexInfluence) * primitive.vertices_.size());
+			data->skinClusterData_.influenceResource = bufferManager_->CreateUploadBuffer(sizeof(VertexInfluence) * subMesh.vertices_.size());
 			VertexInfluence* mappedInfluence = nullptr;
-			skinCluster.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
-			std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * primitive.vertices_.size());
-			skinCluster.mappedInfluence = { mappedInfluence, primitive.vertices_.size() };
-			// VBV
-			skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
-			skinCluster.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence) * primitive.vertices_.size());
-			skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
+			data->skinClusterData_.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
+			std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * subMesh.vertices_.size());
+			data->skinClusterData_.mappedInfluence = { mappedInfluence, subMesh.vertices_.size() };
+
 			// InverseBindPoseMatrixの格納
-			skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
+			data->skinClusterData_.inverseBindPoseMatrices.resize(skeleton.joints.size());
 			std::generate(
-				skinCluster.inverseBindPoseMatrices.begin(),
-				skinCluster.inverseBindPoseMatrices.end(),
+				data->skinClusterData_.inverseBindPoseMatrices.begin(),
+				data->skinClusterData_.inverseBindPoseMatrices.end(),
 				[]() {
 					return MakeIdentity4x4();
 				});
 
-			for (const auto& jointWeight : data.skinClusterData) {
+			for (const auto& jointWeight : data->JointWeights) {
 				auto it = skeleton.jointMap.find(jointWeight.first);
 				if (it == skeleton.jointMap.end()) { continue; }
 
-				skinCluster.inverseBindPoseMatrices[(*it).second] = jointWeight.second.InverseBindPoseMatrix;
+				data->skinClusterData_.inverseBindPoseMatrices[(*it).second] = jointWeight.second.InverseBindPoseMatrix;
 				for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
-					auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex];
+					auto& currentInfluence = data->skinClusterData_.mappedInfluence[vertexWeight.vertexIndex];
 					for (uint32_t index = 0; index < kNumMaxInfluence; ++index) {
 						if (currentInfluence.weights[index] == 0.0f) {
 							currentInfluence.weights[index] = vertexWeight.weight;
@@ -670,19 +640,19 @@ void ModelManager::CreateSkinCluster(const Skeleton& skeleton, const ModelData& 
 			skinCluster.paletteSRVIndex = srvManager_->Allocate();
 			srvManager_->CreateStructuredBufferSRV(skinCluster.paletteSRVIndex, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
 
-			skinCluster.influenceSRVIndex = srvManager_->Allocate();
-			srvManager_->CreateStructuredBufferSRV(skinCluster.influenceSRVIndex, skinCluster.influenceResource.Get(), UINT(primitive.vertices_.size()), sizeof(VertexInfluence));
+			data->skinClusterData_.influenceSRVIndex = srvManager_->Allocate();
+			srvManager_->CreateStructuredBufferSRV(data->skinClusterData_.influenceSRVIndex, data->skinClusterData_.influenceResource.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexInfluence));
 
-			primitive.skinningInformationBuffer = bufferManager_->CreateUploadBuffer(sizeof(SkinningInformation));
+			subMesh.skinningInformationBuffer = bufferManager_->CreateUploadBuffer(sizeof(SkinningInformation));
 			SkinningInformation skinningInformation;
-			skinningInformation.numVertices = uint32_t(primitive.vertices_.size());
-			
-			void* mapped = nullptr;
-			primitive.skinningInformationBuffer->Map(0, nullptr, &mapped);
-			memcpy(mapped, &skinningInformation, sizeof(skinningInformation));
-			primitive.skinningInformationBuffer->Unmap(0, nullptr);
+			skinningInformation.numVertices = uint32_t(subMesh.vertices_.size());
 
-			primitive.skinCluster_ = skinCluster;
+			void* mapped = nullptr;
+			subMesh.skinningInformationBuffer->Map(0, nullptr, &mapped);
+			memcpy(mapped, &skinningInformation, sizeof(skinningInformation));
+			subMesh.skinningInformationBuffer->Unmap(0, nullptr);
 		}
 	}
+
+	return skinCluster;
 }

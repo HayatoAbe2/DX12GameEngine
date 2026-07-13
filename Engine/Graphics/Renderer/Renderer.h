@@ -61,11 +61,11 @@ public:
 	void DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parent);
 
 	// メッシュを描画
-	void DrawMesh(Model* model, Mesh* mesh);
+	void DrawMesh(Model* model, const MeshData& mesh, const MeshRuntime& meshRuntim);
 
 	// インスタンシング描画版
 	void DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld);
-	void DrawMeshInstance(InstancedModel* model, Mesh* mesh);
+	void DrawMeshInstance(InstancedModel* model, const MeshData& mesh);
 
 	// Skybox描画
 	void DrawSkybox(Texture* texture);

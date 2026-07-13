@@ -10,7 +10,17 @@ struct SkinningInformation {
 	uint32_t numVertices;
 };
 
-struct SubMesh {
+struct SubMeshRuntime {
+	// ComputeShader出力
+	Microsoft::WRL::ComPtr<ID3D12Resource> outputVertexBuffer_;
+	D3D12_VERTEX_BUFFER_VIEW outputVBV_;
+	uint32_t outputVertexUAVIndex;
+
+	// 現在ResourceState
+	D3D12_RESOURCE_STATES outputVertexBufferState = D3D12_RESOURCE_STATE_COMMON;
+};
+
+struct SubMeshData {
 	std::vector<VertexData> vertices_{};
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_ = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
@@ -20,15 +30,7 @@ struct SubMesh {
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW ibv_{};
 
-	// SkinCluster
-	SkinCluster skinCluster_;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> outputVertexBuffer_;
-	D3D12_VERTEX_BUFFER_VIEW outputVBV_;
-
+	// ComputeShader入力
 	uint32_t inputVertexSRVIndex;
-	uint32_t outputVertexUAVIndex;
 	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformationBuffer;
-
-	D3D12_RESOURCE_STATES outputVertexBufferState = D3D12_RESOURCE_STATE_COMMON;
 };

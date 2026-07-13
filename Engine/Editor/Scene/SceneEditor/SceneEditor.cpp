@@ -181,6 +181,9 @@ void SceneEditor::Draw(Camera* camera) {
 			} else if (auto* model = dynamic_cast<InstancedModel*>(selected_)) {
 				auto transforms = model->GetTransforms();
 
+				// アクセス範囲修正
+				if (int(transforms.size()) <= editingInstance_) editingInstance_ = int(transforms.size()) - 1;
+
 				float modelMat[16];
 				ToFloat16(modelMat, MakeAffineMatrix(transforms[editingInstance_]));
 
@@ -273,14 +276,29 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 		if (auto* model = dynamic_cast<InstancedModel*>(object)) {
 			auto transforms = model->GetTransforms();
 
+			Vector3 addTranslate = {};
 			if (input.keyboard.IsTrigger(DIK_LEFT)) {
-				editingInstance_--;
+				addTranslate.x = -moveSnap_;
 			}
 			if (input.keyboard.IsTrigger(DIK_RIGHT)) {
-				editingInstance_++;
-				if (transforms.size() > editingInstance_ && input.keyboard.IsPress(DIK_LSHIFT)) {
-					if (gizmoCtx_.useRangeSelect) {
+				addTranslate.x = moveSnap_;
+			}
+			if (input.keyboard.IsTrigger(DIK_UP)) {
+				addTranslate.z = moveSnap_;
+			}
+			if (input.keyboard.IsTrigger(DIK_DOWN)) {
+				addTranslate.z = -moveSnap_;
+			}
 
+			if (input.keyboard.IsTrigger(DIK_LEFT) || input.keyboard.IsTrigger(DIK_RIGHT) ||
+				input.keyboard.IsTrigger(DIK_UP) || input.keyboard.IsTrigger(DIK_DOWN)) {
+
+				// 次インスタンス選択
+				if (transforms.size() > editingInstance_ && input.keyboard.IsPress(DIK_LSHIFT)) {
+					editingInstance_++;
+
+					// 移動
+					if (gizmoCtx_.useRangeSelect) {
 						int r = gizmoCtx_.maxRange + 1 - gizmoCtx_.minRange;
 						for (int i = gizmoCtx_.minRange; i <= gizmoCtx_.maxRange; i++) {
 							// transformコピー
@@ -288,16 +306,17 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 								model->SetTransforms(i + r, transforms[i]);
 							}
 						}
-						
+
 						if (gizmoCtx_.minRange + r < transforms.size()) {
 							gizmoCtx_.minRange += r;
 							gizmoCtx_.maxRange += r;
 						}
 					} else {
-
 						// transformコピー
 						transforms[editingInstance_] = transforms[editingInstance_ - 1];
 					}
+
+					transforms[editingInstance_].translate += addTranslate;
 				}
 			}
 
