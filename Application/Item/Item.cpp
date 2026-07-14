@@ -40,6 +40,8 @@ Item::Item(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rarity) {
 		pointLight.color = { 1.0f,0.8f,0.0f,1.0f };
 		break;
 	}
+
+	pointLight.color = { 1.0f,0.8f,0.0f,0.5f };
 }
 
 void Item::Draw(Camera* camera) {

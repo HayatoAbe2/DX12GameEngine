@@ -57,7 +57,7 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 		} else {
 			bullet->Hit();
 		}
-		camera->StartShake(1.0f, 3);
+		camera->StartShake(0.5f, 2);
 		if (dynamic_cast<FireBullet*>(bullet)) {
 			effectManager_->SpawnExplodeEffect(bullet->GetTransform().translate);
 		} else {
@@ -89,7 +89,7 @@ void CollisionChecker::Check(Player* player, Enemy* enemy, Camera* camera) {
 	if (CheckCollision(segment, circle)) {
 		player->Hit(3.0f, ToXZ(enemy->GetPrePos()));
 
-		camera->StartShake(1.0f, 3);
+		camera->StartShake(0.5f, 2);
 		effectManager_->SpawnHitEffect(player->GetTransform().translate);
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 	}

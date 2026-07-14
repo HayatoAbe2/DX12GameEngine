@@ -71,9 +71,9 @@ void ItemManager::Draw(Camera* camera) {
 	if (canInteract_ && !ctx.Scene().GetCurrentScene()->IsEditMode()) {
 		if (input.gamepad.IsConnected()) {
 			if (input.gamepad.IsPress(XINPUT_GAMEPAD_A)) {
-				controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
-			} else {
 				controlPad_->SetTextureRect(64 * 3, 64 * 8, 64, 64);
+			} else {
+				controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
 			}
 			render.DrawSprite(controlPad_.get());
 		} else {
@@ -110,7 +110,6 @@ void ItemManager::Interact(Player* player) {
 void ItemManager::Spawn(Vector3 pos, int index) {
 	auto& ctx = GameContext::GetInstance();
 
-	// レア度ランダム
 	Rarity rarity = Common;
 	Spawn(pos, index, rarity);
 }

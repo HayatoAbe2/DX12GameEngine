@@ -74,6 +74,23 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	model_->Update();
 
 	invincibleTimer_->Update();
+	if (invincibleTimer_->IsActive() && !isUsingBoost_) {
+		float t = invincibleTimer_->GetRemaining() * 10.0f;
+		float strength = (std::sin(t) + 1.0f) * 0.5f; // 0~1
+		float c = Lerp(1.0f, 2.0f, strength);
+		for (auto& mat : model_->GetMaterials()) {
+			MaterialData matD = mat->GetData();
+			matD.color = Vector4{ c,c,c,2.5f - c };
+			mat->SetData(matD);
+		}
+	} else {
+		for (auto& mat : model_->GetMaterials()) {
+			MaterialData matD = mat->GetData();
+			matD.color = Vector4{ 1,1,1,1 };
+			mat->SetData(matD);
+		}
+	}
+
 	if (hitColorTimer_->IsActive()) {
 		hitColorTimer_->Update();
 
@@ -204,7 +221,12 @@ void Player::Draw(Camera* camera) {
 	}
 
 	if (isUsingBoost_) {
-		render.DrawInstancedModel(instancing_.get(), BlendMode::Add);
+		for (int i = 0; i < 2; ++i) {
+			MaterialData matD = instancing_->GetMaterial(i)->GetData();
+			matD.color = Vector4{ 1,1,1,(i + 1) * 0.3f };
+			instancing_->GetMaterial(i)->SetData(matD);
+		}
+		render.DrawInstancedModel(instancing_.get());
 	}
 
 	model_->SetTransform(transform_);

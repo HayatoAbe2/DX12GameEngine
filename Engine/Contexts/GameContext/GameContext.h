@@ -29,7 +29,7 @@ public:
 	}
 
 	// コンストラクタ
-	GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager, FixFPS* fixFps);
+	GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager, SceneEditor* sceneEditor, FixFPS* fixFps);
 
 	// モデルなどの読み込み
 	AssetContext& Asset() { return *asset_; }

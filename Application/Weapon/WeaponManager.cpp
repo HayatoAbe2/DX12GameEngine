@@ -31,10 +31,6 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	/*auto matData = shadowModel->GetMaterial(0)->GetData();
-	matData.color = { 0,0,0,1 };
-	shadowModel->GetMaterial(0)->SetData(matData);
-	*/
 	WeaponData data;
 
 	if (index == -1) { index = ctx.RandomInt(0, int(WEAPON::Burstgun)); }

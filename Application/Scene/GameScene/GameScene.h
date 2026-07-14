@@ -37,7 +37,6 @@ private:
 	std::unique_ptr<Model> enemyModel_ = nullptr;
 
 	std::shared_ptr<Texture> skybox_ = nullptr;
-	std::shared_ptr<Texture> dissolveMask_ = nullptr;
 	std::unique_ptr<Sprite> fade_ = nullptr;
 
 	std::unique_ptr<Sprite> resultBG_ = nullptr;
@@ -98,6 +97,5 @@ private:
 	// ポーズ
 	bool isPause_ = false;
 
-	std::unique_ptr<Primitive> cylinder_ = nullptr;
 	bool isLoaded_ = false;
 };

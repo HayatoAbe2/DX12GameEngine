@@ -6,13 +6,13 @@
 #include "Engine/SceneObject/LightManager/LightManager.h"
 #include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
 
-GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager, FixFPS* fixFps) {
+GameContext::GameContext(Renderer* renderer, AudioSystem* audio, InputSystem* input, AssetManager* assetManager, LightManager* lightManager, SceneManager* sceneManager, SceneEditor* sceneEditor, FixFPS* fixFps) {
 	asset_ = std::make_unique<AssetContext>(assetManager);
 	audio_ = std::make_unique<AudioContext>(audio);
 	input_ = std::make_unique<InputContext>(input);
 	light_ = std::make_unique<LightContext>(lightManager);
 	render_ = std::make_unique<RenderContext>(renderer, lightManager);
-	scene_ = std::make_unique<SceneContext>(sceneManager);
+	scene_ = std::make_unique<SceneContext>(sceneManager, sceneEditor);
 
 	std::mt19937 randomEngine(randomDevice_());
 	randomEngine_ = randomEngine;

@@ -10,6 +10,7 @@ void GameScene::Initialize() {
 	auto& audio = ctx.Audio();
 	auto& asset = ctx.Asset();
 	auto& render = ctx.Render();
+	auto& scene = ctx.Scene();
 
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();
@@ -35,11 +36,6 @@ void GameScene::Initialize() {
 	data.color = { 0.0f,0.0f,0.0f,1.0f };
 	data.useEnvironmentMap = true;
 	data.environmentIntensity = 1.0f;
-	//for (int i = 0; i < 10; ++i) {
-	//	playerModel_->GetMaterial(i)->SetData(data);
-	//	playerModel_->GetMaterial(i)->SetEnvironmentTexture(skybox_);
-	//}
-	//sceneObjects_.push_back(asset.LoadModel("Resources/Debug/human", "walk.gltf"));
 
 	// マップ
 	std::unique_ptr<InstancedModel> wall = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
@@ -143,19 +139,10 @@ void GameScene::Initialize() {
 	mapTile_->UpdateMapChange(false, enableEditMode_);
 	Reset();
 
-	// dissolve用
-	dissolveMask_ = asset.LoadTexture("Resources/Debug/noise0.png");
-
 #ifdef USE_IMGUI
 	enableEditMode_ = true;
 #endif
 	isLoaded_ = false;
-
-	cylinder_ = asset.CreatePrimitive(asset.CreateMaterial(asset.LoadTexture("Resources/Debug/gradationLine.png")), PrimitiveShape::Cylinder);
-	cylinder_->transform_.translate.x = 2.0f;
-	data = cylinder_->GetMaterial()->GetData();
-	data.uvTransform = data.uvTransform * MakeScaleMatrix({ 1,-1, 1 });
-	cylinder_->GetMaterial()->SetData(data);
 }
 
 void GameScene::Update() {
@@ -206,13 +193,14 @@ void GameScene::Update() {
 
 					// 当たり判定
 					collisionChecker_->Check(player_.get(), bullet, camera_.get());
-
 					for (auto enemy : enemyManager_->GetEnemies()) {
 						collisionChecker_->Check(enemy, bullet, camera_.get());
-
-						if (dynamic_cast<Spiker*>(enemy)) {
-							collisionChecker_->Check(player_.get(), enemy, camera_.get());
-						}
+					}
+				}
+				// 敵とプレイヤー接触
+				for (auto enemy : enemyManager_->GetEnemies()) {
+					if (dynamic_cast<Spiker*>(enemy)) {
+						collisionChecker_->Check(player_.get(), enemy, camera_.get());
 					}
 				}
 
@@ -428,11 +416,14 @@ void GameScene::Draw() {
 
 void GameScene::Reset() {
 	auto& ctx = GameContext::GetInstance();
+	auto& scene = ctx.Scene();
 
 	enemyManager_->Reset();
 	itemManager_->Reset();
 	bulletManager_->Reset();
 	player_->Stop();
+
+	scene.SceneLoad("Resources/Debug/SceneEditor/SceneData.json");
 
 	Vector3 pos;
 	pos = { 5 * 1.5f,0,5 * 1.5f };

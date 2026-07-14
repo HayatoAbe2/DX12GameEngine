@@ -36,7 +36,6 @@ float OrbitStaff::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, 
 		charge_ = (std::max)(charge_, 0.0f);
 		SetChargeStartTimer();
 
-		camera->StartShake(0.2f, 2);
 		return data_.stats.shootCoolTime;
 	}
 }

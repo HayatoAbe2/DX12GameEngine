@@ -11,7 +11,7 @@ Bullet::Bullet(std::unique_ptr<Model> model, const Vector3& direction, const Wea
 	if (dynamic_cast<Enemy*>(user_)) {
 		data_.stats.bulletSpeed *= 0.5f;
 		data_.stats.bulletLifeTime *= 5;
-		data_.bulletColor = { 1,0,0,1 };
+		data_.bulletColor = { 1,0,0,0.7f };
 	}
 
 	auto& ctx = GameContext::GetInstance();
