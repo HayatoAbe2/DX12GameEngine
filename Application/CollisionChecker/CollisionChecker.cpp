@@ -18,13 +18,15 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera) {
 
 	// 敵の弾でなかったらor無敵時間なら判定しない
 	if (!bullet->IsEnemyBullet() ||
-		bullet->IsDead() ||
 		player->IsInvincible()) {
 		return;
 	}
 
+	if (!dynamic_cast<FireBullet*>(bullet) && bullet->IsDead()) return;
+
 	Segment2D segment = { bullet->GetPrePos(), ToXZ(bullet->GetTransform().translate) };
 	Circle circle = { player->GetRadius() + bullet->GetTransform().scale.x / 2.0f, ToXZ(player->GetTransform().translate) };
+	if (dynamic_cast<FireBullet*>(bullet)) { circle.radius = player->GetRadius() + 2.0f; }
 	if (CheckCollision(segment, circle)) {
 		player->Hit(bullet->GetDamage(), bullet->GetPrePos());
 		bullet->Hit();

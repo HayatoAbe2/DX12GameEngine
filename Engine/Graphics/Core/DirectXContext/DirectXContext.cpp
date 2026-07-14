@@ -229,8 +229,8 @@ void DirectXContext::BeginFrame() {
 	// 指定した深度で画面全体をクリアする
 	commandListManager_->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	// 描画用のDescriptorHeapの設定
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvManager_->GetHeap().Get() };
-	commandListManager_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	ID3D12DescriptorHeap* descriptorHeapsRaw[] = { srvManager_->GetHeap().Get() };
+	commandListManager_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeapsRaw);
 	// Viewportを設定
 	commandListManager_->GetCommandList()->RSSetViewports(1, &viewport_);
 	// Scissorを設定
@@ -370,8 +370,8 @@ void DirectXContext::EndFrame() {
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色。RGBAの順
 	cmdList->ClearRenderTargetView(renderTargetManager_->GetRTVHandle(backBufferIndex_), clearColor, 0, nullptr);
 	// 描画用のDescriptorHeapの設定
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvManager_->GetHeap().Get() };
-	cmdList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
+	ID3D12DescriptorHeap* descriptorHeapsRaw[] = { srvManager_->GetHeap().Get() };
+	cmdList->SetDescriptorHeaps(1, descriptorHeapsRaw);
 	// Viewportを設定
 	cmdList->RSSetViewports(1, &viewport_);
 	// Scissorを設定

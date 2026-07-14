@@ -40,9 +40,9 @@ private:
 
 	std::unique_ptr<Sprite> dodgeControlKey_ = nullptr;
 	std::unique_ptr<Sprite> dodgeControlPad_ = nullptr;
-	SpriteData dodgeControlUIData_ = { {0,80}, { 64, 64 } };
+	SpriteData dodgeControlUIData_ = { {1110,360}, { 50, 50 } };
 	std::unique_ptr<Sprite> dodge_ = nullptr;
-	SpriteData dodgeUIData_ = { {60,80}, { 96, 64 } };
+	SpriteData dodgeUIData_ = { {1171,358}, { 80, 53.3f } };
 
 	// 階数
 	std::unique_ptr<Sprite> currentFloor_ = nullptr;

@@ -291,6 +291,10 @@ void GameScene::Update() {
 				if (fadeTimer_ >= kMaxFadeinTimer_) {
 					isFadeIn_ = false;
 					fadeTimer_ = 0;
+
+					// 次のフロア
+					currentFloor_++;
+					Reset();
 				}
 			} else if (isFadeOut_) {
 				fadeTimer_++;
@@ -299,6 +303,8 @@ void GameScene::Update() {
 					isFadeOut_ = false;
 
 					if (player_->IsDead() || currentFloor_ == 3) {
+						Reset();
+
 						if (isShowResult_) {
 							scene.SceneChange("Game");
 							return;
@@ -312,9 +318,6 @@ void GameScene::Update() {
 					} else {
 						fadeTimer_ = 0;
 						isFadeIn_ = true;
-						// 次のフロア
-						currentFloor_++;
-						Reset();
 					}
 				}
 
@@ -346,7 +349,8 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	BaseScene::Draw();
 
-	auto& render = GameContext::GetInstance().Render();
+	auto& ctx = GameContext::GetInstance();
+	auto& render = ctx.Render();
 	if (isShowResult_) {
 		render.SetPostEffectType(PostEffectType::Grayscale);
 	} else {
@@ -370,12 +374,13 @@ void GameScene::Draw() {
 	if (isShowResult_) {
 		render.DrawSprite(resultBG_.get());
 		render.DrawSprite(resultCursor_.get());
-		resultCursor_->ImGuiEdit();
 	}
 
 	if (!enableEditMode_) {
+		fade_->SetSize(Vector2{1280, 720} + Vector2{ 20,80 });
 		render.DrawSprite(fade_.get());
 	}
+
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Weapon");

@@ -98,7 +98,7 @@ private:
 	std::unique_ptr<Timer> hitColorTimer_ = nullptr;
 	std::unique_ptr<Timer> invincibleTimer_ = nullptr;
 	float invincibleTimeOnHit_ = 1.0f;
-	float invincibleTimeOnDodge_ = 0.5f;
+	float invincibleTimeOnDodge_ = 0.25f;
 
 	// モデル
 	std::unique_ptr<Model> model_ = nullptr;
@@ -110,7 +110,7 @@ private:
 	bool canBoost_ = false;
 	bool isUsingBoost_ = false;
 	std::unique_ptr<Timer> boostTimer_;
-	float maxBoostTime_ = 0.2f;
+	float maxBoostTime_ = 0.25f;
 	float boostSpeed_ = 15.0f;
 	Vector3 boostDir_{};
 	int boostCoolTime_ = 10;

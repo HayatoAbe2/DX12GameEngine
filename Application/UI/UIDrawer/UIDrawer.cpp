@@ -36,7 +36,6 @@ void UIDrawer::Initialize(Player* player) {
 	dodge_ = asset.LoadSprite("Resources/Control/Dodge.png");
 	dodge_->SetSize(dodgeUIData_.size);
 	dodge_->SetPosition(dodgeUIData_.pos);
-
 }
 
 void UIDrawer::Update() {
