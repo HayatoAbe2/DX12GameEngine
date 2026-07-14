@@ -20,34 +20,42 @@ void EnemyManager::Initialize() {
 }
 
 void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera) {
-	for (const auto& enemy : enemies_) {
+	for (const auto& enemy : activeEnemies_) {
 		enemy->Update(mapCheck, player, bulletManager, camera);
 	}
 
-	enemies_.erase(
-		std::remove_if(enemies_.begin(), enemies_.end(),
+	activeEnemies_.erase(
+		std::remove_if(activeEnemies_.begin(), activeEnemies_.end(),
 			[](const std::unique_ptr<Enemy>& enemy) {
 				return enemy->IsDead();
 			}
 		),
-		enemies_.end()
+		activeEnemies_.end()
 	);
 }
 
 
 void EnemyManager::Draw(Camera* camera) {
-	for (const auto& enemy : enemies_) {
+	for (const auto& enemy : activeEnemies_) {
 		enemy->Draw(camera);
 	}
 }
 
-void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyType) {
+void EnemyManager::Spawn(std::vector<std::unique_ptr<Enemy>> enemy) {
+	// 控えの敵を出現させる
+	for (auto& e : enemy) {
+		activeEnemies_.push_back(std::move(e));
+	}
+}
+
+void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int enemyType) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
 	std::vector<std::unique_ptr<Weapon>> weapons;
 	EnemyStatus status;
 
+	std::vector<std::unique_ptr<Enemy>> enemies;
 	switch (enemyType) {
 	case 1:
 	{
@@ -58,13 +66,13 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));
 		status.hp = 10;
 		status.radius = 0.5f;
-		status.moveSpeed = 7.0f;
+		status.moveSpeed = 3.0f;
 		status.defaultSearchRadius = 5.0f;
 		status.stunResist = 0;
 		status.canFly = true;
 		status.attackRadius = 9;
 
-		enemies_.push_back(std::make_unique<Bat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		enemies.push_back(std::make_unique<Bat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
 
@@ -75,15 +83,15 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		enemyModel->SetTranslate(pos);
 		enemyShadowModel->SetTranslate(pos);
 		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::Pistol)));
-		status.hp = 20;
+		status.hp = 23;
 		status.radius = 0.9f;
-		status.moveSpeed = 3.5f;
+		status.moveSpeed = 1.5f;
 		status.defaultSearchRadius = 10.0f;
 		status.stunResist = 2;
 		status.canFly = false;
 		status.attackRadius = 9;
 
-		enemies_.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		enemies.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
 	case 3:
@@ -103,7 +111,7 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.canFly = false;
 		status.attackRadius = 9;
 
-		enemies_.push_back(std::make_unique<HeavyKnight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		enemies.push_back(std::make_unique<HeavyKnight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
 
@@ -124,67 +132,52 @@ void EnemyManager::Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyTyp
 		status.canFly = true;
 		status.attackRadius = 9;
 
-		enemies_.push_back(std::make_unique<RedBat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		enemies.push_back(std::make_unique<RedBat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
 	default:
 	{
-		status.hp = 10;
+		status.hp = 5;
 		status.radius = 0.5f;
-		status.moveSpeed = 4.0f;
+		status.moveSpeed = 3.5f;
 		status.defaultSearchRadius = 8.5f;
 		status.stunResist = 0;
 		status.canFly = false;
 		status.attackRadius = -1;
 
-		for (int i = 0; i < 5; ++i) {
+		int num = ctx.RandomInt(2, 4);
+		for (int i = 0; i < num; ++i) {
 			auto enemyModel = asset.LoadModel("Resources/Enemy", "hedgehog.obj");
 			auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "hedgehog.obj");
 			Vector3 spawnPos = pos + Vector3{ ctx.RandomFloat(-1,1), 0, ctx.RandomFloat(-1,1) };
 			enemyModel->SetTranslate(spawnPos);
 			enemyShadowModel->SetTranslate(spawnPos);
 
-			enemies_.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+			enemies.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		}
 		break;
 	}
 	}
+
+	inactiveEnemies_.push_back(std::move(enemies));
 }
 
 void EnemyManager::Reset() {
-	enemies_.clear();
+	activeEnemies_.clear();
 	isSpawned_.clear();
 }
 
-void EnemyManager::LoadCSV(std::string filePath, float tileSize, WeaponManager* weaponManager) {
-	std::ifstream file(filePath);
-	std::string line;
+void EnemyManager::Load(WeaponManager* weaponManager) {
+	isSpawned_.clear();
+	spawnArea_.clear();
+	spawnPos_.clear();
+	activeEnemies_.clear();
+	inactiveEnemies_.clear();
 
-	assert(file.is_open());
-
-	std::getline(file, line); // 最初の行をスキップ
-
-	while (std::getline(file, line)) {
-		std::stringstream ss(line);
-		std::string enemyStr, xStr, zStr;
-
-		std::getline(ss, enemyStr, ',');
-		std::getline(ss, xStr, ',');
-		std::getline(ss, zStr, ',');
-
-		int enemyNum = std::stoi(enemyStr);
-		float x = std::stof(xStr);
-		float z = std::stof(zStr);
-
-		Vector3 pos = Vector3{ x * tileSize, 0, z * tileSize };
-		Spawn(pos, weaponManager, enemyNum);
-	}
-}
-
-void EnemyManager::Load(WeaponManager* weaponManager, const Vector3& playerPos, MapCheck* mapCheck) {
 	auto& ctx = GameContext::GetInstance();
 	auto& scene = ctx.Scene();
 
+	// モデル座標をスポーン位置に反映
 	std::vector<InstancedModel*> models;
 	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
 		if (dynamic_cast<InstancedModel*>(obj)) {
@@ -193,52 +186,61 @@ void EnemyManager::Load(WeaponManager* weaponManager, const Vector3& playerPos, 
 		}
 	}
 
-	std::vector<AABB2D> spawnArea;
-	std::vector<Vector3> spawnPos;
 	for (auto& model : models) {
 		if (model->tag == "enemySpawn") {
-			size_t size = model->GetTransforms().size();
-			if (isSpawned_.size() < size) {
-				isSpawned_.resize(size);
-			}
-
 			for (auto& t : model->GetTransforms()) {
-				AABB2D aabb = { {t.translate.x - t.scale.x / 2.0f, t.translate.z - t.scale.z / 2.0f }, {t.translate.x + t.scale.x / 2.0f, t.translate.z + t.scale.z / 2.0f} };
-				spawnArea.push_back(aabb);
-			}
-
-		} else if (model->tag == "enemySpawnPoint") {
-			for (auto& t : model->GetTransforms()) {
-				spawnPos.push_back(t.translate);
-			}
-		}
-	}
-
-	for (int i = 0; i < isSpawned_.size(); ++i) {
-		if (!isSpawned_[i]) {
-			// 入ったら出現
-			if (CheckCollision(spawnArea[i], Vector2{ playerPos.x, playerPos.z })) {
-
-				for (Vector3 pos : spawnPos) {
-					// 範囲内の出現ポイント
-					if (CheckCollision(spawnArea[i], Vector2{ pos.x, pos.z })) {
-						int num = ctx.RandomInt(1, 3);
-						if (num == 3) num = 5;
-
-						pos.y = 0;
-						Spawn(pos, weaponManager, num);
-					}
+				if (t.scale.x != 0 ||
+					t.scale.y != 0 ||
+					t.scale.z != 0) {
+					AABB2D aabb = { {t.translate.x - t.scale.x / 2.0f, t.translate.z - t.scale.z / 2.0f }, {t.translate.x + t.scale.x / 2.0f, t.translate.z + t.scale.z / 2.0f} };
+					spawnArea_.push_back(aabb);
 				}
-				isSpawned_[i] = true;
+			}
+		} else if (model->tag == "enemySpawnPoint") {
+			for (auto& t : model->GetTransforms()) { 
+				if (t.scale.x != 0 ||
+					t.scale.y != 0 ||
+					t.scale.z != 0) {
+
+					// 出現座標追加
+					spawnPos_.push_back(ToXZ(t.translate));
+					isSpawned_.push_back(false);
+
+					// 敵No.
+					int num = ctx.RandomInt(1, 3);
+					if (num == 3) num = 5;
+
+					// 出現敵のロード
+					CreateEnemy({ t.translate.x, 0, t.translate.z }, weaponManager, num);
+				}
 			}
 		}
 	}
 }
 
+void EnemyManager::SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck) {
+	auto& ctx = GameContext::GetInstance();
+
+	for (int i = 0; i < spawnArea_.size(); ++i)
+		for (int j = 0; j < isSpawned_.size(); ++j) {
+			if (!isSpawned_[j]) {
+				// 入ったら出現
+				if (CheckCollision(spawnArea_[i], ToXZ(playerPos))) {
+
+					// 範囲内の出現ポイント
+					if (CheckCollision(spawnArea_[i], spawnPos_[j])) {
+						Spawn(std::move(inactiveEnemies_[j]));
+						isSpawned_[j] = true;
+					}
+				}
+			}
+		}
+}
+
 std::vector<Enemy*> EnemyManager::GetEnemies() {
 	std::vector<Enemy*> result;
-	result.reserve(enemies_.size());
-	for (auto& e : enemies_) {
+	result.reserve(activeEnemies_.size());
+	for (auto& e : activeEnemies_) {
 		result.push_back(e.get());
 	}
 	return result;

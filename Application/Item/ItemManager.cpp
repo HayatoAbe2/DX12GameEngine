@@ -184,7 +184,7 @@ void ItemManager::Load() {
 
 			for (int i = 0; i < model->GetTransforms().size(); ++i) {
 				Transform t = model->GetTransforms()[i];
-				if (t.translate == Vector3{ 0,0,0 }) continue;
+				if (t.scale == Vector3{ 0,0,0 }) continue;
 				
 				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
 				if (!spawned_[i]) {

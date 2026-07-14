@@ -4,7 +4,7 @@
 
 struct AABB2D {
 	Vector2 min;
-	Vector3 max;
+	Vector2 max;
 };
 
 struct AABB3D {	

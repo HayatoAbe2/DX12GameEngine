@@ -1,7 +1,7 @@
 { 
     "AssaultRifle": {
         "modelName": "AssaultRifle.obj",
-        "damage": 1.4,
+        "damage": 2.8,
         "weight": 0.4,
         "bulletSize": 0.3,
         "bulletSpeed": 45,

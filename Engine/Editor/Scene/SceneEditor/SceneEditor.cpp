@@ -315,9 +315,9 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 						// transformコピー
 						transforms[editingInstance_] = transforms[editingInstance_ - 1];
 					}
-
-					transforms[editingInstance_].translate += addTranslate;
 				}
+
+				transforms[editingInstance_].translate += addTranslate;
 			}
 
 			int count = model->GetNumInstance();
@@ -428,7 +428,6 @@ void SceneEditor::Save() {
 }
 
 void SceneEditor::Load(const std::string& path) {
-#ifdef USE_IMGUI
 	auto& asset = GameContext::GetInstance().Asset();
 
 	// 現在シーンをクリア
@@ -463,7 +462,9 @@ void SceneEditor::Load(const std::string& path) {
 
 			scene_->AddObject(std::move(model));
 		} else if (type == "InstancedModel") {
-			auto model = asset.LoadInstancedModel(objectJson["path"], objectJson["name"], int(objectJson["transforms"].size()));
+			std::unique_ptr<InstancedModel> model;
+
+			model = asset.LoadInstancedModel(objectJson["path"], objectJson["name"], int(objectJson["transforms"].size()));
 			model->tag = objectJson["tag"];
 
 			std::vector<Transform> transforms;
@@ -488,14 +489,19 @@ void SceneEditor::Load(const std::string& path) {
 					json["translate"][1],
 					json["translate"][2]
 				};
+
+				if (t.translate.x == 0 &&
+					t.translate.y == 0 &&
+					t.translate.z == 0) {
+					t.scale = {};
+				}
 				transforms.push_back(t);
 			}
-			model->SetTransforms(transforms);
 
+			model->SetTransforms(transforms);
 			scene_->AddObject(std::move(model));
 		}
 	}
-#endif
 }
 
 std::string SceneEditor::SerializeScene() {

@@ -38,6 +38,7 @@ public:
 	virtual void Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) = 0;
 
 	Transform GetTransform() const override { return model_->GetTransform(); };
+	Vector3 GetPrePos() const override { return prePos_; }
 	void SetTransform(const Transform& transform) const { model_->SetTransform(transform); }
 	float GetRadius() const { return status_.radius; }
 	bool IsDead() { return isDead_; }
@@ -95,4 +96,6 @@ protected:
 	bool isAttacking_ = false;
 
 	std::unique_ptr<Timer> slowTimer_;
+
+	Vector3 prePos_{};
 };

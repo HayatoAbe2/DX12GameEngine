@@ -19,7 +19,7 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera) {
 	// 敵の弾でなかったらor無敵時間なら判定しない
 	if (!bullet->IsEnemyBullet() ||
 		bullet->IsDead() ||
-		player->IsBoosting()) {
+		player->IsInvincible()) {
 		return;
 	}
 
@@ -68,10 +68,30 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 }
 
 void CollisionChecker::Check(Player* player, Enemy* enemy, Camera* camera) {
-	Circle p = { player->GetRadius(), {player->GetTransform().translate.x, player->GetTransform().translate.z} };
-	Circle e = { enemy->GetRadius(), {enemy->GetTransform().translate.x, enemy->GetTransform().translate.z} };
-	if (CheckCollision(p, e)) {
-		player->Hit(3.0f, ToXZ(enemy->GetTransform().translate));
+	auto& ctx = GameContext::GetInstance();
+	auto& audio = ctx.Audio();
+
+	// 判定しない条件
+	if (player->IsInvincible()) {
+		return;
+	}
+
+	Segment2D segment = {
+		ToXZ(player->GetPrePos()),
+		ToXZ(player->GetTransform().translate)
+	};
+
+	Circle circle = {
+		player->GetRadius() + enemy->GetRadius(),
+		ToXZ(enemy->GetTransform().translate)
+	};
+
+	if (CheckCollision(segment, circle)) {
+		player->Hit(3.0f, ToXZ(enemy->GetPrePos()));
+
+		camera->StartShake(1.0f, 3);
+		effectManager_->SpawnHitEffect(player->GetTransform().translate);
+		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 	}
 }
 

@@ -77,6 +77,7 @@ void GameScene::Initialize() {
 	enemySpawn->tag = "enemySpawn";
 	enemySpawnPoint->tag = "enemySpawnPoint";
 	weaponSpawn->tag = "weaponSpawn";
+	start->tag = "start";
 	goal->tag = "goal";
 	this->AddObject(std::move(wall));
 	this->AddObject(std::move(floor));
@@ -84,6 +85,7 @@ void GameScene::Initialize() {
 	this->AddObject(std::move(enemySpawn));
 	this->AddObject(std::move(enemySpawnPoint));
 	this->AddObject(std::move(weaponSpawn));
+	this->AddObject(std::move(start));
 	this->AddObject(std::move(goal));
 
 	mapTile_ = std::make_unique<MapTile>();
@@ -138,7 +140,7 @@ void GameScene::Initialize() {
 
 	// マップ判定
 	mapCheck_ = std::make_unique<MapCheck>();
-	mapTile_->UpdateMapChange(false);
+	mapTile_->UpdateMapChange(false, enableEditMode_);
 	Reset();
 
 	// dissolve用
@@ -147,11 +149,7 @@ void GameScene::Initialize() {
 #ifdef USE_IMGUI
 	enableEditMode_ = true;
 #endif
-
-#ifndef USE_IMGUI 
-	isLoad_ = true;
-#endif
-
+	isLoaded_ = false;
 
 	cylinder_ = asset.CreatePrimitive(asset.CreateMaterial(asset.LoadTexture("Resources/Debug/gradationLine.png")), PrimitiveShape::Cylinder);
 	cylinder_->transform_.translate.x = 2.0f;
@@ -222,7 +220,7 @@ void GameScene::Update() {
 				itemManager_->Update(player_.get());
 
 				// マップ
-				mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty());
+				mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
 				mapTile_->Update(enemyManager_->GetEnemies().size() == 0);
 				mapCheck_->Update(mapTile_->GetMap());
 
@@ -264,10 +262,6 @@ void GameScene::Update() {
 				}
 
 			} else {
-				// ポーズ(フェード中不可)
-			/*	if (input.IsRelease(DIK_ESCAPE)) {
-					isPause_ = true;
-				}*/
 			}
 
 		} else {
@@ -319,6 +313,7 @@ void GameScene::Update() {
 					if (player_->IsDead() || currentFloor_ == 3) {
 						if (isShowResult_) {
 							scene.SceneChange("Game");
+							return;
 						} else {
 							// ゲームオーバーまたはクリア
 							isShowResult_ = true;
@@ -339,16 +334,24 @@ void GameScene::Update() {
 		}
 	}
 
-	mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty());
+	mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
+	enemyManager_->SpawnCheck(player_->GetTransform().translate, mapCheck_.get());
+
+	// カメラ行列更新
 	camera_->Update(debugCamera_.get());
 	debugCamera_->Update();
 
-	if (!enableEditMode_) {
-		itemManager_->Load();
-		enemyManager_->Load(weaponManager_.get(), player_->GetTransform().translate, mapCheck_.get());
-
+	if (enableEditMode_) {
+		isLoaded_ = false;
 	} else {
-		isLoad_ = false;
+		// 編集の反映,再配置
+		itemManager_->Load();
+		if (!isLoaded_) {
+			enemyManager_->Load(weaponManager_.get());
+		}
+
+		isLoaded_ = true;
+
 	}
 }
 
@@ -356,7 +359,11 @@ void GameScene::Draw() {
 	BaseScene::Draw();
 
 	auto& render = GameContext::GetInstance().Render();
-	render.SetPostEffectType(PostEffectType::Outline);
+	if (isShowResult_) {
+		render.SetPostEffectType(PostEffectType::Grayscale);
+	} else {
+		render.SetPostEffectType(PostEffectType::Outline);
+	}
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
 	mapTile_->Draw(camera_.get());
@@ -366,10 +373,6 @@ void GameScene::Draw() {
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
 
-	if (currentFloor_ == 0) {
-		// チュートリアル表示
-	}
-
 	// ui
 	if (!enableEditMode_) {
 		uiDrawer_->Draw();
@@ -377,7 +380,6 @@ void GameScene::Draw() {
 
 	// 結果(プレイ画面の上から)
 	if (isShowResult_) {
-		render.SetPostEffectType(PostEffectType::Grayscale);
 		render.DrawSprite(resultBG_.get());
 		render.DrawSprite(resultCursor_.get());
 		resultCursor_->ImGuiEdit();
@@ -432,42 +434,13 @@ void GameScene::Reset() {
 	bulletManager_->Reset();
 	player_->Stop();
 
-	int floorType = 0;
-	std::string tilePath;
-	std::string itemPath;
-	std::string enemyPath;
-	switch (currentFloor_) {
-	case 0:
-		floorType = 0;
+	Vector3 pos;
+	pos = { 5 * 1.5f,0,5 * 1.5f };
+	pos.y = 0;
 
-		// プレイヤー位置
-		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
+	// プレイヤー位置
+	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });
 
-		break;
-	case 1:
-		floorType = ctx.RandomInt(1, 2);
-
-		// プレイヤー位置
-		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
-
-		break;
-
-	case 2:
-		floorType = ctx.RandomInt(3, 4);
-
-		// プレイヤー位置
-		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
-
-		break;
-
-	case 3:
-		floorType = ctx.RandomInt(10, 11);
-
-		// プレイヤー位置
-		player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, {3,0,3} });
-
-		break;
-	}
-
+	isLoaded_ = false;
 	mapCheck_->Initialize(mapTile_->GetMap(), mapTile_->GetTileSize());
 }

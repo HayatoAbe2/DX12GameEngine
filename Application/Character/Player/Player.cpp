@@ -70,6 +70,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
 
+	prePos_ = model_->GetTransform().translate;
 	model_->Update();
 
 	invincibleTimer_->Update();
@@ -253,25 +254,20 @@ void Player::Hit(float damage, const Vector2& from) {
 			hp_ -= damage;
 			invincibleTimer_->Start(invincibleTimeOnHit_);
 
-			if (hp_ <= 0) {
-				// ゲームオーバー
+			// 行動不能
+			stunTimer_->Start(stunTime_);
 
-			} else {
-				// 行動不能
-				stunTimer_->Start(stunTime_);
+			// ノックバック
+			knockbackVel_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * 20.0f;
 
-				// ノックバック
-				knockbackVel_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * 15.0f;
+			// ダメージを受けると色変更
+			auto data = model_->GetMaterial(0)->GetData();
+			data.color = { 3.0f,3.0f,3.0f,1.0f };
+			model_->GetMaterial(0)->SetData(data);
+			hitColorTimer_->Start(0.2f);
 
-				// ダメージを受けると色変更
-				auto data = model_->GetMaterial(0)->GetData();
-				data.color = { 3.0f,3.0f,3.0f,1.0f };
-				model_->GetMaterial(0)->SetData(data);
-				hitColorTimer_->Start(0.2f);
-
-				// 被ダメージ時の位置を記憶
-				landPos_ = transform_.translate;
-			}
+			// 被ダメージ時の位置を記憶
+			landPos_ = transform_.translate;
 		}
 	}
 }

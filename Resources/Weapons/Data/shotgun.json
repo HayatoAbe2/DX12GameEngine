@@ -1,7 +1,7 @@
 { 
     "Shotgun": {
         "modelName": "Shotgun.obj",
-        "damage": 3.0,
+        "damage": 6.0,
         "weight": 0.5,
         "bulletSize": 0.4,
         "bulletSpeed": 50,

@@ -1,7 +1,7 @@
 { 
     "Wavegun": {
         "modelName": "Wavegun.obj",
-        "damage": 3.5,
+        "damage": 7.0,
         "weight": 0.1,
         "bulletSize": 0.4,
         "bulletSpeed": 24,

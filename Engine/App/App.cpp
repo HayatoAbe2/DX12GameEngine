@@ -69,7 +69,7 @@ void App::Initialize() {
 
 	// シーンマネージャー
 	sceneManager_ = std::make_unique<SceneManager>();
-	
+
 	// コンテキスト(ゲームコードからの関数窓口)
 	gameContext_ = std::make_unique<GameContext>(renderer_.get(), audio_.get(), input_.get(), assetManager_.get(), lightManager_.get(), sceneManager_.get(), dxContext_->GetFixFPS());
 	gameContext_->Set(gameContext_.get());
@@ -78,6 +78,10 @@ void App::Initialize() {
 	logger_->Log(logger_->GetStream(), std::format("[SceneManager] Initialization complete.\n"));
 
 	sceneEditor_ = std::make_unique<SceneEditor>();
+#ifndef USE_IMGUI
+	sceneEditor_->scene_ = sceneManager_->GetCurrentScene();
+	sceneEditor_->Load("Resources/Debug/SceneEditor/SceneData.json");
+#endif
 }
 
 void App::Run() {

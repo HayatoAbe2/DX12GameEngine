@@ -121,11 +121,11 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 			if (overlapY > 0.0f) {
 				float tileCenterY = (tileMinY + tileMaxY) * 0.5f;
 
-				// ⬇️ 押し戻し方向を修正（上下が逆にならないように）
+				// 押し戻し方向
 				if (pos.y > tileCenterY)
-					pos.y += (tileMaxY - charMinY); // キャラが下側 → 下に押し戻す（正方向）
+					pos.y += (tileMaxY - charMinY);
 				else
-					pos.y -= (charMaxY - tileMinY); // キャラが上側 → 上に押し戻す（負方向）
+					pos.y -= (charMaxY - tileMinY);
 
 				// AABB更新
 				charMinY = pos.y - radius;
@@ -160,10 +160,11 @@ bool MapCheck::IsHitWall(const Vector2& pos, float radius) {
 	int startX = std::max(0, static_cast<int>(charMinX / tileSize_));
 	int endX = std::min(mapW - 1, static_cast<int>(charMaxX / tileSize_));
 
-	for (int y = startY; y <= endY; ++y) {
+	for (int y = startY; y <= endY; ++y) { 
 		for (int x = startX; x <= endX; ++x) {
 			if (map_[y][x] == MapTile::Tile::Floor) continue;
 			if (map_[y][x] == MapTile::Tile::None) continue;
+			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
 
 			// タイルAABB
 			float tileMinX = x * tileSize_;

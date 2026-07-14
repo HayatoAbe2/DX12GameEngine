@@ -1,7 +1,7 @@
 { 
     "OrbitStaff": {
         "modelName": "Spellbook.obj",
-        "damage": 3.5,
+        "damage": 7.0,
         "weight": 0.4,
         "bulletSize": 2.0,
         "bulletSpeed": 3,

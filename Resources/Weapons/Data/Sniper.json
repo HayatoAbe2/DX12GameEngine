@@ -1,7 +1,7 @@
 { 
     "Sniper": {
         "modelName": "Shotgun.obj",
-        "damage": 12.0,
+        "damage": 24.0,
         "weight": 0.35,
         "bulletSize": 0.3,
         "bulletSpeed": 45,

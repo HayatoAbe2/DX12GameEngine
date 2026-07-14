@@ -1,7 +1,7 @@
 { 
     "ChargeGun": {
         "modelName": "Shotgun.obj",
-        "damage": 1.0,
+        "damage": 2.0,
         "weight": 0.4,
         "bulletSize": 0.1,
         "bulletSpeed": 30,

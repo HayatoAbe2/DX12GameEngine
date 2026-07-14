@@ -1,7 +1,7 @@
 { 
     "Pistol": {
         "modelName": "Pistol.obj",
-        "damage": 3.0,
+        "damage": 6.0,
         "weight": 0.1,
         "bulletSize": 0.5,
         "bulletSpeed": 30,

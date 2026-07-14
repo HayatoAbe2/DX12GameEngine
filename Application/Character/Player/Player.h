@@ -49,8 +49,10 @@ public:
 	float GetHP() { return hp_; }
 	float GetMaxHP() { return maxHp_; }
 	bool IsBoosting() { return isUsingBoost_; }
+	bool IsInvincible() { return isUsingBoost_ || invincibleTimer_->IsActive(); }
 
 	Transform GetTransform() const override { return transform_; }
+	Vector3 GetPrePos() const override { return prePos_; }
 	void SetTransform(const Transform& transform) { transform_ = transform; }
 	std::unique_ptr<Weapon> DropWeapon() { if (weapon_ && subWeapon_) { return std::move(weapon_); } else { return nullptr; } };
 	void SetWeapon(std::unique_ptr<Weapon> weapon);
@@ -88,7 +90,7 @@ private:
 
 	// スタン時間
 	std::unique_ptr<Timer> stunTimer_ = nullptr;
-	float stunTime_ = 0.25f;
+	float stunTime_ = 0.6f;
 	Vector2 knockbackVel_{};
 
 	bool isFall_ = false;
@@ -132,5 +134,7 @@ private:
 	// クールダウン表示
 	std::unique_ptr<Sprite> shootCooldownSprite_;
 	Vector2 scSize_ = {70,20};
+
+	Vector3 prePos_{};
 };
 

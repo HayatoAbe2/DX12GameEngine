@@ -36,6 +36,7 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 
+	prePos_ = model_->GetTransform().translate;
 	if (hitColorTimer_->IsActive()) {
 		hitColorTimer_->Update();
 		if (hitColorTimer_->IsFinished()) {

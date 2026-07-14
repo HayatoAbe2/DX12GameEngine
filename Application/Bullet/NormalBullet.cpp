@@ -26,6 +26,7 @@ void NormalBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 		Vector2 pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
 
 		if (mapCheck->IsHitWall(pos, data_.stats.bulletSize / 2.0f)) {
+			if (isEnemyBullet_) Hit();
 			velocity_.x *= -1;
 			model_->SetTranslate(model_->GetTransform().translate + Vector3{ velocity_.x * 2,0,0 });
 		}
@@ -35,6 +36,7 @@ void NormalBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 		pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
 
 		if (mapCheck->IsHitWall(pos, data_.stats.bulletSize / 2.0f)) {
+			if (isEnemyBullet_) Hit();
 			velocity_.z *= -1;
 			model_->SetTranslate(model_->GetTransform().translate + Vector3{ 0,0,velocity_.z * 2 });
 		}
@@ -59,10 +61,12 @@ void NormalBullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 	}
 	particle_->Update();
 
-	hitParticle_->Update();
-	hitParticleLifeTime--;
-	if (hitParticleLifeTime <= 0) {
-		canErase_ = true;
+	if (isDead_) {
+		hitParticle_->Update();
+		hitParticleLifeTime--;
+		if (hitParticleLifeTime <= 0) {
+			canErase_ = true;
+		}
 	}
 }
 

@@ -12,16 +12,22 @@ public:
 	void Initialize();
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera);
 	void Draw(Camera* camera);
-	void Spawn(Vector3 pos, WeaponManager* weaponManager, int enemyType);
+	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
+	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int enemyType);
 	void Reset();
 	void LoadCSV(std::string filePath, float tileSize, WeaponManager* weaponManager);
-	void Load(WeaponManager* weaponManager, const Vector3& playerPos, MapCheck* mapCheck);
+	void Load(WeaponManager* weaponManager);
+	void SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck);
 
 	std::vector<Enemy*> GetEnemies();
 private:
-	std::vector<std::unique_ptr<Enemy>> enemies_ = {};
+	std::vector<std::unique_ptr<Enemy>> activeEnemies_ = {};
+	std::vector<std::vector<std::unique_ptr<Enemy>>> inactiveEnemies_ = {};
 
 	std::unique_ptr<ParticleSystem> deathParticle_ = nullptr;
+
 	std::vector<bool> isSpawned_;
+	std::vector<AABB2D> spawnArea_;
+	std::vector<Vector2> spawnPos_;
 };
 

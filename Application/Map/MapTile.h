@@ -18,7 +18,7 @@ public:
 
 	~MapTile();
 	void Initialize();
-	void UpdateMapChange(bool isCombat);
+	void UpdateMapChange(bool isCombat, bool isEditMode);
 	void Update(bool canGoal);
 	void Draw(Camera* camera);
 

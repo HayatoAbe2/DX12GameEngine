@@ -1,7 +1,7 @@
 { 
     "Spellbook": {
         "modelName": "Spellbook.obj",
-        "damage": 8.0,
+        "damage": 16.0,
         "weight": 0.2,
         "bulletSize": 1.2,
         "bulletSpeed": 24,

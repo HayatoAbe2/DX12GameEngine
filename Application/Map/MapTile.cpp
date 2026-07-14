@@ -27,7 +27,7 @@ void MapTile::Initialize() {
 	lightIndex_ = light.AddSpotLight();
 }
 
-void MapTile::UpdateMapChange(bool isCombat) {
+void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 	auto& ctx = GameContext::GetInstance();
 	auto& light = ctx.Light();
 	auto& scene = ctx.Scene();
@@ -41,8 +41,8 @@ void MapTile::UpdateMapChange(bool isCombat) {
 	}
 
 	map_.clear();
-	mapWidth_ = 64;
-	mapHeight_ = 64;
+	mapWidth_ = 128;
+	mapHeight_ = 128;
 	map_.assign(mapHeight_, std::vector<Tile>(mapWidth_, Tile::None));
 
 	for (auto& model : models) {
@@ -51,7 +51,9 @@ void MapTile::UpdateMapChange(bool isCombat) {
 			for (Transform& t : model->GetTransforms()) {
 				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
 				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
-				map_[y][x] = Tile::Floor;
+				if (map_[y][x] != Tile::LeftWall) {
+					map_[y][x] = Tile::Floor;
+				}
 			}
 		}
 		if (model->tag == "wall") {
@@ -67,7 +69,11 @@ void MapTile::UpdateMapChange(bool isCombat) {
 				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
 				map_[y][x] = Tile::CombatWall;
 			}
-			matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
+			if (isCombat || isEditMode) {
+				matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
+			} else {
+				matData.color = { 0.3f, 0.3f, 1.0f, 0.0f };
+			}
 			model->GetMaterial(0)->SetData(matData);
 			model->GetMaterial(1)->SetData(matData);
 
