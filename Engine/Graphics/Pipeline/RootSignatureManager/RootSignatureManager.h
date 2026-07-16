@@ -15,7 +15,9 @@ enum class RootSignatures {
 	Fullscreen,
 
 	SkinningCompute,
+
 	ParticleInit,
+	ParticleEmit,
 
 	Count
 };
@@ -48,6 +50,7 @@ private:
 	void CreateFullscreenRootSignature();
 	void CreateSkinningComputeRootSignature();
 	void CreateParticleInitRootSignature();
+	void CreateParticleEmitRootSignature();
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatures_[(int)RootSignatures::Count];
 

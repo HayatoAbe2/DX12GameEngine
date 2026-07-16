@@ -13,6 +13,7 @@ std::unique_ptr<ParticleSystem> ParticleManager::CreateParticle(uint32_t size, u
 
 	// リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformResource = bufferManager->CreateDefaultBuffer(sizeof(GPUParticle) * size, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterResource = bufferManager->CreateDefaultBuffer(sizeof(uint32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
 	// SRV
 	uint32_t index = descriptorManager->Allocate();
@@ -20,14 +21,26 @@ std::unique_ptr<ParticleSystem> ParticleManager::CreateParticle(uint32_t size, u
 	particleSystem->SetInstanceResource(instanceTransformResource);
 	particleSystem->SetSRVHandle(descriptorManager->GetGPUHandle(index));
 
+	uint32_t emitterSize = (sizeof(EmitterSphere) + 255) & ~255;
+	Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource = bufferManager->CreateUploadBuffer(emitterSize);
+	EmitterSphere* emitterData;
+	emitterResource->Map(0, nullptr, reinterpret_cast<void**>(&emitterData));
+	particleSystem->SetEmitterResource(emitterResource);
+	particleSystem->SetEmitterData(emitterData);
+
 	// UAV
 	uint32_t uavIndex = descriptorManager->Allocate();
 	descriptorManager->CreateStructuredBufferUAV(uavIndex, instanceTransformResource.Get(), UINT(size), sizeof(GPUParticle));
-	particleSystem->SetUAVIndex(uavIndex);
+	particleSystem->SetParticleUAVIndex(uavIndex);
+
+	uavIndex = descriptorManager->Allocate();
+	descriptorManager->CreateStructuredBufferUAV(uavIndex, freeCounterResource.Get(), 1, sizeof(int32_t));
+	particleSystem->SetFreeCounterUAVIndex(uavIndex);
+	particleSystem->SetFreeCounterResource(freeCounterResource);
 
 	// 初期化
 	InitializeParticles(particleSystem.get(), size);
-
+	particleSystem->InitializeGPUParticle();
 	return std::move(particleSystem);
 }
 
@@ -60,7 +73,8 @@ void ParticleManager::InitializeParticles(ParticleSystem* particleSys, uint32_t 
 	ID3D12DescriptorHeap* descriptorHeapsRaw[] = { descriptorManager->GetHeap().Get() };
 	cmdList->SetDescriptorHeaps(1, descriptorHeapsRaw);
 
-	cmdList->SetComputeRootDescriptorTable(0, descriptorManager->GetGPUHandle(particleSys->GetUAVIndex()));
+	cmdList->SetComputeRootDescriptorTable(0, descriptorManager->GetGPUHandle(particleSys->GetParticleUAVIndex()));
+	cmdList->SetComputeRootDescriptorTable(1, descriptorManager->GetGPUHandle(particleSys->GetFreeCounterUAVIndex()));
 	cmdList->Dispatch(UINT(size + 1023) / 1024, 1, 1);
 
 	// Barrier

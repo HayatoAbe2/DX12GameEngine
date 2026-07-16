@@ -15,8 +15,10 @@ public:
     ParticleSystem(uint32_t id) : SceneObject(id) {};
 
     void Initialize(std::unique_ptr<Material> material, int numInstance);
+    void InitializeGPUParticle();
     void Emit(const Transform& baseTransform, const Vector3& velocity);
     void Update();
+    void UpdateForGPUParticle(float deltatime);
 
     void PreDraw(Camera* camera);
 
@@ -35,10 +37,17 @@ public:
     void SetInstanceResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource) {
         instanceTransformationResource_ = resource;
     }
+    void SetFreeCounterResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource) {
+        freeCounterResource_ = resource;
+    }
 
-    void SetOutputBuffer(Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource) { outputBuffer_ = bufferResource; }
-    void SetUAVIndex(uint32_t uavIndex) { uavIndex_ = uavIndex; }
-    uint32_t GetUAVIndex() { return uavIndex_; }
+    // パーティクルデータUAV
+    void SetParticleUAVIndex(uint32_t uavIndex) { particleDataUAVIndex_ = uavIndex; }
+    uint32_t GetParticleUAVIndex() { return particleDataUAVIndex_; }
+
+    // 空きパーティクルUAV
+    void SetFreeCounterUAVIndex(uint32_t uavIndex) { freeCounterUAVIndex_ = uavIndex; }
+    uint32_t GetFreeCounterUAVIndex() { return freeCounterUAVIndex_; }
 
     void SetInstanceTransformData(InstanceGPUData* data) { instanceTransformationData_ = data; }
     void SetParticleData(GPUParticle* data) { particleData_ = data; }
@@ -53,6 +62,10 @@ public:
 
     const D3D12_RESOURCE_STATES& GetCurrentState() { return resourceStates_; }
     void SetState(const D3D12_RESOURCE_STATES& state) { resourceStates_ = state; }
+
+    void SetEmitterResource(Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource) { emitterResource_ = emitterResource; }
+    void SetEmitterData(EmitterSphere* data) { emitterSphereData_ = data; }
+    Microsoft::WRL::ComPtr<ID3D12Resource> GetEmitterResource() { return emitterResource_; }
 private:
     std::vector<Particle> particles_;
 	std::vector<std::unique_ptr<ParticleField>> fields_;
@@ -63,10 +76,16 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformationResource_ = nullptr;
     InstanceGPUData* instanceTransformationData_ = nullptr;
 
-    Microsoft::WRL::ComPtr<ID3D12Resource> outputBuffer_;
-    uint32_t uavIndex_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource_;
+    uint32_t particleDataUAVIndex_;
     GPUParticle* particleData_ = nullptr;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterResource_;
+    uint32_t freeCounterUAVIndex_;
 
     // 現在ResourceState
     D3D12_RESOURCE_STATES resourceStates_ = D3D12_RESOURCE_STATE_COMMON;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> emitterResource_;
+    EmitterSphere* emitterSphereData_;
 };

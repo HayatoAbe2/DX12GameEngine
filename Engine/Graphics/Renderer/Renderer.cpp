@@ -41,6 +41,10 @@ void Renderer::Initialize(DirectXContext* dxContext) {
 	// PerView
 	perViewResource_ = dxContext_->GetBufferManager()->CreateUploadBuffer(sizeof(PerView));
 	perViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_));
+
+	// PerFrame
+	perFrameResource_ = dxContext_->GetBufferManager()->CreateUploadBuffer(sizeof(PerFrame));
+	perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&perFrameData_));
 }
 
 void Renderer::UpdateSpriteTransform(Sprite* sprite) {
@@ -168,8 +172,12 @@ void Renderer::DrawGPUParticle(ParticleSystem* particleSys, int blendMode) {
 	material->UpdateGPU();
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
+	{
+		auto pso = dxContext_->GetPipelineStateManager()->GetParticleEmitPSO();
+		auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::ParticleEmit).Get();
+		particleCompute_->Emit(cmdList.Get(), particleSys, pso, rootSig, dxContext_->GetSRVManager(), perFrameResource_);
+	}
 
-	
 	auto pso = dxContext_->GetPipelineStateManager()->GetGPUParticlePSO(blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::GPUParticle).Get();
 	cmdList->SetPipelineState(pso);
@@ -755,6 +763,9 @@ void Renderer::BeginFrame() {
 
 	perViewData_->viewProjection = camera_->viewMatrix_ * camera_->projectionMatrix_;
 	perViewData_->billboardMatrix = Inverse(camera_->viewMatrix_);
+
+	perFrameData_->deltaTime = dxContext_->GetFixFPS()->GetDeltatime();
+	perFrameData_->time += perFrameData_->deltaTime;
 }
 
 void Renderer::EndFrame() {

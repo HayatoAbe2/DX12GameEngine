@@ -367,6 +367,7 @@ void GameScene::Draw() {
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
 
+	gpuParticle->UpdateForGPUParticle(ctx.GetDeltatime());
 	render.DrawGPUParticle(gpuParticle.get(),BlendMode::Add);
 
 	// ui

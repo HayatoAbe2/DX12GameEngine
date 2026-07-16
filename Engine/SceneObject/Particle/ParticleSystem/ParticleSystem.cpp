@@ -6,6 +6,16 @@ void ParticleSystem::Initialize(std::unique_ptr<Material> material, int numInsta
 	particles_.resize(numInstance);
 }
 
+void ParticleSystem::InitializeGPUParticle() {
+	// EmitterSphere初期化
+	emitterSphereData_->count = 10;
+	emitterSphereData_->frequency = 0.5f;
+	emitterSphereData_->frequencyTime = 0;
+	emitterSphereData_->translate = {};
+	emitterSphereData_->radius = 1.0f;
+	emitterSphereData_->emit = 0;
+}
+
 void ParticleSystem::Update() {
 	for (auto& particle : particles_) {
 		if (particle.alive) {
@@ -22,6 +32,18 @@ void ParticleSystem::Update() {
 				particle.alive = false;
 			}
 		}
+	}
+}
+
+void ParticleSystem::UpdateForGPUParticle(float deltatime) {
+	emitterSphereData_->frequencyTime += deltatime;
+
+	if (emitterSphereData_->frequency <= emitterSphereData_->frequencyTime) {
+		// emit可能
+		emitterSphereData_->frequencyTime -= emitterSphereData_->frequency;
+		emitterSphereData_->emit = 1;
+	} else {
+		emitterSphereData_->emit = 0;
 	}
 }
 

@@ -16,6 +16,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	sceneViewPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Fullscreen);
 	skinningComputePSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::SkinningCompute);
 	particleInitPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::ParticleInit);
+	particleEmitPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::ParticleEmit);
 
 	// InputLayout
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -75,6 +76,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 
 	// パーティクル初期化
 	CreateParticleInitPSO();
+	CreateParticleEmitPSO();
 }
 
 void PipelineStateManager::CreateStandardPSO() {
@@ -483,6 +485,17 @@ void PipelineStateManager::CreateParticleInitPSO() {
 	};
 
 	device_->CreateComputePipelineState(&desc, IID_PPV_ARGS(&particleInitPSO_));
+}
+
+void PipelineStateManager::CreateParticleEmitPSO() {
+	D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
+	desc.pRootSignature = particleEmitPSOData.rootSignature.Get();
+	desc.CS = {
+		particleEmitPSOData.computeShaderBlob->GetBufferPointer(),
+		particleEmitPSOData.computeShaderBlob->GetBufferSize()
+	};
+
+	device_->CreateComputePipelineState(&desc, IID_PPV_ARGS(&particleEmitPSO_));
 }
 
 // ----------------------------------------------------

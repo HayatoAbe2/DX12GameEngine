@@ -5,12 +5,6 @@
 
 class ParticleCompute {
 public:
-	void Dispatch(ID3D12GraphicsCommandList* cmdList, ParticleSystem* particleSys, ID3D12PipelineState* pipelineState, ID3D12RootSignature* rootSignature, SRVManager* srvManager);
-
-	// Dispatch前
-	void TransitionOutputBufferToUAV(ID3D12GraphicsCommandList* cmdList, ParticleSystem* particleSys);
-
-	// Dispatch後
-	void TransitionOutputBufferToVB(ID3D12GraphicsCommandList* cmdList, ParticleSystem* particleSys);
+	void Emit(ID3D12GraphicsCommandList* cmdList, ParticleSystem* particleSys, ID3D12PipelineState* pipelineState, ID3D12RootSignature* rootSignature, SRVManager* descriptorManager, Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource);
 };
 

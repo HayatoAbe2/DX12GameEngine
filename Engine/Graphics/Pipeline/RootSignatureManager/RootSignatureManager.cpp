@@ -18,6 +18,7 @@ void RootSignatureManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateFullscreenRootSignature();
 	CreateSkinningComputeRootSignature();
 	CreateParticleInitRootSignature();
+	CreateParticleEmitRootSignature();
 }
 
 void RootSignatureManager::CreateStandardRootSignature() {
@@ -628,19 +629,29 @@ void RootSignatureManager::CreateSkinningComputeRootSignature() {
 }
 
 void RootSignatureManager::CreateParticleInitRootSignature() {
-	D3D12_DESCRIPTOR_RANGE range{};
-	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-	range.BaseShaderRegister = 0;
-	range.NumDescriptors = 1;
+	D3D12_DESCRIPTOR_RANGE range[2]{};
+	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[0].BaseShaderRegister = 0;
+	range[0].NumDescriptors = 1;
+	range[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[1].BaseShaderRegister = 1;
+	range[1].NumDescriptors = 1;
 
-	D3D12_ROOT_PARAMETER rootParameters[1]{};
+	D3D12_ROOT_PARAMETER rootParameters[2]{};
 
 	// UAV
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	rootParameters[0].Descriptor.ShaderRegister = 0; // u0
 	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
-	rootParameters[0].DescriptorTable.pDescriptorRanges = &range;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &range[0];
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].Descriptor.ShaderRegister = 1; // u1
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &range[1];
+
 
 	D3D12_ROOT_SIGNATURE_DESC desc{};
 	desc.NumParameters = _countof(rootParameters);
@@ -663,6 +674,64 @@ void RootSignatureManager::CreateParticleInitRootSignature() {
 		signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::ParticleInit]));
+
+	assert(SUCCEEDED(hr));
+}
+
+void RootSignatureManager::CreateParticleEmitRootSignature() {
+	D3D12_ROOT_PARAMETER rootParameters[4]{};
+
+	// b0
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+	// b1
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].Descriptor.ShaderRegister = 1;
+
+	D3D12_DESCRIPTOR_RANGE range[2]{};
+	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[0].BaseShaderRegister = 0;
+	range[0].NumDescriptors = 1;
+	range[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[1].BaseShaderRegister = 1;
+	range[1].NumDescriptors = 1;
+	// u0
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[2].Descriptor.ShaderRegister = 0; // u0
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &range[0];
+
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[3].Descriptor.ShaderRegister = 1; // u1
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &range[1];
+
+	D3D12_ROOT_SIGNATURE_DESC desc{};
+	desc.NumParameters = _countof(rootParameters);
+	desc.pParameters = rootParameters;
+
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
+	HRESULT hr =
+		D3D12SerializeRootSignature(
+			&desc,
+			D3D_ROOT_SIGNATURE_VERSION_1,
+			&signatureBlob,
+			&errorBlob);
+
+	assert(SUCCEEDED(hr));
+
+	hr = device_->CreateRootSignature(
+		0,
+		signatureBlob->GetBufferPointer(),
+		signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::ParticleEmit]));
 
 	assert(SUCCEEDED(hr));
 }

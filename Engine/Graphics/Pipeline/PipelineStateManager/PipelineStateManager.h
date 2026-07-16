@@ -25,6 +25,7 @@ public:
 	ID3D12PipelineState* GetPostEffectPSO(int effectType) { return postEffect[effectType].pso.Get(); }
 	ID3D12PipelineState* GetSkinningComputePSO() { return skinningComputePSO_.Get(); }
 	ID3D12PipelineState* GetParticleInitPSO() { return particleInitPSO_.Get(); }
+	ID3D12PipelineState* GetParticleEmitPSO() { return particleEmitPSO_.Get(); }
 
 	void SetStandardBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { standardPSOData.vertexShaderBlob = vsBlob; standardPSOData.pixelShaderBlob = psBlob; }
 	void SetInstancingBlob(Microsoft::WRL::ComPtr<IDxcBlob> vsBlob, Microsoft::WRL::ComPtr<IDxcBlob> psBlob) { instancingPSOData.vertexShaderBlob = vsBlob; instancingPSOData.pixelShaderBlob = psBlob; }
@@ -41,6 +42,7 @@ public:
 
 	void SetSkinningComputeBlob(Microsoft::WRL::ComPtr<IDxcBlob> csBlob) { skinningComputePSOData.computeShaderBlob = csBlob; }
 	void SetParticleInitBlob(Microsoft::WRL::ComPtr<IDxcBlob> csBlob) { particleInitPSOData.computeShaderBlob = csBlob; }
+	void SetParticleEmitBlob(Microsoft::WRL::ComPtr<IDxcBlob> csBlob) { particleEmitPSOData.computeShaderBlob = csBlob; }
 private:
 	struct PSOData {
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
@@ -72,6 +74,7 @@ private:
 	PostEffectData postEffect[int(PostEffectType::Count)];
 	ComputePSOData skinningComputePSOData;
 	ComputePSOData particleInitPSOData;
+	ComputePSOData particleEmitPSOData;
 
 	void CreateStandardPSO();
 	void CreateInstancingPSO();
@@ -86,6 +89,7 @@ private:
 	void CreatePostEffectPSO(PostEffectData& postEffect);
 	void CreateSkinningComputePSO();
 	void CreateParticleInitPSO();
+	void CreateParticleEmitPSO();
 
 	// inputLayout
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[(int)BlendMode::Count] = {};
@@ -113,6 +117,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> sceneViewPSO_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> skinningComputePSO_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> particleInitPSO_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> particleEmitPSO_ = nullptr;
 
 	//
 	// 参照

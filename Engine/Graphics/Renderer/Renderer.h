@@ -146,6 +146,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> perViewResource_;
 	PerView* perViewData_ = nullptr;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> perFrameResource_;
+	PerFrame* perFrameData_ = nullptr;
+
 	std::unique_ptr<SkinningSystem> skinningSystem_;
 	std::unique_ptr<ParticleCompute> particleCompute_;
+
 };

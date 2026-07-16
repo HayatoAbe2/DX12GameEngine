@@ -1,3 +1,5 @@
+static const uint32_t kMaxParticles = 1024;
+
 struct Particle {
     float32_t3 scale;
     float32_t3 translate;

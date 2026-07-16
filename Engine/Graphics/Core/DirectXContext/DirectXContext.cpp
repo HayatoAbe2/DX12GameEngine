@@ -146,6 +146,9 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	pipelineStateManager_->SetParticleInitBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle/InitializeParticle.CS.hlsl", L"cs_6_0", logger_)
 	);
+	pipelineStateManager_->SetParticleEmitBlob(
+		shaderCompiler_->Compile(L"Resources/Shaders/Particle/EmitParticle.CS.hlsl", L"cs_6_0", logger_)
+	);
 
 	// Outline用リソース
 	outlineResource_ = bufferManager_->CreateUploadBuffer(sizeof(OutlineData));
