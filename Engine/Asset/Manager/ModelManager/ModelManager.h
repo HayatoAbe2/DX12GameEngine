@@ -53,7 +53,7 @@ private:
 	// DescriptorHeap管理クラス
 	DescriptorHeapManager* descriptorHeapManager_ = nullptr;
 	// SRV管理クラス
-	SRVManager* srvManager_ = nullptr;
+	SRVManager* descriptorManager_ = nullptr;
 	// バッファ管理クラス
 	BufferManager* bufferManager_ = nullptr;
 	// CB管理クラス

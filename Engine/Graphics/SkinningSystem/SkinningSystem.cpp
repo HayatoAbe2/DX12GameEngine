@@ -4,13 +4,14 @@ void SkinningSystem::Dispatch(ID3D12GraphicsCommandList* cmdList, Model* model, 
 	SkinClusterRuntime skinCluster = model->GetSkinCluster();
 	SkinClusterData data = model->GetData()->skinClusterData_;
 
+	cmdList->SetComputeRootSignature(rootSignature);
+	cmdList->SetPipelineState(pipelineState);
+
 	auto& meshData = model->GetData()->meshes;
 	for (int i = 0; i < meshData.size(); ++i) {
 		auto& subMeshData = meshData[i].subMeshes;
 		auto& subMeshRuntime = model->GetMesh()[i].subMeshes;
 		for (int j = 0; j < subMeshData.size(); ++j) {
-			cmdList->SetComputeRootSignature(rootSignature);
-			cmdList->SetPipelineState(pipelineState);
 			cmdList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle.second);
 			cmdList->SetComputeRootDescriptorTable(1, srvManager->GetGPUHandle(subMeshData[j].inputVertexSRVIndex));
 			cmdList->SetComputeRootDescriptorTable(2, srvManager->GetGPUHandle(data.influenceSRVIndex));

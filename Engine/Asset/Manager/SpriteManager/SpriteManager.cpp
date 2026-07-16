@@ -17,7 +17,7 @@ SpriteManager::SpriteManager(DirectXContext* dxContext, Logger* logger, TextureM
 	// DescriptorHeap管理クラス
 	descriptorHeapManager_ = dxContext->GetDescriptorHeapManager();
 	// SRV管理クラス
-	srvManager_ = dxContext->GetSRVManager();
+	descriptorManager_ = dxContext->GetSRVManager();
 	// バッファ管理クラス
 	bufferManager_ = dxContext->GetBufferManager();
 	// CB管理クラス

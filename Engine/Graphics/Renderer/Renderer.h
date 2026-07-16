@@ -15,6 +15,7 @@
 #include <d3d12.h>
 #include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
 #include "Engine/Graphics/SkinningSystem/SkinningSystem.h"
+#include "Engine/Graphics/Renderer/ParticleCompute/ParticleCompute.h"
 
 class Model;
 class InstancedModel;
@@ -54,6 +55,7 @@ public:
 	void DrawModelInstance(InstancedModel* model, LightManager* lightManager, int blendMode);
 
 	void DrawParticles(ParticleSystem* particleSys, int blendMode);
+	void DrawGPUParticle(ParticleSystem* particleSys, int blendMode);
 	void DrawPrimitive(Primitive* primitive, int blendMode);
 	void DrawSprite(Sprite* sprite, int blendMode);
 
@@ -141,6 +143,9 @@ private:
 	SkyboxData skybox;
 
 	Camera* camera_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> perViewResource_;
+	PerView* perViewData_ = nullptr;
 
 	std::unique_ptr<SkinningSystem> skinningSystem_;
+	std::unique_ptr<ParticleCompute> particleCompute_;
 };

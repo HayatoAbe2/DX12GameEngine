@@ -12,10 +12,12 @@ void RootSignatureManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateStandardRootSignature();
 	CreateInstancingRootSignature();
 	CreateParticleRootSignature();
+	CreateGPUParticleRootSignature();
 	CreateSkyboxRootSignature();
 	CreateGridRootSignature();
 	CreateFullscreenRootSignature();
 	CreateSkinningComputeRootSignature();
+	CreateParticleInitRootSignature();
 }
 
 void RootSignatureManager::CreateStandardRootSignature() {
@@ -110,10 +112,10 @@ void RootSignatureManager::CreateStandardRootSignature() {
 		assert(false);
 	}
 	// バイナリを元に生成
-	standardRootSignature_ = nullptr;
+	rootSignatures_[(int)RootSignatures::Standard] = nullptr;
 	hr = device_->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&standardRootSignature_));
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::Standard]));
 	assert(SUCCEEDED(hr));
 
 }
@@ -202,7 +204,7 @@ void RootSignatureManager::CreateInstancingRootSignature() {
 		assert(false);
 	}
 
-	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&instancingRootSignature_));
+	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::Instancing]));
 	assert(SUCCEEDED(hr));
 }
 
@@ -271,7 +273,75 @@ void RootSignatureManager::CreateParticleRootSignature() {
 		assert(false);
 	}
 
-	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&particleRootSignature_));
+	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::Particle]));
+	assert(SUCCEEDED(hr));
+}
+
+void RootSignatureManager::CreateGPUParticleRootSignature() {
+	D3D12_ROOT_PARAMETER rootParameters[4]{};
+
+	// PerViewCBV
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[0].Descriptor.ShaderRegister = 1;
+
+	// ParticleSRV
+	D3D12_DESCRIPTOR_RANGE particleRange{};
+	particleRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	particleRange.NumDescriptors = 1;
+	particleRange.BaseShaderRegister = 1;
+	particleRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &particleRange;
+
+	// MaterialCBV
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[2].Descriptor.ShaderRegister = 0;
+
+	// TextureSRV
+	D3D12_DESCRIPTOR_RANGE textureRange{};
+
+	textureRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	textureRange.NumDescriptors = 1;
+	textureRange.BaseShaderRegister = 0;
+	textureRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &textureRange;
+
+	// Sampler
+	D3D12_STATIC_SAMPLER_DESC sampler{};
+
+	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampler.ShaderRegister = 0;
+	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; 
+
+	D3D12_ROOT_SIGNATURE_DESC desc{};
+	desc.NumParameters = _countof(rootParameters);
+	desc.pParameters = rootParameters;
+	desc.NumStaticSamplers = 1;
+	desc.pStaticSamplers = &sampler;
+	desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
+	HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		logger_->Log(logger_->GetStream(), reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+
+	hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::GPUParticle]));
 	assert(SUCCEEDED(hr));
 }
 
@@ -352,7 +422,7 @@ void RootSignatureManager::CreateSkyboxRootSignature() {
 		0,
 		signatureBlob->GetBufferPointer(),
 		signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&skyboxRootSignature_));
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::Skybox]));
 
 	assert(SUCCEEDED(hr));
 }
@@ -393,10 +463,9 @@ void RootSignatureManager::CreateGridRootSignature() {
 		assert(false);
 	}
 	// バイナリを元に生成
-	gridRootSignature_ = nullptr;
 	hr = device_->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&gridRootSignature_));
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::Grid]));
 	assert(SUCCEEDED(hr));
 }
 
@@ -474,10 +543,9 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 		assert(false);
 	}
 	// バイナリを元に生成
-	fullscreenRootSignature_ = nullptr;
 	hr = device_->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&fullscreenRootSignature_));
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::Fullscreen]));
 	assert(SUCCEEDED(hr));
 }
 
@@ -553,9 +621,48 @@ void RootSignatureManager::CreateSkinningComputeRootSignature() {
 		assert(false);
 	}
 	// バイナリを元に生成
-	skinningComputeRootSignature_ = nullptr;
 	hr = device_->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&skinningComputeRootSignature_));
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::SkinningCompute]));
+	assert(SUCCEEDED(hr));
+}
+
+void RootSignatureManager::CreateParticleInitRootSignature() {
+	D3D12_DESCRIPTOR_RANGE range{};
+	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range.BaseShaderRegister = 0;
+	range.NumDescriptors = 1;
+
+	D3D12_ROOT_PARAMETER rootParameters[1]{};
+
+	// UAV
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[0].Descriptor.ShaderRegister = 0; // u0
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &range;
+
+	D3D12_ROOT_SIGNATURE_DESC desc{};
+	desc.NumParameters = _countof(rootParameters);
+	desc.pParameters = rootParameters;
+
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
+	HRESULT hr =
+		D3D12SerializeRootSignature(
+			&desc,
+			D3D_ROOT_SIGNATURE_VERSION_1,
+			&signatureBlob,
+			&errorBlob);
+
+	assert(SUCCEEDED(hr));
+
+	hr = device_->CreateRootSignature(
+		0,
+		signatureBlob->GetBufferPointer(),
+		signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::ParticleInit]));
+
 	assert(SUCCEEDED(hr));
 }

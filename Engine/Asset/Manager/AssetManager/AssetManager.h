@@ -7,6 +7,7 @@
 #include "Engine/Asset/Manager/TextureManager/TextureManager.h"
 #include "Engine/Asset/Manager/SpriteManager/SpriteManager.h"
 #include "Engine/Asset/Manager/AnimationManager/AnimationManager.h"
+#include "Engine/Asset/Manager/ParticleManager/ParticleManager.h"
 
 class DirectXContext;
 class Logger;
@@ -21,6 +22,7 @@ public:
 	std::unique_ptr<Model> LoadModelFile(const std::string& directoryPath, const std::string& filename);
 	std::unique_ptr<InstancedModel> LoadModelFile(const std::string& directoryPath, const std::string& filename, const int numInstance);
 	std::unique_ptr<ParticleSystem> CreateParticle(int numInstance);
+	std::unique_ptr<ParticleSystem> CreateGPUParticle(int numInstance);
 	std::unique_ptr<Primitive> CreatePrimitive(PrimitiveShape shape);
 	std::unique_ptr<Sprite> LoadSprite(const std::string& filePath);
 	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
@@ -41,6 +43,9 @@ private:
 
 	// アニメーション
 	std::unique_ptr<AnimationManager> animationManager_ = nullptr;
+
+	// パーティクル
+	std::unique_ptr<ParticleManager> particleManager_ = nullptr;
 
 	uint32_t assetId_ = 0;
 };

@@ -261,6 +261,8 @@
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
+    <ClCompile Include="Engine\Asset\Manager\ParticleManager\ParticleManager.cpp" />
+    <ClCompile Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -296,6 +298,8 @@
     <FxCompile Include="Resources\Shaders\Skinning\SkinningObject3d.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Random\RandomNoise.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Skinning\Skinning.CS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Particle\InitializeParticle.CS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Particle\Particle.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\imconfig.h">
@@ -579,6 +583,8 @@
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
     <ClInclude Include="Engine\Math\VectorConvert\VectorConvert.h" />
     <ClInclude Include="Engine\Graphics\SkinningSystem\SkinningSystem.h" />
+    <ClInclude Include="Engine\Asset\Manager\ParticleManager\ParticleManager.h" />
+    <ClInclude Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
@@ -598,5 +604,6 @@
     <None Include="Resources\Shaders\Skybox.hlsli" />
     <None Include="Resources\Shaders\Fullscreen.hlsli" />
     <None Include="Resources\Shaders\SceneView.PS.hlsl" />
+    <None Include="Resources\Shaders\Particle\Particle.hlsli" />
   </ItemGroup>
 </Project>

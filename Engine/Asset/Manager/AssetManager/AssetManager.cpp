@@ -5,6 +5,7 @@ AssetManager::AssetManager(DirectXContext* dxContext, Logger* logger) {
 	modelManager_ = std::make_unique<ModelManager>(dxContext, logger, textureManager_.get());
 	spriteManager_ = std::make_unique<SpriteManager>(dxContext, logger, textureManager_.get());
 	animationManager_ = std::make_unique<AnimationManager>();
+	particleManager_ = std::make_unique<ParticleManager>(dxContext);
 }
 
 std::unique_ptr<Model> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename) {
@@ -21,6 +22,9 @@ std::unique_ptr<InstancedModel> AssetManager::LoadModelFile(const std::string& d
 
 std::unique_ptr<ParticleSystem> AssetManager::CreateParticle(int numInstance) {
 	return std::move(modelManager_->CreateParticleInstanceResource(numInstance, GenerateID()));
+}
+std::unique_ptr<ParticleSystem> AssetManager::CreateGPUParticle(int numInstance) {
+	return std::move(particleManager_->CreateParticle(numInstance, GenerateID()));
 }
 
 std::unique_ptr<Primitive> AssetManager::CreatePrimitive(PrimitiveShape shape) {

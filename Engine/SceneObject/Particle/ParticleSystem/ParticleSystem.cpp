@@ -68,7 +68,7 @@ void ParticleSystem::PreDraw(Camera* camera) {
 		worldMatrix.m[3][2] = t.translate.z;
 		worldMatrix.m[3][3] = 1.0f;
 
-		//Matrix4x4 worldMatrix = MakeAffineMatrix(transforms[i]);
+
 		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(camera->viewMatrix_, camera->projectionMatrix_));
 		instanceTransformationData_[i].WVP = worldViewProjectionMatrix;
 		instanceTransformationData_[i].World = worldMatrix;

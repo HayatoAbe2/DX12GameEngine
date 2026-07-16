@@ -143,6 +143,8 @@ void GameScene::Initialize() {
 	enableEditMode_ = true;
 #endif
 	isLoaded_ = false;
+
+	gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")),1024);
 }
 
 void GameScene::Update() {
@@ -358,12 +360,14 @@ void GameScene::Draw() {
 	}
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
-	mapTile_->Draw(camera_.get());
+	//mapTile_->Draw(camera_.get());
 	player_->Draw(camera_.get());
 	enemyManager_->Draw(camera_.get());
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
+
+	render.DrawGPUParticle(gpuParticle.get(),BlendMode::Add);
 
 	// ui
 	if (!enableEditMode_) {

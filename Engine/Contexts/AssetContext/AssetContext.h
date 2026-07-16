@@ -18,6 +18,7 @@ public:
 
 	// パーティクル
 	std::unique_ptr<ParticleSystem> CreateParticleSystem(std::unique_ptr<Material> material, int instanceNum);
+	std::unique_ptr<ParticleSystem> CreateGPUParticleSystem(std::unique_ptr<Material> material, int instanceNum);
 
 	// Primitive
 	std::unique_ptr<Primitive> CreatePrimitive(std::unique_ptr<Material> material, PrimitiveShape shape = PrimitiveShape::Plane);

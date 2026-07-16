@@ -24,7 +24,7 @@ ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureMan
 	// DescriptorHeap管理クラス
 	descriptorHeapManager_ = dxContext->GetDescriptorHeapManager();
 	// SRV管理クラス
-	srvManager_ = dxContext->GetSRVManager();
+	descriptorManager_ = dxContext->GetSRVManager();
 	// バッファ管理クラス
 	bufferManager_ = dxContext->GetBufferManager();
 	// ログ出力クラス
@@ -360,8 +360,8 @@ SubMeshRuntime ModelManager::CreateSubMesh(aiMesh* aiMesh) {
 
 	// ComputeShader出力用VB
 	subMesh.outputVertexBuffer_ = bufferManager_->CreateDefaultBuffer(size, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-	subMesh.outputVertexUAVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredBufferUAV(subMesh.outputVertexUAVIndex, subMesh.outputVertexBuffer_.Get(), UINT(aiMesh->mNumVertices), sizeof(VertexData));
+	subMesh.outputVertexUAVIndex = descriptorManager_->Allocate();
+	descriptorManager_->CreateStructuredBufferUAV(subMesh.outputVertexUAVIndex, subMesh.outputVertexBuffer_.Get(), UINT(aiMesh->mNumVertices), sizeof(VertexData));
 	subMesh.outputVBV_.BufferLocation = subMesh.outputVertexBuffer_->GetGPUVirtualAddress();
 	subMesh.outputVBV_.SizeInBytes = UINT(size);
 	subMesh.outputVBV_.StrideInBytes = sizeof(VertexData);
@@ -448,8 +448,8 @@ SubMeshData ModelManager::CreateSubMeshData(aiMesh* aiMesh) {
 	data.vertexBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&dst2));
 	memcpy(dst2, data.vertices_.data(), size);
 	data.vertexBuffer_->Unmap(0, nullptr);
-	data.inputVertexSRVIndex = srvManager_->Allocate();
-	srvManager_->CreateStructuredBufferSRV(data.inputVertexSRVIndex, data.vertexBuffer_.Get(), UINT(data.vertices_.size()), sizeof(VertexData));
+	data.inputVertexSRVIndex = descriptorManager_->Allocate();
+	descriptorManager_->CreateStructuredBufferSRV(data.inputVertexSRVIndex, data.vertexBuffer_.Get(), UINT(data.vertices_.size()), sizeof(VertexData));
 
 	// VBV
 	data.vertexBufferView_.BufferLocation = data.vertexBuffer_->GetGPUVirtualAddress();
@@ -460,11 +460,11 @@ SubMeshData ModelManager::CreateSubMeshData(aiMesh* aiMesh) {
 }
 
 void ModelManager::CreateInstancingSRV(InstancedModel* model, const int numInstance_) {
-	auto index = srvManager_->Allocate();
-	srvManager_->CreateStructuredBufferSRV(index, model->GetInstanceResource().Get(), numInstance_, sizeof(InstanceGPUData));
+	auto index = descriptorManager_->Allocate();
+	descriptorManager_->CreateStructuredBufferSRV(index, model->GetInstanceResource().Get(), numInstance_, sizeof(InstanceGPUData));
 
 	// SRVハンドル
-	model->SetSRVHandle(srvManager_->GetGPUHandle(index));
+	model->SetSRVHandle(descriptorManager_->GetGPUHandle(index));
 }
 
 std::unique_ptr<ModelNode> ModelManager::ReadNode(aiNode* aiNode) {
@@ -528,10 +528,10 @@ std::unique_ptr<ParticleSystem> ModelManager::CreateParticleInstanceResource(int
 	particleSystem->SetInstanceResource(instanceTransformResource);
 	particleSystem->SetInstanceTransformData(transformData);
 
-	auto index = srvManager_->Allocate();
-	srvManager_->CreateStructuredBufferSRV(index, particleSystem->GetInstanceResource().Get(), numInstance, sizeof(InstanceGPUData));
+	auto index = descriptorManager_->Allocate();
+	descriptorManager_->CreateStructuredBufferSRV(index, particleSystem->GetInstanceResource().Get(), numInstance, sizeof(InstanceGPUData));
 	// SRVハンドル
-	particleSystem->SetSRVHandle(srvManager_->GetGPUHandle(index));
+	particleSystem->SetSRVHandle(descriptorManager_->GetGPUHandle(index));
 
 	return std::move(particleSystem);
 }
@@ -593,15 +593,15 @@ int32_t ModelManager::CreateJoint(const ModelNode& node,
 }
 
 SkinClusterRuntime ModelManager::CreateSkinCluster(const Skeleton& skeleton, ModelData* data) {
-	auto index = srvManager_->Allocate();
+	auto index = descriptorManager_->Allocate();
 	SkinClusterRuntime skinCluster;
 	skinCluster.paletteResource = bufferManager_->CreateUploadBuffer(sizeof(WellForGPU) * skeleton.joints.size());
 	WellForGPU* mappedPalette = nullptr;
 	skinCluster.paletteResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedPalette));
 	skinCluster.mappedPalette = { mappedPalette, skeleton.joints.size() };
-	skinCluster.paletteSrvHandle.first = srvManager_->GetCPUHandle(index);
-	skinCluster.paletteSrvHandle.second = srvManager_->GetGPUHandle(index);
-	srvManager_->CreateStructuredBufferSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
+	skinCluster.paletteSrvHandle.first = descriptorManager_->GetCPUHandle(index);
+	skinCluster.paletteSrvHandle.second = descriptorManager_->GetGPUHandle(index);
+	descriptorManager_->CreateStructuredBufferSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
 
 	for (auto& mesh : data->meshes) {
 		for (auto& subMesh : mesh.subMeshes) {
@@ -637,11 +637,11 @@ SkinClusterRuntime ModelManager::CreateSkinCluster(const Skeleton& skeleton, Mod
 					}
 				}
 			}
-			skinCluster.paletteSRVIndex = srvManager_->Allocate();
-			srvManager_->CreateStructuredBufferSRV(skinCluster.paletteSRVIndex, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
+			skinCluster.paletteSRVIndex = descriptorManager_->Allocate();
+			descriptorManager_->CreateStructuredBufferSRV(skinCluster.paletteSRVIndex, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
 
-			data->skinClusterData_.influenceSRVIndex = srvManager_->Allocate();
-			srvManager_->CreateStructuredBufferSRV(data->skinClusterData_.influenceSRVIndex, data->skinClusterData_.influenceResource.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexInfluence));
+			data->skinClusterData_.influenceSRVIndex = descriptorManager_->Allocate();
+			descriptorManager_->CreateStructuredBufferSRV(data->skinClusterData_.influenceSRVIndex, data->skinClusterData_.influenceResource.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexInfluence));
 
 			subMesh.skinningInformationBuffer = bufferManager_->CreateUploadBuffer(sizeof(SkinningInformation));
 			SkinningInformation skinningInformation;

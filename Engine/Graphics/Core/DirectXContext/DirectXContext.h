@@ -52,7 +52,7 @@ public:
 	DeviceManager* GetDeviceManager() { return deviceManager_.get(); }
 	CommandListManager* GetCommandListManager() { return commandListManager_.get(); }
 	DescriptorHeapManager* GetDescriptorHeapManager() { return descriptorHeapManager_.get(); }
-	SRVManager* GetSRVManager() { return srvManager_.get(); }
+	SRVManager* GetSRVManager() { return descriptorManager_.get(); }
 	PipelineStateManager* GetPipelineStateManager() { return pipelineStateManager_.get(); }
 	RootSignatureManager* GetRootSignatureManager() { return rootSignatureManager_.get(); }
 	BufferManager* GetBufferManager() { return bufferManager_.get(); }
@@ -141,7 +141,7 @@ private:
 	std::unique_ptr<RenderTargetManager> renderTargetManager_ = nullptr;
 
 	// SRVマネージャー
-	std::unique_ptr<SRVManager> srvManager_ = nullptr;
+	std::unique_ptr<SRVManager> descriptorManager_ = nullptr;
 
 	// コマンド関連
 	std::unique_ptr<CommandListManager> commandListManager_ = nullptr;

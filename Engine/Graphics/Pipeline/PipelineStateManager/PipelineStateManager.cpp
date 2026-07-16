@@ -4,16 +4,18 @@
 
 void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>& device, RootSignatureManager* rootSignatureManager) {
 	device_ = device;
-	standardPSOData.rootSignature = rootSignatureManager->GetStandardRootSignature();
-	instancingPSOData.rootSignature = rootSignatureManager->GetInstancingRootSignature();
-	spritePSOData.rootSignature = rootSignatureManager->GetStandardRootSignature();
-	particlePSOData.rootSignature = rootSignatureManager->GetParticleRootSignature();
-	primitivePSOData.rootSignature = rootSignatureManager->GetStandardRootSignature();
-	skyboxPSOData.rootSignature = rootSignatureManager->GetSkyboxRootSignature();
-	gridPSOData.rootSignature = rootSignatureManager->GetGridRootSignature();
-	fullscreenPSOData.rootSignature = rootSignatureManager->GetFullscreenRootSignature();
-	sceneViewPSOData.rootSignature = rootSignatureManager->GetFullscreenRootSignature();
-	skinningComputePSOData.rootSignature = rootSignatureManager->GetSkinningComputeRootSignature();
+	standardPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Standard);
+	instancingPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Instancing);
+	spritePSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Standard);
+	particlePSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Particle);
+	gpuParticlePSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::GPUParticle);
+	primitivePSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Standard);
+	skyboxPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Skybox);
+	gridPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Grid);
+	fullscreenPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Fullscreen);
+	sceneViewPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::Fullscreen);
+	skinningComputePSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::SkinningCompute);
+	particleInitPSOData.rootSignature = rootSignatureManager->GetRootSignature(RootSignatures::ParticleInit);
 
 	// InputLayout
 	inputElementDescs_[0].SemanticName = "POSITION";
@@ -32,6 +34,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	inputElementDescs_[3].SemanticIndex = 0;
 	inputElementDescs_[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs_[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
 	inputElementDescs_[4].SemanticName = "Weight";
 	inputElementDescs_[4].SemanticIndex = 0;
 	inputElementDescs_[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -51,6 +54,7 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateInstancingPSO();
 	CreateSpritePSO();
 	CreateParticlePSO();
+	CreateGPUParticlePSO();
 	CreatePrimitivePSO();
 	CreateSkyboxPSO();
 	CreateGridPSO();
@@ -68,6 +72,9 @@ void PipelineStateManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 
 	// スキニング
 	CreateSkinningComputePSO();
+
+	// パーティクル初期化
+	CreateParticleInitPSO();
 }
 
 void PipelineStateManager::CreateStandardPSO() {
@@ -214,6 +221,38 @@ void PipelineStateManager::CreateParticlePSO() {
 	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &particlePSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
 	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &particlePSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
 	CreatePSO(baseDesc, CreateScreenBlendDesc(), &particlePSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
+}
+
+void PipelineStateManager::CreateGPUParticlePSO() {
+	assert(gpuParticlePSOData.rootSignature);
+	assert(gpuParticlePSOData.vertexShaderBlob);
+	assert(gpuParticlePSOData.pixelShaderBlob);
+	assert(inputLayoutDesc_.pInputElementDescs != nullptr);
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc{};
+	baseDesc.pRootSignature = gpuParticlePSOData.rootSignature.Get();
+	baseDesc.InputLayout = inputLayoutDesc_;
+	baseDesc.VS = { gpuParticlePSOData.vertexShaderBlob->GetBufferPointer(), gpuParticlePSOData.vertexShaderBlob->GetBufferSize() };
+	baseDesc.PS = { gpuParticlePSOData.pixelShaderBlob->GetBufferPointer(), gpuParticlePSOData.pixelShaderBlob->GetBufferSize() };
+	baseDesc.BlendState = CreateNoneBlendDesc();
+	baseDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	baseDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+	baseDesc.DepthStencilState.DepthEnable = TRUE;
+	baseDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	baseDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+	baseDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	baseDesc.NumRenderTargets = 1;
+	baseDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	baseDesc.SampleDesc.Count = 1;
+	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	CreatePSO(baseDesc, CreateNoneBlendDesc(), &gpuParticlePSO_[static_cast<int>(BlendMode::None)]);			// ブレンドなし
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &gpuParticlePSO_[static_cast<int>(BlendMode::Normal)]);		// αブレンド
+	CreatePSO(baseDesc, CreateAddBlendDesc(), &gpuParticlePSO_[static_cast<int>(BlendMode::Add)]);				// 加算
+	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &gpuParticlePSO_[static_cast<int>(BlendMode::Subtract)]);	// 減算
+	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &gpuParticlePSO_[static_cast<int>(BlendMode::Multiply)]);	// 乗算
+	CreatePSO(baseDesc, CreateScreenBlendDesc(), &gpuParticlePSO_[static_cast<int>(BlendMode::Screen)]);		// スクリーン
 }
 
 void PipelineStateManager::CreatePrimitivePSO() {
@@ -433,6 +472,17 @@ void PipelineStateManager::CreateSkinningComputePSO() {
 	};
 
 	device_->CreateComputePipelineState(&desc, IID_PPV_ARGS(&skinningComputePSO_));
+}
+
+void PipelineStateManager::CreateParticleInitPSO() {
+	D3D12_COMPUTE_PIPELINE_STATE_DESC desc{};
+	desc.pRootSignature = particleInitPSOData.rootSignature.Get();
+	desc.CS = {
+		particleInitPSOData.computeShaderBlob->GetBufferPointer(),
+		particleInitPSOData.computeShaderBlob->GetBufferSize()
+	};
+
+	device_->CreateComputePipelineState(&desc, IID_PPV_ARGS(&particleInitPSO_));
 }
 
 // ----------------------------------------------------

@@ -36,15 +36,23 @@ public:
         instanceTransformationResource_ = resource;
     }
 
-    void SetInstanceTransformData(InstanceGPUData* data) { instanceTransformationData_ = data; }
+    void SetOutputBuffer(Microsoft::WRL::ComPtr<ID3D12Resource> bufferResource) { outputBuffer_ = bufferResource; }
+    void SetUAVIndex(uint32_t uavIndex) { uavIndex_ = uavIndex; }
+    uint32_t GetUAVIndex() { return uavIndex_; }
 
-    const D3D12_GPU_DESCRIPTOR_HANDLE& GetInstanceSRVHandle() const { return instanceSRVHandleGPU_; }
+    void SetInstanceTransformData(InstanceGPUData* data) { instanceTransformationData_ = data; }
+    void SetParticleData(GPUParticle* data) { particleData_ = data; }
+
+    const D3D12_GPU_DESCRIPTOR_HANDLE& GetParticleSRVHandle() const { return instanceSRVHandleGPU_; }
     void SetSRVHandle(D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU) { instanceSRVHandleGPU_ = srvHandleGPU; }
 
     const D3D12_GPU_VIRTUAL_ADDRESS GetInstanceCBV()const { return instanceTransformationResource_->GetGPUVirtualAddress(); }
 
     int GetNumInstance() { return int(particles_.size()); }
     Material* GetMaterial() { return material_.get(); }
+
+    const D3D12_RESOURCE_STATES& GetCurrentState() { return resourceStates_; }
+    void SetState(const D3D12_RESOURCE_STATES& state) { resourceStates_ = state; }
 private:
     std::vector<Particle> particles_;
 	std::vector<std::unique_ptr<ParticleField>> fields_;
@@ -54,4 +62,11 @@ private:
     D3D12_GPU_DESCRIPTOR_HANDLE instanceSRVHandleGPU_{};
     Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformationResource_ = nullptr;
     InstanceGPUData* instanceTransformationData_ = nullptr;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> outputBuffer_;
+    uint32_t uavIndex_;
+    GPUParticle* particleData_ = nullptr;
+
+    // 現在ResourceState
+    D3D12_RESOURCE_STATES resourceStates_ = D3D12_RESOURCE_STATE_COMMON;
 };

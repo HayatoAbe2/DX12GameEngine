@@ -18,3 +18,8 @@ struct GPUParticle {
     float currentTime;
     Vector4 color;
 };
+
+struct PerView {
+    Matrix4x4 viewProjection;
+    Matrix4x4 billboardMatrix;
+};

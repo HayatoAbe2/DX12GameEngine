@@ -31,7 +31,7 @@ public:
 	int GetNumInstance() { return numInstance_; }
 	void SetNumInstance(int numInstance) { numInstance_ = numInstance; }
 
-	const D3D12_GPU_DESCRIPTOR_HANDLE& GetInstanceSRVHandle() const { return instanceSRVHandleGPU_; }
+	const D3D12_GPU_DESCRIPTOR_HANDLE& GetParticleSRVHandle() const { return instanceSRVHandleGPU_; }
 	void SetSRVHandle(D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU) { instanceSRVHandleGPU_ = srvHandleGPU; }
 
 	const Microsoft::WRL::ComPtr<ID3D12Resource>& GetInstanceResource() const { return instanceTransformationResource_; }

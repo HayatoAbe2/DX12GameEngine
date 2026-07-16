@@ -19,6 +19,12 @@ std::unique_ptr<ParticleSystem> AssetContext::CreateParticleSystem(std::unique_p
 	particleSystem->Initialize(std::move(material), numInstance);
 	return std::move(particleSystem);
 }
+std::unique_ptr<ParticleSystem> AssetContext::CreateGPUParticleSystem(std::unique_ptr<Material> material, int numInstance) {
+	std::unique_ptr<ParticleSystem> particleSystem = assetManager_->CreateGPUParticle(numInstance);
+	particleSystem->name = material->name_;
+	particleSystem->Initialize(std::move(material), numInstance);
+	return std::move(particleSystem);
+}
 
 std::unique_ptr<Primitive> AssetContext::CreatePrimitive(std::unique_ptr<Material> material, PrimitiveShape shape) {
 	std::unique_ptr<Primitive> primitive = assetManager_->CreatePrimitive(shape);

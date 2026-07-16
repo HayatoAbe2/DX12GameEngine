@@ -17,7 +17,7 @@ TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) {
 	// DescriptorHeap管理クラス
 	descriptorHeapManager_ = dxContext->GetDescriptorHeapManager();
 	// SRV管理クラス
-	srvManager_ = dxContext->GetSRVManager();
+	descriptorManager_ = dxContext->GetSRVManager();
 	// バッファ管理クラス
 	bufferManager_ = dxContext->GetBufferManager();
 	// CB管理クラス
@@ -58,14 +58,14 @@ void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
 		commandListManager_->ExecuteAndWait();
 
 		// SRVIndexを進める
-		auto index = srvManager_->Allocate();
+		auto index = descriptorManager_->Allocate();
 		// SRV作成
-		srvManager_->CreateTextureSRV(index, textureResource.Get(), metadata.format, UINT(metadata.mipLevels), metadata.IsCubemap());
+		descriptorManager_->CreateTextureSRV(index, textureResource.Get(), metadata.format, UINT(metadata.mipLevels), metadata.IsCubemap());
 
 		// textureResourceをセット
 		texture->SetResource(textureResource);
 		// SRVのGPUハンドルをセット
-		texture->SetSRVHandle(srvManager_->GetGPUHandle(index));
+		texture->SetSRVHandle(descriptorManager_->GetGPUHandle(index));
 
 		// キャッシュ登録
 		textureCache_[texture->GetMtlPath()] = texture;

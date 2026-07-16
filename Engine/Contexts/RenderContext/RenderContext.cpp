@@ -22,6 +22,9 @@ void RenderContext::DrawInstancedModel(InstancedModel* instancedModel, BlendMode
 void RenderContext::DrawParticle(ParticleSystem* particleSystem, BlendMode blendMode) {
 	renderer_->DrawParticles(particleSystem, static_cast<int>(blendMode));
 }
+void RenderContext::DrawGPUParticle(ParticleSystem* particleSystem, BlendMode blendMode) {
+	renderer_->DrawGPUParticle(particleSystem, static_cast<int>(blendMode));
+}
 
 void RenderContext::DrawPrimitive(Primitive* primitive, BlendMode blendMode) {
 	renderer_->DrawPrimitive(primitive, static_cast<int>(blendMode));

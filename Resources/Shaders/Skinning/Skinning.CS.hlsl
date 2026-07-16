@@ -48,16 +48,6 @@ void main(uint32_t3 DTid : SV_DispatchThreadID) {
         skinned.normal += mul(input.normal, (float32_t3x3) gMatrixPalette[influence.index.z].skeletonSpaceInverseTransposeMatrix) * influence.weight.z;
         skinned.normal += mul(input.normal, (float32_t3x3) gMatrixPalette[influence.index.w].skeletonSpaceInverseTransposeMatrix) * influence.weight.w;
         skinned.normal = normalize(skinned.normal);
-
-        
-        Vertex debug;
-
-        debug.position = float32_t4(1.0f, 0.0f, 0.0f, 1.0f);
-        debug.texcoord = float32_t2(0.0f, 0.0f);
-        debug.normal = float32_t3(0.0f, 1.0f, 0.0f);
-        debug.color = float32_t4(1, 1, 1, 1);
-
-        gOutputVertices[vertexIndex] = debug;
         
         // 結果
         gOutputVertices[vertexIndex] = skinned;

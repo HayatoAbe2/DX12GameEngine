@@ -17,6 +17,7 @@ public:
 
 	// パーティクルシステムで管理しているパーティクルの描画
 	void DrawParticle(ParticleSystem* particleSystem, BlendMode blendMode = BlendMode::Normal);
+	void DrawGPUParticle(ParticleSystem* particleSystem, BlendMode blendMode = BlendMode::Normal);
 	
 	// 図形
 	void DrawPrimitive(Primitive* primitive, BlendMode blendMode = BlendMode::Normal);
