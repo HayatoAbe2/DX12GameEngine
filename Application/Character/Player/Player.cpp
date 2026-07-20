@@ -60,8 +60,8 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	boostTimer_ = std::make_unique<Timer>();
 	invincibleTimer_ = std::make_unique<Timer>();
 
-	attackDirection_ = Normalize(Vector3(1, 0, 0));
-	transform_.rotate.y = -std::atan2(attackDirection_.z, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
+	attackDirection_ = Normalize(Vector2(1, 0));
+	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
 	transform_.translate.x = 5;
 }
 
@@ -124,7 +124,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 				dir.x = input.gamepad.GetRightStick().x;
 				dir.y = input.gamepad.GetRightStick().y;
 
-				attackDirection_ = Normalize(Vector3(dir.x, 0, dir.y));
+				attackDirection_ = Normalize(Vector2(dir.x, dir.y));
 			}
 		} else {
 			Vector2 win = ctx.GetWindowSize();
@@ -132,16 +132,14 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 			mouse.y = win.y - mouse.y;
 
 			Vector2 dir = Normalize(mouse - win / 2.0f);
-			attackDirection_ = { dir.x,0,dir.y };
+			attackDirection_ = { dir.x,dir.y };
 		}
 		// プレイヤーの向き
-		transform_.rotate.y = -std::atan2(attackDirection_.z, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
+		transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
 
 		// 減速
 		if (weapon_) {
-			float weight = weapon_->GetData().stats.weight + weapon_->GetModifier().add.weight;
-			weight *= weapon_->GetModifier().multiplier.weight;
-
+			float weight = weapon_->GetData().stats.weight;
 			moveSpeed_ = defaultMoveSpeed_ * (1.0f - weight);
 		} else {
 			moveSpeed_ = defaultMoveSpeed_;
@@ -169,13 +167,13 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 				if (ctx.IsSceneWindowHovered()) {
 #endif
 					if (input.mouse.IsPress(MouseButton::Left)) {
-						Shoot(bulletManager, camera);
+						Trigger(bulletManager, camera);
 					}
 #ifdef USE_IMGUI
 				}
 #endif
 				if (input.gamepad.GetRTrigger() > 0.2f) {
-					Shoot(bulletManager, camera);
+					Trigger(bulletManager, camera);
 				}
 
 			} else {
@@ -388,12 +386,12 @@ void Player::Move(MapCheck* mapCheck) {
 	}
 }
 
-void Player::Shoot(BulletManager* bulletManager, Camera* camera) {
+void Player::Trigger(BulletManager* bulletManager, Camera* camera) {
 	auto& ctx = GameContext::GetInstance();
 	auto& input = ctx.Input();
 
 	if (weapon_) {
-		shootCooldownTimer_->Start(weapon_->Shoot(weaponTransform_.translate, attackDirection_, bulletManager, camera, this));
+		shootCooldownTimer_->Start(weapon_->Trigger(weaponTransform_.translate, attackDirection_, bulletManager, camera, this));
 	}
 }
 

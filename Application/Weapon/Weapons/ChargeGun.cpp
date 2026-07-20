@@ -4,7 +4,7 @@
 #include "Character/Enemy/Enemy.h"
 #include <Character/Player/Player.h>
 
-float ChargeGun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
+float ChargeGun::Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Camera* camera, Character* from) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	auto& audio = ctx.Audio();

@@ -9,7 +9,7 @@ void HeavyKnight::Attack(BulletManager* bulletManager, const Vector3& dir, Camer
 
 		if (comboInterval_ <= 0) {
 			// 射撃
-			float time = currentWeapon_->Shoot(model_->GetTransform().translate, dir, bulletManager, camera, this);
+			float time = currentWeapon_->Trigger(model_->GetTransform().translate, dir, bulletManager, camera, this);
 
 			if (attackCoolTimer_->IsActive()) {
 				attackCoolTimer_->AddTime(time);

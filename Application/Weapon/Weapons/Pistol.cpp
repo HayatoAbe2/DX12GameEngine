@@ -4,7 +4,7 @@
 #include <Character/Enemy/Enemy.h>
 #include <Character/Player/Player.h>
 
-float Pistol::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
+float Pistol::Trigger(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
 	if (dynamic_cast<Player*>(from) && charge_ < 1.0f) {
 		return 0;
 	}

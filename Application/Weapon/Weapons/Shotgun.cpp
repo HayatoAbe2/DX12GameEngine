@@ -5,7 +5,7 @@
 #include <Character/Player/Player.h>
 #include <numbers>
 
-float Shotgun::Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
+float Shotgun::Trigger(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) {
 	if (dynamic_cast<Player*>(from) && charge_ < 1.0f) {
 		return 0;
 	}

@@ -163,7 +163,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Weapon\Weapons\AccelGun.cpp" />
-    <ClCompile Include="Application\Bullet\AccelBullet.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
@@ -175,11 +174,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\Bullet\BulletManager.cpp" />
-    <ClCompile Include="Application\Bullet\FireBullet.cpp" />
-    <ClCompile Include="Application\Bullet\NormalBullet.cpp" />
-    <ClCompile Include="Application\Bullet\RapidBullet.cpp" />
-    <ClCompile Include="Application\Bullet\SpreadBullet.cpp" />
-    <ClCompile Include="Application\Bullet\WaveBullet.cpp" />
     <ClCompile Include="Application\CollisionChecker\CollisionChecker.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
     <ClCompile Include="Application\Character\Enemy\Enemies\Bat.cpp" />
@@ -282,7 +276,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Contexts\SceneContext\SceneContext.cpp" />
     <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp" />
     <ClCompile Include="Application\Timer\Timer.cpp" />
-    <ClCompile Include="Application\Bullet\OrbitBullet.cpp" />
     <ClCompile Include="Application\Weapon\Weapons\OrbitStaff.cpp" />
     <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ParticleManager\ParticleManager.cpp" />
@@ -439,7 +432,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Weapon\Weapons\AccelGun.h" />
-    <ClInclude Include="Application\Bullet\AccelBullet.h" />
     <ClInclude Include="Application\Character\Character.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
@@ -460,11 +452,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Asset\Resource\Animation.h" />
     <ClInclude Include="Application\Bullet\Bullet.h" />
     <ClInclude Include="Application\Bullet\BulletManager.h" />
-    <ClInclude Include="Application\Bullet\FireBullet.h" />
-    <ClInclude Include="Application\Bullet\NormalBullet.h" />
-    <ClInclude Include="Application\Bullet\RapidBullet.h" />
-    <ClInclude Include="Application\Bullet\SpreadBullet.h" />
-    <ClInclude Include="Application\Bullet\WaveBullet.h" />
     <ClInclude Include="Application\CollisionChecker\CollisionChecker.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
     <ClInclude Include="Application\Character\Enemy\Enemies\Bat.h" />
@@ -586,7 +573,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\Enemies\Spiker.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\SceneEditor.h" />
     <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
-    <ClInclude Include="Application\Bullet\OrbitBullet.h" />
     <ClInclude Include="Application\Weapon\Weapons\OrbitStaff.h" />
     <ClInclude Include="Application\Weapon\Weapons\Sniper.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />

@@ -11,7 +11,7 @@ public:
 		burstTimer_[0] = std::make_unique<Timer>();
 		burstTimer_[1] = std::make_unique<Timer>();
 	}
-	float Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) override;
+	float Trigger(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) override;
 	void Update() override;
 
 private:
