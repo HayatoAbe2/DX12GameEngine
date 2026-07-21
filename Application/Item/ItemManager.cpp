@@ -107,13 +107,6 @@ void ItemManager::Interact(Player* player) {
 	}
 }
 
-void ItemManager::Spawn(Vector3 pos, int index) {
-	auto& ctx = GameContext::GetInstance();
-
-	Rarity rarity = Common;
-	Spawn(pos, index, rarity);
-}
-
 void ItemManager::Spawn(Vector3 pos, int index, Rarity rarity) {
 	// 設置する
 	auto weapon = std::move(weaponManager_->GetWeapon(index, rarity));
@@ -139,31 +132,6 @@ void ItemManager::Reset() {
 	spawned_.clear();
 }
 
-void ItemManager::LoadCSV(const std::string& filePath, const float tileSize) {
-	std::ifstream file(filePath);
-	std::string line;
-
-	assert(file.is_open());
-
-	std::getline(file, line); // 最初の行をスキップ
-
-	while (std::getline(file, line)) {
-		std::stringstream ss(line);
-		std::string itemStr, xStr, zStr;
-
-		std::getline(ss, itemStr, ',');
-		std::getline(ss, xStr, ',');
-		std::getline(ss, zStr, ',');
-
-		int itemNum = std::stoi(itemStr);
-		float x = std::stof(xStr);
-		float z = std::stof(zStr);
-
-		Vector3 pos = Vector3{ x * tileSize, 0.5f, z * tileSize };
-		Spawn(pos, itemNum);
-	}
-}
-
 void ItemManager::Load() {
 	auto& ctx = GameContext::GetInstance();
 	auto& scene = ctx.Scene();
@@ -187,7 +155,7 @@ void ItemManager::Load() {
 				
 				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
 				if (!spawned_[i]) {
-					Spawn(pos, -1);
+					Spawn(pos, -1, Common);
 					spawned_[i] = true;
 				}
 			}

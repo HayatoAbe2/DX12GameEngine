@@ -143,8 +143,6 @@ void GameScene::Initialize() {
 	enableEditMode_ = true;
 #endif
 	isLoaded_ = false;
-
-	gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")),1024);
 }
 
 void GameScene::Update() {
@@ -194,9 +192,9 @@ void GameScene::Update() {
 				for (const auto& bullet : bulletManager_->GetBullets()) {
 
 					// 当たり判定
-					collisionChecker_->Check(player_.get(), bullet, camera_.get());
+					collisionChecker_->Check(player_.get(), bullet, camera_.get(), bulletManager_.get());
 					for (auto enemy : enemyManager_->GetEnemies()) {
-						collisionChecker_->Check(enemy, bullet, camera_.get());
+						collisionChecker_->Check(enemy, bullet, camera_.get(), player_.get(), enemyManager_.get());
 					}
 				}
 				// 敵とプレイヤー接触
@@ -366,9 +364,6 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
-
-	gpuParticle->UpdateForGPUParticle(ctx.GetDeltatime());
-	render.DrawGPUParticle(gpuParticle.get(),BlendMode::Add);
 
 	// ui
 	if (!enableEditMode_) {

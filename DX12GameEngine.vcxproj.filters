@@ -263,6 +263,10 @@
     <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ParticleManager\ParticleManager.cpp" />
     <ClCompile Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.cpp" />
+    <ClCompile Include="Application\Item\Passive\Passive.cpp" />
+    <ClCompile Include="Application\Item\Passive\Counter\Counter.cpp" />
+    <ClCompile Include="Application\Item\Passive\Reload\ReloadBoost.cpp" />
+    <ClCompile Include="Application\Item\Passive\Lightning\Lightning.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -586,6 +590,10 @@
     <ClInclude Include="Engine\Graphics\SkinningSystem\SkinningSystem.h" />
     <ClInclude Include="Engine\Asset\Manager\ParticleManager\ParticleManager.h" />
     <ClInclude Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.h" />
+    <ClInclude Include="Application\Item\Passive\Passive.h" />
+    <ClInclude Include="Application\Item\Passive\Counter\Counter.h" />
+    <ClInclude Include="Application\Item\Passive\Reload\ReloadBoost.h" />
+    <ClInclude Include="Application\Item\Passive\Lightning\Lightning.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

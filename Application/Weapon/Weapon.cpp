@@ -13,8 +13,11 @@ void Weapon::Update() {
 	chargeStartTimer_->Update();
 	if (chargeStartTimer_->IsFinished()) {
 		float deltatime = GameContext::GetInstance().GetDeltatime();
-		charge_ = (std::min)(data_.stats.maxCharge, charge_ + deltatime / data_.stats.chargeTime);
+		float chargeTime = data_.stats.chargeTime * modifier_.multiplier.shootCoolTime;
+		charge_ = (std::min)(data_.stats.maxCharge, charge_ + deltatime / chargeTime);
 	}
+
+	modifier_.multiplier.shootCoolTime = 1.0f;
 }
 
 void Weapon::SetChargeStartTimer() {
