@@ -33,7 +33,7 @@ struct Orbit {
 	float speed;
 
 	// 現在角度
-	float angle;
+	float angle = 0;
 
 	// 半径
 	float radius;
@@ -47,19 +47,26 @@ struct Wave {
 	// 速度
 	float speed;
 
+	// 最大角度
+	float maxAngle;
+
 	// 現在時間
-	float time;
+	float time = 0;
 };
 
 // 加速
 struct Accel {
 	// 加速量 /秒
-	float amount;
+	float rate;
 };
 
 // ヒット時減速
 struct Slow {
 	// 減速量(%)
+	float rate;
+
+	// 時間
+	float time;
 };
 
 // 炎ダメージ
@@ -68,10 +75,10 @@ struct Flame {
 	float stack;
 
 	// 間隔
-
+	float interval;
 
 	// ダメージ
-
+	float damage;
 };
 
 // 凍結

@@ -1,16 +1,6 @@
 #include "EquipmentUI.h"
 #include "Character/Player/Player.h"
 #include "Weapon/Weapon.h"
-#include "Weapon/Weapons/AssaultRifle.h"
-#include "Weapon/Weapons/Pistol.h"
-#include "Weapon/Weapons/Shotgun.h"
-#include "Weapon/Weapons/FireBall.h"
-#include "Weapon/Weapons/Wavegun.h"
-#include "Weapon/Weapons/OrbitStaff.h"
-#include "Weapon/Weapons/AccelGun.h"
-#include "Weapon/Weapons/ChargeGun.h"
-#include "Weapon/Weapons/Sniper.h"
-#include "Weapon/Weapons/Burstgun.h"
 
 void EquipmentUI::Initialize(Player* player) {
 	player_ = player;
@@ -79,25 +69,15 @@ void EquipmentUI::Update() {
 		}
 
 		// 武器アイコン
-		if (dynamic_cast<AssaultRifle*>(weapon)) {
+		if (weapon->GetData().modelName == "AssaultRifle.obj") {
 			equipment_ = equipAssaultRifle_.get();
-		} else if (dynamic_cast<Pistol*>(weapon)) {
+		} else if (weapon->GetData().modelName == "Pistol.obj") {
 			equipment_ = equipPistol_.get();
-		} else if (dynamic_cast<Shotgun*>(weapon)) {
+		} else if (weapon->GetData().modelName == "Shotgun.obj") {
 			equipment_ = equipShotgun_.get();
-		} else if (dynamic_cast<FireBall*>(weapon)) {
+		} else if (weapon->GetData().modelName == "Spellbook.obj") {
 			equipment_ = equipFireBall_.get();
-		} else if (dynamic_cast<Wavegun*>(weapon)) {
-			equipment_ = equipWavegun_.get();
-		}else if(dynamic_cast<OrbitStaff*>(weapon)) {
-			equipment_ = equipFireBall_.get();
-		} else if (dynamic_cast<ChargeGun*>(weapon)) {
-			equipment_ = equipShotgun_.get();
-		} else if (dynamic_cast<AccelGun*>(weapon)) {
-			equipment_ = equipPistol_.get();
-		} else if (dynamic_cast<Sniper*>(weapon)) {
-			equipment_ = equipAssaultRifle_.get();
-		} else if (dynamic_cast<Burstgun*>(weapon)) {
+		} else if (weapon->GetData().modelName == "Wavegun.obj") {
 			equipment_ = equipWavegun_.get();
 		}
 		equipment_->SetSize({ 150, 150 });
@@ -122,25 +102,15 @@ void EquipmentUI::Update() {
 			}
 
 			// 武器アイコン
-			if (dynamic_cast<AssaultRifle*>(weapon2)) {
+			if (weapon2->GetData().modelName == "AssaultRifle.obj") {
 				equipment2_ = equipAssaultRifle2_.get();
-			} else if (dynamic_cast<Pistol*>(weapon2)) {
+			} else if (weapon2->GetData().modelName == "Pistol.obj") {
 				equipment2_ = equipPistol2_.get();
-			} else if (dynamic_cast<Shotgun*>(weapon2)) {
+			} else if (weapon2->GetData().modelName == "Shotgun.obj") {
 				equipment2_ = equipShotgun2_.get();
-			} else if (dynamic_cast<FireBall*>(weapon2)) {
+			} else if (weapon2->GetData().modelName == "Spellbook.obj") {
 				equipment2_ = equipFireBall2_.get();
-			} else if (dynamic_cast<Wavegun*>(weapon2)) {
-				equipment2_ = equipWavegun2_.get();
-			} else if (dynamic_cast<OrbitStaff*>(weapon2)) {
-				equipment2_ = equipFireBall2_.get();
-			} else if (dynamic_cast<ChargeGun*>(weapon2)) {
-				equipment2_ = equipShotgun2_.get();
-			} else if (dynamic_cast<AccelGun*>(weapon2)) {
-				equipment2_ = equipPistol2_.get();
-			} else if (dynamic_cast<Sniper*>(weapon2)) {
-				equipment2_ = equipAssaultRifle2_.get();
-			} else if (dynamic_cast<Burstgun*>(weapon2)) {
+			} else if (weapon2->GetData().modelName == "Wavegun.obj") {
 				equipment2_ = equipWavegun2_.get();
 			}
 

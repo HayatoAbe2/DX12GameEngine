@@ -26,6 +26,7 @@ public:
 	};
 
 private:
+
 	// json読み込み
 	void LoadJson(const std::string& path);
 	// 読み込んだデータ

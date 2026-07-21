@@ -11,8 +11,8 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 	Timer* attackTimer = enemy->GetAttackTimer();
 
 	// 攻撃の向き
-	Vector3 attackDirection = Normalize(player->GetTransform().translate - transform.translate);
-	transform.rotate = { 0,-std::atan2(attackDirection.z, attackDirection.x) + float(std::numbers::pi) / 2.0f,0 };
+	Vector2 attackDirection = ToXZ(Normalize(player->GetTransform().translate - transform.translate));
+	transform.rotate = { 0,-std::atan2(attackDirection.y, attackDirection.x) + float(std::numbers::pi) / 2.0f,0 };
 
 	float remain = attackTimer->GetRemaining();
 	if (remain <= attackMotionStart_) {
@@ -47,7 +47,7 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 	}
 
 	if (attackTimer->IsFinished() || enemy->IsAttacking()) {
-		enemy->Attack(bulletManager, attackDirection, nullptr);
+		enemy->Attack(bulletManager, attackDirection);
 	} else {
 		attackTimer->Update();
 	}

@@ -4,12 +4,23 @@
 #include "Map/MapCheck.h"
 #include <numbers>
 
-Bullet::Bullet(const Vector2& direction, const BulletData& data, Character* from) {
+Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& data, Character* from) {
 	data_ = data;
 	user_ = from;
 
-	collider_.center = from->GetTransform().translate;
+	auto& ctx = GameContext::GetInstance();
+	auto& asset = ctx.Asset();
+
+	collider_.center = pos;
 	collider_.radius = data_.radius;
+
+	if (data_.traits.move.orbit) {
+		Vector2 center = ToXZ(user_->GetTransform().translate);
+		Vector2 offset = pos - center;
+
+		// angleを生成位置から決める
+		data_.traits.move.orbit->angle = std::atan2(offset.x, offset.y);
+	}
 
 	// 敵弾の色統一
 	if (dynamic_cast<Enemy*>(user_)) {
@@ -18,7 +29,6 @@ Bullet::Bullet(const Vector2& direction, const BulletData& data, Character* from
 		data_.color = { 0.8f,0,0,1.0f };
 	}
 
-	auto& ctx = GameContext::GetInstance();
 	velocity_ = direction * data_.speed;
 
 	if (dynamic_cast<Enemy*>(from)) {
@@ -26,17 +36,28 @@ Bullet::Bullet(const Vector2& direction, const BulletData& data, Character* from
 		velocity_ /= 2.0f;
 	}
 	lifeTime_ = data_.lifeTime;
+
+	// パーティクル
+	particle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
+	particle_->SetLifeTime(2);
+	particle_->SetColor(data_.color);
+
+	hitParticle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
+	hitParticle_->SetLifeTime(hitParticleLifeTime);
+	hitParticle_->SetColor(data_.color);
+	particleField_ = std::make_unique<ParticleField>();
+	particleField_->SetCheckArea(false);
 }
 
 void Bullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 	auto& ctx = GameContext::GetInstance();
 
-	Move(mapCheck, effectManager);
-
 	if (!isDead_) {
+		Move(mapCheck, effectManager);
+
 		lifeTime_--;
 		if (lifeTime_ <= 0) {
-			Hit();
+			isDead_ = true;
 		}
 
 		// パーティクル
@@ -47,10 +68,10 @@ void Bullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
 			};
 			Transform transform = {
-				{data_.radius,data_.radius,data_.radius},
+				Vector3{data_.radius,data_.radius,data_.radius} * 2.0f,
 				{0,0,0},
-				{collider_.center.x, data_.radius, collider_.center.y} }; 
-			particle_->Emit(transform, -Vector3{ velocity_.x, 0, velocity_.y } * 0.5f);
+				Vector3{collider_.center.x, data_.radius, collider_.center.y} + randomVector };
+			particle_->Emit(transform, -Vector3{ velocity_.x, 0, velocity_.y } * 0.5f * ctx.GetDeltatime());
 		}
 	}
 	particle_->Update();
@@ -77,15 +98,34 @@ void Bullet::Hit() {
 	auto& ctx = GameContext::GetInstance();
 
 	if (particleField_) {
-		isDead_ = true;
+		if (data_.traits.onHitEnemy.piercing) {
+			int& current = data_.traits.onHitEnemy.piercing->current;
+			int& maxCount = data_.traits.onHitEnemy.piercing->count;
+
+			if (current < maxCount) {
+				// 貫通(消さない)
+				current++;
+			} else {
+				isDead_ = true;
+			}
+
+		} else {
+			isDead_ = true;
+		}
 
 		// 飛散パーティクル
-		particleField_->SetGravity(-0.4f, {collider_.center.x, 0.5f, collider_.center.y});
+		particleField_->SetGravity(-0.4f, { collider_.center.x, 0.5f, collider_.center.y });
 		hitParticle_->AddField(std::move(particleField_));
 		for (int i = 0; i < hitParticleNum_; ++i) {
-			Transform transform = { collider_.center.x, 0.5f, collider_.center.y };
-			transform.scale = Vector3{ 0.05f, 1.0f, 1.0f } * 5;
+			Vector3 randomVector = {
+			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
+			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
+			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
+			};
+			Transform transform;
+			transform.translate = Vector3(collider_.center.x, 0.5f, collider_.center.y) + randomVector;
 			transform.rotate = { 0,0,ctx.RandomFloat(0, float(std::numbers::pi) * 2.0f) };
+			transform.scale = Vector3(collider_.radius, collider_.radius, collider_.radius) * 3.0f;
 			hitParticle_->Emit(transform, {});
 		}
 	}
@@ -95,25 +135,32 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 	auto& ctx = GameContext::GetInstance();
 	prePos_ = collider_.center;
 
+	// 軌道回転
 	if (data_.traits.move.orbit) {
 		float angle = data_.traits.move.orbit->angle;
 		float speed = data_.traits.move.orbit->speed;
 		float radius = data_.traits.move.orbit->radius;
 		collider_.center = ToXZ(user_->GetTransform().translate) + radius * Vector2(std::sin(angle), std::cos(angle));
-		data_.traits.move.orbit->angle += speed;
+		data_.traits.move.orbit->angle += speed * ctx.GetDeltatime();
+
+		return;
 	}
 
+	// 波
 	if (data_.traits.move.wave) {
-		Vector2 currentVel = velocity_;cv   
-		float sinWave_ = sinf(0.4f * float(std::numbers::pi) * data_.traits.move.wave->time - 0.5f);
-		currentVel = TransformVector(velocity_, MakeRotateYMatrix(float(std::numbers::pi) / 5.0f * sinWave_)); 
+		Vector2 currentVel = velocity_;
+		float amplitude = data_.traits.move.wave->amplitude;
+		float speed = data_.traits.move.wave->speed;
+		float maxAngle = data_.traits.move.wave->maxAngle * float(std::numbers::pi) / 180.0f;
+		float sinWave_ = sinf(speed * float(std::numbers::pi) * data_.traits.move.wave->time) * amplitude;
+		currentVel = ToXZ(TransformVector(Vector3(velocity_.x, 0, velocity_.y), MakeRotateYMatrix(maxAngle * sinWave_)));
+		collider_.center += currentVel * ctx.GetDeltatime();
+		data_.traits.move.wave->time += ctx.GetDeltatime();
 	}
 
 	// 加速
 	if (data_.traits.move.accel) {
-		Vector2 dir = Normalize(velocity_);
-		float length = Length(velocity_);
-		velocity_ = dir * (length * data_.traits.move.accel->amount);
+		velocity_ *= data_.traits.move.accel->rate;
 	}
 
 	// 反射する場合、XとZ軸を片方ずつ動かす
@@ -138,6 +185,7 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 			collider_.center.y += velocity_.y * 2 * ctx.GetDeltatime();
 		}
 	} else {
+		collider_.center += velocity_ * ctx.GetDeltatime();
 		if (mapCheck->IsHitWall(collider_.center, collider_.radius)) {
 			OnHitWall(effectManager);
 		}
@@ -147,13 +195,11 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 
 void Bullet::OnHitWall(EffectManager* effectManager) {
 	Hit();
-	if (data_.traits.onHitAnything.explode) {
-		effectManager->SpawnExplodeEffect({ collider_.center.x, 0.5f, collider_.center.y });
-	}
+
+	OnHitAnything(effectManager);
 }
 
 void Bullet::OnHitAnything(EffectManager* effectManager) {
-	Hit();
 	if (data_.traits.onHitAnything.explode) {
 		effectManager->SpawnExplodeEffect({ collider_.center.x, 0.5f, collider_.center.y });
 	}

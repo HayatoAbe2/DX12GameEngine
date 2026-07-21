@@ -162,12 +162,9 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application\Weapon\Weapons\AccelGun.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\ChargeGun.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Burstgun.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -191,11 +188,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\UI\UIDrawer\UIDrawer.cpp" />
     <ClCompile Include="Application\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\Weapon\WeaponManager.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\AssaultRifle.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\FireBall.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Pistol.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Shotgun.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Wavegun.cpp" />
     <ClCompile Include="Engine\Contexts\AssetContext\AssetContext.cpp" />
     <ClCompile Include="Engine\Contexts\AudioContext\AudioContext.cpp" />
     <ClCompile Include="Engine\Graphics\GPUResource\BufferManager\BufferManager.cpp" />
@@ -276,7 +268,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Contexts\SceneContext\SceneContext.cpp" />
     <ClCompile Include="Engine\Math\Quaternion\Quaternion.cpp" />
     <ClCompile Include="Application\Timer\Timer.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\OrbitStaff.cpp" />
     <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ParticleManager\ParticleManager.cpp" />
     <ClCompile Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.cpp" />
@@ -287,7 +278,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </ClCompile>
     <ClCompile Include="Application\Character\Enemy\Enemies\Spiker.cpp" />
     <ClCompile Include="Engine\Editor\Scene\SceneEditor\SceneEditor.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Sniper.cpp" />
     <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -431,7 +421,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\Weapon\Weapons\AccelGun.h" />
     <ClInclude Include="Application\Character\Character.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
@@ -439,8 +428,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
-    <ClInclude Include="Application\Weapon\Weapons\ChargeGun.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Burstgun.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
@@ -472,11 +459,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Weapon\Weapon.h" />
     <ClInclude Include="Application\Weapon\WeaponManager.h" />
     <ClInclude Include="Application\Weapon\WeaponStatus.h" />
-    <ClInclude Include="Application\Weapon\Weapons\AssaultRifle.h" />
-    <ClInclude Include="Application\Weapon\Weapons\FireBall.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Pistol.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Shotgun.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Wavegun.h" />
     <ClInclude Include="Engine\SceneObject\Model\Skeleton.h" />
     <ClInclude Include="Engine\SceneObject\SceneObject.h" />
     <ClInclude Include="Engine\Contexts\AssetContext\AssetContext.h" />
@@ -573,8 +555,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\Enemies\Spiker.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\SceneEditor.h" />
     <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
-    <ClInclude Include="Application\Weapon\Weapons\OrbitStaff.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Sniper.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />
     <ClInclude Include="Engine\Graphics\SkinningSystem\SkinningSystem.h" />
     <ClInclude Include="Engine\Asset\Manager\ParticleManager\ParticleManager.h" />

@@ -7,13 +7,13 @@
 // 複数弾
 struct MultiShotParam {
 	// 発射数
-	int8_t pelletCount;
+	int8_t count;
 
-	// 拡散角度
+	// 拡散角度(度)
 	float maxAngle;
 
-	// 均等に飛ぶ
-
+	// 範囲内でランダムに飛ぶ
+	bool random;
 };
 // 溜め
 struct ChargeParam {
@@ -33,6 +33,9 @@ struct BurstParam {
 	// 間隔
 	float interval;
 	Timer timer;
+
+	// 方向
+	Vector2 dir;
 };
 
 struct WeaponStats {

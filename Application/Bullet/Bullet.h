@@ -10,21 +10,22 @@ class MapCheck;
 
 class Bullet {
 public:
-	Bullet(const Vector2& direction,const BulletData& data, Character* from);
+	Bullet(const Vector2& pos, const Vector2& direction, const BulletData& data, Character* from);
 	~Bullet() = default;
 	void Update(MapCheck* mapCheck, EffectManager* effectManager);
 	void Draw(Camera* camera);
 	void Hit();
 
 	bool IsEnemyBullet() { return isEnemyBullet_; }
-	const Circle& GetCollider() const  { return collider_; }
+	const Circle& GetCollider() const { return collider_; }
+	const BulletData& GetData() const { return data_; }
 	float GetDamage() { return data_.damage; }
 	float GetKnockback() { return data_.knockback; }
 	bool IsDead() { return isDead_; }
 	bool CanErase() { return canErase_; }
 	Vector2 GetPrePos() { return prePos_; }
 	bool CanHit() { return noHitTimer_.IsFinished(); }
-	
+
 public:
 	void Move(MapCheck* mapCheck, EffectManager* effectManager);
 
@@ -50,7 +51,7 @@ public:
 	bool isDead_ = false;
 	// 弾リストから削除可能
 	bool canErase_ = false;
-	
+
 	// 無敵時間(ヒットした敵に一定時間当たらないリストに変更予定)
 	Timer noHitTimer_;
 	float invinsibleTime_ = 0.15f;

@@ -1,16 +1,27 @@
 { 
     "ChargeGun": {
         "modelName": "Shotgun.obj",
-        "damage": 2.0,
         "weight": 0.4,
-        "bulletSize": 0.1,
-        "bulletSpeed": 30,
         "shootCoolTime": 0.5,
-        "bulletLifeTime": 60,
-        "knockback": 0.1,
         "maxCharge": 1.0,
         "chargeTime": 3.5,
-        "bulletColor": [0.7, 0.7, 0.7, 1.0],
+
+        "bullet": {
+            "damage": 2.0,
+            "radius": 0.1,
+            "speed": 30,
+            "lifeTime": 60,
+            "knockback": 0.1,
+            "color": [0.7, 0.7, 0.7, 1.0]
+        },
+
+        "traits": {
+            "charge":{
+                "time": 2.0,
+                "damage": 2.5
+            }
+        },
+
         "rarity": "Rare"
   }
 }

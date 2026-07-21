@@ -146,10 +146,10 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		}
 
 		if (weapon_) {
-			weapon_->Update();
+			weapon_->Update(transform_.translate, bulletManager, this);
 
 			if (subWeapon_) {
-				subWeapon_->Update();
+				subWeapon_->Update(transform_.translate, bulletManager, this);
 
 				// 入れ替え
 				if ((input.keyboard.IsTrigger(DIK_TAB) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_B))) {
@@ -391,7 +391,7 @@ void Player::Trigger(BulletManager* bulletManager, Camera* camera) {
 	auto& input = ctx.Input();
 
 	if (weapon_) {
-		shootCooldownTimer_->Start(weapon_->Trigger(weaponTransform_.translate, attackDirection_, bulletManager, camera, this));
+		shootCooldownTimer_->Start(weapon_->Trigger(weaponTransform_.translate, attackDirection_, bulletManager, this));
 	}
 }
 

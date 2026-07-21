@@ -19,9 +19,9 @@
 void EnemyManager::Initialize() {
 }
 
-void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera) {
+void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
 	for (const auto& enemy : activeEnemies_) {
-		enemy->Update(mapCheck, player, bulletManager, camera);
+		enemy->Update(mapCheck, player, bulletManager);
 	}
 
 	activeEnemies_.erase(
@@ -35,9 +35,9 @@ void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bul
 }
 
 
-void EnemyManager::Draw(Camera* camera) {
+void EnemyManager::Draw() {
 	for (const auto& enemy : activeEnemies_) {
-		enemy->Draw(camera);
+		enemy->Draw();
 	}
 }
 

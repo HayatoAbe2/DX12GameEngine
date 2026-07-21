@@ -1,6 +1,6 @@
 #include "RedBat.h"
 
-void RedBat::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) {
+void RedBat::Attack(BulletManager* bulletManager, const Vector2& dir) {
 	// 攻撃中
 	if (comboCount_ < maxCombo_) {
 		isAttacking_ = true;
@@ -8,7 +8,7 @@ void RedBat::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* ca
 
 		if (comboInterval_ <= 0) {
 			// 射撃
-			float time = currentWeapon_->Trigger(model_->GetTransform().translate, dir, bulletManager, camera, this);
+			float time = currentWeapon_->Trigger(model_->GetTransform().translate, dir, bulletManager, this);
 
 			if (attackCoolTimer_->IsActive()) {
 				attackCoolTimer_->AddTime(time);

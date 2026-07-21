@@ -13,29 +13,25 @@ class Player;
 class Enemy : public Character{
 public:
 	virtual ~Enemy() = default;
-	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status,std::vector<std::unique_ptr<Weapon>> rWeapons);
+	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons);
 
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera);
+	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager);
 
 	// Update内関数
 	void Stun(MapCheck* mapCheck);
 	void Fall();
 
-	/// <summary>
-	/// 描画
-	/// </summary>
-	/// <param name="context">コンテキスト</param>
-	/// <param name="camera">カメラ</param>
-	void Draw(Camera* camera);
+	// 描画
+	void Draw();
 
 	// 被ダメージ時
 	void Hit(float damage, const Vector2& from, const float knockback);
 
 	// 敵ごとの関数
-	virtual void Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) = 0;
+	virtual void Attack(BulletManager* bulletManager, const Vector2& dir) = 0;
 
 	Transform GetTransform() const override { return model_->GetTransform(); };
 	Vector3 GetPrePos() const override { return prePos_; }

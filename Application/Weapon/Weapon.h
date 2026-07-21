@@ -11,8 +11,8 @@ public:
 	Weapon(const WeaponData& data, std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel);
 	~Weapon() = default;
 
-	float Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Camera* camera, Character* from);
-	void Update();
+	float Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
+	void Update(const Vector3& pos, BulletManager* bulletManager, Character* from);
 
 	Model* GetWeaponModel() { return model_.get(); }
 	Model* GetWeaponShadowModel() { return shadowModel_.get(); }
@@ -21,15 +21,14 @@ public:
 	
 	float GetCharge() { return charge_; }
 protected:
-	float Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Camera* camera, Character* from);
-
+	float Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
 	void SetChargeStartTimer();
 
 	WeaponData data_;
 	std::unique_ptr<Model> model_;
 	std::unique_ptr<Model> shadowModel_;
 
-	std::unique_ptr<Timer> reloadStartTimer_;
-	float charge_;
+	Timer reloadStartTimer_;
+	float charge_ = 0;
 };
 

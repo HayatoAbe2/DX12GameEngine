@@ -4,9 +4,6 @@
 #include "Character/Enemy/Enemy.h"
 #include "Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
-#include <Bullet/WaveBullet.h>
-#include <Bullet/FireBullet.h>
-#include <Bullet/OrbitBullet.h>
 
 void CollisionChecker::Initialize(EffectManager* effectManager) {
 	effectManager_ = effectManager;
@@ -22,19 +19,21 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera) {
 		return;
 	}
 
-	if (!dynamic_cast<FireBullet*>(bullet) && bullet->IsDead()) return;
+	if (bullet->IsDead()) return;
 
-	Segment2D segment = { bullet->GetPrePos(), ToXZ(bullet->GetTransform().translate) };
-	Circle circle = { player->GetRadius() + bullet->GetTransform().scale.x / 2.0f, ToXZ(player->GetTransform().translate) };
-	if (dynamic_cast<FireBullet*>(bullet)) { circle.radius = player->GetRadius() + 2.0f; }
+	Segment2D segment = { bullet->GetPrePos(), bullet->GetCollider().center };
+	Circle circle = { player->GetRadius() + bullet->GetCollider().radius, ToXZ(player->GetTransform().translate) };
 	if (CheckCollision(segment, circle)) {
 		player->Hit(bullet->GetDamage(), bullet->GetPrePos());
+
 		bullet->Hit();
+		bullet->OnHitAnything(effectManager_);
+
 		camera->StartShake(1.0f, 3);
-		if (dynamic_cast<FireBullet*>(bullet)) {
-			effectManager_->SpawnExplodeEffect(bullet->GetTransform().translate);
+		if (bullet->GetData().traits.onHitAnything.explode) {
+			effectManager_->SpawnExplodeEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
 		} else {
-			effectManager_->SpawnHitEffect(bullet->GetTransform().translate);
+			effectManager_->SpawnHitEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
 		}
 
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
@@ -48,23 +47,27 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 	// 敵の弾だったら判定しない
 	if (bullet->IsEnemyBullet() || bullet->IsDead() || !bullet->CanHit()) { return; }
 
-	Segment2D segment = { bullet->GetPrePos(), ToXZ(bullet->GetTransform().translate) };
-	Circle circle = { enemy->GetRadius() + bullet->GetTransform().scale.x / 2.0f, ToXZ(enemy->GetTransform().translate) };
+	Segment2D segment = { bullet->GetPrePos(), bullet->GetCollider().center };
+	Circle circle = { enemy->GetRadius() + bullet->GetCollider().radius, ToXZ(enemy->GetTransform().translate) };
+
 	if (CheckCollision(segment, circle)) {
 		enemy->Hit(bullet->GetDamage(), bullet->GetPrePos(), bullet->GetKnockback());
-		if (dynamic_cast<WaveBullet*>(bullet)) { 
+
+		// 減速効果
+		if (bullet->GetData().traits.onHitEnemy.slow) {
 			enemy->Slow();
-			bullet->Hit();
-		} else if (dynamic_cast<OrbitBullet*>(bullet)) {
-		} else {
-			bullet->Hit();
 		}
+
+		bullet->Hit();
+		bullet->OnHitAnything(effectManager_);
+
 		camera->StartShake(0.5f, 2);
-		if (dynamic_cast<FireBullet*>(bullet)) {
-			effectManager_->SpawnExplodeEffect(bullet->GetTransform().translate);
+		if (bullet->GetData().traits.onHitAnything.explode) {
+			effectManager_->SpawnExplodeEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
 		} else {
-			effectManager_->SpawnHitEffect(bullet->GetTransform().translate);
+			effectManager_->SpawnHitEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
 		}
+
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 	}
 }

@@ -217,11 +217,6 @@
     <ClCompile Include="Application\Item\ItemManager.cpp" />
     <ClCompile Include="Application\Map\MapCheck.cpp" />
     <ClCompile Include="Application\Map\MapTile.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\AssaultRifle.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\FireBall.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Pistol.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Shotgun.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Wavegun.cpp" />
     <ClCompile Include="Application\Weapon\Weapon.cpp" />
     <ClCompile Include="Application\Weapon\WeaponManager.cpp" />
     <ClCompile Include="Application\CollisionChecker\CollisionChecker.cpp" />
@@ -245,11 +240,6 @@
     <ClCompile Include="Application\Effect\Hit\HitEffect.cpp" />
     <ClCompile Include="Application\Effect\Explode\ExplodeEffect.cpp" />
     <ClCompile Include="Externals\ImGuizmo\ImGuizmo.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\OrbitStaff.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\AccelGun.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\ChargeGun.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Sniper.cpp" />
-    <ClCompile Include="Application\Weapon\Weapons\Burstgun.cpp" />
     <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
@@ -518,11 +508,6 @@
     <ClInclude Include="Application\Item\ItemManager.h" />
     <ClInclude Include="Application\Map\MapCheck.h" />
     <ClInclude Include="Application\Map\MapTile.h" />
-    <ClInclude Include="Application\Weapon\Weapons\AssaultRifle.h" />
-    <ClInclude Include="Application\Weapon\Weapons\FireBall.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Pistol.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Shotgun.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Wavegun.h" />
     <ClInclude Include="Application\Weapon\Weapon.h" />
     <ClInclude Include="Application\Weapon\WeaponManager.h" />
     <ClInclude Include="Application\Weapon\WeaponStatus.h" />
@@ -559,11 +544,6 @@
     <ClInclude Include="Externals\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="Application\Character\Character.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\GizmoCtx.h" />
-    <ClInclude Include="Application\Weapon\Weapons\OrbitStaff.h" />
-    <ClInclude Include="Application\Weapon\Weapons\AccelGun.h" />
-    <ClInclude Include="Application\Weapon\Weapons\ChargeGun.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Sniper.h" />
-    <ClInclude Include="Application\Weapon\Weapons\Burstgun.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />

@@ -8280,7 +8280,7 @@ static void DemoWindowInputs()
         if (ImGui::TreeNode("Dragging"))
         {
             IMGUI_DEMO_MARKER("Inputs & Focus/Dragging");
-            ImGui::TextWrapped("You can use ImGui::GetMouseDragDelta(0) to query for the dragged amount on any widget.");
+            ImGui::TextWrapped("You can use ImGui::GetMouseDragDelta(0) to query for the dragged rate on any widget.");
             for (int button = 0; button < 3; button++)
             {
                 ImGui::Text("IsMouseDragging(%d):", button);
@@ -8743,8 +8743,8 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
                 }
 
             SeparatorText("Misc");
-            SliderFloat2("DisplayWindowPadding", (float*)&style.DisplayWindowPadding, 0.0f, 30.0f, "%.0f"); SameLine(); HelpMarker("Apply to regular windows: amount which we enforce to keep visible when moving near edges of your screen.");
-            SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f"); SameLine(); HelpMarker("Apply to every windows, menus, popups, tooltips: amount where we avoid displaying contents. Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
+            SliderFloat2("DisplayWindowPadding", (float*)&style.DisplayWindowPadding, 0.0f, 30.0f, "%.0f"); SameLine(); HelpMarker("Apply to regular windows: rate which we enforce to keep visible when moving near edges of your screen.");
+            SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f"); SameLine(); HelpMarker("Apply to every windows, menus, popups, tooltips: rate where we avoid displaying contents. Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
 
             EndTabItem();
         }
@@ -9963,7 +9963,7 @@ static void ShowExampleAppLongText(bool* p_open)
     static int test_type = 0;
     static ImGuiTextBuffer log;
     static int lines = 0;
-    ImGui::Text("Printing unusually long amount of text.");
+    ImGui::Text("Printing unusually long rate of text.");
     ImGui::Combo("Test type", &test_type,
         "Single call to TextUnformatted()\0"
         "Multiple calls to Text(), clipped\0"

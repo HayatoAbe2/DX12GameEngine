@@ -1,16 +1,20 @@
 { 
     "Sniper": {
         "modelName": "Shotgun.obj",
-        "damage": 24.0,
         "weight": 0.35,
-        "bulletSize": 0.3,
-        "bulletSpeed": 45,
         "shootCoolTime": 2.0,
-        "bulletLifeTime": 30,
-        "knockback": 0.1,
         "maxCharge": 1.0,
         "chargeTime": 2.0,
-        "bulletColor": [1.0, 1.0, 0.0, 1.0],
+
+        "bullet": {
+            "damage": 24.0,
+            "radius": 0.3,
+            "speed": 45,
+            "lifeTime": 30,
+            "knockback": 0.1,
+            "color": [1.0, 1.0, 0.0, 1.0]
+        },
+
         "rarity": "Rare"
   }
 }
