@@ -18,7 +18,7 @@ public:
     void InitializeGPUParticle();
     void Emit(const Transform& baseTransform, const Vector3& velocity);
     void Update();
-    void UpdateForGPUParticle(float deltatime);
+    void UpdateEmitterForGPUParticle(float deltatime);
 
     void PreDraw(Camera* camera);
 

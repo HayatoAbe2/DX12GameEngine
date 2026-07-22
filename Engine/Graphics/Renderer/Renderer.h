@@ -45,19 +45,19 @@ public:
 	/// モデル描画
 	/// </summary>
 	/// <param name="blendMode">ブレンドモード</param>
-	void DrawModel(Model* model, LightManager* lightManager, int blendMode);
+	void DrawModel(Model* model, LightManager* lightManager, BlendMode blendMode);
 
 	/// <summary>
 	/// インスタンスモデル描画
 	/// </summary>
 	/// <param name="model">複数インスタンスを持つモデル</param>
 	/// <param name="blendMode">ブレンドモード</param>
-	void DrawModelInstance(InstancedModel* model, LightManager* lightManager, int blendMode);
+	void DrawModelInstance(InstancedModel* model, LightManager* lightManager, BlendMode blendMode);
 
-	void DrawParticles(ParticleSystem* particleSys, int blendMode);
-	void DrawGPUParticle(ParticleSystem* particleSys, int blendMode);
-	void DrawPrimitive(Primitive* primitive, int blendMode);
-	void DrawSprite(Sprite* sprite, int blendMode);
+	void DrawParticles(ParticleSystem* particleSys, BlendMode blendMode);
+	void DrawGPUParticle(ParticleSystem* particleSys, BlendMode blendMode);
+	void DrawPrimitive(Primitive* primitive, BlendMode blendMode);
+	void DrawSprite(Sprite* sprite, BlendMode blendMode);
 
 	// ノードごとに描画
 	void DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parent);

@@ -143,6 +143,8 @@ void GameScene::Initialize() {
 	enableEditMode_ = true;
 #endif
 	isLoaded_ = false;
+
+	gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
 }
 
 void GameScene::Update() {
@@ -363,6 +365,9 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());
+	
+	gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
+	render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
 
 	// ui
 	if (!enableEditMode_) {

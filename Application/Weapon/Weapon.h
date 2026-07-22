@@ -17,7 +17,7 @@ public:
 	Model* GetWeaponModel() { return model_.get(); }
 	Model* GetWeaponShadowModel() { return shadowModel_.get(); }
 	// ステータス(強化分)
-	WeaponModifier& GetModifier() { return modifier_; }
+	std::array<ModifierType, size_t(ModifierStats::count)>& GetModifier() { return data_.modifiers; }
 	// データ(基礎数値)
 	const WeaponData& GetData() const { return data_; }
 	

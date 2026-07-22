@@ -1,5 +1,4 @@
 #include "Counter.h"
-#include <Bullet/RapidBullet.h>
 
 Counter::Counter(Sprite* sprite) : Passive(sprite) {
 }
@@ -9,36 +8,22 @@ void Counter::OnHit(const Vector2& pos, BulletManager* bulletManager, Character*
 	auto& asset = ctx.Asset();
 	auto& audio = ctx.Audio();
 
-	WeaponData wd;
-	wd.stats.damage = 6.0f;
-	wd.stats.bulletSize = 0.5f;
-	wd.stats.bulletSpeed = 30;
-	wd.stats.bulletLifeTime = 60;
-	wd.stats.knockback = 0.3f;
-	wd.bulletColor = {0.5f,0.5f,0.5f,0.8f};
+	// 弾データ
+	BulletData data;
+	data.damage = 6.0f;
+	data.radius = 0.5f;
+	data.speed = 30;
+	data.lifeTime = 60;
+	data.knockback = 0.3f;
+	data.color = {0.5f,0.5f,0.5f,0.8f};
 
-    for (int i = 0; i < 8; i++) {
-        float angle = (2.0f * float(std::numbers::pi) / 8) * i;
+	int count = 8;
+    for (int i = 0; i < count; i++) {
+        float angle = (2.0f * float(std::numbers::pi) / count) * i;
+        Vector2 shotDir = {cosf(angle), sinf(angle)};
 
-        Vector3 shotDir = {
-            cosf(angle),
-            0,
-            sinf(angle)
-        };
-
-        auto bullet = asset.LoadModel("Resources/Bullets", "gunBullet.obj");
-
-        bullet->SetTranslate({ pos.x, 0.5f, pos.y });
-
-        std::unique_ptr<RapidBullet> newBullet =
-            std::make_unique<RapidBullet>(
-                std::move(bullet),
-                shotDir,
-                wd,
-                from
-            );
-
-        newBullet->Initialize();
+		// 弾生成
+        std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>(pos, shotDir, data, from);
         bulletManager->AddBullet(std::move(newBullet));
     }
 }

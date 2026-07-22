@@ -77,6 +77,22 @@ struct WeaponTrait {
 	std::optional<BurstParam> burst;
 };
 
+// 強化などの変更
+enum class ModifierStats {
+	damage,
+	size,
+	knockback,
+	coolTime,
+
+	count
+};
+
+// 計算方法
+struct ModifierType {
+	float add = 0;
+	float multiply = 1;
+};
+
 struct WeaponData {
 	std::string name;
 	std::string modelName;
@@ -86,6 +102,9 @@ struct WeaponData {
 
 	// 種類ごとの特殊パラメータ
 	WeaponTrait traits;
+
+	// ステータス変化
+	std::array<ModifierType, size_t(ModifierStats::count)> modifiers;
 
 	// 弾のデータ
 	BulletData bullet;

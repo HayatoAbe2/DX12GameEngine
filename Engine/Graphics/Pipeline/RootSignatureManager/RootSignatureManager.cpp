@@ -19,6 +19,7 @@ void RootSignatureManager::Initialize(const Microsoft::WRL::ComPtr<ID3D12Device>
 	CreateSkinningComputeRootSignature();
 	CreateParticleInitRootSignature();
 	CreateParticleEmitRootSignature();
+	CreateParticleUpdateRootSignature();
 }
 
 void RootSignatureManager::CreateStandardRootSignature() {
@@ -733,5 +734,48 @@ void RootSignatureManager::CreateParticleEmitRootSignature() {
 		signatureBlob->GetBufferSize(),
 		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::ParticleEmit]));
 
+	assert(SUCCEEDED(hr));
+}
+
+void RootSignatureManager::CreateParticleUpdateRootSignature() {
+	D3D12_ROOT_PARAMETER rootParameters[2]{};
+
+	// b0
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[0].Descriptor.ShaderRegister = 0;
+
+
+	D3D12_DESCRIPTOR_RANGE range[1]{};
+	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[0].BaseShaderRegister = 0;
+	range[0].NumDescriptors = 1;
+
+	// u0
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].Descriptor.ShaderRegister = 0; // u0
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &range[0];
+
+	D3D12_ROOT_SIGNATURE_DESC desc{};
+	desc.NumParameters = _countof(rootParameters);
+	desc.pParameters = rootParameters;
+
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+
+	HRESULT hr = D3D12SerializeRootSignature(
+			&desc,
+			D3D_ROOT_SIGNATURE_VERSION_1,
+			&signatureBlob,
+			&errorBlob);
+	assert(SUCCEEDED(hr));
+
+	hr = device_->CreateRootSignature(
+		0,
+		signatureBlob->GetBufferPointer(),
+		signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&rootSignatures_[(int)RootSignatures::ParticleUpdate]));
 	assert(SUCCEEDED(hr));
 }

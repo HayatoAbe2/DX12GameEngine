@@ -37,7 +37,8 @@ void main(uint32_t3 DTid : SV_DispatchThreadID) {
                 gParticles[particleIndex].translate = generator.Generate3d();
                 gParticles[particleIndex].color.rgb = generator.Generate3d();
                 gParticles[particleIndex].color.a = 1.0f;
-                gParticles[particleIndex].velocity = generator.Generate3d();
+                gParticles[particleIndex].velocity = generator.Generate3d() - float32_t3(0.5f, 0.5f, 0.5f);
+                gParticles[particleIndex].lifeTime = 3.0f;
             }
         }
     }

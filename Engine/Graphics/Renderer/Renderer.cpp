@@ -70,13 +70,13 @@ void Renderer::UpdateSpriteTransform(Sprite* sprite) {
 	dxContext_->GetCommandListManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, cbAddress);
 }
 
-void Renderer::DrawModel(Model* model, LightManager* lightManager, int blendMode) {
+void Renderer::DrawModel(Model* model, LightManager* lightManager, BlendMode blendMode) {
 	// GPUに渡すデータの更新
 	cameraData_->position = camera_->transform_.translate;
 	if (lightManager) { lightManager->Update(); }
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetStandardPSO(blendMode);
+	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Standard, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Standard).Get();
 	if (!model->GetData()->JointWeights.empty()) {
 		// GPUでのスキニング処理
@@ -102,13 +102,13 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, int blendMode
 	DrawNode(model, cmdList, model->GetRootNode(), MakeIdentity4x4());
 }
 
-void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManager, int blendMode) {
+void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManager, BlendMode blendMode) {
 	// GPUに渡すデータの更新
 	cameraData_->position = camera_->transform_.translate;
 	if (lightManager) { lightManager->Update(); }
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetInstancingPSO(blendMode);
+	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Instancing, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Instancing).Get();
 
 	// PSO設定
@@ -134,7 +134,7 @@ void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManag
 	DrawNodeInstance(model, cmdList, model->GetRootNode(), MakeIdentity4x4());
 }
 
-void Renderer::DrawParticles(ParticleSystem* particleSys, int blendMode) {
+void Renderer::DrawParticles(ParticleSystem* particleSys, BlendMode blendMode) {
 	particleSys->PreDraw(camera_);
 
 	Material* material = particleSys->GetMaterial();
@@ -142,7 +142,7 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, int blendMode) {
 	material->UpdateGPU();
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetParticlePSO(blendMode);
+	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Particle, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Particle).Get();
 
 	cmdList->SetPipelineState(pso);
@@ -166,7 +166,7 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, int blendMode) {
 	cmdList->DrawIndexedInstanced(indexCountPerInstance, particleSys->GetNumInstance(), 0, 0, 0);
 }
 
-void Renderer::DrawGPUParticle(ParticleSystem* particleSys, int blendMode) {
+void Renderer::DrawGPUParticle(ParticleSystem* particleSys, BlendMode blendMode) {
 	Material* material = particleSys->GetMaterial();
 	// マテリアル更新
 	material->UpdateGPU();
@@ -176,9 +176,13 @@ void Renderer::DrawGPUParticle(ParticleSystem* particleSys, int blendMode) {
 		auto pso = dxContext_->GetPipelineStateManager()->GetParticleEmitPSO();
 		auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::ParticleEmit).Get();
 		particleCompute_->Emit(cmdList.Get(), particleSys, pso, rootSig, dxContext_->GetSRVManager(), perFrameResource_);
+
+		pso = dxContext_->GetPipelineStateManager()->GetParticleUpdatePSO();
+		rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::ParticleUpdate).Get();
+		particleCompute_->Update(cmdList.Get(), particleSys, pso, rootSig, dxContext_->GetSRVManager(), perFrameResource_);
 	}
 
-	auto pso = dxContext_->GetPipelineStateManager()->GetGPUParticlePSO(blendMode);
+	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::GPUParticle, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::GPUParticle).Get();
 	cmdList->SetPipelineState(pso);
 	cmdList->SetGraphicsRootSignature(rootSig);
@@ -196,13 +200,13 @@ void Renderer::DrawGPUParticle(ParticleSystem* particleSys, int blendMode) {
 	cmdList->DrawIndexedInstanced(indexCountPerInstance, particleSys->GetNumInstance(), 0, 0, 0);
 }
 
-void Renderer::DrawPrimitive(Primitive* primitive, int blendMode) {
+void Renderer::DrawPrimitive(Primitive* primitive, BlendMode blendMode) {
 	Material* material = primitive->GetMaterial();
 	// マテリアル更新
 	material->UpdateGPU();
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetPrimitivePSO(blendMode);
+	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Primitive, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Standard).Get();
 	cmdList->SetPipelineState(pso);
 	cmdList->SetGraphicsRootSignature(rootSig);
@@ -247,9 +251,9 @@ void Renderer::DrawPrimitive(Primitive* primitive, int blendMode) {
 	cmdList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
 };
 
-void Renderer::DrawSprite(Sprite* sprite, int blendMode) {
+void Renderer::DrawSprite(Sprite* sprite, BlendMode blendMode) {
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetSpritePSO(blendMode);
+	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Sprite, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Standard).Get();
 
 	sprite->UpdateMaterial();
@@ -732,7 +736,7 @@ void Renderer::DrawSkybox(Texture* texture) {
 	skybox.transformData->WVP = skybox.transformData->World * camera_->viewMatrix_ * camera_->projectionMatrix_;
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
-	auto pso = dxContext_->GetPipelineStateManager()->GetSkyboxPSO(int(BlendMode::Normal));
+	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Skybox, BlendMode::Normal);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Skybox).Get();
 
 	cmdList->SetPipelineState(pso);

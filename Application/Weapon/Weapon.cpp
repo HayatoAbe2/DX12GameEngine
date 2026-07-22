@@ -34,7 +34,7 @@ void Weapon::Update(const Vector3& pos, BulletManager* bulletManager, Character*
 	reloadStartTimer_.Update();
 	if (reloadStartTimer_.IsFinished()) {
 		float deltatime = GameContext::GetInstance().GetDeltatime();
-		float chargeTime = data_.stats.chargeTime * modifier_.multiplier.shootCoolTime;
+		float chargeTime = data_.stats.chargeTime * data_.modifiers[int(ModifierStats::coolTime)].multiply;
 		charge_ = (std::min)(data_.stats.maxCharge, charge_ + deltatime / chargeTime);
 	}
 

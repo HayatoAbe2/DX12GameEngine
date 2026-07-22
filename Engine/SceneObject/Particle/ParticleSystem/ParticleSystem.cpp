@@ -35,7 +35,7 @@ void ParticleSystem::Update() {
 	}
 }
 
-void ParticleSystem::UpdateForGPUParticle(float deltatime) {
+void ParticleSystem::UpdateEmitterForGPUParticle(float deltatime) {
 	emitterSphereData_->frequencyTime += deltatime;
 
 	if (emitterSphereData_->frequency <= emitterSphereData_->frequencyTime) {

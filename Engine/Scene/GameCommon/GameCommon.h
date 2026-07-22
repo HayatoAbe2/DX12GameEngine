@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include <numbers>
+#include <array>
 
 // 配置物
 #include "Engine/Scene/Camera/Camera.h"

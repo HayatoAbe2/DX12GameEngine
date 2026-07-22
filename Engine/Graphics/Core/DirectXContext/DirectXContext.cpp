@@ -89,31 +89,38 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 
 	// Shaderをコンパイルする
 	pipelineStateManager_ = std::make_unique<PipelineStateManager>();
-	pipelineStateManager_->SetStandardBlob(
+	pipelineStateManager_->SetBlob(
+		MainPSOType::Standard,
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3d.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
 	);
-	pipelineStateManager_->SetInstancingBlob(
+	pipelineStateManager_->SetBlob(
+		MainPSOType::Instancing,
 		shaderCompiler_->Compile(L"Resources/Shaders/Instance.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Instance.PS.hlsl", L"ps_6_0", logger_)
 	);
-	pipelineStateManager_->SetSpriteBlob(
+	pipelineStateManager_->SetBlob(
+		MainPSOType::Sprite,
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3D.PS.hlsl", L"ps_6_0", logger_)
 	);
-	pipelineStateManager_->SetParticleBlob(
+	pipelineStateManager_->SetBlob(
+		MainPSOType::Particle,
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle.PS.hlsl", L"ps_6_0", logger_)
 	);
-	pipelineStateManager_->SetGPUParticleBlob(
+	pipelineStateManager_->SetBlob(
+		MainPSOType::GPUParticle,
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle/Particle.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle.PS.hlsl", L"ps_6_0", logger_)
 	);
-	pipelineStateManager_->SetPrimitiveBlob(
+	pipelineStateManager_->SetBlob(
+		MainPSOType::Primitive,
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3d.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Object3d.PS.hlsl", L"ps_6_0", logger_)
 	);
-	pipelineStateManager_->SetSkyboxBlob(
+	pipelineStateManager_->SetBlob(
+		MainPSOType::Skybox,
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.VS.hlsl", L"vs_6_0", logger_),
 		shaderCompiler_->Compile(L"Resources/Shaders/Skybox.PS.hlsl", L"ps_6_0", logger_)
 	);
@@ -148,6 +155,9 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	);
 	pipelineStateManager_->SetParticleEmitBlob(
 		shaderCompiler_->Compile(L"Resources/Shaders/Particle/EmitParticle.CS.hlsl", L"cs_6_0", logger_)
+	);
+	pipelineStateManager_->SetParticleUpdateBlob(
+		shaderCompiler_->Compile(L"Resources/Shaders/Particle/UpdateParticle.CS.hlsl", L"cs_6_0", logger_)
 	);
 
 	// Outline用リソース

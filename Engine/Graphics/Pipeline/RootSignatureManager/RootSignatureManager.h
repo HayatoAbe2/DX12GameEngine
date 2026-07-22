@@ -18,6 +18,7 @@ enum class RootSignatures {
 
 	ParticleInit,
 	ParticleEmit,
+	ParticleUpdate,
 
 	Count
 };
@@ -51,6 +52,7 @@ private:
 	void CreateSkinningComputeRootSignature();
 	void CreateParticleInitRootSignature();
 	void CreateParticleEmitRootSignature();
+	void CreateParticleUpdateRootSignature();
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatures_[(int)RootSignatures::Count];
 
