@@ -1,7 +1,6 @@
 #include "Item.h"
 #include "GameCommon.h"
 #include <numbers>
-#include "Weapon/Weapons/FireBall.h"
 
 Item::~Item() {
 	auto& ctx = GameContext::GetInstance();
@@ -16,7 +15,7 @@ Item::Item(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rarity) {
 
 	weapon_ = std::move(weapon);
 	weapon_->GetWeaponModel()->SetTranslate(pos);
-	if (weapon_ && dynamic_cast<FireBall*>(weapon_.get())) {
+	if (weapon_ && weapon_->GetData().bullet.traits.onHitAnything.explode) {
 	} else {
 		weapon_->GetWeaponModel()->SetRotate({ 0,float(std::numbers::pi / 2.0f),0 });
 	}

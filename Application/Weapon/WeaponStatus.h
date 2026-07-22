@@ -2,36 +2,79 @@
 #include "Rarity.h"
 #include "Weapon/Trait/BulletTrait.h"
 #include "GameCommon.h"
-#include <variant>
+#include <Timer/Timer.h>
 
-struct NormalParam {};
-struct ShotgunParam {
+// 複数弾
+struct MultiShotParam {
 	// 発射数
-	int8_t pelletCount;
+	int8_t count;
 
-	// 拡散角度
-	float maxAngle = 0;
+	// 拡散角度(度)
+	float maxAngle;
+
+	// 範囲内でランダムに飛ぶ
+	bool random;
+};
+// 溜め
+struct ChargeParam {
+	// 最大までの時間
+	float time;
+	float currentTime = 0;
+
+	// ダメージ上昇率
+	float damage;
+};
+// バースト
+struct BurstParam {
+	// 連続射撃回数
+	int count;
+	int currentCount = 0;
+
+	// 間隔
+	float interval;
+	Timer timer;
+
+	// 方向
+	Vector2 dir;
 };
 
 struct WeaponStats {
-	// ダメージ
-	float damage;
-	// 射撃中減速率
+	// 弾のブレ
+
+	// 減速率
 	float weight;
-	// 弾の大きさ
-	float bulletSize;
-	// 弾速
-	float bulletSpeed;
 	// 射撃クールダウン
 	float shootCoolTime;
-	// 弾の生存時間
-	int bulletLifeTime;
-	// ノックバック
-	float knockback;
 	// 最大チャージ(弾数)
 	float maxCharge;
 	// 1発分のチャージ時間
 	float chargeTime;
+};
+
+// 弾のデータ
+struct BulletData {
+	// ダメージ
+	float damage;
+	// 弾の大きさ
+	float radius;
+	// 弾速
+	float speed;
+	// 弾の生存時間
+	int lifeTime;
+	// 与えるノックバック
+	float knockback;
+
+	// 属性(弾の性質)
+	BulletTraits traits;
+	// 弾の色
+	Vector4 color;
+};
+
+// 特殊パラメータ
+struct WeaponTrait {
+	std::optional<MultiShotParam> multiShot;
+	std::optional<ChargeParam> charge;
+	std::optional<BurstParam> burst;
 };
 
 struct WeaponData {
@@ -40,20 +83,13 @@ struct WeaponData {
 
 	// 共通の基本ステータス
 	WeaponStats stats;
-	// 種類ごとの特殊パラメータ
-	std::variant<NormalParam, ShotgunParam> weaponSpecialData;
-	// 属性(弾の性質)
-	BulletTraits bulletTraits;
-	// 弾の色
-	Vector4 bulletColor;
-	// レア度(表示に影響)
-	Rarity rarity;
-};
 
-// 強化
-struct WeaponModifier {
-	WeaponStats add;
-	WeaponStats multiplier{
-		1,1,1,1,1,1,1
-	};
+	// 種類ごとの特殊パラメータ
+	WeaponTrait traits;
+
+	// 弾のデータ
+	BulletData bullet;
+
+	// レア度
+	Rarity rarity;
 };

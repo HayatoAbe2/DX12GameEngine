@@ -183,7 +183,7 @@ void GameScene::Update() {
 
 				// 敵
 				if (!enableEditMode_) {
-					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), camera_.get());
+					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get());
 					mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
 				}
 
@@ -358,9 +358,8 @@ void GameScene::Draw() {
 	}
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 
-	//mapTile_->Draw(camera_.get());
 	player_->Draw(camera_.get());
-	enemyManager_->Draw(camera_.get());
+	enemyManager_->Draw();
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw(camera_.get());
 	effectManager_->Draw(camera_.get());

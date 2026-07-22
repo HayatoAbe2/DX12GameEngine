@@ -33,7 +33,7 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	currentState_ = std::make_unique<EnemyIdle>();
 }
 
-void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera) {
+void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
 
 	prePos_ = model_->GetTransform().translate;
@@ -115,7 +115,7 @@ void Enemy::Fall() {
 	}
 }
 
-void Enemy::Draw(Camera* camera) {
+void Enemy::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 

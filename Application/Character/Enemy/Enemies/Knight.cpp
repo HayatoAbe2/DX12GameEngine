@@ -1,6 +1,6 @@
 #include "Knight.h"
 
-void Knight::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) {	
+void Knight::Attack(BulletManager* bulletManager, const Vector2& dir) {	
 	// 攻撃中
 	if (comboCount_ < maxCombo_) {
 		isAttacking_ = true;
@@ -8,7 +8,7 @@ void Knight::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* ca
 		
 		if (comboInterval_ <= 0) {
 			// 射撃
-			float time = weapons_[0]->Shoot(model_->GetTransform().translate, dir, bulletManager, camera, this);
+			float time = weapons_[0]->Trigger(model_->GetTransform().translate, dir, bulletManager, this);
 
 			if (attackCoolTimer_->IsActive()) {
 				attackCoolTimer_->AddTime(time);

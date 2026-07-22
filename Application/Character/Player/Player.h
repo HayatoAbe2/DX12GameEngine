@@ -41,7 +41,7 @@ public:
 	void OnDealDamage(const Vector2& pos, EnemyManager* enemyManager);
 
 	void Move(MapCheck* mapCheck);
-	void Shoot(BulletManager* bulletManager, Camera* camera);
+	void Trigger(BulletManager* bulletManager, Camera* camera);
 	void Boost(MapCheck* mapCheck);
 	void Fall();
 	void Stun(MapCheck* mapCheck);
@@ -87,7 +87,7 @@ private:
 	const float defaultMoveSpeed_ = 10.0f;
 
 	// 攻撃の向き
-	Vector3 attackDirection_ = {};
+	Vector2 attackDirection_ = {};
 
 	// hp
 	float hp_ = 100;

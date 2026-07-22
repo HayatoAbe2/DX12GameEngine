@@ -1,16 +1,5 @@
 #include "WeaponManager.h"
 #include "Weapon.h"
-#include "Weapon/Weapons/Pistol.h"
-#include "Weapon/Weapons/AssaultRifle.h"
-#include "Weapon/Weapons/Shotgun.h"
-#include "Weapon/Weapons/FireBall.h"
-#include "Weapon/Weapons/Wavegun.h"
-#include "Weapon/Weapons/OrbitStaff.h"
-#include "Weapon/Weapons/AccelGun.h"
-#include "Weapon/Weapons/ChargeGun.h"
-#include "Weapon/Weapons/Sniper.h"
-#include "Weapon/Weapons/Burstgun.h"
-#include <fstream>
 #include <Externals/nlohmann/json.hpp>
 
 void WeaponManager::Initialize() {
@@ -33,120 +22,20 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 
 	WeaponData data;
 
-	if (index == -1) { index = ctx.RandomInt(0, int(WEAPON::Burstgun)); }
-	MaterialData matData = {};
-	switch (index) {
-	case static_cast<int>(WEAPON::Pistol):
-	{
-		data = weaponDataMap["Pistol"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<Pistol>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::AssaultRifle):
-	{
-		data = weaponDataMap["AssaultRifle"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<AssaultRifle>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::Shotgun):
-	{
-		data = weaponDataMap["Shotgun"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<Shotgun>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::FireBall):
-	{
-		data = weaponDataMap["Spellbook"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<FireBall>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::Wavegun):
-	{
-		data = weaponDataMap["Wavegun"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<Wavegun>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::OrbitStaff):
-	{
-		data = weaponDataMap["OrbitStaff"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<OrbitStaff>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::ChargeGun):
-	{
-		data = weaponDataMap["ChargeGun"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<ChargeGun>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::AccelGun):
-	{
-		data = weaponDataMap["AccelGun"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<AccelGun>(data, std::move(model), std::move(shadowModel));
-	}
-	case static_cast<int>(WEAPON::Sniper):
-	{
-		data = weaponDataMap["Sniper"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<Sniper>(data, std::move(model), std::move(shadowModel));
-	}
-	default:
-	{
-		data = weaponDataMap["Burstgun"];
-		auto model = asset.LoadModel("Resources/Weapons", data.modelName);
-		matData = model->GetMaterial(0)->GetData();
-		matData.color = { 0.2f,0.2f,0.2f,1 };
-		model->GetMaterial(0)->SetData(matData);
-		model->GetMaterial(1)->SetData(matData);
-		auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
-		return std::make_unique<Burstgun>(data, std::move(model), std::move(shadowModel));
-	}
-	}
+	// ランダム
+	if (index == -1) { index = ctx.RandomInt(0, int(WEAPON::Count) - 1); }
+
+	// 武器データ
+	data = weaponDataMap[WeaponNames[index]];
+
+	auto model = asset.LoadModel("Resources/Weapons", data.modelName);
+	auto shadowModel = asset.LoadModel("Resources/Weapons", data.modelName);
+	MaterialData matData = model->GetMaterial(0)->GetData();
+	matData.color = { 0.2f,0.2f,0.2f,1 };
+	model->GetMaterial(0)->SetData(matData);
+	model->GetMaterial(1)->SetData(matData);
+
+	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
 }
 
 void WeaponManager::LoadJson(const std::string& path) {
@@ -157,34 +46,171 @@ void WeaponManager::LoadJson(const std::string& path) {
 	file >> j;
 
 	for (auto& [name, data] : j.items()) {
-		WeaponData wd{};
+		WeaponData weapon{};
 
-		wd.name = name;
-		wd.modelName = data["modelName"];
+		weapon.name = name;
+		weapon.modelName = data["modelName"];
 
-		wd.stats.damage = data["damage"];
-		wd.stats.weight = data["weight"];
+		// enum変換
+		weapon.rarity = data["rarity"].get<Rarity>();
 
-		wd.stats.bulletSize = data["bulletSize"];
-		wd.stats.bulletSpeed = data["bulletSpeed"];
+		weapon.stats.weight = data["weight"];
+		weapon.stats.shootCoolTime = data["shootCoolTime"];
+		weapon.stats.maxCharge = data["maxCharge"];
+		weapon.stats.chargeTime = data["chargeTime"];
 
-		wd.stats.shootCoolTime = data["shootCoolTime"];
-		wd.stats.bulletLifeTime = data["bulletLifeTime"];
+		// 弾
+		auto& bullet = data["bullet"];
+		weapon.bullet.damage = bullet["damage"];
+		weapon.bullet.radius = bullet["radius"];
+		weapon.bullet.speed = bullet["speed"];
+		weapon.bullet.lifeTime = bullet["lifeTime"];
+		weapon.bullet.knockback = bullet["knockback"];
+		auto& color = bullet["color"];
+		weapon.bullet.color.x = color[0];
+		weapon.bullet.color.y = color[1];
+		weapon.bullet.color.z = color[2];
+		weapon.bullet.color.w = color[3];
 
-		wd.stats.knockback = data["knockback"];
+		///
+		/// 弾の性質
+		///
+		if (bullet.contains("traits")) {
+			auto& traits = bullet["traits"];
 
-		wd.stats.maxCharge = data["maxCharge"];
-		wd.stats.chargeTime = data["chargeTime"];
+			// 移動関連
+			if (traits.contains("move")) {
+				auto& move = traits["move"];
 
-		auto color = data["bulletColor"];
-		wd.bulletColor.x = color[0];
-		wd.bulletColor.y = color[1];
-		wd.bulletColor.z = color[2];
-		wd.bulletColor.w = color[3];
+				if (move.contains("wave")) {
+					Wave t;
+					auto& j = move["wave"];
 
-		// enum変換機能
-		wd.rarity = data["rarity"].get<Rarity>();
+					t.amplitude = j["amplitude"];
+					t.speed = j["speed"];
+					t.maxAngle = j["maxAngle"];
 
-		weaponDataMap[name] = wd;
+					weapon.bullet.traits.move.wave = t;
+				}
+
+				if (move.contains("accel")) {
+					Accel t;
+					auto& j = move["accel"];
+
+					t.rate = j["rate"];
+
+					weapon.bullet.traits.move.accel = t;
+				}
+
+				if (move.contains("orbit")) {
+					Orbit t;
+					auto& j = move["orbit"];
+
+					t.radius = j["radius"];
+					t.speed = j["speed"];
+
+					weapon.bullet.traits.move.orbit = t;
+				}
+			}
+
+			// 壁ヒット時
+			if (traits.contains("onHitWall")) {
+				auto& wall = traits["onHitWall"];
+
+				if (wall.contains("ricochet")) {
+					Ricochet t;
+					auto& j = wall["ricochet"];
+
+					t.count = j["count"];
+					t.onHitEnemy = j["onHitEnemy"];
+					t.toEnemy = j["toEnemy"];
+
+					weapon.bullet.traits.onHitWall.ricochet = t;
+				}
+			}
+
+			if (traits.contains("onHitEnemy")) {
+				auto& enemy = traits["onHitEnemy"];
+
+				if (enemy.contains("piercing")) {
+					Piercing t;
+					auto& j = enemy["piercing"];
+
+					t.count = j["count"];
+
+					weapon.bullet.traits.onHitEnemy.piercing = t;
+				}
+
+				if (enemy.contains("slow")) {
+					Slow t;
+					auto& j = enemy["slow"];
+
+					t.rate = j["rate"];
+					t.time = j["time"];
+
+					weapon.bullet.traits.onHitEnemy.slow = t;
+				}
+
+				if (enemy.contains("flame")) {}
+				if (enemy.contains("freeze")) {}
+				if (enemy.contains("volt")) {}
+
+			}
+
+			if (traits.contains("onHitAnything")) {
+				auto& any = traits["onHitAnything"];
+
+				if (any.contains("explode")) {
+					Explode t;
+					auto& j = any["explode"];
+
+					t.radius = j["radius"];
+
+					weapon.bullet.traits.onHitAnything.explode = t;
+				}
+			}
+		}
+
+		///
+		/// 武器の性質
+		///
+
+		if (data.contains("traits")) {
+			auto& traits = data["traits"];
+
+			// MultiShot
+			if (traits.contains("multiShot")) {
+				MultiShotParam param;
+				auto& j = traits["multiShot"];
+
+				param.count = j["count"];
+				param.maxAngle = j["maxAngle"];
+				param.random = j["random"];
+
+				weapon.traits.multiShot = param;
+			}
+			// Charge
+			if (traits.contains("charge")) {
+				ChargeParam param;
+				auto& j = traits["charge"];
+
+				param.time = j["time"];
+				param.damage = j["damage"];
+
+				weapon.traits.charge = param;
+			}
+			// Burst
+			if (traits.contains("burst")) {
+				BurstParam param;
+				auto& j = traits["burst"];
+
+				param.count = j["count"];
+				param.interval = j["interval"];
+
+				weapon.traits.burst = param;
+			}
+		}
+
+		weaponDataMap[name] = weapon;
 	}
 }

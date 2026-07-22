@@ -9,9 +9,10 @@ class BulletManager;
 class Weapon {
 public:
 	Weapon(const WeaponData& data, std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel);
-	virtual ~Weapon() = default;
-	virtual float Shoot(Vector3 pos, Vector3 dir, BulletManager* bulletManager, Camera* camera, Character* from) = 0;
-	virtual void Update();
+	~Weapon() = default;
+
+	float Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
+	void Update(const Vector3& pos, BulletManager* bulletManager, Character* from);
 
 	Model* GetWeaponModel() { return model_.get(); }
 	Model* GetWeaponShadowModel() { return shadowModel_.get(); }
@@ -22,14 +23,14 @@ public:
 	
 	float GetCharge() { return charge_; }
 protected:
+	float Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
 	void SetChargeStartTimer();
 
 	WeaponData data_;
-	WeaponModifier modifier_{};
 	std::unique_ptr<Model> model_;
 	std::unique_ptr<Model> shadowModel_;
 
-	std::unique_ptr<Timer> chargeStartTimer_;
-	float charge_;
+	Timer reloadStartTimer_;
+	float charge_ = 0;
 };
 

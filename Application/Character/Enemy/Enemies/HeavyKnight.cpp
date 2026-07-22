@@ -1,6 +1,6 @@
 #include "HeavyKnight.h"
 
-void HeavyKnight::Attack(BulletManager* bulletManager, const Vector3& dir, Camera* camera) {
+void HeavyKnight::Attack(BulletManager* bulletManager, const Vector2& dir) {
 
 	// 攻撃中
 	if (comboCount_ < maxCombo_) {
@@ -9,7 +9,7 @@ void HeavyKnight::Attack(BulletManager* bulletManager, const Vector3& dir, Camer
 
 		if (comboInterval_ <= 0) {
 			// 射撃
-			float time = currentWeapon_->Shoot(model_->GetTransform().translate, dir, bulletManager, camera, this);
+			float time = currentWeapon_->Trigger(model_->GetTransform().translate, dir, bulletManager, this);
 
 			if (attackCoolTimer_->IsActive()) {
 				attackCoolTimer_->AddTime(time);

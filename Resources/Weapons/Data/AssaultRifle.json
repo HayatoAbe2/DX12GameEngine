@@ -1,16 +1,29 @@
-{ 
+{
     "AssaultRifle": {
         "modelName": "AssaultRifle.obj",
-        "damage": 2.8,
+
         "weight": 0.4,
-        "bulletSize": 0.3,
-        "bulletSpeed": 45,
         "shootCoolTime": 0.15,
-        "bulletLifeTime": 60,
-        "knockback": 0.1,
         "maxCharge": 10.0,
         "chargeTime": 0.5,
-        "bulletColor": [0.5, 0.7, 0.0, 1.0],
+
+        "bullet": {
+            "damage": 2.8,
+            "radius": 0.3,
+            "speed": 45,
+            "lifeTime": 60,
+            "knockback": 0.1,
+            "color": [0.5, 0.7, 0.0, 1.0],
+
+            "traits":{
+                "onHitEnemy":{
+                    "piercing":{
+                        "count": 2
+                    }
+                }
+            }
+        },
+
         "rarity": "Common"
-  }
+    }
 }

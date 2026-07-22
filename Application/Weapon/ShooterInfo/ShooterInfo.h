@@ -8,5 +8,4 @@ enum class Team {
 // 発射者の情報
 struct ShooterInfo {
 	Team team;
-
 };

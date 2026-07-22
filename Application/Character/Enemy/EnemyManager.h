@@ -10,8 +10,8 @@ class WeaponManager;
 class EnemyManager {
 public:
 	void Initialize();
-	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, Camera* camera);
-	void Draw(Camera* camera);
+	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager);
+	void Draw();
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
 	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int enemyType);
 	void Reset();
