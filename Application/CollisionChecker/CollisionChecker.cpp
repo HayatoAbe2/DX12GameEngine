@@ -9,7 +9,7 @@ void CollisionChecker::Initialize(EffectManager* effectManager) {
 	effectManager_ = effectManager;
 }
 
-void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera) {
+void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
@@ -37,10 +37,12 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera) {
 		}
 
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
+
+		player->OnHit(bullet->GetPrePos(), bulletManager);
 	}
 }
 
-void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
+void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera, Player* player, EnemyManager* enemyManager) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
@@ -69,6 +71,8 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera) {
 		}
 
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
+
+		player->OnDealDamage(circle.center, enemyManager);
 	}
 }
 

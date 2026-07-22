@@ -3,11 +3,13 @@
 #include "Weapon/Weapon.h"
 #include "Timer/Timer.h"
 #include "Character/Character.h"
+#include "Item/Passive/Passive.h"
 
 class Camera;
 class MapCheck;
 class ItemManager;
 class BulletManager;
+class EnemyManager;
 
 class Player : public Character{
 public:
@@ -34,6 +36,9 @@ public:
 
 	// 被弾
 	void Hit(float damage, const Vector2& from);
+
+	void OnHit(const Vector2& from, BulletManager* bulletManager);
+	void OnDealDamage(const Vector2& pos, EnemyManager* enemyManager);
 
 	void Move(MapCheck* mapCheck);
 	void Trigger(BulletManager* bulletManager, Camera* camera);
@@ -136,5 +141,10 @@ private:
 	Vector2 scSize_ = {70,20};
 
 	Vector3 prePos_{};
+
+	std::vector<std::unique_ptr<Passive>> passives_;
+	std::vector<std::unique_ptr<Sprite>> sprites_;
+
+	bool usePassive_[3];
 };
 

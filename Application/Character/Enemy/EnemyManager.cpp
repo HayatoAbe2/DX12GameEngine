@@ -11,8 +11,6 @@
 #include "Character/Enemy/Enemies/HeavyKnight.h"
 #include "Character/Enemy/Enemies/RedBat.h"
 #include "Character/Enemy/Enemies/Spiker.h"
-#include <fstream>
-#include <sstream>
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include "Engine/SceneObject/SceneObject.h"
 

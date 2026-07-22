@@ -165,6 +165,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
+    <ClCompile Include="Application\Item\Passive\Counter\Counter.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -246,6 +247,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Contexts\InputContext\InputContext.cpp" />
     <ClCompile Include="Engine\Contexts\LightContext\LightContext.cpp" />
     <ClCompile Include="Application\Effect\Hit\HitEffect.cpp" />
+    <ClCompile Include="Application\Item\Passive\Lightning\Lightning.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Math\Matrix4x4\Matrix4x4.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\Model.cpp" />
@@ -271,6 +273,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\SceneObject\Primitive\Primitive.cpp" />
     <ClCompile Include="Engine\Asset\Manager\ParticleManager\ParticleManager.cpp" />
     <ClCompile Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.cpp" />
+    <ClCompile Include="Application\Item\Passive\Passive.cpp" />
+    <ClCompile Include="Application\Item\Passive\Reload\ReloadBoost.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -428,6 +432,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
+    <ClInclude Include="Application\Item\Passive\Counter\Counter.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Engine\Editor\Scene\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
@@ -559,6 +564,9 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Graphics\SkinningSystem\SkinningSystem.h" />
     <ClInclude Include="Engine\Asset\Manager\ParticleManager\ParticleManager.h" />
     <ClInclude Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.h" />
+    <ClInclude Include="Application\Item\Passive\Passive.h" />
+    <ClInclude Include="Application\Item\Passive\Reload\ReloadBoost.h" />
+    <ClInclude Include="Application\Item\Passive\Lightning\Lightning.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

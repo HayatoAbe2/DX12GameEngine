@@ -98,6 +98,4 @@ private:
 	bool isPause_ = false;
 
 	bool isLoaded_ = false;
-
-	std::unique_ptr<ParticleSystem> gpuParticle;
 };

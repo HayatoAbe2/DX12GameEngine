@@ -13,12 +13,10 @@ public:
 	void Update(Player* player);
 	void Draw(Camera* camera);
 	void Interact(Player* player);
-	void Spawn(Vector3 pos,int index);
 	void Spawn(Vector3 pos,int index,Rarity rarity);
 	void Drop(Vector3 pos,std::unique_ptr<Weapon> weapon);
 	void SpawnAndDrop(Vector3 pos, int index);
 	void Reset();
-	void LoadCSV(const std::string& filePath,const float tileSize);
 	void Load();
 	
 private:

@@ -9,6 +9,10 @@
 #include <cmath>
 #define DIRECTINPUT_VERSION 0x0800
 #include "dinput.h"
+#include <Character/Enemy/EnemyManager.h>
+#include <Item/Passive/Counter/Counter.h>
+#include <Item/Passive/Reload/ReloadBoost.h>
+#include <Item/Passive/Lightning/Lightning.h>
 
 
 Player::~Player() {
@@ -63,6 +67,15 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	attackDirection_ = Normalize(Vector2(1, 0));
 	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
 	transform_.translate.x = 5;
+
+	sprites_.push_back(asset.LoadSprite("Resources/Items/16.png"));
+	sprites_.push_back(asset.LoadSprite("Resources/Items/21.png"));
+	sprites_.push_back(asset.LoadSprite("Resources/Items/13.png"));
+
+	for (int i = 0; i < 3; ++i) {
+		sprites_[i]->SetSize({ 75, 75 });
+		sprites_[i]->SetPosition({ 325.0f + 55 * i,0 });
+	}
 }
 
 void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera, BulletManager* bulletManager) {
@@ -110,6 +123,10 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 			Boost(mapCheck);
 		} else {
 			Move(mapCheck);
+		}
+
+		for (auto& p : passives_) {
+			p->OnUpdate(weapon_.get(), subWeapon_.get());
 		}
 
 		// アイテム取得
@@ -252,6 +269,12 @@ void Player::Draw(Camera* camera) {
 		}
 	}
 
+	for (int i = 0; i < 3; ++i) {
+		if (usePassive_[i]) {
+			render.DrawSprite(sprites_[i].get());
+		}
+	}
+
 	// パーティクル
 	render.DrawParticle(moveParticle_.get(), BlendMode::Add);
 
@@ -261,6 +284,34 @@ void Player::Draw(Camera* camera) {
 	ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", transform_.rotate.x, transform_.rotate.y, transform_.rotate.z);
 	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", transform_.scale.x, transform_.scale.y, transform_.scale.z);
 	ImGui::Text("HP: %f", hp_);
+	
+	if (ImGui::Checkbox("counter", &usePassive_[0])) {
+		if (usePassive_[0]) {
+			passives_.push_back(std::make_unique<Counter>(sprites_[0].get()));
+		} else {
+			std::erase_if(passives_, [](const auto& passive) {
+				return dynamic_cast<Counter*>(passive.get()) != nullptr;
+				});
+		}
+	}
+	if (ImGui::Checkbox("reload", &usePassive_[1])) {
+		if (usePassive_[1]) {
+			passives_.push_back(std::make_unique<ReloadBoost>(sprites_[1].get()));
+		} else {
+			std::erase_if(passives_, [](const auto& passive) {
+				return dynamic_cast<ReloadBoost*>(passive.get()) != nullptr;
+				});
+		}
+	}
+	if (ImGui::Checkbox("pursuit", &usePassive_[2])) {
+		if (usePassive_[2]) {
+			passives_.push_back(std::make_unique<Lightning>(sprites_[2].get()));
+		} else {
+			std::erase_if(passives_, [](const auto& passive) {
+				return dynamic_cast<Lightning*>(passive.get()) != nullptr;
+				});
+		}
+	}
 	ImGui::End();
 #endif
 }
@@ -289,6 +340,18 @@ void Player::Hit(float damage, const Vector2& from) {
 			// 被ダメージ時の位置を記憶
 			landPos_ = transform_.translate;
 		}
+	}
+}
+
+void Player::OnHit(const Vector2& from, BulletManager* bulletManager) {
+	for (auto& p : passives_) {
+		p->OnHit(from, bulletManager, this);
+	}
+}
+
+void Player::OnDealDamage(const Vector2& pos, EnemyManager* enemyManager) {
+	for (auto& p : passives_) {
+		p->OnDealDamage(pos, enemyManager);
 	}
 }
 
