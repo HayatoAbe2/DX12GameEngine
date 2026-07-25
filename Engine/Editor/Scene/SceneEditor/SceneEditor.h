@@ -5,6 +5,7 @@
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include <Externals/nlohmann/json.hpp>
 #ifdef USE_IMGUI
+#include "imgui_stdlib.h"
 #include "GizmoCtx.h"
 #endif
 
@@ -53,5 +54,7 @@ private:
 
 	bool undoRequest_ = false;
 	bool redoRequest_ = false;
+
+	int addInstanceNum_ = 1;
 };
 

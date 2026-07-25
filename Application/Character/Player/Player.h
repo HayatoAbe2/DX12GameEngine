@@ -4,6 +4,7 @@
 #include "Timer/Timer.h"
 #include "Character/Character.h"
 #include "Item/Passive/Passive.h"
+#include "Wallet/Wallet.h"
 
 class Camera;
 class MapCheck;
@@ -15,23 +16,11 @@ class Player : public Character{
 public:
 	~Player();
 
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	/// <param name="playerModel">モデル</param>
-	void Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Model> playerShadow);
-
-	/// <summary>
-	/// 更新
-	/// </summary>
-	/// <param name="context">コンテキスト</param>
-	void Update(MapCheck* mapCheck, ItemManager* itemManager_, Camera* camera, BulletManager* bulletManager);
-
-	/// <summary>
-	/// 描画
-	/// </summary>
-	/// <param name="context">コンテキスト</param>
-	/// <param name="camera">カメラ</param>
+	// 初期化
+	void Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Model> playerShadow, ItemManager* itemManager);
+	// 更新
+	void Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager);
+	// 描画
 	void Draw(Camera* camera);
 
 	// 被弾
@@ -53,13 +42,13 @@ public:
 	Weapon* GetSubWeapon() { return subWeapon_.get(); }
 	float GetHP() { return hp_; }
 	float GetMaxHP() { return maxHp_; }
+	Wallet& GetWallet() { return wallet_; }
 	bool IsBoosting() { return isUsingBoost_; }
 	bool IsInvincible() { return isUsingBoost_ || invincibleTimer_->IsActive(); }
 
 	Transform GetTransform() const override { return transform_; }
 	Vector3 GetPrePos() const override { return prePos_; }
 	void SetTransform(const Transform& transform) { transform_ = transform; }
-	std::unique_ptr<Weapon> DropWeapon() { if (weapon_ && subWeapon_) { return std::move(weapon_); } else { return nullptr; } };
 	void SetWeapon(std::unique_ptr<Weapon> weapon);
 	bool IsDead() { return hp_ <= 0; }
 
@@ -146,5 +135,10 @@ private:
 	std::vector<std::unique_ptr<Sprite>> sprites_;
 
 	bool usePassive_[3];
+
+	// 所持金
+	Wallet wallet_;
+
+	ItemManager* itemManager_ = nullptr;
 };
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "GameCommon.h"
-#include "Item.h"
+#include "Item/World/WorldWeapon/WorldWeapon.h"
+#include "Item/World/WorldPassive/WorldPassive.h"
+#include "Item/World/WorldMoney/WorldMoney.h"
 #include "Rarity.h"
 
 class Player;
@@ -11,19 +13,35 @@ class ItemManager {
 public:
 	void Initialize(WeaponManager* weaponManager);
 	void Update(Player* player);
-	void Draw(Camera* camera);
+	void Draw();
+
+	// 近くのアイテムにインタラクト
 	void Interact(Player* player);
-	void Spawn(Vector3 pos,int index,Rarity rarity);
+
+	// 新しく出現させる
+	void SpawnWeapon(Vector3 pos,int index,Rarity rarity);
+	void SpawnMoney(Vector3 pos,int amount);
+
+	// 持っていたものを落とす
 	void Drop(Vector3 pos,std::unique_ptr<Weapon> weapon);
-	void SpawnAndDrop(Vector3 pos, int index);
+
+	// 配置リセット
 	void Reset();
+
+	// 次フレームに配置(描画段階での生成をしないため)
+	void SetSpawn(Vector3 pos, int index);
+
+	// シーンを見て配置
 	void Load();
 	
 private:
 	std::unique_ptr<Sprite> controlKey_ = nullptr;
 	std::unique_ptr<Sprite> controlPad_ = nullptr;
 	WeaponManager* weaponManager_ = nullptr;
-	std::vector<std::unique_ptr<Item>> items_;
+
+	// 落ちているアイテム
+	std::vector<std::unique_ptr<WorldItem>> items_;
+
 	bool canInteract_ = true;
 
 	std::vector<bool> spawned_;

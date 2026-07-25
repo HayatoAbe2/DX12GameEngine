@@ -19,7 +19,9 @@ Player::~Player() {
 
 }
 
-void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Model> playerShadow) {
+void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Model> playerShadow, ItemManager* itemManager) {
+	itemManager_ = itemManager;
+	
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
@@ -78,7 +80,7 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	}
 }
 
-void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera, BulletManager* bulletManager) {
+void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
@@ -131,7 +133,7 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 
 		// アイテム取得
 		if (input.keyboard.IsRelease(DIK_F) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) {
-			itemManager->Interact(this);
+			itemManager_->Interact(this);
 		}
 
 		// 攻撃の向き
@@ -163,13 +165,13 @@ void Player::Update(MapCheck* mapCheck, ItemManager* itemManager, Camera* camera
 		}
 
 		if (weapon_) {
-			weapon_->Update(transform_.translate, bulletManager, this);
+			weapon_->Update(transform_.translate, attackDirection_, bulletManager, this);
 
 			if (subWeapon_) {
-				subWeapon_->Update(transform_.translate, bulletManager, this);
+				subWeapon_->Update(transform_.translate, attackDirection_, bulletManager, this);
 
 				// 入れ替え
-				if ((input.keyboard.IsTrigger(DIK_TAB) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_B))) {
+				if ((input.keyboard.IsTrigger(DIK_TAB) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_B)) && weapon_->CanChange()) {
 					weapon_.swap(subWeapon_);
 				}
 			}
@@ -252,12 +254,12 @@ void Player::Draw(Camera* camera) {
 		shadowTransform = weaponTransform_;
 		shadowTransform.scale.y = 0.0f;
 		shadowTransform.translate.y = 0.01f;
-		weapon_->GetWeaponShadowModel()->SetTransform(shadowTransform);
-		render.DrawModel(weapon_->GetWeaponShadowModel());
+		weapon_->GetShadowModel()->SetTransform(shadowTransform);
+		render.DrawModel(weapon_->GetShadowModel());
 
 		// 武器描画
-		weapon_->GetWeaponModel()->SetTransform(weaponTransform_);
-		render.DrawModel(weapon_->GetWeaponModel());
+		weapon_->GetModel()->SetTransform(weaponTransform_);
+		render.DrawModel(weapon_->GetModel());
 
 		// 照準方向
 		direction_->SetTransform(weaponTransform_);
@@ -535,10 +537,17 @@ void Player::Stun(MapCheck* mapCheck) {
 }
 
 void Player::SetWeapon(std::unique_ptr<Weapon> weapon) {
+	// サブ武器に装備
 	if (weapon_ && subWeapon_ == nullptr) {
 		subWeapon_ = std::move(weapon);
 		return;
 	}
 
+	// 両方持っているなら交換
+	if (weapon_ && subWeapon_) {
+		itemManager_->Drop(transform_.translate, std::move(weapon_)); 
+	}
+
+	// 装備
 	weapon_ = std::move(weapon);
 }

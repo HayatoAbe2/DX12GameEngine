@@ -107,7 +107,24 @@ void SceneEditor::Draw(Camera* camera) {
 
 		// アセットブラウザ
 		ImGui::Begin("Asset Brouser");
+		const char* items[]
+		{
+			"Human",
+			"Floor",
+		};
+		ImGui::Combo(
+			"Model",
+			&selectedAssetIndex_,
+			items,
+			IM_ARRAYSIZE(items));
 
+		ImGui::InputInt("numInstance", &addInstanceNum_);
+
+		if (ImGui::Button("Add")) {
+			auto& asset = GameContext::GetInstance().Asset();
+			PushUndo();
+			scene_->AddObject(asset.LoadInstancedModel(selectedAssetDir_[selectedAssetIndex_], selectedAssetPath_[selectedAssetIndex_], addInstanceNum_));
+		}
 		ImGui::End();
 
 		// ギズモ
@@ -260,6 +277,8 @@ void SceneEditor::Draw(Camera* camera) {
 void SceneEditor::DrawInspector(SceneObject* object) {
 #ifdef USE_IMGUI
 	auto& input = GameContext::GetInstance().Input();
+
+	ImGui::InputText("tag", &object->tag);
 
 	// トランスフォーム等
 	if (ImGui::CollapsingHeader("Transform") && !ImGuizmo::IsUsing()) {

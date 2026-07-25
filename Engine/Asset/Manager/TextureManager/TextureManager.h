@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include "externals/DirectXTex/DirectXTex.h"
+#include <assimp/texture.h>
 
 class DirectXContext;
 class Logger;
@@ -16,11 +17,11 @@ public:
 	TextureManager(DirectXContext* dxContext, Logger* logger);
 	
 	std::shared_ptr<Texture> Load(const std::string& texturePath, uint32_t id);
-	void CreateTextureSRV(const std::shared_ptr<Texture>& texture);
+	void CreateTextureSRV(const std::shared_ptr<Texture>& texture, const aiTexture* tex = nullptr);
 
 private:
 	// 関数内で使う関数
-	DirectX::ScratchImage LoadFile(const std::string& filePath);
+	DirectX::ScratchImage LoadFile(const std::string& filePath, const aiTexture* tex);
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const Microsoft::WRL::ComPtr<ID3D12Device>& device, const DirectX::TexMetadata& metadata);
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
 

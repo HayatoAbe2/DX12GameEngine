@@ -2,8 +2,6 @@
 #include "Character/Player/Player.h"
 #include "Weapon/WeaponManager.h"
 #include "Weapon/Weapon.h"
-#include <fstream>
-#include <sstream>
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include "Engine/SceneObject/SceneObject.h"
 
@@ -22,6 +20,8 @@ void ItemManager::Initialize(WeaponManager* weaponManager) {
 	controlPad_->SetSize({ 64,64 });
 	controlPad_->SetPosition({ 640 - 32,720 - 460 });
 	controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
+
+	SpawnMoney({ 5,0.5f,5 }, 3);
 }
 
 void ItemManager::Update(Player* player) {
@@ -31,20 +31,21 @@ void ItemManager::Update(Player* player) {
 		nextSpawnIndex_ = -1;
 	}
 
+	// 削除
 	items_.erase(
 		std::remove_if(items_.begin(), items_.end(),
-			[](const std::unique_ptr<Item>& item) {
+			[](const std::unique_ptr<WorldItem>& item) {
 				return item->IsDead();
 			}
 		),
 		items_.end()
 	);
 
-	// 最短のアイテムを探す
+	// 最短距離にあるアイテムを探す
 	int closestIndex = -1;
 	float closestDistance = FLT_MAX;
 	for (auto& item : items_) {
-		float distance = Length(item->GetTransform().translate - player->GetTransform().translate);
+		float distance = Length(item->GetPosition() - ToXZ(player->GetTransform().translate));
 		if (distance < closestDistance && distance < 2.0f) {
 			closestDistance = distance;
 			closestIndex = int(&item - &items_[0]);
@@ -53,20 +54,30 @@ void ItemManager::Update(Player* player) {
 
 	// 取得範囲内
 	if (player->GetInteractRadius() >= closestDistance) {
-		canInteract_ = true;
+		// 自動取得
+		if (items_[closestIndex]->CanAutoGet()) {
+			// アイテム毎の取得処理
+			items_[closestIndex]->OnPickup(player);
+		}
+		
+		// インタラクト可能
+		if (items_[closestIndex]->CanInteract()) {
+			canInteract_ = true;
+		}
 	} else {
 		canInteract_ = false;
 	}
 }
 
-void ItemManager::Draw(Camera* camera) {
+void ItemManager::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& input = ctx.Input();
 	auto& render = ctx.Render();
 
-	for (const auto& item : items_) {
-		item->Draw(camera);
+	for (const auto& i : items_) {
+		i->Draw();
 	}
+
 
 	if (canInteract_ && !ctx.Scene().GetCurrentScene()->IsEditMode()) {
 		if (input.gamepad.IsConnected()) {
@@ -92,7 +103,9 @@ void ItemManager::Interact(Player* player) {
 	int closestIndex = -1;
 	float closestDistance = FLT_MAX;
 	for (auto& item : items_) {
-		float distance = Length(item->GetTransform().translate - player->GetTransform().translate);
+		if (!item->CanInteract()) { continue; }
+
+		float distance = Length(item->GetPosition() - ToXZ(player->GetTransform().translate));
 		if (distance < closestDistance && distance < 2.0f) {
 			closestDistance = distance;
 			closestIndex = int(&item - &items_[0]);
@@ -101,34 +114,39 @@ void ItemManager::Interact(Player* player) {
 
 	// 取得範囲内なら取る
 	if (player->GetInteractRadius() >= closestDistance) {
-		Drop(player->GetTransform().translate, player->DropWeapon());
-		player->SetWeapon(std::move(items_[closestIndex]->GetWeapon()));
-		items_[closestIndex]->Erase();
+		// アイテム毎の取得処理
+		items_[closestIndex]->OnPickup(player);
 	}
 }
 
-void ItemManager::Spawn(Vector3 pos, int index, Rarity rarity) {
+void ItemManager::SpawnWeapon(Vector3 pos, int index, Rarity rarity) {
 	// 設置する
 	auto weapon = std::move(weaponManager_->GetWeapon(index, rarity));
-	auto newItem = std::make_unique<Item>(std::move(weapon), pos, rarity);
+	auto newItem = std::make_unique<WorldWeapon>(std::move(weapon), pos, rarity);
 	items_.push_back(std::move(newItem));
 }
 
+void ItemManager::SpawnMoney(Vector3 pos, int amount) {
+	auto money = std::make_unique<WorldMoney>(pos, amount);
+	items_.push_back(std::move(money));
+}
+
 void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
-	// アイテムを落とす
+	// 武器を落とす
 	if (weapon) {
-		auto newItem = std::make_unique<Item>(std::move(weapon), pos + Vector3{0,0.5f,0}, weapon->GetData().rarity);
+		pos.y = 0.5f;
+		auto newItem = std::make_unique<WorldWeapon>(std::move(weapon), pos, weapon->GetData().rarity);
 		items_.push_back(std::move(newItem));
 	}
 }
 
-void ItemManager::SpawnAndDrop(Vector3 pos, int index) {
+void ItemManager::SetSpawn(Vector3 pos, int index) {
 	nextSpawnPos_ = pos;
 	nextSpawnIndex_ = index;
 }
 
 void ItemManager::Reset() {
-	items_.clear();
+	//weapons_.clear();
 	spawned_.clear();
 }
 
@@ -155,7 +173,7 @@ void ItemManager::Load() {
 				
 				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
 				if (!spawned_[i]) {
-					Spawn(pos, -1, Common);
+					SpawnWeapon(pos, -1, Common);
 					spawned_[i] = true;
 				}
 			}

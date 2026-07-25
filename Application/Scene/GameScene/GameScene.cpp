@@ -105,7 +105,7 @@ void GameScene::Initialize() {
 
 	// プレイヤー
 	player_ = std::make_unique<Player>();
-	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_));
+	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_), itemManager_.get());
 	player_->SetWeapon(weaponManager_->GetWeapon(0));
 
 	// 敵
@@ -163,7 +163,7 @@ void GameScene::Update() {
 			} else {
 				// プレイヤー処理
 				if (!isFadeOut_) {
-					player_->Update(mapCheck_.get(), itemManager_.get(), camera_.get(), bulletManager_.get());
+					player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
 				}
 
 				// ゲームオーバー
@@ -363,11 +363,11 @@ void GameScene::Draw() {
 	player_->Draw(camera_.get());
 	enemyManager_->Draw();
 	bulletManager_->Draw(camera_.get());
-	itemManager_->Draw(camera_.get());
+	itemManager_->Draw();
 	effectManager_->Draw(camera_.get());
 	
-	gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
-	render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
+	//gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
+	//render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
 
 	// ui
 	if (!enableEditMode_) {
@@ -389,34 +389,34 @@ void GameScene::Draw() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Weapon");
 	if (ImGui::Button("Pistol")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 0);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
 	};
 	if (ImGui::Button("AssaultRifle")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 1);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 1);
 	};
 	if (ImGui::Button("Shotgun")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 2);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 2);
 	};
 	if (ImGui::Button("Flame")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 3);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 3);
 	};
 	if (ImGui::Button("Wave")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 4);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 4);
 	};
 	if (ImGui::Button("Orbit")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 5);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 5);
 	};
 	if (ImGui::Button("Charge")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 6);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 6);
 	};
 	if (ImGui::Button("Accel")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 7);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 7);
 	};
 	if (ImGui::Button("Sniper")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 8);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 8);
 	};
 	if (ImGui::Button("Burst")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 9);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 9);
 	};
 	ImGui::End();
 

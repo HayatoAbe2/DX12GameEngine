@@ -35,7 +35,9 @@ void ImGuiManager::Initialize([[maybe_unused]] HWND* hwnd, [[maybe_unused]] ID3D
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.Fonts->AddFontFromFileTTF("Resources/Debug/Font/BIZ-UDGothicB.ttc", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
 	ImGui_ImplWin32_Init(*hwnd);
 
 	ImGui_ImplDX12_InitInfo initInfo = {};

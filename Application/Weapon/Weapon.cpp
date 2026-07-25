@@ -24,13 +24,15 @@ float Weapon::Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bul
 	if (data_.traits.charge) {
 		data_.traits.charge->currentTime += ctx.GetDeltatime();
 		data_.traits.charge->currentTime = (std::min)(data_.traits.charge->currentTime, data_.traits.charge->time);
+		data_.traits.charge->charging = true;
+		canChange_ = false;
 		return 0;
 	}
 
 	return Fire(pos, dir, bulletManager, from);
 }
 
-void Weapon::Update(const Vector3& pos, BulletManager* bulletManager, Character* from) {
+void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from) {
 	reloadStartTimer_.Update();
 	if (reloadStartTimer_.IsFinished()) {
 		float deltatime = GameContext::GetInstance().GetDeltatime();
@@ -50,7 +52,13 @@ void Weapon::Update(const Vector3& pos, BulletManager* bulletManager, Character*
 		}
 	}
 
-
+	if (data_.traits.charge) {
+		// 長押しをやめたら発射
+		if (!data_.traits.charge->charging && data_.traits.charge->time > 0) {
+			Fire(pos, dir, bulletManager, from);
+			canChange_ = true;
+		}
+	}
 }
 
 float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from) {
@@ -65,11 +73,14 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 		current++;
 		data_.traits.burst->dir = dir;
 
-		// 追加射撃の予約
 		if (current < maxCount) {
+			// 追加射撃の予約
 			data_.traits.burst->timer.Start(data_.traits.burst->interval);
+			canChange_ = false;
 		} else {
+			// 終了
 			current = 0;
+			canChange_ = true;
 		}
 	}
 

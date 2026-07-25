@@ -1,5 +1,4 @@
 #pragma once
-#include "GameCommon.h"
 #include "UI/Equipment/EquipmentUI.h"
 
 class Player;
