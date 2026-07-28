@@ -15,6 +15,8 @@ public:
 	// 取得されたとき
 	virtual void OnPickup(Player* player) = 0;
 
+	void MoveToPlayer(Vector2 pos);
+
 	Vector2 GetPosition() { return position_; }
 	bool CanInteract() { return canInteract_; }
 	bool CanAutoGet() { return canAutoGet_; }
@@ -57,5 +59,7 @@ protected:
 
 	float valueRangeMin_ = 0.85f;
 	float valueRangeMax_ = 1.15f;
+
+	float moveSpeed_ = 0.3f;
 };
 

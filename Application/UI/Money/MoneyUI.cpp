@@ -22,7 +22,7 @@ MoneyUI::MoneyUI(Wallet& wallet) : wallet_(wallet) {
     moneyEase_.current = wallet_.GetCurrentMoney();
 }
 
-void MoneyUI::Shake(Vector2 drawPos) {
+void MoneyUI::Shake(Vector2& drawPos) {
     // 所持金不足時の揺れタイマー
     if (shake_.timer.IsActive()) {
         shake_.timer.Update();

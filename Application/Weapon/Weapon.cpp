@@ -32,7 +32,7 @@ float Weapon::Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bul
 	return Fire(pos, dir, bulletManager, from);
 }
 
-void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from) {
+void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from, bool isPress) {
 	reloadStartTimer_.Update();
 	if (reloadStartTimer_.IsFinished()) {
 		float deltatime = GameContext::GetInstance().GetDeltatime();
@@ -46,16 +46,21 @@ void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulle
 		auto& timer = data_.traits.burst->timer;
 		timer.Update();
 
-		if (timer.IsFinished() && current < maxCount) {
+		if (timer.IsFinished() && current > 0 && current < maxCount) {
 			// 方向は一度目のもので固定
 			Fire(pos, data_.traits.burst->dir, bulletManager, from);
 		}
 	}
 
 	if (data_.traits.charge) {
-		// 長押しをやめたら発射
-		if (!data_.traits.charge->charging && data_.traits.charge->time > 0) {
-			Fire(pos, dir, bulletManager, from);
+
+		if (!isPress && data_.traits.charge->charging) {
+			data_.traits.charge->charging = false;
+		}
+		// チャージしていて離したら1回だけ発射 
+		if (!data_.traits.charge->charging && data_.traits.charge->currentTime > 0.0f) {
+			Fire(pos, dir, bulletManager, from); 
+			data_.traits.charge->currentTime = 0.0f; 
 			canChange_ = true;
 		}
 	}
@@ -84,6 +89,11 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 		}
 	}
 
+	if (data_.traits.charge) {
+		data_.bullet.radius += charge_;
+		data_.bullet.damage += charge_ * 3.0f;
+	}
+
 	// 複数弾
 	if (data_.traits.multiShot && data_.traits.multiShot->count > 1) {
 		int count = data_.traits.multiShot->count;
@@ -94,13 +104,13 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 			// 角度の間隔
 			float step = maxAngle / float(count - 1);
 
-			for (int i = 0; i <= count; ++i) {
+			for (int i = 0; i < count; ++i) {
 				float angle = -maxAngle * 0.5f + step * i;
 				float cos = std::cos(angle);
 				float sin = std::sin(angle);
 				Vector2 rotatedDir{
 					dir.x * cos - dir.y * sin,
-					dir.y * sin + dir.y * cos
+					dir.x * sin + dir.y * cos
 				};
 
 				// 弾生成

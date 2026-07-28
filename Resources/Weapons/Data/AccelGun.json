@@ -18,7 +18,7 @@
             "traits":{
                 "move":{
                     "accel":{
-                        "rate": 0.05
+                        "rate": 1.05
                     }
                 }
             }

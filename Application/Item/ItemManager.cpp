@@ -20,11 +20,9 @@ void ItemManager::Initialize(WeaponManager* weaponManager) {
 	controlPad_->SetSize({ 64,64 });
 	controlPad_->SetPosition({ 640 - 32,720 - 460 });
 	controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
-
-	SpawnMoney({ 5,0.5f,5 }, 3);
 }
 
-void ItemManager::Update(Player* player) {
+void ItemManager::Update(Player* player, bool isCombat) {
 	// 配置予約があれば出現
 	if (nextSpawnIndex_ > 0) {
 		Drop(nextSpawnPos_, weaponManager_->GetWeapon(nextSpawnIndex_));
@@ -40,6 +38,13 @@ void ItemManager::Update(Player* player) {
 		),
 		items_.end()
 	);
+
+	for (auto& i : items_) {
+		i->Update();
+		if (i->CanAutoGet() && !isCombat) {
+			i->MoveToPlayer(ToXZ(player->GetTransform().translate));
+		}
+	}
 
 	// 最短距離にあるアイテムを探す
 	int closestIndex = -1;
@@ -126,6 +131,7 @@ void ItemManager::SpawnWeapon(Vector3 pos, int index, Rarity rarity, bool isForS
 }
 
 void ItemManager::SpawnMoney(Vector3 pos, int amount) {
+	pos.y = 0.5f;
 	auto money = std::make_unique<WorldMoney>(pos, amount);
 	items_.push_back(std::move(money));
 }
@@ -145,7 +151,7 @@ void ItemManager::SetSpawn(Vector3 pos, int index) {
 }
 
 void ItemManager::Reset() {
-	//items_.clear();
+	items_.clear();
 	spawned_.clear();
 	spawnedSale_.clear();
 }

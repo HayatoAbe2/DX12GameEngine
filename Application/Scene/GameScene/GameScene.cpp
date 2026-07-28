@@ -209,7 +209,7 @@ void GameScene::Update() {
 				}
 
 				// アイテム
-				itemManager_->Update(player_.get());
+				itemManager_->Update(player_.get(), enemyManager_->GetEnemies().size() != 0);
 
 				// マップ
 				mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
@@ -297,8 +297,8 @@ void GameScene::Update() {
 					fadeTimer_ = 0;
 
 					// 次のフロア
-					currentFloor_++;
-					Reset();
+					//currentFloor_++;
+					//Reset();
 				}
 			} else if (isFadeOut_) {
 				fadeTimer_++;
@@ -311,7 +311,6 @@ void GameScene::Update() {
 						return;
 					}
 				}
-
 			}
 		}
 	}
@@ -343,7 +342,7 @@ void GameScene::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 	if (isShowResult_) {
-		render.SetPostEffectType(PostEffectType::Grayscale);
+		//render.SetPostEffectType(PostEffectType::Grayscale);
 	} else {
 		render.SetPostEffectType(PostEffectType::Outline);
 	}

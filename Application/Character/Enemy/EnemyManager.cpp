@@ -27,7 +27,7 @@ void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bul
 		std::remove_if(activeEnemies_.begin(), activeEnemies_.end(),
 			[&](const std::unique_ptr<Enemy>& enemy) {
 				if (enemy->IsDead()) {
-					itemManager->SpawnMoney(enemy->GetTransform().translate, 5);
+					itemManager->SpawnMoney(enemy->GetTransform().translate, 15);
 					return true;
 				}
 				return false;

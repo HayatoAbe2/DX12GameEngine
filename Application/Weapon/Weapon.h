@@ -13,7 +13,7 @@ public:
 	~Weapon() = default;
 
 	float Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
-	void Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
+	void Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from, bool isPress = false);
 
 	Model* GetModel() { return model_.get(); }
 	Model* GetShadowModel() { return shadowModel_.get(); }

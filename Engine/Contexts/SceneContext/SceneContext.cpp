@@ -16,5 +16,6 @@ BaseScene* SceneContext::GetCurrentScene() {
 }
 
 void SceneContext::SceneLoad(const std::string& path) {
+	sceneEditor_->scene_ = sceneManager_->GetCurrentScene();
 	sceneEditor_->Load(path);
 }

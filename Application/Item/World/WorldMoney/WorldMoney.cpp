@@ -12,9 +12,15 @@ WorldMoney::WorldMoney(Vector3 pos, int amount) :
 	auto& asset = ctx.Asset();
 	model_ = asset.LoadModel("Resources/Items", "Coin.obj");
 	model_->SetTranslate(pos);
+	for (auto& mat : model_->GetMaterials()) {
+		auto data = mat->GetData();
+		data.color = { 0.8f,0.8f,0,1 };
+		mat->SetData(data);
+	}
 }
 
 void WorldMoney::Update() {
+	model_->SetTranslate({ position_.x, 0.5f, position_.y });
 	model_->SetRotate(model_->GetTransform().rotate + Vector3(0, 0.05f, 0));
 }
 

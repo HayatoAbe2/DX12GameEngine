@@ -37,17 +37,19 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	transform_.translate.z = 1;
 
 	// 残像
-	instancing_ = asset.LoadInstancedModel("Resources/Debug/human", "walk.gltf", 2);
-	MaterialData data = instancing_->GetMaterial(0)->GetData();
-	data.color = { 0.3f,0.3f,1,0.2f };
-	data.enableLighting = false;
-	instancing_->GetMaterial(0)->SetData(data);
+	for (int i = 0; i < 2; ++i) {
+		instancing_[i] = asset.LoadModel("Resources/Debug/human", "walk.gltf");
+		MaterialData data = instancing_[i]->GetMaterial(0)->GetData();
+		data.color = { 0.7f,0.7f,1,0.7f };
+		data.enableLighting = false;
+		instancing_[i]->GetMaterial(0)->SetData(data);
+	}
 
 	// 方向線
 	direction_ = asset.LoadModel("Resources/Direction", "Direction.obj");
 	auto dData = direction_->GetMaterial(0)->GetData();
 	dData.color = { 1,0,0,dirDisplayAlpha_ };
-	direction_->GetMaterial(0)->SetData(data);
+	direction_->GetMaterial(0)->SetData(dData);
 
 	// 移動時パーティクル
 	moveParticle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), moveParticleNum_);
@@ -165,7 +167,13 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 		}
 
 		if (weapon_) {
-			weapon_->Update(transform_.translate, attackDirection_, bulletManager, this);
+
+
+			if (input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > 0.2f) {
+				weapon_->Update(transform_.translate, attackDirection_, bulletManager, this, true);
+			} else {
+				weapon_->Update(transform_.translate, attackDirection_, bulletManager, this, false);
+			}
 
 			if (subWeapon_) {
 				subWeapon_->Update(transform_.translate, attackDirection_, bulletManager, this);
@@ -216,8 +224,10 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	instancingTransforms[1] = instancingTransforms[0];
 	instancingTransforms[0] = transform_;
 
+	instancing_[0]->SetTransform(instancingTransforms[1]);
+	instancing_[1]->SetTransform(instancingTransforms[2]);
 	for (int i = 0; i < 2; ++i) {
-		instancing_->SetTransforms(i, instancingTransforms[i]);
+		instancing_[i]->Update();
 	}
 }
 
@@ -239,11 +249,8 @@ void Player::Draw(Camera* camera) {
 
 	if (isUsingBoost_) {
 		for (int i = 0; i < 2; ++i) {
-			MaterialData matD = instancing_->GetMaterial(i)->GetData();
-			matD.color = Vector4{ 1,1,1,(i + 1) * 0.3f };
-			instancing_->GetMaterial(i)->SetData(matD);
+			render.DrawModel(instancing_[i].get());
 		}
-		render.DrawInstancedModel(instancing_.get());
 	}
 
 	model_->SetTransform(transform_);

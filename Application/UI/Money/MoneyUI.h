@@ -16,7 +16,7 @@ public:
 	void Draw();
 
 private:
-	void Shake(Vector2 drawPos);
+	void Shake(Vector2& drawPos);
 	void Ease();
 
 	Vector2 pos_ = {500, 20};

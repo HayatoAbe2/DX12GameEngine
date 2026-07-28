@@ -12,7 +12,7 @@ class Camera;
 class ItemManager {
 public:
 	void Initialize(WeaponManager* weaponManager);
-	void Update(Player* player);
+	void Update(Player* player, bool isCombat);
 	void Draw();
 
 	// 近くのアイテムにインタラクト

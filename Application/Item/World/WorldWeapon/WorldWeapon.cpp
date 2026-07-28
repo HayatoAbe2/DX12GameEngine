@@ -23,6 +23,7 @@ std::unique_ptr<Weapon> WorldWeapon::GetWeapon() {
 }
 
 void WorldWeapon::Update() {
+	weapon_->GetModel()->SetTranslate({ position_.x, 0.5f, position_.y });
 }
 
 void WorldWeapon::Draw() {
@@ -31,7 +32,7 @@ void WorldWeapon::Draw() {
 	auto& render = ctx.Render();
 
 	render.DrawModel(weapon_->GetModel());
-	render.DrawModel(weapon_->GetShadowModel());
+	//render.DrawModel(weapon_->GetShadowModel());
 }
 
 void WorldWeapon::OnPickup(Player* player) {

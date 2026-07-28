@@ -108,6 +108,11 @@ void WorldItem::Draw() {
 	}
 }
 
+void WorldItem::MoveToPlayer(Vector2 pos) {
+	position_ += Normalize(pos - position_) * moveSpeed_;
+	moveSpeed_ += 0.001f;
+}
+
 void WorldItem::Erase() {
 	auto& ctx = GameContext::GetInstance();
 	auto& light = ctx.Light();

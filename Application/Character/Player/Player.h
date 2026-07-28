@@ -80,8 +80,8 @@ private:
 	Vector2 attackDirection_ = {};
 
 	// hp
-	float hp_ = 1;
-	float maxHp_ = 1;
+	float hp_ = 150;
+	float maxHp_ = 150;
 
 	// スタン時間
 	std::unique_ptr<Timer> stunTimer_ = nullptr;
@@ -98,7 +98,7 @@ private:
 	// モデル
 	std::unique_ptr<Model> model_ = nullptr;
 	std::unique_ptr<Model> shadowModel_ = nullptr;
-	std::unique_ptr<InstancedModel> instancing_ = nullptr;
+	std::unique_ptr<Model> instancing_[2];
 	Transform instancingTransforms[4]{};
 
 	// ダッシュ
