@@ -115,9 +115,11 @@ void GameScene::Initialize() {
 	// 弾
 	bulletManager_ = std::make_unique<BulletManager>();
 
+	moneyUI_ = std::make_unique<MoneyUI>(player_->GetWallet());
+
 	// UI描画システム
 	uiDrawer_ = std::make_unique<UIDrawer>();
-	uiDrawer_->Initialize(player_.get());
+	uiDrawer_->Initialize(player_.get(), moneyUI_.get());
 
 	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,0,-cameraDistance_ };
 
@@ -144,7 +146,7 @@ void GameScene::Initialize() {
 #endif
 	isLoaded_ = false;
 
-	gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
+	//gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
 }
 
 void GameScene::Update() {
@@ -185,7 +187,7 @@ void GameScene::Update() {
 
 				// 敵
 				if (!enableEditMode_) {
-					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get());
+					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), itemManager_.get());
 					mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
 				}
 
@@ -304,22 +306,9 @@ void GameScene::Update() {
 				if (fadeTimer_ >= kMaxFadeoutTimer_) {
 					isFadeOut_ = false;
 
-					if (player_->IsDead() || currentFloor_ == 3) {
-						Reset();
-
-						if (isShowResult_) {
-							scene.SceneChange("Game");
-							return;
-						} else {
-							// ゲームオーバーまたはクリア
-							isShowResult_ = true;
-
-							fadeTimer_ = 0;
-							isFadeIn_ = true;
-						}
-					} else {
-						fadeTimer_ = 0;
-						isFadeIn_ = true;
+					if (isShowResult_) {
+						scene.SceneChange("Game");
+						return;
 					}
 				}
 
@@ -338,8 +327,8 @@ void GameScene::Update() {
 		isLoaded_ = false;
 	} else {
 		// 編集の反映,再配置
-		itemManager_->Load();
 		if (!isLoaded_) {
+			itemManager_->Load();
 			enemyManager_->Load(weaponManager_.get());
 		}
 
@@ -365,7 +354,7 @@ void GameScene::Draw() {
 	bulletManager_->Draw(camera_.get());
 	itemManager_->Draw();
 	effectManager_->Draw(camera_.get());
-	
+
 	//gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
 	//render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
 
@@ -381,7 +370,7 @@ void GameScene::Draw() {
 	}
 
 	if (!enableEditMode_) {
-		fade_->SetSize(Vector2{1280, 720} + Vector2{ 20,80 });
+		fade_->SetSize(Vector2{ 1280, 720 } + Vector2{ 20,80 });
 		render.DrawSprite(fade_.get());
 	}
 

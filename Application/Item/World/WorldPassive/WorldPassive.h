@@ -6,7 +6,7 @@
 class WorldPassive : public WorldItem {
 public:
 	// コンストラクタで所有権移転
-	WorldPassive(std::unique_ptr<Passive> passive, Vector3 pos, Rarity rarity);
+	WorldPassive(std::unique_ptr<Passive> passive, Vector3 pos, Rarity rarity, bool isForSale = false);
 
 	std::unique_ptr<Passive> GetPassiveItem();
 

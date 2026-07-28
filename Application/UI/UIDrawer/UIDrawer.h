@@ -1,11 +1,12 @@
 #pragma once
 #include "UI/Equipment/EquipmentUI.h"
+#include "UI/Money/MoneyUI.h"
 
 class Player;
 class UIDrawer {
 public:
 	// 初期化
-	void Initialize(Player* player);
+	void Initialize(Player* player, MoneyUI* moneyUI);
 	// 更新
 	void Update();
 	// 描画
@@ -46,5 +47,7 @@ private:
 	// 階数
 	std::unique_ptr<Sprite> currentFloor_ = nullptr;
 	SpriteData floorUIData_ = { {640,320}, { 212,32 } };
+
+	MoneyUI* money_ = nullptr;
 };
 

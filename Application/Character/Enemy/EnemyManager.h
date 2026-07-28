@@ -5,12 +5,13 @@
 class MapCheck;
 class Player;
 class BulletManager;
+class ItemManager;
 class WeaponManager;
 
 class EnemyManager {
 public:
 	void Initialize();
-	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager);
+	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager);
 	void Draw();
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
 	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int enemyType);

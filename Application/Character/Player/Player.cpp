@@ -13,7 +13,7 @@
 #include <Item/Passive/Counter/Counter.h>
 #include <Item/Passive/Reload/ReloadBoost.h>
 #include <Item/Passive/Lightning/Lightning.h>
-
+#include "UI/Money/MoneyUI.h"
 
 Player::~Player() {
 

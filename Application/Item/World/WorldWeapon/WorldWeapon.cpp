@@ -1,8 +1,8 @@
 #include "WorldWeapon.h"
 #include <numbers>
 
-WorldWeapon::WorldWeapon(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rarity) :
-	WorldItem(pos, rarity),
+WorldWeapon::WorldWeapon(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rarity, bool isForSale) :
+	WorldItem(pos, rarity, isForSale),
 	weapon_(std::move(weapon)) {
 
 	weapon_->GetModel()->SetTranslate(pos);
@@ -10,6 +10,11 @@ WorldWeapon::WorldWeapon(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rar
 	if (weapon_ && weapon_->GetData().name == "Spellbook") {
 	} else {
 		weapon_->GetModel()->SetRotate({ 0,float(std::numbers::pi) / 2.0f,0 });
+	}
+
+	if (isForSale_) {
+		auto& ctx = GameContext::GetInstance();
+		price_ = int(price_ * ctx.RandomFloat(valueRangeMin_, valueRangeMax_));
 	}
 }
 
@@ -21,6 +26,7 @@ void WorldWeapon::Update() {
 }
 
 void WorldWeapon::Draw() {
+	WorldItem::Draw();
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 
@@ -29,6 +35,14 @@ void WorldWeapon::Draw() {
 }
 
 void WorldWeapon::OnPickup(Player* player) {
+	if (isForSale_) {
+		Wallet& wallet = player->GetWallet();
+		if (!wallet.Pay(price_)) {
+			// 所持金不足
+			return;
+		}
+	}
+
 	// プレイヤーに持たせる
 	player->SetWeapon(this->GetWeapon());
 

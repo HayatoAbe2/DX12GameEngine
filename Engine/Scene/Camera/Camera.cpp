@@ -28,7 +28,7 @@ void Camera::Update(DebugCamera* debugCamera) {
 	}
 
 	Vector2 windowSize = ctx.GetWindowSize();
-	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, windowSize.x / windowSize.y, 0.1f, 100.0f);
+	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, windowSize.x / windowSize.y);
 }
 
 void Camera::StartShake(float amplitude, int frame) {

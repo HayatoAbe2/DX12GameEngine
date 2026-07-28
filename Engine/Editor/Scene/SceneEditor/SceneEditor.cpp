@@ -342,6 +342,7 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 			int count = model->GetNumInstance();
 			ImGui::DragInt("Instance", &editingInstance_, 1, 0, count - 1);
 
+			if (int(transforms.size()) <= editingInstance_) editingInstance_ = int(transforms.size()) - 1;
 			gizmoCtx_.editingInstance = editingInstance_;
 
 			Transform t = transforms[editingInstance_];

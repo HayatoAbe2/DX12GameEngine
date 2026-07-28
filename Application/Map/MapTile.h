@@ -8,10 +8,7 @@ public:
 	enum Tile {
 		None,
 		Floor,
-		LeftWall,
-		RightWall,
-		UpWall,
-		BottomWall,
+		Wall,
 		Goal,
 		CombatWall
 	};

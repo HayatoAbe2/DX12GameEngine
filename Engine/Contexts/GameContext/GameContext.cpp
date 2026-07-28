@@ -32,6 +32,12 @@ Vector2 GameContext::GetWindowSize() const {
 	return { float(rect.right),float(rect.bottom) };
 }
 
+Vector2 GameContext::GetRenderWindowSize() const {
+	RECT rect;
+	GetClientRect(hwnd_, &rect);
+	return { float(rect.right),float(rect.bottom) };
+}
+
 #ifdef USE_IMGUI
 bool GameContext::IsSceneWindowHovered() const {
 	return renderer_->GetSceneWindowHovered();

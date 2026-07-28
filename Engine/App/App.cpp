@@ -65,7 +65,7 @@ void App::Initialize() {
 
 	// ライト
 	lightManager_ = std::make_unique<LightManager>();
-	lightManager_->Initialize(dxContext_->GetBufferManager());
+	lightManager_->Initialize(dxContext_->GetBufferManager(), logger_.get());
 
 	// シーンマネージャー
 	sceneManager_ = std::make_unique<SceneManager>();
@@ -134,7 +134,8 @@ void App::Finalize() {
 		input_.reset();
 		logger_->Log(logger_->GetStream(), std::format("[Input] Shutdown complete.\n"));
 
-		lightManager_.reset();
+		// reset()にすると終了時落ちる。後ほど修正予定
+		lightManager_.release();
 		logger_->Log(logger_->GetStream(), std::format("[LightManager] Shutdown complete.\n"));
 
 		assetManager_.reset();

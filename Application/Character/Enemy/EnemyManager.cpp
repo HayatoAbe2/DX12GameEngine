@@ -13,19 +13,24 @@
 #include "Character/Enemy/Enemies/Spiker.h"
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include "Engine/SceneObject/SceneObject.h"
+#include "Item/ItemManager.h"
 
 void EnemyManager::Initialize() {
 }
 
-void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
+void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager) {
 	for (const auto& enemy : activeEnemies_) {
 		enemy->Update(mapCheck, player, bulletManager);
 	}
 
 	activeEnemies_.erase(
 		std::remove_if(activeEnemies_.begin(), activeEnemies_.end(),
-			[](const std::unique_ptr<Enemy>& enemy) {
-				return enemy->IsDead();
+			[&](const std::unique_ptr<Enemy>& enemy) {
+				if (enemy->IsDead()) {
+					itemManager->SpawnMoney(enemy->GetTransform().translate, 5);
+					return true;
+				}
+				return false;
 			}
 		),
 		activeEnemies_.end()
@@ -195,7 +200,7 @@ void EnemyManager::Load(WeaponManager* weaponManager) {
 				}
 			}
 		} else if (model->tag == "enemySpawnPoint") {
-			for (auto& t : model->GetTransforms()) { 
+			for (auto& t : model->GetTransforms()) {
 				if (t.scale.x != 0 ||
 					t.scale.y != 0 ||
 					t.scale.z != 0) {

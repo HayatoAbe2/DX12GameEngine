@@ -163,7 +163,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 				aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
 
 				texture->SetMtlFilePath(directoryPath + "/" + textureFilePath.C_Str());
-				if (filePath.ends_with(".FBX") || filePath.ends_with(".GLB")) {
+				if (filePath.ends_with(".fbx") || filePath.ends_with(".glb")) {
 					const aiTexture* tex = scene->GetEmbeddedTexture(textureFilePath.C_Str());
 
 					// SRVを作成

@@ -6,7 +6,7 @@
 class WorldWeapon : public WorldItem {
 public:
 	// コンストラクタで所有権移転
-	WorldWeapon(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rarity);
+	WorldWeapon(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rarity, bool isForSale = false);
 
 	std::unique_ptr<Weapon> GetWeapon();
 

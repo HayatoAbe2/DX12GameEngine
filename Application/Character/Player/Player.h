@@ -11,6 +11,7 @@ class MapCheck;
 class ItemManager;
 class BulletManager;
 class EnemyManager;
+class MoneyUI;
 
 class Player : public Character{
 public:
@@ -79,8 +80,8 @@ private:
 	Vector2 attackDirection_ = {};
 
 	// hp
-	float hp_ = 100;
-	float maxHp_ = 100;
+	float hp_ = 1;
+	float maxHp_ = 1;
 
 	// スタン時間
 	std::unique_ptr<Timer> stunTimer_ = nullptr;

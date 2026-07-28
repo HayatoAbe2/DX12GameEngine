@@ -78,7 +78,6 @@ void ItemManager::Draw() {
 		i->Draw();
 	}
 
-
 	if (canInteract_ && !ctx.Scene().GetCurrentScene()->IsEditMode()) {
 		if (input.gamepad.IsConnected()) {
 			if (input.gamepad.IsPress(XINPUT_GAMEPAD_A)) {
@@ -119,10 +118,10 @@ void ItemManager::Interact(Player* player) {
 	}
 }
 
-void ItemManager::SpawnWeapon(Vector3 pos, int index, Rarity rarity) {
+void ItemManager::SpawnWeapon(Vector3 pos, int index, Rarity rarity, bool isForSale) {
 	// 設置する
 	auto weapon = std::move(weaponManager_->GetWeapon(index, rarity));
-	auto newItem = std::make_unique<WorldWeapon>(std::move(weapon), pos, rarity);
+	auto newItem = std::make_unique<WorldWeapon>(std::move(weapon), pos, rarity, isForSale);
 	items_.push_back(std::move(newItem));
 }
 
@@ -146,13 +145,15 @@ void ItemManager::SetSpawn(Vector3 pos, int index) {
 }
 
 void ItemManager::Reset() {
-	//weapons_.clear();
+	//items_.clear();
 	spawned_.clear();
+	spawnedSale_.clear();
 }
 
 void ItemManager::Load() {
 	auto& ctx = GameContext::GetInstance();
 	auto& scene = ctx.Scene();
+	Reset();
 
 	std::vector<InstancedModel*> models;
 	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
@@ -173,8 +174,24 @@ void ItemManager::Load() {
 				
 				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
 				if (!spawned_[i]) {
-					SpawnWeapon(pos, -1, Common);
+					SpawnWeapon(pos, -1, Common, false);
 					spawned_[i] = true;
+				}
+			}
+		}
+
+		if (model->tag == "weaponForSale") {
+			int size = int(model->GetTransforms().size());
+			if (int(spawnedSale_.size()) < size) spawnedSale_.resize(size);
+
+			for (int i = 0; i < model->GetTransforms().size(); ++i) {
+				Transform t = model->GetTransforms()[i];
+				if (t.scale == Vector3{ 0,0,0 }) continue;
+
+				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+				if (!spawnedSale_[i]) {
+					SpawnWeapon(pos, -1, Common, true);
+					spawnedSale_[i] = true;
 				}
 			}
 		}

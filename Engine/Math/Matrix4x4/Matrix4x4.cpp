@@ -396,7 +396,7 @@ Matrix4x4 MakeViewProjectionMatrix(Transform cameraTransform, Vector2 windowSize
 	// カメラの変更がなければ変更する必要はない
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, windowSize.x / windowSize.y, 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, windowSize.x / windowSize.y);
 	return Multiply(viewMatrix, projectionMatrix);
 };
 

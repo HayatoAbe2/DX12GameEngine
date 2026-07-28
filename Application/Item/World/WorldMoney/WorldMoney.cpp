@@ -10,7 +10,7 @@ WorldMoney::WorldMoney(Vector3 pos, int amount) :
 	// コインのモデルはここで生成
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
-	model_ = asset.LoadModel("Resources/Debug", "suzanne.obj");
+	model_ = asset.LoadModel("Resources/Items", "Coin.obj");
 	model_->SetTranslate(pos);
 }
 

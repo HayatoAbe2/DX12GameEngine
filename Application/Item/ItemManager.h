@@ -19,7 +19,7 @@ public:
 	void Interact(Player* player);
 
 	// 新しく出現させる
-	void SpawnWeapon(Vector3 pos,int index,Rarity rarity);
+	void SpawnWeapon(Vector3 pos,int index,Rarity rarity, bool isForSale);
 	void SpawnMoney(Vector3 pos,int amount);
 
 	// 持っていたものを落とす
@@ -45,6 +45,7 @@ private:
 	bool canInteract_ = true;
 
 	std::vector<bool> spawned_;
+	std::vector<bool> spawnedSale_;
 	int nextSpawnIndex_ = -1;
 	Vector3 nextSpawnPos_{};
 };
