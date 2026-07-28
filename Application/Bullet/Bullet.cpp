@@ -19,7 +19,7 @@ Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& d
 		Vector2 offset = pos - center;
 
 		// angleを生成位置から決める
-		data_.traits.move.orbit->angle = std::atan2(offset.x, offset.y);
+		data_.traits.move.orbit->angle = std::atan2(offset.y, offset.x);
 	}
 
 	// 敵弾の色統一
@@ -153,9 +153,15 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 		float speed = data_.traits.move.wave->speed;
 		float maxAngle = data_.traits.move.wave->maxAngle * float(std::numbers::pi) / 180.0f;
 		float sinWave_ = sinf(speed * float(std::numbers::pi) * data_.traits.move.wave->time) * amplitude;
-		currentVel = ToXZ(TransformVector(Vector3(velocity_.x, 0, velocity_.y), MakeRotateYMatrix(maxAngle * sinWave_)));
+		float angle = std::sin(data_.traits.move.wave->time * data_.traits.move.wave->speed * 2.0f * float(std::numbers::pi)) * maxAngle;
+		currentVel = ToXZ(TransformVector(Vector3(velocity_.x, 0, velocity_.y), MakeRotateYMatrix(angle)));
 		collider_.center += currentVel * ctx.GetDeltatime();
 		data_.traits.move.wave->time += ctx.GetDeltatime();
+
+		if (mapCheck->IsHitWall(collider_.center, collider_.radius)) {
+			OnHitWall(effectManager);
+		}
+		return;
 	}
 
 	// 加速
@@ -164,7 +170,7 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 	}
 
 	// 反射する場合、XとZ軸を片方ずつ動かす
-	if (data_.traits.onHitWall.ricochet) {
+	if (data_.traits.onHitWall.ricochet && data_.traits.onHitWall.ricochet->current < data_.traits.onHitWall.ricochet->count) {
 		collider_.center.x += velocity_.x * ctx.GetDeltatime();
 		// 反射
 		if (mapCheck->IsHitWall(collider_.center, collider_.radius)) {
@@ -195,6 +201,11 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 
 void Bullet::OnHitWall(EffectManager* effectManager) {
 	Hit();
+
+	// 仮処理(貫通が壁で消えないため)
+	if (data_.traits.onHitEnemy.piercing) {
+		isDead_ = true;
+	}
 
 	OnHitAnything(effectManager);
 }

@@ -105,7 +105,7 @@ void GameScene::Initialize() {
 
 	// プレイヤー
 	player_ = std::make_unique<Player>();
-	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_));
+	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_), itemManager_.get());
 	player_->SetWeapon(weaponManager_->GetWeapon(0));
 
 	// 敵
@@ -115,9 +115,11 @@ void GameScene::Initialize() {
 	// 弾
 	bulletManager_ = std::make_unique<BulletManager>();
 
+	moneyUI_ = std::make_unique<MoneyUI>(player_->GetWallet());
+
 	// UI描画システム
 	uiDrawer_ = std::make_unique<UIDrawer>();
-	uiDrawer_->Initialize(player_.get());
+	uiDrawer_->Initialize(player_.get(), moneyUI_.get());
 
 	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,0,-cameraDistance_ };
 
@@ -144,7 +146,7 @@ void GameScene::Initialize() {
 #endif
 	isLoaded_ = false;
 
-	gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
+	//gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
 }
 
 void GameScene::Update() {
@@ -163,7 +165,7 @@ void GameScene::Update() {
 			} else {
 				// プレイヤー処理
 				if (!isFadeOut_) {
-					player_->Update(mapCheck_.get(), itemManager_.get(), camera_.get(), bulletManager_.get());
+					player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
 				}
 
 				// ゲームオーバー
@@ -185,7 +187,7 @@ void GameScene::Update() {
 
 				// 敵
 				if (!enableEditMode_) {
-					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get());
+					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), itemManager_.get());
 					mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
 				}
 
@@ -207,7 +209,7 @@ void GameScene::Update() {
 				}
 
 				// アイテム
-				itemManager_->Update(player_.get());
+				itemManager_->Update(player_.get(), enemyManager_->GetEnemies().size() != 0);
 
 				// マップ
 				mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
@@ -295,8 +297,8 @@ void GameScene::Update() {
 					fadeTimer_ = 0;
 
 					// 次のフロア
-					currentFloor_++;
-					Reset();
+					//currentFloor_++;
+					//Reset();
 				}
 			} else if (isFadeOut_) {
 				fadeTimer_++;
@@ -304,25 +306,11 @@ void GameScene::Update() {
 				if (fadeTimer_ >= kMaxFadeoutTimer_) {
 					isFadeOut_ = false;
 
-					if (player_->IsDead() || currentFloor_ == 3) {
-						Reset();
-
-						if (isShowResult_) {
-							scene.SceneChange("Game");
-							return;
-						} else {
-							// ゲームオーバーまたはクリア
-							isShowResult_ = true;
-
-							fadeTimer_ = 0;
-							isFadeIn_ = true;
-						}
-					} else {
-						fadeTimer_ = 0;
-						isFadeIn_ = true;
+					if (isShowResult_) {
+						scene.SceneChange("Game");
+						return;
 					}
 				}
-
 			}
 		}
 	}
@@ -338,8 +326,8 @@ void GameScene::Update() {
 		isLoaded_ = false;
 	} else {
 		// 編集の反映,再配置
-		itemManager_->Load();
 		if (!isLoaded_) {
+			itemManager_->Load();
 			enemyManager_->Load(weaponManager_.get());
 		}
 
@@ -354,7 +342,7 @@ void GameScene::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 	if (isShowResult_) {
-		render.SetPostEffectType(PostEffectType::Grayscale);
+		//render.SetPostEffectType(PostEffectType::Grayscale);
 	} else {
 		render.SetPostEffectType(PostEffectType::Outline);
 	}
@@ -363,11 +351,11 @@ void GameScene::Draw() {
 	player_->Draw(camera_.get());
 	enemyManager_->Draw();
 	bulletManager_->Draw(camera_.get());
-	itemManager_->Draw(camera_.get());
+	itemManager_->Draw();
 	effectManager_->Draw(camera_.get());
-	
-	gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
-	render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
+
+	//gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
+	//render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
 
 	// ui
 	if (!enableEditMode_) {
@@ -381,7 +369,7 @@ void GameScene::Draw() {
 	}
 
 	if (!enableEditMode_) {
-		fade_->SetSize(Vector2{1280, 720} + Vector2{ 20,80 });
+		fade_->SetSize(Vector2{ 1280, 720 } + Vector2{ 20,80 });
 		render.DrawSprite(fade_.get());
 	}
 
@@ -389,34 +377,34 @@ void GameScene::Draw() {
 #ifdef USE_IMGUI
 	ImGui::Begin("Weapon");
 	if (ImGui::Button("Pistol")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 0);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
 	};
 	if (ImGui::Button("AssaultRifle")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 1);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 1);
 	};
 	if (ImGui::Button("Shotgun")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 2);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 2);
 	};
 	if (ImGui::Button("Flame")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 3);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 3);
 	};
 	if (ImGui::Button("Wave")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 4);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 4);
 	};
 	if (ImGui::Button("Orbit")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 5);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 5);
 	};
 	if (ImGui::Button("Charge")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 6);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 6);
 	};
 	if (ImGui::Button("Accel")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 7);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 7);
 	};
 	if (ImGui::Button("Sniper")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 8);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 8);
 	};
 	if (ImGui::Button("Burst")) {
-		itemManager_->SpawnAndDrop(player_->GetTransform().translate, 9);
+		itemManager_->SetSpawn(player_->GetTransform().translate, 9);
 	};
 	ImGui::End();
 

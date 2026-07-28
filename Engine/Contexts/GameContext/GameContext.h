@@ -54,6 +54,7 @@ public:
 	///
 
 	Vector2 GetWindowSize() const;
+	Vector2 GetRenderWindowSize() const;
 
 #ifdef USE_IMGUI
 	bool IsSceneWindowHovered() const;

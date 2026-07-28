@@ -2,6 +2,7 @@
 #include <Externals/nlohmann/json.hpp>
 
 enum Rarity {
+	None,
 	Common,
 	Rare,
 	Epic,

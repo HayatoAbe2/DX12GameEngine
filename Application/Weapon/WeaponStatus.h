@@ -23,6 +23,8 @@ struct ChargeParam {
 
 	// ダメージ上昇率
 	float damage;
+
+	bool charging = false;
 };
 // バースト
 struct BurstParam {

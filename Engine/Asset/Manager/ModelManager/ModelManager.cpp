@@ -43,11 +43,13 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 
 	// assimpでモデル作成
 	Assimp::Importer importer;
+
 	// obj->DirectX12変換
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 
 	if (!scene) {
 		std::string error = importer.GetErrorString();
+		logger_->Log(logger_->GetStream(), error);
 		assert(false && "Assimp failed to load model");
 		return nullptr;
 	}
@@ -155,17 +157,25 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 			auto texture = std::make_shared<Texture>(textureId);
 
 			aiMaterial* aiMaterial = scene->mMaterials[materialIndex];
+			const aiTexture* tex = nullptr;
 			if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
 				aiString textureFilePath;
 				aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
 
 				texture->SetMtlFilePath(directoryPath + "/" + textureFilePath.C_Str());
+				if (filePath.ends_with(".fbx") || filePath.ends_with(".glb")) {
+					const aiTexture* tex = scene->GetEmbeddedTexture(textureFilePath.C_Str());
+
+					// SRVを作成
+					textureManager_->CreateTextureSRV(texture, tex);
+				} else {
+					textureManager_->CreateTextureSRV(texture);
+				}
+
 			} else {
 				texture->SetMtlFilePath("Resources/Debug/white1x1.png");
+				textureManager_->CreateTextureSRV(texture);
 			}
-
-			// SRVを作成
-			textureManager_->CreateTextureSRV(texture);
 
 			// デフォルト環境テクスチャ
 			auto environmentTexture = std::make_shared<Texture>(envTextureId);

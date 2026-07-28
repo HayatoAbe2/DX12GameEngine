@@ -3,7 +3,13 @@
 #include "Engine/Graphics/Debug/ImGuiManager/ImGuiManager.h"
 #include "Engine/Math/MathUtils.h"
 
-void LightManager::Initialize(BufferManager* bufferManager) {
+LightManager::~LightManager() {
+	spotLightsData_.clear();
+	pointLightsData_.clear();
+	lightResource_.Reset();
+}
+
+void LightManager::Initialize(BufferManager* bufferManager, Logger* logger) {
 	UINT cbSize = (sizeof(LightsForGPU) + 255) & ~255; // 256 の倍数に丸める
 	lightResource_ = bufferManager->CreateUploadBuffer(cbSize);
 	lightResource_->Map(0, nullptr, reinterpret_cast<void**>(&lightData_));

@@ -3,8 +3,9 @@
 #include "Weapon/Weapon.h"
 #include "Bullet/BulletManager.h"
 #include "Character/Enemy/EnemyManager.h"
+#include "Item/Item.h"
 
-class Passive {
+class Passive : public Item {
 public:
 	Passive();
 	~Passive() = default;

@@ -35,6 +35,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -111,6 +112,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
       <TreatWarningAsError>true</TreatWarningAsError>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <AdditionalIncludeDirectories>$(ProjectDir)externals\assimp\include;$(ProjectDir);$(ProjectDir)Engine\Scene\GameCommon;$(ProjectDir)Externals\imgui;$(ProjectDir)application</AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -180,7 +182,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Character\Enemy\Enemies\RedBat.cpp" />
     <ClCompile Include="Application\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="Application\Item\Item.cpp" />
+    <ClCompile Include="Application\Item\World\WorldItem.cpp" />
     <ClCompile Include="Application\Item\ItemManager.cpp" />
     <ClCompile Include="Application\Map\MapCheck.cpp" />
     <ClCompile Include="Application\Map\MapTile.cpp" />
@@ -229,6 +231,11 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Externals\imgui\imgui_impl_win32.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Externals\imgui\imgui_stdlib.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_tables.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -248,6 +255,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Contexts\LightContext\LightContext.cpp" />
     <ClCompile Include="Application\Effect\Hit\HitEffect.cpp" />
     <ClCompile Include="Application\Item\Passive\Lightning\Lightning.cpp" />
+    <ClCompile Include="Application\Item\Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Math\Matrix4x4\Matrix4x4.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\Model.cpp" />
@@ -275,6 +283,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Graphics\Renderer\ParticleCompute\ParticleCompute.cpp" />
     <ClCompile Include="Application\Item\Passive\Passive.cpp" />
     <ClCompile Include="Application\Item\Passive\Reload\ReloadBoost.cpp" />
+    <ClCompile Include="Application\UI\Money\MoneyUI.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -283,6 +292,11 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Character\Enemy\Enemies\Spiker.cpp" />
     <ClCompile Include="Engine\Editor\Scene\SceneEditor\SceneEditor.cpp" />
     <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
+    <ClCompile Include="Application\Item\World\WorldWeapon\WorldWeapon.cpp" />
+    <ClCompile Include="Application\Wallet\Wallet.cpp" />
+    <ClCompile Include="Application\Event\Shop\Shop.cpp" />
+    <ClCompile Include="Application\Item\World\WorldMoney\WorldMoney.cpp" />
+    <ClCompile Include="Application\Item\World\WorldPassive\WorldPassive.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Dissolve\Dissolve.PS.hlsl">
@@ -458,7 +472,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\Enemy.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyManager.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyStatus.h" />
-    <ClInclude Include="Application\Item\Item.h" />
+    <ClInclude Include="Application\Item\World\WorldItem.h" />
     <ClInclude Include="Application\Item\ItemManager.h" />
     <ClInclude Include="Application\Map\MapCheck.h" />
     <ClInclude Include="Application\Map\MapTile.h" />
@@ -516,6 +530,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Externals\imgui\imgui_impl_dx12.h" />
     <ClInclude Include="Externals\imgui\imgui_impl_win32.h" />
     <ClInclude Include="Externals\imgui\imgui_internal.h" />
+    <ClInclude Include="Externals\imgui\imgui_stdlib.h" />
     <ClInclude Include="Externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="Externals\imgui\imstb_truetype.h" />
@@ -572,6 +587,13 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Item\Passive\Passive.h" />
     <ClInclude Include="Application\Item\Passive\Reload\ReloadBoost.h" />
     <ClInclude Include="Application\Item\Passive\Lightning\Lightning.h" />
+    <ClInclude Include="Application\Item\World\WorldWeapon\WorldWeapon.h" />
+    <ClInclude Include="Application\Item\Item.h" />
+    <ClInclude Include="Application\Wallet\Wallet.h" />
+    <ClInclude Include="Application\UI\Money\MoneyUI.h" />
+    <ClInclude Include="Application\Event\Shop\Shop.h" />
+    <ClInclude Include="Application\Item\World\WorldMoney\WorldMoney.h" />
+    <ClInclude Include="Application\Item\World\WorldPassive\WorldPassive.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

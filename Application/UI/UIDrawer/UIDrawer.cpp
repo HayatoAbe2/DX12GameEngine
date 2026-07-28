@@ -1,8 +1,9 @@
 #include "UIDrawer.h"
 #include "Character/Player/Player.h"
 
-void UIDrawer::Initialize(Player* player) {
+void UIDrawer::Initialize(Player* player, MoneyUI* moneyUI) {
 	player_ = player;
+	money_ = moneyUI;
 
 	equipment_ = std::make_unique<EquipmentUI>();
 	equipment_->Initialize(player);
@@ -93,9 +94,11 @@ void UIDrawer::Draw() {
 	render.DrawSprite(lifeBack_.get());
 	render.DrawSprite(damage_.get());
 	render.DrawSprite(life_.get());
+
 #pragma endregion
 
 	equipment_->Draw();
+	money_->Draw();
 }
 
 void UIDrawer::UpdatePlayerUI() {

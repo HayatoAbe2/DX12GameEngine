@@ -51,7 +51,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			for (Transform& t : model->GetTransforms()) {
 				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
 				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
-				if (map_[y][x] != Tile::LeftWall) {
+				if (map_[y][x] != Tile::Wall) {
 					map_[y][x] = Tile::Floor;
 				}
 			}
@@ -60,7 +60,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			for (Transform& t : model->GetTransforms()) {
 				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
 				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
-				map_[y][x] = Tile::LeftWall;
+				map_[y][x] = Tile::Wall;
 			}
 		}
 		if (model->tag == "barrier") {
@@ -111,9 +111,17 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			}
 			model->GetMaterial(0)->SetData(matData);
 			model->GetMaterial(1)->SetData(matData);
+		} else if (model->tag == "weaponForSale") {
+			if (scene.GetCurrentScene()->IsEditMode()) {
+				matData.color = { 1.0f, 1.0f, 0.0f, 0.5f };
+			} else {
+				matData.color.w = 0;
+			}
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
 		} else if (model->tag == "enemySpawn") {
 			if (scene.GetCurrentScene()->IsEditMode()) {
-				matData.color = { 1.0f, 0.3f, 0.3f, 0.5f };
+				matData.color = { 0.7f, 0.3f, 0.3f, 0.5f };
 			} else {
 				matData.color.w = 0;
 			}
@@ -121,7 +129,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			model->GetMaterial(1)->SetData(matData);
 		} else if (model->tag == "enemySpawnPoint") {
 			if (scene.GetCurrentScene()->IsEditMode()) {
-				matData.color = { 0.7f, 0.7f, 0.0f, 0.5f };
+				matData.color = { 1.0f, 0.0f, 0.0f, 0.5f };
 			} else {
 				matData.color.w = 0;
 			}

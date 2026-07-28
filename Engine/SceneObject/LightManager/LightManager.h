@@ -3,11 +3,14 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <vector>
+#include "Engine/Io/Logger/Logger.h"
 
 class BufferManager;
 class LightManager {
 public:
-	void Initialize(BufferManager* bufferManager);
+	~LightManager();
+
+	void Initialize(BufferManager* bufferManager, Logger* logger);
 	
 	void Update();
 
@@ -63,6 +66,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Resource> GetLightResource() { return lightResource_; }
 
 private:
+	Logger* logger_;
 
 	// ライト全体
 	Microsoft::WRL::ComPtr<ID3D12Resource> lightResource_ = nullptr;

@@ -24,13 +24,15 @@ float Weapon::Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bul
 	if (data_.traits.charge) {
 		data_.traits.charge->currentTime += ctx.GetDeltatime();
 		data_.traits.charge->currentTime = (std::min)(data_.traits.charge->currentTime, data_.traits.charge->time);
+		data_.traits.charge->charging = true;
+		canChange_ = false;
 		return 0;
 	}
 
 	return Fire(pos, dir, bulletManager, from);
 }
 
-void Weapon::Update(const Vector3& pos, BulletManager* bulletManager, Character* from) {
+void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from, bool isPress) {
 	reloadStartTimer_.Update();
 	if (reloadStartTimer_.IsFinished()) {
 		float deltatime = GameContext::GetInstance().GetDeltatime();
@@ -44,13 +46,24 @@ void Weapon::Update(const Vector3& pos, BulletManager* bulletManager, Character*
 		auto& timer = data_.traits.burst->timer;
 		timer.Update();
 
-		if (timer.IsFinished() && current < maxCount) {
+		if (timer.IsFinished() && current > 0 && current < maxCount) {
 			// 方向は一度目のもので固定
 			Fire(pos, data_.traits.burst->dir, bulletManager, from);
 		}
 	}
 
+	if (data_.traits.charge) {
 
+		if (!isPress && data_.traits.charge->charging) {
+			data_.traits.charge->charging = false;
+		}
+		// チャージしていて離したら1回だけ発射 
+		if (!data_.traits.charge->charging && data_.traits.charge->currentTime > 0.0f) {
+			Fire(pos, dir, bulletManager, from); 
+			data_.traits.charge->currentTime = 0.0f; 
+			canChange_ = true;
+		}
+	}
 }
 
 float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from) {
@@ -65,12 +78,20 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 		current++;
 		data_.traits.burst->dir = dir;
 
-		// 追加射撃の予約
 		if (current < maxCount) {
+			// 追加射撃の予約
 			data_.traits.burst->timer.Start(data_.traits.burst->interval);
+			canChange_ = false;
 		} else {
+			// 終了
 			current = 0;
+			canChange_ = true;
 		}
+	}
+
+	if (data_.traits.charge) {
+		data_.bullet.radius += charge_;
+		data_.bullet.damage += charge_ * 3.0f;
 	}
 
 	// 複数弾
@@ -83,13 +104,13 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 			// 角度の間隔
 			float step = maxAngle / float(count - 1);
 
-			for (int i = 0; i <= count; ++i) {
+			for (int i = 0; i < count; ++i) {
 				float angle = -maxAngle * 0.5f + step * i;
 				float cos = std::cos(angle);
 				float sin = std::sin(angle);
 				Vector2 rotatedDir{
 					dir.x * cos - dir.y * sin,
-					dir.y * sin + dir.y * cos
+					dir.x * sin + dir.y * cos
 				};
 
 				// 弾生成

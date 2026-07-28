@@ -34,7 +34,7 @@ std::shared_ptr<Texture> TextureManager::Load(const std::string& texturePath, ui
 	return texture;
 }
 
-void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
+void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture, const aiTexture* tex) {
 	if (!texture->GetMtlPath().empty()) {
 
 		// テクスチャのキャッシュ
@@ -46,7 +46,7 @@ void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
 		}
 
 		// Textureリソース作成
-		DirectX::ScratchImage mipImages = LoadFile(texture->GetMtlPath());
+		DirectX::ScratchImage mipImages = LoadFile(texture->GetMtlPath(), tex);
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 		Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = CreateTextureResource(device_, metadata);
 
@@ -75,7 +75,7 @@ void TextureManager::CreateTextureSRV(const std::shared_ptr<Texture>& texture) {
 	}
 }
 
-DirectX::ScratchImage TextureManager::LoadFile(const std::string& filePath) {
+DirectX::ScratchImage TextureManager::LoadFile(const std::string& filePath, const aiTexture* tex) {
 	// ファイル読み込み
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = logger_->ConvertString(filePath);
@@ -83,6 +83,8 @@ DirectX::ScratchImage TextureManager::LoadFile(const std::string& filePath) {
 	if (filePathW.ends_with(L".dds")) {
 		// ddsファイル
 		hr = DirectX::LoadFromDDSFile(filePathW.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
+	} else if (tex) {
+		hr = DirectX::LoadFromWICMemory(reinterpret_cast<const uint8_t*>(tex->pcData), tex->mWidth, DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	} else {
 		// その他
 		hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);

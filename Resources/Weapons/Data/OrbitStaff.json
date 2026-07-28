@@ -20,6 +20,12 @@
                         "radius": 3.0,
                         "speed": 2.5
                     }
+                },
+
+                "onHitEnemy":{
+                    "piercing":{
+                        "count": 4
+                    }
                 }
             }
         },

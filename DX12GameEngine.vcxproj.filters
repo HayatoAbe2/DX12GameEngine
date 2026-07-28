@@ -213,7 +213,7 @@
     <ClCompile Include="Application\Character\Enemy\Enemies\RedBat.cpp" />
     <ClCompile Include="Application\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="Application\Item\Item.cpp" />
+    <ClCompile Include="Application\Item\World\WorldItem.cpp" />
     <ClCompile Include="Application\Item\ItemManager.cpp" />
     <ClCompile Include="Application\Map\MapCheck.cpp" />
     <ClCompile Include="Application\Map\MapTile.cpp" />
@@ -250,6 +250,14 @@
     <ClCompile Include="Application\Item\Passive\Counter\Counter.cpp" />
     <ClCompile Include="Application\Item\Passive\Reload\ReloadBoost.cpp" />
     <ClCompile Include="Application\Item\Passive\Lightning\Lightning.cpp" />
+    <ClCompile Include="Application\Item\World\WorldWeapon\WorldWeapon.cpp" />
+    <ClCompile Include="Application\Item\Item.cpp" />
+    <ClCompile Include="Application\Wallet\Wallet.cpp" />
+    <ClCompile Include="Application\UI\Money\MoneyUI.cpp" />
+    <ClCompile Include="Application\Event\Shop\Shop.cpp" />
+    <ClCompile Include="Application\Item\World\WorldMoney\WorldMoney.cpp" />
+    <ClCompile Include="Application\Item\World\WorldPassive\WorldPassive.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_stdlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -509,7 +517,7 @@
     <ClInclude Include="Application\Character\Enemy\Enemy.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyManager.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyStatus.h" />
-    <ClInclude Include="Application\Item\Item.h" />
+    <ClInclude Include="Application\Item\World\WorldItem.h" />
     <ClInclude Include="Application\Item\ItemManager.h" />
     <ClInclude Include="Application\Map\MapCheck.h" />
     <ClInclude Include="Application\Map\MapTile.h" />
@@ -561,6 +569,14 @@
     <ClInclude Include="Application\Item\Passive\Counter\Counter.h" />
     <ClInclude Include="Application\Item\Passive\Reload\ReloadBoost.h" />
     <ClInclude Include="Application\Item\Passive\Lightning\Lightning.h" />
+    <ClInclude Include="Application\Item\World\WorldWeapon\WorldWeapon.h" />
+    <ClInclude Include="Application\Item\Item.h" />
+    <ClInclude Include="Application\Wallet\Wallet.h" />
+    <ClInclude Include="Application\UI\Money\MoneyUI.h" />
+    <ClInclude Include="Application\Event\Shop\Shop.h" />
+    <ClInclude Include="Application\Item\World\WorldMoney\WorldMoney.h" />
+    <ClInclude Include="Application\Item\World\WorldPassive\WorldPassive.h" />
+    <ClInclude Include="Externals\imgui\imgui_stdlib.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

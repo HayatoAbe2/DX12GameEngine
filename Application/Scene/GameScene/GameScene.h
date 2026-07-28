@@ -100,4 +100,5 @@ private:
 	bool isLoaded_ = false;
 
 	std::unique_ptr<ParticleSystem> gpuParticle;
+	std::unique_ptr<MoneyUI> moneyUI_;
 };
