@@ -201,21 +201,20 @@ void EnemyManager::Load(WeaponManager* weaponManager) {
 			}
 		} else if (model->tag == "enemySpawnPoint") {
 			for (auto& t : model->GetTransforms()) {
-				if (t.scale.x != 0 ||
-					t.scale.y != 0 ||
-					t.scale.z != 0) {
-
-					// 出現座標追加
-					spawnPos_.push_back(ToXZ(t.translate));
-					isSpawned_.push_back(false);
-
-					// 敵No.
-					int num = ctx.RandomInt(1, 3);
-					if (num == 3) num = 5;
-
-					// 出現敵のロード
-					CreateEnemy({ t.translate.x, 0, t.translate.z }, weaponManager, num);
+				if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) {
+					continue;
 				}
+
+				// 出現座標追加
+				spawnPos_.push_back(ToXZ(t.translate));
+				isSpawned_.push_back(false);
+
+				// 敵No.
+				int num = ctx.RandomInt(1, 3);
+				if (num == 3) num = 5;
+
+				// 出現敵のロード
+				CreateEnemy({ t.translate.x, 0, t.translate.z }, weaponManager, num);
 			}
 		}
 	}

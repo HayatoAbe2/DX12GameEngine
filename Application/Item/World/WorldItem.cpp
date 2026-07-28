@@ -12,27 +12,30 @@ WorldItem::WorldItem(Vector3 pos, Rarity rarity, bool isForSale) {
 	auto& asset = ctx.Asset();
 
 	// アイテム強調ライトの追加
-	lightIndex_ = light.AddPointLight();
-	auto& pointLight = light.GetPointLight(lightIndex_);
-	pointLight.position = pos;
-	pointLight.intensity = 1.0f;
-	pointLight.radius = 3.0f;
-	switch (rarity) {
-	case static_cast<int>(Rarity::Common):
-		pointLight.color = { 0.5f,0.5f,0.5f,1.0f };
-		break;
-	case static_cast<int>(Rarity::Rare):
-		pointLight.color = { 0.1f,0.1f,0.7f,1.0f };
-		break;
-	case static_cast<int>(Rarity::Epic):
-		pointLight.color = { 0.8f,0.1f,0.8f,1.0f };
-		break;
-	case static_cast<int>(Rarity::Legendary):
-		pointLight.color = { 1.0f,0.8f,0.0f,1.0f };
-		break;
+	if (rarity_ > Rarity::None) {
+		lightIndex_ = light.AddPointLight();
+		if (lightIndex_ >= 0) {
+			auto& pointLight = light.GetPointLight(lightIndex_);
+			pointLight.position = pos;
+			pointLight.intensity = 1.0f;
+			pointLight.radius = 3.0f;
+			switch (rarity) {
+			case static_cast<int>(Rarity::Common):
+				pointLight.color = { 0.5f,0.5f,0.5f,1.0f };
+				break;
+			case static_cast<int>(Rarity::Rare):
+				pointLight.color = { 0.1f,0.1f,0.7f,1.0f };
+				break;
+			case static_cast<int>(Rarity::Epic):
+				pointLight.color = { 0.8f,0.1f,0.8f,1.0f };
+				break;
+			case static_cast<int>(Rarity::Legendary):
+				pointLight.color = { 1.0f,0.8f,0.0f,1.0f };
+				break;
+			}
+			pointLight.color = { 1.0f,0.8f,0.0f,0.5f };
+		}
 	}
-
-	pointLight.color = { 1.0f,0.8f,0.0f,0.5f };
 
 	isForSale_ = isForSale;
 	if (isForSale_) {
@@ -54,7 +57,9 @@ WorldItem::~WorldItem() {
 	auto& ctx = GameContext::GetInstance();
 	auto& light = ctx.Light();
 
-	light.RemovePointLight(lightIndex_);
+	if (rarity_ > Rarity::None && lightIndex_ >= 0) {
+		light.RemovePointLight(lightIndex_);
+	}
 }
 
 void WorldItem::Draw() {
@@ -77,7 +82,7 @@ void WorldItem::Draw() {
 		pos.y = (1.0f - ndc.y) * 0.5f * window.y;
 
 		int price = price_;
-	
+
 		// 桁数
 		int digitCount = 1;
 		int temp = price;
@@ -91,7 +96,7 @@ void WorldItem::Draw() {
 		float left = pos.x - totalWidth * 0.5f;
 
 		// アイコン
-		coinIcon_->SetPosition({left, pos.y});
+		coinIcon_->SetPosition({ left, pos.y });
 		render.DrawSprite(coinIcon_.get());
 
 		// 数字開始位置
@@ -101,7 +106,7 @@ void WorldItem::Draw() {
 			int digit = price % 10;
 			price /= 10;
 
-			numbers_[i]->SetPosition({left + numSpacing_ * (digitCount - i), pos.y});
+			numbers_[i]->SetPosition({ left + numSpacing_ * (digitCount - i), pos.y });
 			numbers_[i]->SetTextureRect(digitWidth_ * digit, 0, digitWidth_, digitWidth_);
 			render.DrawSprite(numbers_[i].get());
 		}

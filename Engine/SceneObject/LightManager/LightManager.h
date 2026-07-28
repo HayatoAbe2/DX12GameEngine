@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <vector>
+#include <array>
 #include "Engine/Io/Logger/Logger.h"
 
 class BufferManager;
@@ -35,6 +36,7 @@ public:
 
 	// ポイントライト取得(編集用)
 	PointLight& GetPointLight(int index) {
+		assert(index >= 0);
 		return pointLightsData_[index];
 	}
 	#pragma endregion
@@ -58,6 +60,7 @@ public:
 
 	// スポットライト取得(編集用)
 	SpotLight& GetSpotLight(int index) {
+		assert(index >= 0);
 		return spotLightsData_[index];
 	}
 
@@ -74,8 +77,8 @@ private:
 
 	// 各ライト
 	DirectionalLight directionalLightData_;
-	std::vector<PointLight> pointLightsData_;
-	std::vector<SpotLight> spotLightsData_;
+	std::array<PointLight, maxPointLights> pointLightsData_;
+	std::array<SpotLight, maxSpotLights> spotLightsData_;
 
 	// 空き
 	bool isPointFree[maxPointLights]{};

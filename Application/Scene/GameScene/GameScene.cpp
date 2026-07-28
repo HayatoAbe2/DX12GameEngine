@@ -37,53 +37,6 @@ void GameScene::Initialize() {
 	data.useEnvironmentMap = true;
 	data.environmentIntensity = 1.0f;
 
-	// マップ
-	std::unique_ptr<InstancedModel> wall = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	std::unique_ptr<InstancedModel> wallShadow = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	std::unique_ptr<InstancedModel> floor = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 900);
-	std::unique_ptr<InstancedModel> barrier = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 500);
-	std::unique_ptr<InstancedModel> enemySpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 30);
-	std::unique_ptr<InstancedModel> enemySpawnPoint = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 300);
-	std::unique_ptr<InstancedModel> weaponSpawn = asset.LoadInstancedModel("Resources/Floor", "floor.obj", 30);
-	std::unique_ptr<InstancedModel> start = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
-	std::unique_ptr<InstancedModel> goal = asset.LoadInstancedModel("Resources/Tiles", "sphere.obj", 1);
-
-	auto matData = wall->GetMaterial(0)->GetData();
-	matData.useEnvironmentMap = true;
-	matData.environmentIntensity = 0.6f;
-	wall->GetMaterial(0)->SetEnvironmentTexture(skybox_);
-	wall->GetMaterial(0)->SetData(matData);
-	wall->GetMaterial(1)->SetEnvironmentTexture(skybox_);
-	wall->GetMaterial(1)->SetData(matData);
-
-	matData = barrier->GetMaterial(0)->GetData();
-	matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
-	barrier->GetMaterial(0)->SetData(matData);
-	barrier->GetMaterial(1)->SetData(matData);
-	matData.color = { 1.0f, 0.3f, 0.3f, 0.5f };
-	enemySpawn->GetMaterial(0)->SetData(matData);
-	enemySpawn->GetMaterial(1)->SetData(matData);
-	matData.color = { 0.3f, 1.0f, 0.3f, 0.5f };
-	weaponSpawn->GetMaterial(0)->SetData(matData);
-	weaponSpawn->GetMaterial(1)->SetData(matData);
-
-	wall->tag = "wall";
-	floor->tag = "floor";
-	barrier->tag = "barrier";
-	enemySpawn->tag = "enemySpawn";
-	enemySpawnPoint->tag = "enemySpawnPoint";
-	weaponSpawn->tag = "weaponSpawn";
-	start->tag = "start";
-	goal->tag = "goal";
-	this->AddObject(std::move(wall));
-	this->AddObject(std::move(floor));
-	this->AddObject(std::move(barrier));
-	this->AddObject(std::move(enemySpawn));
-	this->AddObject(std::move(enemySpawnPoint));
-	this->AddObject(std::move(weaponSpawn));
-	this->AddObject(std::move(start));
-	this->AddObject(std::move(goal));
-
 	mapTile_ = std::make_unique<MapTile>();
 	mapTile_->Initialize();
 
@@ -136,14 +89,15 @@ void GameScene::Initialize() {
 	resultCursor_->SetSize({ 48,56 });
 	resultCursor_->SetColor({ 1, 1, 1, 0.7f });
 
+#ifdef USE_IMGUI
+	//enableEditMode_ = true;
+#endif
+
 	// マップ判定
 	mapCheck_ = std::make_unique<MapCheck>();
 	mapTile_->UpdateMapChange(false, enableEditMode_);
 	Reset();
 
-#ifdef USE_IMGUI
-	enableEditMode_ = true;
-#endif
 	isLoaded_ = false;
 
 	//gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);

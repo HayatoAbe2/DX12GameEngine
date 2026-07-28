@@ -4,8 +4,6 @@
 #include "Engine/Math/MathUtils.h"
 
 LightManager::~LightManager() {
-	spotLightsData_.clear();
-	pointLightsData_.clear();
 	lightResource_.Reset();
 }
 
@@ -14,8 +12,6 @@ void LightManager::Initialize(BufferManager* bufferManager, Logger* logger) {
 	lightResource_ = bufferManager->CreateUploadBuffer(cbSize);
 	lightResource_->Map(0, nullptr, reinterpret_cast<void**>(&lightData_));
 
-	pointLightsData_.resize(maxPointLights);
-	spotLightsData_.resize(maxSpotLights);
 	for (int i = 0; i < maxPointLights; i++) {
 		isPointFree[i] = true;
 	}
