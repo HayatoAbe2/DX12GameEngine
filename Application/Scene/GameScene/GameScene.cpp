@@ -103,6 +103,9 @@ void GameScene::Initialize() {
 	isLoaded_ = false;
 
 	//gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
+
+	player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
+	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,30,-19 };
 }
 
 void GameScene::Update() {

@@ -24,6 +24,6 @@ void FixFPS::Update() {
 
 	// 時間の記録
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-	deltatime_ = std::chrono::duration<float>(end - reference_).count();
+	deltatime_ = std::min(std::chrono::duration<float>(end - reference_).count(), 0.1f);
 	reference_ = end;
 }
