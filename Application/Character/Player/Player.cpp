@@ -238,6 +238,8 @@ void Player::Draw(Camera* camera) {
 	}
 	if (isUsingBoost_) {
 		for (int i = 0; i < 2; ++i) {
+			render.AddPostEffect(PostEffectType::BoxFilter5x5);
+			render.AddPostEffect(PostEffectType::GaussianFilter3x3);
 			render.DrawModel(instancing_[i].get());
 		}
 	}

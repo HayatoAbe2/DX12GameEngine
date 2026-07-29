@@ -80,6 +80,8 @@ void GameScene::Initialize() {
 	fade_ = asset.LoadSprite("resources/Debug/white1x1.png");
 	fade_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
 	fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	fadePhase_ = FadePhase::FadeIn;
+	fadeTimer_.Start(kMaxFadeinTimer_);
 
 	resultBG_ = asset.LoadSprite("resources/Result/result.png");
 	resultBG_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
@@ -118,22 +120,22 @@ void GameScene::Update() {
 
 			} else {
 				// プレイヤー処理
-				if (!isFadeOut_) {
+				if (fadePhase_ == FadePhase::None) {
 					player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
-				}
 
-				// ゲームオーバー
-				if (player_->IsDead() && !isFadeOut_) {
-					isFadeOut_ = true;
-					fadeTimer_ = 0;
-				}
+					// ゲームオーバー
+					if (player_->IsDead()) {
+						fadePhase_ = FadePhase::FadeOut;
+						fadeTimer_.Start(kMaxFadeoutTimer_);
+					}
 
-				// ゴール判定
-				Vector2 pos = { player_->GetTransform().translate.x,player_->GetTransform().translate.z };
-				if (mapCheck_->IsGoal(pos, player_->GetRadius(), enemyManager_->GetEnemies().size() == 0) && !isFadeOut_) {
-					isFadeOut_ = true;
-					fadeTimer_ = 0;
-					audio.SoundPlay(L"Resources/Sounds/SE/warp.mp3", false);
+					// ゴール判定
+					Vector2 pos = { player_->GetTransform().translate.x,player_->GetTransform().translate.z };
+					if (mapCheck_->IsGoal(pos, player_->GetRadius(), enemyManager_->GetEnemies().size() == 0)) {
+						fadePhase_ = FadePhase::FadeOut;
+						fadeTimer_.Start(kMaxFadeoutTimer_);
+						audio.SoundPlay(L"Resources/Sounds/SE/warp.mp3", false);
+					}
 				}
 
 				// カメラ追従
@@ -175,19 +177,19 @@ void GameScene::Update() {
 				uiDrawer_->Update();
 			}
 
-			if (isFadeIn_) {
-				fadeTimer_++;
-				fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f - (float)fadeTimer_ / (float)kMaxFadeinTimer_ });
-				if (fadeTimer_ >= kMaxFadeinTimer_) {
-					isFadeIn_ = false;
-					fadeTimer_ = 0;
+			if (fadePhase_ == FadePhase::FadeIn) {
+				// フェードイン
+				fadeTimer_.Update();
+				fade_->SetColor({ 1.0f,1.0f,1.0f, fadeTimer_.GetRemaining() / kMaxFadeinTimer_ });
+				if (fadeTimer_.IsFinished()) {
+					fadePhase_ = FadePhase::None;
 				}
-			} else if (isFadeOut_) {
-				fadeTimer_++;
-				fade_->SetColor({ 1.0f,1.0f,1.0f,(float)fadeTimer_ / (float)kMaxFadeoutTimer_ });
-				if (fadeTimer_ >= kMaxFadeoutTimer_) {
-					isFadeOut_ = false;
 
+			} else if (fadePhase_ == FadePhase::FadeOut) {
+				// フェードアウト
+				fadeTimer_.Update();
+				fade_->SetColor({ 1.0f,1.0f,1.0f, 1.0f - fadeTimer_.GetRemaining() / kMaxFadeoutTimer_ });
+				if (fadeTimer_.IsFinished()) {
 					if (player_->IsDead() || currentFloor_ == 3) {
 						if (isShowResult_) {
 							scene.SceneChange("Game");
@@ -195,21 +197,21 @@ void GameScene::Update() {
 							// ゲームオーバーまたはクリア
 							isShowResult_ = true;
 
-							fadeTimer_ = 0;
-							isFadeIn_ = true;
+							fadeTimer_.Start(kMaxFadeinTimer_);
+							fadePhase_ = FadePhase::FadeIn;
 							resultTime_ = 0;
 						}
 					} else {
-						fadeTimer_ = 0;
-						isFadeIn_ = true;
-						resultTime_ = 0;
+						isShowResult_ = true;
+
+						fadeTimer_.Start(kMaxFadeinTimer_);
+						fadePhase_ = FadePhase::FadeIn;
+
 						// 次のフロア
 						currentFloor_++;
 						Reset();
 					}
 				}
-
-			} else {
 			}
 
 		} else {
@@ -240,33 +242,26 @@ void GameScene::Update() {
 			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
 			resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
 
-			if (resultTime_ >= 0.2f && !isFadeOut_) {
-				isFadeOut_ = true;
-				fadeTimer_ = 0;
+			if (fadePhase_ == FadePhase::FadeIn) {
+				// フェードイン
+				fadeTimer_.Update();
+				fade_->SetColor({ 1.0f,1.0f,1.0f, fadeTimer_.GetRemaining() / kMaxFadeinTimer_ });
+				if (fadeTimer_.IsFinished()) {
+					fadePhase_ = FadePhase::None;
+				}
+			} else if (fadePhase_ == FadePhase::FadeOut) {
+				// フェードアウト
+				fadeTimer_.Update();
+				fade_->SetColor({ 1.0f,1.0f,1.0f, 1.0f - fadeTimer_.GetRemaining() / kMaxFadeoutTimer_ });
+				if (fadeTimer_.IsFinished()) {
+					fadePhase_ = FadePhase::None;
+				}
 			}
 
-			if (isFadeIn_) {
-				fadeTimer_++;
-				fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f - (float)fadeTimer_ / (float)kMaxFadeinTimer_ });
-				if (fadeTimer_ >= kMaxFadeinTimer_) {
-					isFadeIn_ = false;
-					fadeTimer_ = 0;
-
-					// 次のフロア
-					//currentFloor_++;
-					//Reset();
-				}
-			} else if (isFadeOut_) {
-				fadeTimer_++;
-				fade_->SetColor({ 1.0f,1.0f,1.0f,(float)fadeTimer_ / (float)kMaxFadeoutTimer_ });
-				if (fadeTimer_ >= kMaxFadeoutTimer_) {
-					isFadeOut_ = false;
-
-					if (isShowResult_) {
-						scene.SceneChange("Game");
-						return;
-					}
-				}
+			if (isShowResult_ &&
+				(input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A))) {
+				scene.SceneChange("Game");
+				return;
 			}
 		}
 	}
@@ -298,10 +293,14 @@ void GameScene::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 	if (isShowResult_) {
-		//render.SetPostEffectType(PostEffectType::Grayscale);
-	} else {
 		render.AddPostEffect(PostEffectType::Grayscale);
+		render.AddPostEffect(PostEffectType::Vignette);
+	} else {
 		render.AddPostEffect(PostEffectType::Outline);
+	}
+
+	if (fadePhase_ != FadePhase::None) {
+		render.AddPostEffect(PostEffectType::RadialBlur);
 	}
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 

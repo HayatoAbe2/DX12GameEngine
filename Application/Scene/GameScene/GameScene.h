@@ -80,11 +80,15 @@ private:
 	std::unique_ptr <DebugCamera> debugCamera_ = nullptr;
 
 	// フェード
-	bool isFadeIn_ = true;
-	bool isFadeOut_ = false;
-	int fadeTimer_ = 0;
-	const int kMaxFadeinTimer_ = 30;
-	const int kMaxFadeoutTimer_ = 40;
+	enum class FadePhase {
+		None,
+		FadeIn,
+		FadeOut,
+	};
+	FadePhase fadePhase_;
+	Timer fadeTimer_;
+	const float kMaxFadeinTimer_ = 1.0f;
+	const float kMaxFadeoutTimer_ = 1.0f;
 
 	// 階数
 	int currentFloor_ = 1;
