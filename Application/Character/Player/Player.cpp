@@ -21,7 +21,7 @@ Player::~Player() {
 
 void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Model> playerShadow, ItemManager* itemManager) {
 	itemManager_ = itemManager;
-	
+
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
@@ -39,8 +39,9 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	// 残像
 	for (int i = 0; i < 2; ++i) {
 		instancing_[i] = asset.LoadModel("Resources/Debug/human", "walk.gltf");
+		instancing_[i]->SetAnimation(asset.LoadAnimation("Resources/Debug/human", "walk.gltf"));
 		MaterialData data = instancing_[i]->GetMaterial(0)->GetData();
-		data.color = { 0.7f,0.7f,1,0.7f };
+		data.color = { 0.5f,0.5f,0.5f, 1.0f - (i + 1) * 0.25f };
 		data.enableLighting = false;
 		instancing_[i]->GetMaterial(0)->SetData(data);
 	}
@@ -71,15 +72,6 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	attackDirection_ = Normalize(Vector2(1, 0));
 	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
 	transform_.translate.x = 5;
-
-	sprites_.push_back(asset.LoadSprite("Resources/Items/16.png"));
-	sprites_.push_back(asset.LoadSprite("Resources/Items/21.png"));
-	sprites_.push_back(asset.LoadSprite("Resources/Items/13.png"));
-
-	for (int i = 0; i < 3; ++i) {
-		sprites_[i]->SetSize({ 75, 75 });
-		sprites_[i]->SetPosition({ 325.0f + 55 * i,0 });
-	}
 }
 
 void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager) {
@@ -243,14 +235,15 @@ void Player::Draw(Camera* camera) {
 		shadowTransform.translate.y = 0.01f;
 		shadowModel_->SetTransform(shadowTransform);
 		render.DrawModel(shadowModel_.get());
-	} else {
-		render.SetPostEffectType(PostEffectType::BoxFilter5x5);
 	}
-
 	if (isUsingBoost_) {
 		for (int i = 0; i < 2; ++i) {
 			render.DrawModel(instancing_[i].get());
 		}
+	}
+
+	for (auto& p : passives_) {
+		p->Draw();
 	}
 
 	model_->SetTransform(transform_);
@@ -278,12 +271,6 @@ void Player::Draw(Camera* camera) {
 		}
 	}
 
-	for (int i = 0; i < 3; ++i) {
-		if (usePassive_[i]) {
-			render.DrawSprite(sprites_[i].get());
-		}
-	}
-
 	// パーティクル
 	render.DrawParticle(moveParticle_.get(), BlendMode::Add);
 
@@ -293,34 +280,7 @@ void Player::Draw(Camera* camera) {
 	ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", transform_.rotate.x, transform_.rotate.y, transform_.rotate.z);
 	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", transform_.scale.x, transform_.scale.y, transform_.scale.z);
 	ImGui::Text("HP: %f", hp_);
-	
-	if (ImGui::Checkbox("counter", &usePassive_[0])) {
-		if (usePassive_[0]) {
-			passives_.push_back(std::make_unique<Counter>(sprites_[0].get()));
-		} else {
-			std::erase_if(passives_, [](const auto& passive) {
-				return dynamic_cast<Counter*>(passive.get()) != nullptr;
-				});
-		}
-	}
-	if (ImGui::Checkbox("reload", &usePassive_[1])) {
-		if (usePassive_[1]) {
-			passives_.push_back(std::make_unique<ReloadBoost>(sprites_[1].get()));
-		} else {
-			std::erase_if(passives_, [](const auto& passive) {
-				return dynamic_cast<ReloadBoost*>(passive.get()) != nullptr;
-				});
-		}
-	}
-	if (ImGui::Checkbox("pursuit", &usePassive_[2])) {
-		if (usePassive_[2]) {
-			passives_.push_back(std::make_unique<Lightning>(sprites_[2].get()));
-		} else {
-			std::erase_if(passives_, [](const auto& passive) {
-				return dynamic_cast<Lightning*>(passive.get()) != nullptr;
-				});
-		}
-	}
+
 	ImGui::End();
 #endif
 }
@@ -552,9 +512,18 @@ void Player::SetWeapon(std::unique_ptr<Weapon> weapon) {
 
 	// 両方持っているなら交換
 	if (weapon_ && subWeapon_) {
-		itemManager_->Drop(transform_.translate, std::move(weapon_)); 
+		itemManager_->Drop(transform_.translate, std::move(weapon_));
 	}
 
 	// 装備
 	weapon_ = std::move(weapon);
+}
+
+void Player::AddPassive(std::unique_ptr<Passive> passive) {
+	Sprite* sprite = passive->GetSprite();
+	int index = int(passives_.size());
+	sprite->SetSize({ 75, 75 });
+	sprite->SetPosition({ 500.0f + 55 * index, 0 });
+
+	passives_.push_back(std::move(passive));
 }

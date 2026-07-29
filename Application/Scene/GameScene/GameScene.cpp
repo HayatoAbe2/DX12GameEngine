@@ -197,10 +197,12 @@ void GameScene::Update() {
 
 							fadeTimer_ = 0;
 							isFadeIn_ = true;
+							resultTime_ = 0;
 						}
 					} else {
 						fadeTimer_ = 0;
 						isFadeIn_ = true;
+						resultTime_ = 0;
 						// 次のフロア
 						currentFloor_++;
 						Reset();
@@ -238,7 +240,7 @@ void GameScene::Update() {
 			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
 			resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
 
-			if (input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A)) {
+			if (resultTime_ >= 0.2f && !isFadeOut_) {
 				isFadeOut_ = true;
 				fadeTimer_ = 0;
 			}
@@ -298,7 +300,8 @@ void GameScene::Draw() {
 	if (isShowResult_) {
 		//render.SetPostEffectType(PostEffectType::Grayscale);
 	} else {
-		render.SetPostEffectType(PostEffectType::Outline);
+		render.AddPostEffect(PostEffectType::Grayscale);
+		render.AddPostEffect(PostEffectType::Outline);
 	}
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
 

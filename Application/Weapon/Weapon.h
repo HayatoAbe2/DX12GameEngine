@@ -4,6 +4,7 @@
 #include "Character/Character.h"
 #include "Timer/Timer.h"
 #include "Item/Item.h"
+#include "Bullet/Bullet.h"
 
 class BulletManager;
 
@@ -14,6 +15,7 @@ public:
 
 	float Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
 	void Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from, bool isPress = false);
+	void Draw();
 
 	Model* GetModel() { return model_.get(); }
 	Model* GetShadowModel() { return shadowModel_.get(); }

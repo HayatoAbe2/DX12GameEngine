@@ -21,6 +21,7 @@ public:
 	// 新しく出現させる
 	void SpawnWeapon(Vector3 pos,int index,Rarity rarity, bool isForSale);
 	void SpawnMoney(Vector3 pos,int amount);
+	void SpawnPassive(Vector3 pos, bool isForSale);
 
 	// 持っていたものを落とす
 	void Drop(Vector3 pos,std::unique_ptr<Weapon> weapon);
@@ -46,6 +47,8 @@ private:
 
 	std::vector<bool> spawned_;
 	std::vector<bool> spawnedSale_;
+	std::vector<bool> spawnedPassive_;
+	std::vector<bool> spawnedPassiveSale_;
 	int nextSpawnIndex_ = -1;
 	Vector3 nextSpawnPos_{};
 };

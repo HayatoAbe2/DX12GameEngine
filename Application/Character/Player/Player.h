@@ -51,6 +51,7 @@ public:
 	Vector3 GetPrePos() const override { return prePos_; }
 	void SetTransform(const Transform& transform) { transform_ = transform; }
 	void SetWeapon(std::unique_ptr<Weapon> weapon);
+	void AddPassive(std::unique_ptr<Passive> passive);
 	bool IsDead() { return hp_ <= 0; }
 
 	void Stop() { boostTimer_->Reset(); }
@@ -133,7 +134,6 @@ private:
 	Vector3 prePos_{};
 
 	std::vector<std::unique_ptr<Passive>> passives_;
-	std::vector<std::unique_ptr<Sprite>> sprites_;
 
 	bool usePassive_[3];
 

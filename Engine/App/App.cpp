@@ -134,7 +134,7 @@ void App::Finalize() {
 		input_.reset();
 		logger_->Log(logger_->GetStream(), std::format("[Input] Shutdown complete.\n"));
 
-		lightManager_.release();
+		lightManager_.reset();
 		logger_->Log(logger_->GetStream(), std::format("[LightManager] Shutdown complete.\n"));
 
 		assetManager_.reset();

@@ -119,7 +119,23 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			}
 			model->GetMaterial(0)->SetData(matData);
 			model->GetMaterial(1)->SetData(matData);
-		} else if (model->tag == "enemySpawn") {
+		} else if (model->tag == "passive") {
+			if (scene.GetCurrentScene()->IsEditMode()) {
+				matData.color = { 0.3f, 1.0f, 0.3f, 0.5f };
+			} else {
+				matData.color.w = 0;
+			}
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
+		} else if (model->tag == "passiveForSale") {
+			if (scene.GetCurrentScene()->IsEditMode()) {
+				matData.color = { 1.0f, 1.0f, 0.0f, 0.5f };
+			} else {
+				matData.color.w = 0;
+			}
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
+		} else  if (model->tag == "enemySpawn") {
 			if (scene.GetCurrentScene()->IsEditMode()) {
 				matData.color = { 0.7f, 0.3f, 0.3f, 0.5f };
 			} else {

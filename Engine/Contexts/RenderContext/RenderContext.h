@@ -26,12 +26,15 @@ public:
 	void DrawSkybox(Texture* skybox);
 
 	// ポストエフェクト設定
-	void SetPostEffectType(PostEffectType type) { renderer_->SetPostEffectType(type); }
+	void AddPostEffect(PostEffectType type) { renderer_->AddPostEffect(type); }
 	void SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle) { renderer_->SetDissolveMask(handle); }
 
 	// カメラセット
 	void SetCamera(Camera* camera) { renderer_->SetCamera(camera); }
 	Camera* GetCamera() { return renderer_->GetCamera(); }
+
+	// レンダーパス変更
+	void BeginPass(RenderPass pass, bool clear = true) { renderer_->BeginPass(pass, clear); }
 private:
 	Renderer* renderer_ = nullptr;
 	LightManager* lightManager_ = nullptr;

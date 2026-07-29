@@ -2,6 +2,10 @@
 #include "Item/Passive/Passive.h"
 #include "Item/World/WorldItem.h"
 
+#include "Item/Passive/Counter/Counter.h"
+#include "Item/Passive/Lightning/Lightning.h"
+#include "Item/Passive/Reload/ReloadBoost.h"
+
 // 落ちている状態
 class WorldPassive : public WorldItem {
 public:

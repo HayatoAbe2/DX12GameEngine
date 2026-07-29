@@ -3,7 +3,7 @@
 
 class Lightning : public Passive{
 public:
-	Lightning(Sprite* sprite);
+	Lightning(std::unique_ptr<Sprite> sprite);
 	void OnDealDamage(const Vector2& pos, EnemyManager* enemyManager) override;
 };
 

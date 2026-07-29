@@ -7,7 +7,7 @@
         "chargeTime": 2.0,
 
         "bullet": {
-            "damage": 24.0,
+            "damage": 28.0,
             "radius": 0.3,
             "speed": 45,
             "lifeTime": 30,

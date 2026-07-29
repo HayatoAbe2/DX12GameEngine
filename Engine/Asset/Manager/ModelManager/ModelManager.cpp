@@ -158,15 +158,20 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 
 			aiMaterial* aiMaterial = scene->mMaterials[materialIndex];
 			const aiTexture* tex = nullptr;
+			aiTextureType textureType = aiTextureType_NONE;
 			if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+				textureType = aiTextureType_DIFFUSE;
+			} else if (aiMaterial->GetTextureCount(aiTextureType_BASE_COLOR) > 0) {
+				textureType = aiTextureType_BASE_COLOR;
+			}
+
+			if (textureType != aiTextureType_NONE) {
 				aiString textureFilePath;
 				aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
 
 				texture->SetMtlFilePath(directoryPath + "/" + textureFilePath.C_Str());
-				if (filePath.ends_with(".fbx") || filePath.ends_with(".glb")) {
+				if (textureFilePath.C_Str()[0] == '*') {
 					const aiTexture* tex = scene->GetEmbeddedTexture(textureFilePath.C_Str());
-
-					// SRVを作成
 					textureManager_->CreateTextureSRV(texture, tex);
 				} else {
 					textureManager_->CreateTextureSRV(texture);

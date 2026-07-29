@@ -1,6 +1,6 @@
 #include "Counter.h"
 
-Counter::Counter(Sprite* sprite) : Passive(sprite) {
+Counter::Counter(std::unique_ptr<Sprite> sprite) : Passive(std::move(sprite)) {
 }
 
 void Counter::OnHit(const Vector2& pos, BulletManager* bulletManager, Character* from) {

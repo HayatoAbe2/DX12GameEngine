@@ -64,6 +64,9 @@ void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulle
 			canChange_ = true;
 		}
 	}
+
+	// modifireリセット
+	data_.modifiers[int(ModifierStats::coolTime)].multiply = 1.0f;
 }
 
 float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from) {
@@ -87,11 +90,6 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 			current = 0;
 			canChange_ = true;
 		}
-	}
-
-	if (data_.traits.charge) {
-		data_.bullet.radius += charge_;
-		data_.bullet.damage += charge_ * 3.0f;
 	}
 
 	// 複数弾
@@ -124,6 +122,13 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 
 		// 弾生成
 		std::unique_ptr<Bullet> bullet = std::make_unique<Bullet>(ToXZ(pos), dir, data_.bullet, from);
+
+		if (data_.traits.charge) {
+			float rate = data_.traits.charge->currentTime / data_.traits.charge->time;
+			bullet->GetData().damage += data_.traits.charge->damage * rate;
+			bullet->GetData().radius += rate * 3.0f;
+		}
+
 		// BulletManagerの管理下に移動
 		bulletManager->AddBullet(std::move(bullet));
 

@@ -4,14 +4,14 @@
 struct Piercing {
 	// 回数
 	int count;
-	int current;
+	int current = 0;
 };
 
 // 跳弾
 struct Ricochet {
 	// 回数
 	int count;
-	int current;
+	int current = 0;
 
 	// 敵ヒット時反射
 	bool onHitEnemy;

@@ -7,11 +7,11 @@
 
 class Passive : public Item {
 public:
-	Passive();
 	~Passive() = default;
 
-	Passive(Sprite* sprite);
+	Passive(std::unique_ptr<Sprite> sprite);
 
+	Sprite* GetSprite() { return sprite_.get(); }
 	void Draw();
 
 	virtual void OnUpdate(Weapon* weapon, Weapon* subWeapon) {}
@@ -19,6 +19,6 @@ public:
 	virtual void OnHit(const Vector2& pos, BulletManager* bulletManager, Character* self){}
 
 private:
-	Sprite* sprite_;
+	std::unique_ptr<Sprite> sprite_;
 };
 

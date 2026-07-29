@@ -17,8 +17,8 @@
 
         "traits": {
             "charge":{
-                "time": 2.0,
-                "damage": 2.5
+                "time": 1.5,
+                "damage": 15.5
             }
         },
 

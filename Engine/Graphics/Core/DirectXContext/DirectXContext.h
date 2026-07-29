@@ -24,6 +24,11 @@
 
 #include "externals/DirectXTex/DirectXTex.h"
 
+enum class RenderPass {
+	Scene,
+	OutlineMask,
+};
+
 class DirectXContext {
 public:
 
@@ -47,6 +52,8 @@ public:
 	/// </summary>
 	void EndFrame();
 
+	void BeginPass(RenderPass pass, bool clear = true);
+
 	// アクセサ
 	RECT GetWindowRect() { return windowRect_; }
 	DeviceManager* GetDeviceManager() { return deviceManager_.get(); }
@@ -60,7 +67,7 @@ public:
 	FixFPS* GetFixFPS() { return fixFPS_.get(); }
 	Vector2 GetSceneWindowSize() { return imGuiManager_->GetSceneWindowSize(); }
 
-	void SetPostEffectType(PostEffectType type) { postEffectType_ = type; }
+	void AddPostEffect(PostEffectType type) { postEffects_.push_back(type); }
 	void SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle) {dissolveMaskHandle_ = handle;}
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
@@ -69,6 +76,16 @@ public:
 	void SetGizmoCtx(const GizmoCtx& ctx) { imGuiManager_->SetGizmoCtx(ctx); }
 #endif
 private:
+	struct PostBuffer {
+		ID3D12Resource* resource;
+		D3D12_CPU_DESCRIPTOR_HANDLE rtv;
+		D3D12_GPU_DESCRIPTOR_HANDLE srv;
+		D3D12_RESOURCE_STATES* state;
+	};
+	void ApplyPostEffect(PostEffectType type, const PostBuffer& src, const PostBuffer& dst);
+
+	// TransitionBarrier
+	void Transition(ID3D12GraphicsCommandList* cmd, ID3D12Resource* resource, D3D12_RESOURCE_STATES& current, D3D12_RESOURCE_STATES next);
 
 	/// <summary>
 	/// SwapChain初期化
@@ -79,6 +96,9 @@ private:
 	/// RenderTextureの生成
 	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateRenderTextureResource();
+
+	// ポストエフェクト書き込みTexture
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreatePostEffectResource();
 
 	/// <summary>
 	/// SceneView作成
@@ -113,12 +133,12 @@ private:
 	uint32_t depthTextureSRVIndex_;
 
 	// RenderTextureリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> renderTextureResource_ = nullptr;
-	uint32_t renderTextureSRVIndex_;
+	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> renderTextureResource_{};
+	std::array<uint32_t, 2> renderTextureSRVIndex_;
 
 	// 遷移バリア
 	D3D12_RESOURCE_BARRIER swapChainBarrier_ = {};
-	D3D12_RESOURCE_BARRIER renderTextureBarrier_ = {};
+	std::array<D3D12_RESOURCE_BARRIER, 2> renderTextureBarrier_ = {};
 	D3D12_RESOURCE_BARRIER sceneViewBarrier_ = {};
 	D3D12_RESOURCE_BARRIER depthBarrier_ = {};
 
@@ -165,7 +185,7 @@ private:
 	// カメラ
 	Camera* camera_ = nullptr;
 
-	PostEffectType postEffectType_ = PostEffectType::None;
+	std::vector<PostEffectType> postEffects_;
 
 	struct OutlineData {
 		Matrix4x4 projectionInverse;
@@ -184,15 +204,17 @@ private:
 	HWND hwnd_{};
 	RECT windowRect_{};
 
-	// デバッグでの、シーン描画用
+	// デバッグでのシーン描画用
 	Microsoft::WRL::ComPtr<ID3D12Resource> sceneViewResource_;
 	uint32_t sceneViewSRVIndex_;
-
 	uint32_t sceneViewRTVIndex_;
 	D3D12_CPU_DESCRIPTOR_HANDLE sceneViewRTVHandle_;
 
-
 	D3D12_GPU_DESCRIPTOR_HANDLE dissolveMaskHandle_{};
 
+	D3D12_RESOURCE_STATES renderTextureState_[2]{
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+	};
 };
 

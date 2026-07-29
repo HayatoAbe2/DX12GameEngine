@@ -750,9 +750,6 @@ void Renderer::DrawSkybox(Texture* texture) {
 	cmdList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 }
 
-void Renderer::SetPostEffectType(PostEffectType type) {
-	dxContext_->SetPostEffectType(type);
-}
 void Renderer::SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
 	dxContext_->SetDissolveMask(handle);
 }

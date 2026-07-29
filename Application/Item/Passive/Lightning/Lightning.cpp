@@ -1,6 +1,6 @@
  #include "Lightning.h"
 
-Lightning::Lightning(Sprite* sprite) : Passive(sprite) {
+Lightning::Lightning(std::unique_ptr<Sprite> sprite) : Passive(std::move(sprite)) {
 }
 
 void Lightning::OnDealDamage(const Vector2& pos, EnemyManager* enemyManager) {

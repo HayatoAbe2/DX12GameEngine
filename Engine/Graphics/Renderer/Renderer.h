@@ -73,7 +73,7 @@ public:
 	void DrawSkybox(Texture* texture);
 
 	// ポストエフェクト設定
-	void SetPostEffectType(PostEffectType type);
+	void AddPostEffect(PostEffectType type) { dxContext_->AddPostEffect(type); }
 	void SetDissolveMask(D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 	// カメラセット
@@ -92,6 +92,8 @@ public:
 
 	// ImGuiシーンのサイズ
 	Vector2 GetSceneWindowSize() { return dxContext_->GetSceneWindowSize(); }
+
+	void BeginPass(RenderPass pass, bool clear) { dxContext_->BeginPass(pass, clear); }
 
 #ifdef USE_IMGUI
 	bool GetSceneWindowHovered() { return dxContext_->GetSceneWindowHovered(); }

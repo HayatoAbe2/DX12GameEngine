@@ -18,7 +18,7 @@ public:
 
 	bool IsEnemyBullet() { return isEnemyBullet_; }
 	const Circle& GetCollider() const { return collider_; }
-	const BulletData& GetData() const { return data_; }
+	BulletData& GetData() { return data_; }
 	float GetDamage() { return data_.damage; }
 	float GetKnockback() { return data_.knockback; }
 	bool IsDead() { return isDead_; }

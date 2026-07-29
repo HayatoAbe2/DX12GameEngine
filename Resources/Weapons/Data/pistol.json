@@ -17,7 +17,7 @@
             "traits":{
                 "onHitWall":{
                     "ricochet":{
-                        "count": 3,
+                        "count": 2,
                         "onHitEnemy": false,
                         "toEnemy":false
                     }

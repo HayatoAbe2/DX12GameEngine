@@ -15,8 +15,7 @@ Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& d
 	collider_.radius = data_.radius;
 
 	if (data_.traits.move.orbit) {
-		Vector2 center = ToXZ(user_->GetTransform().translate);
-		Vector2 offset = pos - center;
+		Vector2 offset = direction;
 
 		// angleを生成位置から決める
 		data_.traits.move.orbit->angle = std::atan2(offset.y, offset.x);
@@ -26,7 +25,7 @@ Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& d
 	if (dynamic_cast<Enemy*>(user_)) {
 		data_.speed *= 0.5f;
 		data_.lifeTime *= 5;
-		data_.color = { 0.8f,0,0,1.0f };
+		data_.color = { 0.7f, 0.2f, 0.1f, data_.color.w };
 	}
 
 	velocity_ = direction * data_.speed;
@@ -59,8 +58,22 @@ void Bullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 		if (lifeTime_ <= 0) {
 			isDead_ = true;
 		}
+	}
 
-		// パーティクル
+	if (isDead_) {
+		hitParticleLifeTime--;
+		if (hitParticleLifeTime <= 0) {
+			canErase_ = true;
+		}
+	}
+}
+
+void Bullet::Draw(Camera* camera) {
+	auto& ctx = GameContext::GetInstance();
+	auto& render = ctx.Render();
+
+	// パーティクル
+	if (!isDead_) {
 		for (int i = 0; i < 50; ++i) {
 			Vector3 randomVector = {
 			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
@@ -75,19 +88,7 @@ void Bullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
 		}
 	}
 	particle_->Update();
-
-	if (isDead_) {
-		hitParticle_->Update();
-		hitParticleLifeTime--;
-		if (hitParticleLifeTime <= 0) {
-			canErase_ = true;
-		}
-	}
-}
-
-void Bullet::Draw(Camera* camera) {
-	auto& ctx = GameContext::GetInstance();
-	auto& render = ctx.Render();
+	hitParticle_->Update();
 
 	// パーティクル
 	render.DrawParticle(particle_.get(), BlendMode::Add);
@@ -127,6 +128,19 @@ void Bullet::Hit() {
 			transform.rotate = { 0,0,ctx.RandomFloat(0, float(std::numbers::pi) * 2.0f) };
 			transform.scale = Vector3(collider_.radius, collider_.radius, collider_.radius) * 3.0f;
 			hitParticle_->Emit(transform, {});
+		}
+	} else {
+		if (data_.traits.onHitEnemy.piercing) {
+			int& current = data_.traits.onHitEnemy.piercing->current;
+			int& maxCount = data_.traits.onHitEnemy.piercing->count;
+
+			if (current < maxCount) {
+				// 貫通(消さない)
+				current++;
+			} else {
+				isDead_ = true;
+			}
+
 		}
 	}
 }

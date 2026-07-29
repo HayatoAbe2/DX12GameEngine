@@ -44,7 +44,8 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	descriptorHeapManager_->Initialize(deviceManager_->GetDevice().Get());
 
 	// RenderTexture
-	renderTextureResource_ = CreateRenderTextureResource();
+	renderTextureResource_[0] = CreateRenderTextureResource();
+	renderTextureResource_[1] = CreatePostEffectResource();
 	sceneViewResource_ = CreateSceneViewResource();
 
 	// RTV作成
@@ -55,9 +56,12 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	descriptorManager_ = std::make_unique<SRVManager>();
 	descriptorManager_->Initialize(descriptorHeapManager_.get(), deviceManager_->GetDevice().Get());
 
-	renderTextureSRVIndex_ = descriptorManager_->Allocate();
-	descriptorManager_->CreateRenderTextureSRV(renderTextureSRVIndex_, renderTextureResource_);
-	descriptorManager_->GetGPUHandle(renderTextureSRVIndex_);
+	// renderTextureリソース
+	for (int i = 0; i < 2; ++i) {
+		renderTextureSRVIndex_[i] = descriptorManager_->Allocate();
+		descriptorManager_->CreateRenderTextureSRV(renderTextureSRVIndex_[i], renderTextureResource_[i]);
+		descriptorManager_->GetGPUHandle(renderTextureSRVIndex_[i]);
+	}
 
 	// sceneViewリソース(デバッグ用)
 	sceneViewSRVIndex_ = descriptorManager_->Allocate();
@@ -211,19 +215,22 @@ void DirectXContext::BeginFrame() {
 		commandListManager_->Wait();
 		commandListManager_->Reset();
 		renderTargetManager_->ReleaseSwapChainBuffers();
-		renderTextureResource_.Reset();
+		for (auto& resource : renderTextureResource_) {
+			resource.Reset();
+		}
 		depthStencilResource_.Reset();
 		swapChain_->ResizeBuffers(2, UINT(windowRect_.right), UINT(windowRect_.bottom), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
 		// RenderTexture再生成
-		renderTextureResource_ = CreateRenderTextureResource();
+		renderTextureResource_[0] = CreateRenderTextureResource();
+		renderTextureResource_[1] = CreatePostEffectResource();
 		sceneViewResource_ = CreateSceneViewResource();
 
 		// DepthSRV再作成
 		depthStencilResource_ = CreateDepthStencilTextureResource(deviceManager_->GetDevice());
 
 		// RTV再生成
-		renderTargetManager_->Resize(swapChain_.Get(), deviceManager_->GetDevice().Get(), renderTextureResource_.Get(), sceneViewResource_.Get());
+		renderTargetManager_->Resize(swapChain_.Get(), deviceManager_->GetDevice().Get(), renderTextureResource_, sceneViewResource_);
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // Format。基本的にはResourceに合わせる
@@ -231,29 +238,36 @@ void DirectXContext::BeginFrame() {
 		deviceManager_->GetDevice()->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, descriptorHeapManager_->GetDSVHeap()->GetCPUDescriptorHandleForHeapStart());
 
 		// SRV再作成
-		descriptorManager_->CreateRenderTextureSRV(renderTextureSRVIndex_, renderTextureResource_);
+		for (int i = 0; i < 2; ++i) {
+			descriptorManager_->CreateRenderTextureSRV(renderTextureSRVIndex_[i], renderTextureResource_[i]);
+		}
 		descriptorManager_->CreateRenderTextureSRV(sceneViewSRVIndex_, sceneViewResource_);
 		descriptorManager_->CreateDepthSRV(depthTextureSRVIndex_, depthStencilResource_);
 	}
 
 	descriptorManager_->PreDraw(commandListManager_->GetCommandList());
 
+	auto cmdList = commandListManager_->GetCommandList();
+
+	Transition(cmdList.Get(), renderTextureResource_[0].Get(), renderTextureState_[0], D3D12_RESOURCE_STATE_RENDER_TARGET);
+
 	// 描画先のRTVとDSVを設定する
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = descriptorHeapManager_->GetCPUDescriptorHandle(descriptorHeapManager_->GetDSVHeap().Get(), descriptorHeapManager_->GetDSVHeapSize(), 0);
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetRenderTextureRTVHandle();
-	commandListManager_->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetRenderTextureRTVHandle()[0];
+	cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 	// 指定した色で画面全体をクリアする
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色。RGBAの順
-	commandListManager_->GetCommandList()->ClearRenderTargetView(renderTargetManager_->GetRenderTextureRTVHandle(), clearColor, 0, nullptr);
+	cmdList->ClearRenderTargetView(renderTargetManager_->GetRenderTextureRTVHandle()[0], clearColor, 0, nullptr);
+
 	// 指定した深度で画面全体をクリアする
-	commandListManager_->GetCommandList()->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	cmdList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	// 描画用のDescriptorHeapの設定
 	ID3D12DescriptorHeap* descriptorHeapsRaw[] = { descriptorManager_->GetHeap().Get() };
-	commandListManager_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeapsRaw);
+	cmdList->SetDescriptorHeaps(1, descriptorHeapsRaw);
 	// Viewportを設定
-	commandListManager_->GetCommandList()->RSSetViewports(1, &viewport_);
+	cmdList->RSSetViewports(1, &viewport_);
 	// Scissorを設定
-	commandListManager_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
+	cmdList->RSSetScissorRects(1, &scissorRect_);
 
 	// CBV書き込み先リセット
 	constantBufferManager_->BeginFrame();
@@ -261,107 +275,78 @@ void DirectXContext::BeginFrame() {
 	imGuiManager_->BeginFrame();
 
 	imGuiManager_->DrawSceneWindow(descriptorManager_->GetGPUHandle(sceneViewSRVIndex_), windowRect_);
+
+	// ポストエフェクトリセット
+	postEffects_.clear();
 }
 
 void DirectXContext::EndFrame() {
 	auto cmdList = commandListManager_->GetCommandList();
 
-	// RTV>SRV
-	renderTextureBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	renderTextureBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	renderTextureBarrier_.Transition.pResource = renderTextureResource_.Get();
-	renderTextureBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	renderTextureBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	cmdList->ResourceBarrier(1, &renderTextureBarrier_);
+	PostBuffer buffer[2]{ {
+		renderTextureResource_[0].Get(),
+		renderTargetManager_->GetRenderTextureRTVHandle()[0],
+		descriptorManager_->GetGPUHandle(renderTextureSRVIndex_[0]),
+		&renderTextureState_[0]
+		},{
+		renderTextureResource_[1].Get(),
+		renderTargetManager_->GetRenderTextureRTVHandle()[1],
+		descriptorManager_->GetGPUHandle(renderTextureSRVIndex_[1]),
+		&renderTextureState_[1]
+		}
+	};
 
-	// SRV>RTV
-	sceneViewBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	sceneViewBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	sceneViewBarrier_.Transition.pResource = sceneViewResource_.Get();
-	sceneViewBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	sceneViewBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	cmdList->ResourceBarrier(1, &sceneViewBarrier_);
-	
-	// SceneViewにコピー
+	PostBuffer* src = &buffer[0];
+	PostBuffer* dst = &buffer[1];
+
+	// depthBarrier
+	depthBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	depthBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	depthBarrier_.Transition.pResource = depthStencilResource_.Get();
+	depthBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+	depthBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	cmdList->ResourceBarrier(1, &depthBarrier_);
+
+	if (postEffects_.empty()) {
+		// ポストエフェクトなし
+		ApplyPostEffect(PostEffectType::None, *src, *dst);
+		std::swap(src, dst);
+	} else {
+		// ポストエフェクト処理
+		for (auto type : postEffects_) {
+			ApplyPostEffect(type, *src, *dst);
+			std::swap(src, dst);
+		}
+	}
+
+	D3D12_RESOURCE_BARRIER barrier{};
+	Transition(cmdList.Get(), src->resource, *src->state, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	// sceneViewをSRV→RTV
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = sceneViewResource_.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	cmdList->ResourceBarrier(1, &barrier);
+
 	cmdList->OMSetRenderTargets(1, &sceneViewRTVHandle_, false, nullptr);
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
 	cmdList->SetPipelineState(pipelineStateManager_->GetSceneViewPSO());
-	cmdList->SetGraphicsRootDescriptorTable(0, descriptorManager_->GetGPUHandle(renderTextureSRVIndex_));
+	cmdList->SetGraphicsRootDescriptorTable(0, src->srv);
 	cmdList->DrawInstanced(3, 1, 0, 0);
 
 	// depthBarrier
-	if (postEffectType_ == PostEffectType::Outline) {
-		depthBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		depthBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		depthBarrier_.Transition.pResource = depthStencilResource_.Get();
-		depthBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		depthBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-		cmdList->ResourceBarrier(1, &depthBarrier_);
-	}
+	depthBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	depthBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+	cmdList->ResourceBarrier(1, &depthBarrier_);
 
-	// コピー
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	switch (postEffectType_) {
-	case PostEffectType::Grayscale:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Grayscale)));
-
-		break;
-	case PostEffectType::Vignette:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Vignette)));
-
-		break;
-	case PostEffectType::GaussianFilter3x3:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::GaussianFilter3x3)));
-		break;
-	case PostEffectType::BoxFilter5x5:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::BoxFilter5x5)));
-		break;
-	case PostEffectType::Outline:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Outline)));
-
-		cmdList->SetGraphicsRootDescriptorTable(1, descriptorManager_->GetGPUHandle(depthTextureSRVIndex_));
-		outlineData_->projectionInverse = Inverse(camera_->projectionMatrix_);
-		cmdList->SetGraphicsRootConstantBufferView(2, outlineResource_->GetGPUVirtualAddress());
-		break;
-	case PostEffectType::RadialBlur:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::RadialBlur)));
-		break;
-	case PostEffectType::Dissolve:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::Dissolve)));
-		cmdList->SetGraphicsRootDescriptorTable(1, dissolveMaskHandle_);
-		break;
-	case PostEffectType::RandomNoise:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(PostEffectType::RandomNoise)));
-		timeData_->time += 1.0f / 60.0f;
-		cmdList->SetGraphicsRootConstantBufferView(2, timeResource_->GetGPUVirtualAddress());
-		break;
-	default:
-		cmdList->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
-		cmdList->SetPipelineState(pipelineStateManager_->GetCopyImagePSO());
-		break;
-	}
-	cmdList->SetGraphicsRootDescriptorTable(0, descriptorManager_->GetGPUHandle(renderTextureSRVIndex_));
-	cmdList->DrawInstanced(3, 1, 0, 0);
-
-	// depthBarrier
-	if (postEffectType_ == PostEffectType::Outline) {
-		depthBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-		depthBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-		cmdList->ResourceBarrier(1, &depthBarrier_);
-	}
-
-	// RTV>SRV
-	sceneViewBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	sceneViewBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	cmdList->ResourceBarrier(1, &sceneViewBarrier_);
+	// sceneViewをRTV>SRV
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = sceneViewResource_.Get();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	cmdList->ResourceBarrier(1, &barrier);
 
 	// これから書き込むバックバッファのインデックスを取得
 	backBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
@@ -426,14 +411,70 @@ void DirectXContext::EndFrame() {
 	commandListManager_->Reset();
 
 	fixFPS_->Update();
+}
 
-	// 次フレーム、RenderTextureに対して描画
-	renderTextureBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	renderTextureBarrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	renderTextureBarrier_.Transition.pResource = renderTextureResource_.Get();
-	renderTextureBarrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	renderTextureBarrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	commandListManager_->GetCommandList()->ResourceBarrier(1, &renderTextureBarrier_);
+//void DirectXContext::BeginPass(RenderPass pass, bool clear) {
+//	auto cmdList = commandListManager_->GetCommandList();
+//
+//	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = descriptorHeapManager_->GetCPUDescriptorHandle(descriptorHeapManager_->GetDSVHeap().Get(), descriptorHeapManager_->GetDSVHeapSize(), 0);
+//
+//	// パスのRTV
+//	D3D12_CPU_DESCRIPTOR_HANDLE rtv{};
+//	switch (pass) {
+//	case RenderPass::Scene:
+//		rtv = renderTargetManager_->GetRenderTextureRTVHandle();
+//		break;
+//	case RenderPass::OutlineMask:
+//		rtv = outlineMaskRTVHandle_;
+//		break;
+//	}
+//	cmdList->OMSetRenderTargets(1, &rtv, false, &dsvHandle);
+//
+//	if (clear) {
+//		float clearColor[] = { 0,0,0,0 };
+//		cmdList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+//	}
+//}
+
+void DirectXContext::ApplyPostEffect(PostEffectType type, const PostBuffer& src, const PostBuffer& dst) {
+	auto cmd = commandListManager_->GetCommandList();
+
+	// RTV→SRV
+	Transition(cmd.Get(), src.resource, *src.state, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	// SRV→RTV
+	Transition(cmd.Get(), dst.resource, *dst.state, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	cmd->OMSetRenderTargets(1, &dst.rtv, false, nullptr);
+	cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cmd->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
+
+	if (type == PostEffectType::None) {
+		cmd->SetPipelineState(pipelineStateManager_->GetCopyImagePSO());
+	} else {
+		cmd->SetPipelineState(pipelineStateManager_->GetPostEffectPSO(int(type)));
+	}
+
+	// 入力テクスチャ
+	cmd->SetGraphicsRootDescriptorTable(0, src.srv); // Outlineだけ深度を渡す 
+
+	switch (type) {
+	case PostEffectType::Outline:
+		cmd->SetGraphicsRootDescriptorTable(1, descriptorManager_->GetGPUHandle(depthTextureSRVIndex_));
+		outlineData_->projectionInverse = Inverse(camera_->projectionMatrix_);
+		cmd->SetGraphicsRootConstantBufferView(2, outlineResource_->GetGPUVirtualAddress());
+		break;
+	case PostEffectType::Dissolve:
+		cmd->SetGraphicsRootDescriptorTable(1, dissolveMaskHandle_);
+		break;
+	case PostEffectType::RandomNoise:
+		timeData_->time += 1.0f / 60.0f;
+		cmd->SetGraphicsRootConstantBufferView(2, timeResource_->GetGPUVirtualAddress());
+		break;
+	default:
+		break;
+	}
+
+	cmd->DrawInstanced(3, 1, 0, 0);
 }
 
 void DirectXContext::InitializeSwapChain(HWND hwnd) {
@@ -493,6 +534,43 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateRenderTextureResour
 	return resource;
 }
 
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreatePostEffectResource() {
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = windowRect_.right;
+	resourceDesc.Height = windowRect_.bottom;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE clearValue{};
+	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	clearValue.Color[0] = 0.0f;
+	clearValue.Color[1] = 0.0f;
+	clearValue.Color[2] = 0.0f;
+	clearValue.Color[3] = 1.0f;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+
+	HRESULT hr =
+		deviceManager_->GetDevice()->CreateCommittedResource(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+			&clearValue,
+			IID_PPV_ARGS(&resource));
+
+	assert(SUCCEEDED(hr));
+
+	return resource;
+}
+
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateSceneViewResource() {
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = windowRect_.right;
@@ -529,6 +607,8 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateSceneViewResource()
 
 	return resource;
 }
+
+
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateDepthStencilTextureResource(
 	const Microsoft::WRL::ComPtr<ID3D12Device>& device) {
@@ -582,4 +662,16 @@ void DirectXContext::SetViewportAndScissor() {
 	scissorRect_.right = windowRect_.right;
 	scissorRect_.top = 0;
 	scissorRect_.bottom = windowRect_.bottom;
+}
+
+void DirectXContext::Transition(ID3D12GraphicsCommandList* cmd, ID3D12Resource* resource, D3D12_RESOURCE_STATES& current, D3D12_RESOURCE_STATES next) {
+	if (current == next) return;
+
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = resource;
+	barrier.Transition.StateBefore = current;
+	barrier.Transition.StateAfter = next;
+	cmd->ResourceBarrier(1, &barrier);
+	current = next;
 }
