@@ -360,10 +360,16 @@ void Player::Move(MapCheck* mapCheck) {
 	}
 
 	if (input.mouse.IsPress(MouseButton::Right)) {
-		model_->ChangeAnimation(sneak_, 0.2f);
+		model_->ChangeAnimation(sneak_, 0.15f);
 		moveSpeed_ /= 2.0f;
+		for (int i = 0; i < 2; ++i) {
+			instancing_[i]->ChangeAnimation(sneak_, 0.15f);
+		}
 	} else {
-		model_->ChangeAnimation(walk_, 0.2f);
+		model_->ChangeAnimation(walk_, 0.15f);
+		for (int i = 0; i < 2; ++i) {
+			instancing_[i]->ChangeAnimation(walk_, 0.15f);
+		}
 	}
 
 	// 入力を反映

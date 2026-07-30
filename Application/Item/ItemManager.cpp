@@ -149,8 +149,7 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Items/13.png"));
 		break;
 	default:
-		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Items/16.png"));
-		//p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Items/21.png"));
+		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Items/21.png"));
 		break;
 	}
 	auto newItem = std::make_unique<WorldPassive>(std::move(p), pos, Rarity::Rare, isForSale);
@@ -186,67 +185,64 @@ void ItemManager::Load() {
 	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
 		if (dynamic_cast<InstancedModel*>(obj)) {
 			auto* model = dynamic_cast<InstancedModel*>(obj);
-			models.push_back(model);
-		}
-	}
 
-	for (auto& model : models) {
-		if (model->tag == "weaponSpawn") {
-			int size = int(model->GetTransforms().size());
-			for (int i = 0; i < size; ++i) {
-				Transform t = model->GetTransforms()[i];
-				if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{0,0,0} ) continue;
-				if (int(spawned_.size()) < i + 1) spawned_.resize(i + 1);
+			if (model->tag == "weaponSpawn") {
+				int size = int(model->GetTransforms().size());
+				for (int i = 0; i < size; ++i) {
+					Transform t = model->GetTransforms()[i];
+					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
+					if (int(spawned_.size()) < i + 1) spawned_.resize(i + 1);
 
-				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-				if (!spawned_[i]) {
-					SpawnWeapon(pos, -1, Common, false);
-					spawned_[i] = true;
+					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+					if (!spawned_[i]) {
+						SpawnWeapon(pos, -1, Common, false);
+						spawned_[i] = true;
+					}
 				}
 			}
-		}
 
-		if (model->tag == "weaponForSale") {
-			int size = int(model->GetTransforms().size());
+			if (model->tag == "weaponForSale") {
+				int size = int(model->GetTransforms().size());
 
-			for (int i = 0; i < size; ++i) {
-				Transform t = model->GetTransforms()[i];
-				if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
-				if (int(spawnedSale_.size()) < i + 1) spawnedSale_.resize(i + 1);
-				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-				if (!spawnedSale_[i]) {
-					SpawnWeapon(pos, -1, Common, true);
-					spawnedSale_[i] = true;
+				for (int i = 0; i < size; ++i) {
+					Transform t = model->GetTransforms()[i];
+					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
+					if (int(spawnedSale_.size()) < i + 1) spawnedSale_.resize(i + 1);
+					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+					if (!spawnedSale_[i]) {
+						SpawnWeapon(pos, -1, Common, true);
+						spawnedSale_[i] = true;
+					}
 				}
 			}
-		}
 
-		if (model->tag == "passive") {
-			int size = int(model->GetTransforms().size());
+			if (model->tag == "passive") {
+				int size = int(model->GetTransforms().size());
 
-			for (int i = 0; i < size; ++i) {
-				Transform t = model->GetTransforms()[i];
-				if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
-				if (int(spawnedPassive_.size()) < i + 1) spawnedPassive_.resize(i + 1);
-				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-				if (!spawnedPassive_[i]) {
-					SpawnPassive(pos, false);
-					spawnedPassive_[i] = true;  
+				for (int i = 0; i < size; ++i) {
+					Transform t = model->GetTransforms()[i];
+					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
+					if (int(spawnedPassive_.size()) < i + 1) spawnedPassive_.resize(i + 1);
+					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+					if (!spawnedPassive_[i]) {
+						SpawnPassive(pos, false);
+						spawnedPassive_[i] = true;
+					}
 				}
 			}
-		}
 
-		if (model->tag == "passiveForSale") {
-			int size = int(model->GetTransforms().size());
+			if (model->tag == "passiveForSale") {
+				int size = int(model->GetTransforms().size());
 
-			for (int i = 0; i < size; ++i) {
-				Transform t = model->GetTransforms()[i];
-				if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
-				if (int(spawnedPassiveSale_.size()) < i + 1) spawnedPassiveSale_.resize(i + 1);
-				Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-				if (!spawnedPassiveSale_[i]) {
-					SpawnPassive(pos, true);
-					spawnedPassiveSale_[i] = true;
+				for (int i = 0; i < size; ++i) {
+					Transform t = model->GetTransforms()[i];
+					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
+					if (int(spawnedPassiveSale_.size()) < i + 1) spawnedPassiveSale_.resize(i + 1);
+					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
+					if (!spawnedPassiveSale_[i]) {
+						SpawnPassive(pos, true);
+						spawnedPassiveSale_[i] = true;
+					}
 				}
 			}
 		}

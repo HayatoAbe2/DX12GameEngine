@@ -44,6 +44,14 @@ void WorldPassive::Draw() {
 }
 
 void WorldPassive::OnPickup(Player* player) {
+	if (isForSale_) {
+		Wallet& wallet = player->GetWallet();
+		if (!wallet.Pay(price_)) {
+			// 所持金不足
+			return;
+		}
+	}
+
 	player->AddPassive(std::move(passive_));
 
 	// ワールド上からはなくなる
