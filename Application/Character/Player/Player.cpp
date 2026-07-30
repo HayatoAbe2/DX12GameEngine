@@ -359,7 +359,7 @@ void Player::Move(MapCheck* mapCheck) {
 		dir.y = 1;
 	}
 
-	if (input.mouse.IsPress(MouseButton::Right)) {
+	if (input.mouse.IsPress(MouseButton::Right) || input.gamepad.GetLTrigger() > 0.2f) {
 		model_->ChangeAnimation(sneak_, 0.15f);
 		moveSpeed_ /= 2.0f;
 		for (int i = 0; i < 2; ++i) {

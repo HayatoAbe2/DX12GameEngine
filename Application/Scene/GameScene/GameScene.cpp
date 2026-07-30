@@ -312,8 +312,8 @@ void GameScene::Draw() {
 	itemManager_->Draw();
 	effectManager_->Draw(camera_.get());
 
-	gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
-	render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
+	//gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
+	//render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
 
 	// ui
 	if (!enableEditMode_) {

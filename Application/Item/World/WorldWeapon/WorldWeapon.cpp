@@ -23,8 +23,11 @@ std::unique_ptr<Weapon> WorldWeapon::GetWeapon() {
 }
 
 void WorldWeapon::Update() {
-	weapon_->GetModel()->SetTranslate({ position_.x, 0.5f, position_.y });
-	weapon_->GetShadowModel()->SetTranslate({ position_.x, 0.5f, position_.y });
+	auto model = weapon_->GetModel();
+	auto shadow = weapon_->GetShadowModel();
+	model->SetTranslate({ position_.x, 0.5f, position_.y });
+	shadow->SetTranslate({ position_.x, 0.5f, position_.y });
+	shadow->SetRotate(model->GetTransform().rotate);
 }
 
 void WorldWeapon::Draw() {
