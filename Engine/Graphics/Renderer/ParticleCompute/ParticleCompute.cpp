@@ -20,6 +20,7 @@ void ParticleCompute::Emit(ID3D12GraphicsCommandList* cmdList, ParticleSystem* p
 	cmdList->SetComputeRootConstantBufferView(1, perFrameResource->GetGPUVirtualAddress());
 	cmdList->SetComputeRootDescriptorTable(2, descriptorManager->GetGPUHandle(particleSys->GetParticleUAVIndex()));
 	cmdList->SetComputeRootDescriptorTable(3, descriptorManager->GetGPUHandle(particleSys->GetFreeCounterUAVIndex()));
+	cmdList->SetComputeRootDescriptorTable(4, descriptorManager->GetGPUHandle(particleSys->GetFreeListUAVIndex()));
 	cmdList->Dispatch(1, 1, 1);
 }
 
@@ -38,6 +39,8 @@ void ParticleCompute::Update(ID3D12GraphicsCommandList* cmdList, ParticleSystem*
 
 	cmdList->SetComputeRootConstantBufferView(0, perFrameResource->GetGPUVirtualAddress());
 	cmdList->SetComputeRootDescriptorTable(1, descriptorManager->GetGPUHandle(particleSys->GetParticleUAVIndex()));
+	cmdList->SetComputeRootDescriptorTable(2, descriptorManager->GetGPUHandle(particleSys->GetFreeCounterUAVIndex()));
+	cmdList->SetComputeRootDescriptorTable(3, descriptorManager->GetGPUHandle(particleSys->GetFreeListUAVIndex()));
 	cmdList->Dispatch(1, 1, 1);
 
 	// TransitionBarrier

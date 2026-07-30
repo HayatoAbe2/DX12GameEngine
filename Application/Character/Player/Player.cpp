@@ -36,6 +36,10 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	transform_.translate.x = 1;
 	transform_.translate.z = 1;
 
+	walk_ = asset.LoadAnimation("Resources/Debug/human", "walk.gltf");
+	sneak_ = asset.LoadAnimation("Resources/Debug/human", "sneakWalk.gltf");
+	model_->SetAnimation(walk_);
+
 	// 残像
 	for (int i = 0; i < 2; ++i) {
 		instancing_[i] = asset.LoadModel("Resources/Debug/human", "walk.gltf");
@@ -353,6 +357,13 @@ void Player::Move(MapCheck* mapCheck) {
 
 	if (input.keyboard.IsPress(DIK_S)) {
 		dir.y = 1;
+	}
+
+	if (input.mouse.IsPress(MouseButton::Right)) {
+		model_->ChangeAnimation(sneak_, 0.2f);
+		moveSpeed_ /= 2.0f;
+	} else {
+		model_->ChangeAnimation(walk_, 0.2f);
 	}
 
 	// 入力を反映

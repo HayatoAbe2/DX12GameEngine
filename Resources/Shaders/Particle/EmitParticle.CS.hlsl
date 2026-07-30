@@ -18,7 +18,8 @@ struct PerFrame {
 ConstantBuffer<EmitterSphere> gEmitter : register(b0);
 ConstantBuffer<PerFrame> gPerFrame : register(b1);
 RWStructuredBuffer<Particle> gParticles : register(u0);
-RWStructuredBuffer<int32_t> gFreeCounter : register(u1);
+RWStructuredBuffer<int32_t> gFreeListIndex : register(u1);
+RWStructuredBuffer<uint32_t> gFreeList : register(u2);
 
 // パーティクルEmit
 [numthreads(1, 1, 1)]
@@ -29,16 +30,23 @@ void main(uint32_t3 DTid : SV_DispatchThreadID) {
         
         // 出現させる
         for (uint32_t i = 0; i < gEmitter.count; ++i) {
-            int32_t particleIndex;
-            InterlockedAdd(gFreeCounter[0], 1, particleIndex);
-            
-            if (particleIndex < kMaxParticles) {
+            int32_t freeListIndex;
+            // FreeListからIndex取得
+            InterlockedAdd(gFreeListIndex[0], -1, freeListIndex);
+            if (0 <= freeListIndex && freeListIndex < kMaxParticles) { // 空きあり
+                uint32_t particleIndex = gFreeList[freeListIndex];
+             
                 gParticles[particleIndex].scale = generator.Generate3d();
                 gParticles[particleIndex].translate = generator.Generate3d();
                 gParticles[particleIndex].color.rgb = generator.Generate3d();
                 gParticles[particleIndex].color.a = 1.0f;
                 gParticles[particleIndex].velocity = generator.Generate3d() - float32_t3(0.5f, 0.5f, 0.5f);
                 gParticles[particleIndex].lifeTime = 3.0f;
+                gParticles[particleIndex].currentTime = 0.0f;
+            } else {
+                // indexを戻す
+                InterlockedAdd(gFreeListIndex[0], 1);
+                break;
             }
         }
     }

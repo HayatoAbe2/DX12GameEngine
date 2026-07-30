@@ -27,7 +27,7 @@ public:
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 	void SetAnimation(std::shared_ptr<Animation> animation) { animationPlayer_ = std::make_unique<AnimationPlayer>(animation, rootNode_->name); }
-
+	void ChangeAnimation(std::shared_ptr<Animation> animation, float time);
 	
 	void CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager);
 	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); } 

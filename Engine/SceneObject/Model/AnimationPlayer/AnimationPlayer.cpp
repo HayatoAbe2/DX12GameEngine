@@ -19,28 +19,107 @@ void AnimationPlayer::Update(ModelNode& rootNode) {
 }
 
 void AnimationPlayer::Update(Skeleton& skeleton) {
-	animationTime_ += GameContext::GetInstance().GetDeltatime();
+	float deltaTime = GameContext::GetInstance().GetDeltatime();
+	animationTime_ += deltaTime;
 	animationTime_ = std::fmod(animationTime_, animation_->duration);
 
-	for (Joint& joint : skeleton.joints) {
-		if (auto it = animation_->nodeAnimations.find(joint.name); it != animation_->nodeAnimations.end()) {
-			const NodeAnimation& rootNodeAnimation = (*it).second;
-
-			if (rootNodeAnimation.translate.size() != 0) {
-				joint.transform.translate = CalculateValue(rootNodeAnimation.translate, animationTime_);
-			}
-			if (rootNodeAnimation.rotate.size() != 0) {
-				joint.transform.rotate = Normalize(CalculateValue(rootNodeAnimation.rotate, animationTime_));
-			}
-			if (rootNodeAnimation.scale.size() != 0) {
-				joint.transform.scale = CalculateValue(rootNodeAnimation.scale, animationTime_);
-			}
-			joint.localMatrix = MakeAffineMatrix(
-				joint.transform.scale,
-				joint.transform.rotate,
-				joint.transform.translate);
-		}
+	// 次のアニメーションへの補間
+	if (nextAnimation_) {
+		nextAnimationTime_ += deltaTime;
+		nextAnimationTime_ = std::fmod(nextAnimationTime_, nextAnimation_->duration);
+		blendTime_ += deltaTime;
 	}
+
+	float t = 0;
+	if (nextAnimation_) {
+		t = (std::min)(blendTime_ / blendDuration_, 1.0f);
+	}
+
+	for (Joint& joint : skeleton.joints) {
+		auto currentIt = animation_->nodeAnimations.find(joint.name);
+		// 現在アニメーションに存在しないJointは触らない 
+		if (currentIt == animation_->nodeAnimations.end()) {
+			continue;
+		}
+
+		// jointのTransform
+		const NodeAnimation& currentNode = currentIt->second;
+
+		if (nextAnimation_) {
+			Vector3 currentTranslate = joint.transform.translate;
+			Quaternion currentRotate = joint.transform.rotate;
+			Vector3 currentScale = joint.transform.scale;
+
+			if (!currentNode.translate.empty()) {
+				currentTranslate = CalculateValue(currentNode.translate, animationTime_);
+			}
+			if (!currentNode.rotate.empty()) {
+				currentRotate = Normalize(CalculateValue(currentNode.rotate, animationTime_));
+			}
+			if (!currentNode.scale.empty()) {
+				currentScale = CalculateValue(currentNode.scale, animationTime_);
+			}
+
+			// 次値（存在しなければ現在値を維持）
+			Vector3 nextTranslate = currentTranslate;
+			Quaternion nextRotate = currentRotate;
+			Vector3 nextScale = currentScale;
+
+			if (auto nextIt = nextAnimation_->nodeAnimations.find(joint.name);
+				nextIt != nextAnimation_->nodeAnimations.end()) {
+				const NodeAnimation& nextNode = nextIt->second;
+				if (!nextNode.translate.empty()) {
+					nextTranslate = CalculateValue(nextNode.translate, nextAnimationTime_);
+				}
+				if (!nextNode.rotate.empty()) {
+					nextRotate = Normalize(CalculateValue(nextNode.rotate, nextAnimationTime_));
+				}
+				if (!nextNode.scale.empty()) {
+					nextScale = CalculateValue(nextNode.scale, nextAnimationTime_);
+				}
+			}
+
+			// 補間
+			joint.transform.translate = Lerp(currentTranslate, nextTranslate, t);
+			joint.transform.rotate = Normalize(Slerp(currentRotate, nextRotate, t));
+			joint.transform.scale = Lerp(currentScale, nextScale, t);
+
+		} else {
+			if (!currentNode.translate.empty()) {
+				joint.transform.translate = CalculateValue(currentNode.translate, animationTime_);
+			}
+			if (!currentNode.rotate.empty()) {
+				joint.transform.rotate = Normalize(CalculateValue(currentNode.rotate, animationTime_));
+			}
+			if (!currentNode.scale.empty()) {
+				joint.transform.scale = CalculateValue(currentNode.scale, animationTime_);
+			}
+		}
+
+		joint.localMatrix = MakeAffineMatrix(
+			joint.transform.scale,
+			joint.transform.rotate,
+			joint.transform.translate);
+	}
+
+	if (t >= 1.0f) {
+		// 完全に移行
+		animation_ = nextAnimation_;
+		animationTime_ = nextAnimationTime_;
+		nextAnimation_.reset();
+	}
+}
+
+void AnimationPlayer::ChangeAnimation(std::shared_ptr<Animation> animation, float duration) {
+	// 再生中、切替中のものと同じだったら無視
+	if (animation_ == animation || nextAnimation_ == animation) {
+		return;
+	}
+
+	nextAnimation_ = animation;
+	nextAnimationTime_ = 0;
+	blendTime_ = 0;
+	blendDuration_ = duration;
 }
 
 Vector3 AnimationPlayer::CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {

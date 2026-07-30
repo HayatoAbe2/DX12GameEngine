@@ -40,14 +40,21 @@ public:
     void SetFreeCounterResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource) {
         freeCounterResource_ = resource;
     }
+    void SetFreeListResource(Microsoft::WRL::ComPtr<ID3D12Resource> resource) {
+        freeListResource_ = resource;
+    }
 
     // パーティクルデータUAV
     void SetParticleUAVIndex(uint32_t uavIndex) { particleDataUAVIndex_ = uavIndex; }
     uint32_t GetParticleUAVIndex() { return particleDataUAVIndex_; }
 
-    // 空きパーティクルUAV
+    // 空きパーティクルIndexのUAV
     void SetFreeCounterUAVIndex(uint32_t uavIndex) { freeCounterUAVIndex_ = uavIndex; }
     uint32_t GetFreeCounterUAVIndex() { return freeCounterUAVIndex_; }
+
+    // 空きパーティクルリストUAV
+    void SetFreeListUAVIndex(uint32_t uavIndex) { freeListUAVIndex_ = uavIndex; }
+    uint32_t GetFreeListUAVIndex() { return freeListUAVIndex_; }
 
     void SetInstanceTransformData(InstanceGPUData* data) { instanceTransformationData_ = data; }
     void SetParticleData(GPUParticle* data) { particleData_ = data; }
@@ -82,6 +89,9 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterResource_;
     uint32_t freeCounterUAVIndex_;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> freeListResource_;
+    uint32_t freeListUAVIndex_;
 
     // 現在ResourceState
     D3D12_RESOURCE_STATES resourceStates_ = D3D12_RESOURCE_STATE_COMMON;

@@ -56,3 +56,9 @@ void Model::CopyModelData(std::shared_ptr<ModelData> data, BufferManager* buffer
 		materials_.push_back(std::move(newMat));
 	}
 }
+
+void Model::ChangeAnimation(std::shared_ptr<Animation> animation, float time) {
+	if (animationPlayer_) {
+		animationPlayer_->ChangeAnimation(animation, time);
+	}
+}

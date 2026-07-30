@@ -30,7 +30,6 @@ void GameScene::Initialize() {
 	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
 
 	playerModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
-	playerModel_->SetAnimation(asset.LoadAnimation("Resources/Debug/human", "walk.gltf"));
 	playerShadowModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
 	MaterialData data = playerModel_->GetMaterial(0)->GetData();
 	data.color = { 0.0f,0.0f,0.0f,1.0f };
@@ -102,7 +101,7 @@ void GameScene::Initialize() {
 
 	isLoaded_ = false;
 
-	//gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
+	gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
 
 	player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
 	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,30,-19 };
@@ -313,8 +312,8 @@ void GameScene::Draw() {
 	itemManager_->Draw();
 	effectManager_->Draw(camera_.get());
 
-	//gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
-	//render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
+	gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
+	render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
 
 	// ui
 	if (!enableEditMode_) {

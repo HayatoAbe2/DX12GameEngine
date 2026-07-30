@@ -141,5 +141,8 @@ private:
 	Wallet wallet_;
 
 	ItemManager* itemManager_ = nullptr;
+
+	std::shared_ptr<Animation> walk_;
+	std::shared_ptr<Animation> sneak_;
 };
 

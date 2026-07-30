@@ -630,15 +630,18 @@ void RootSignatureManager::CreateSkinningComputeRootSignature() {
 }
 
 void RootSignatureManager::CreateParticleInitRootSignature() {
-	D3D12_DESCRIPTOR_RANGE range[2]{};
+	D3D12_DESCRIPTOR_RANGE range[3]{};
 	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	range[0].BaseShaderRegister = 0;
 	range[0].NumDescriptors = 1;
 	range[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	range[1].BaseShaderRegister = 1;
 	range[1].NumDescriptors = 1;
+	range[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[2].BaseShaderRegister = 2;
+	range[2].NumDescriptors = 1;
 
-	D3D12_ROOT_PARAMETER rootParameters[2]{};
+	D3D12_ROOT_PARAMETER rootParameters[3]{};
 
 	// UAV
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -652,6 +655,12 @@ void RootSignatureManager::CreateParticleInitRootSignature() {
 	rootParameters[1].Descriptor.ShaderRegister = 1; // u1
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
 	rootParameters[1].DescriptorTable.pDescriptorRanges = &range[1];
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[2].Descriptor.ShaderRegister = 2;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &range[2];
 
 
 	D3D12_ROOT_SIGNATURE_DESC desc{};
@@ -680,7 +689,7 @@ void RootSignatureManager::CreateParticleInitRootSignature() {
 }
 
 void RootSignatureManager::CreateParticleEmitRootSignature() {
-	D3D12_ROOT_PARAMETER rootParameters[4]{};
+	D3D12_ROOT_PARAMETER rootParameters[5]{};
 
 	// b0
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -692,13 +701,16 @@ void RootSignatureManager::CreateParticleEmitRootSignature() {
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	rootParameters[1].Descriptor.ShaderRegister = 1;
 
-	D3D12_DESCRIPTOR_RANGE range[2]{};
+	D3D12_DESCRIPTOR_RANGE range[3]{};
 	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	range[0].BaseShaderRegister = 0;
 	range[0].NumDescriptors = 1;
 	range[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	range[1].BaseShaderRegister = 1;
 	range[1].NumDescriptors = 1;
+	range[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[2].BaseShaderRegister = 2;
+	range[2].NumDescriptors = 1;
 	// u0
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
@@ -711,6 +723,12 @@ void RootSignatureManager::CreateParticleEmitRootSignature() {
 	rootParameters[3].Descriptor.ShaderRegister = 1; // u1
 	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
 	rootParameters[3].DescriptorTable.pDescriptorRanges = &range[1];
+
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[4].Descriptor.ShaderRegister = 2;
+	rootParameters[4].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[4].DescriptorTable.pDescriptorRanges = &range[2];
 
 	D3D12_ROOT_SIGNATURE_DESC desc{};
 	desc.NumParameters = _countof(rootParameters);
@@ -738,7 +756,7 @@ void RootSignatureManager::CreateParticleEmitRootSignature() {
 }
 
 void RootSignatureManager::CreateParticleUpdateRootSignature() {
-	D3D12_ROOT_PARAMETER rootParameters[2]{};
+	D3D12_ROOT_PARAMETER rootParameters[4]{};
 
 	// b0
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
@@ -746,10 +764,16 @@ void RootSignatureManager::CreateParticleUpdateRootSignature() {
 	rootParameters[0].Descriptor.ShaderRegister = 0;
 
 
-	D3D12_DESCRIPTOR_RANGE range[1]{};
+	D3D12_DESCRIPTOR_RANGE range[3]{};
 	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 	range[0].BaseShaderRegister = 0;
 	range[0].NumDescriptors = 1;
+	range[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[1].BaseShaderRegister = 1;
+	range[1].NumDescriptors = 1;
+	range[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	range[2].BaseShaderRegister = 2;
+	range[2].NumDescriptors = 1;
 
 	// u0
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -757,6 +781,18 @@ void RootSignatureManager::CreateParticleUpdateRootSignature() {
 	rootParameters[1].Descriptor.ShaderRegister = 0; // u0
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
 	rootParameters[1].DescriptorTable.pDescriptorRanges = &range[0];
+	// u1
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[2].Descriptor.ShaderRegister = 1;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &range[1];
+	// u2
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[3].Descriptor.ShaderRegister = 2;
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &range[2];
 
 	D3D12_ROOT_SIGNATURE_DESC desc{};
 	desc.NumParameters = _countof(rootParameters);

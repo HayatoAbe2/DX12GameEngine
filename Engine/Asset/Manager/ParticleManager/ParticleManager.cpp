@@ -13,7 +13,8 @@ std::unique_ptr<ParticleSystem> ParticleManager::CreateParticle(uint32_t size, u
 
 	// リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> instanceTransformResource = bufferManager->CreateDefaultBuffer(sizeof(GPUParticle) * size, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-	Microsoft::WRL::ComPtr<ID3D12Resource> freeCounterResource = bufferManager->CreateDefaultBuffer(sizeof(uint32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeListIResource = bufferManager->CreateDefaultBuffer(sizeof(uint32_t), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	Microsoft::WRL::ComPtr<ID3D12Resource> freeListResource = bufferManager->CreateDefaultBuffer(sizeof(uint32_t) * size, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
 	// SRV
 	uint32_t index = descriptorManager->Allocate();
@@ -34,9 +35,14 @@ std::unique_ptr<ParticleSystem> ParticleManager::CreateParticle(uint32_t size, u
 	particleSystem->SetParticleUAVIndex(uavIndex);
 
 	uavIndex = descriptorManager->Allocate();
-	descriptorManager->CreateStructuredBufferUAV(uavIndex, freeCounterResource.Get(), 1, sizeof(int32_t));
+	descriptorManager->CreateStructuredBufferUAV(uavIndex, freeListIResource.Get(), 1, sizeof(int32_t));
 	particleSystem->SetFreeCounterUAVIndex(uavIndex);
-	particleSystem->SetFreeCounterResource(freeCounterResource);
+	particleSystem->SetFreeCounterResource(freeListIResource);
+
+	uavIndex = descriptorManager->Allocate();
+	descriptorManager->CreateStructuredBufferUAV(uavIndex, freeListResource.Get(), UINT(size), sizeof(uint32_t));
+	particleSystem->SetFreeListUAVIndex(uavIndex);
+	particleSystem->SetFreeListResource(freeListResource);
 
 	// 初期化
 	InitializeParticles(particleSystem.get(), size);
@@ -75,6 +81,7 @@ void ParticleManager::InitializeParticles(ParticleSystem* particleSys, uint32_t 
 
 	cmdList->SetComputeRootDescriptorTable(0, descriptorManager->GetGPUHandle(particleSys->GetParticleUAVIndex()));
 	cmdList->SetComputeRootDescriptorTable(1, descriptorManager->GetGPUHandle(particleSys->GetFreeCounterUAVIndex()));
+	cmdList->SetComputeRootDescriptorTable(2, descriptorManager->GetGPUHandle(particleSys->GetFreeListUAVIndex()));
 	cmdList->Dispatch(UINT(size + 1023) / 1024, 1, 1);
 
 	// Barrier

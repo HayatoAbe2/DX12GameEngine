@@ -15,6 +15,8 @@ public:
 	// ボーンアニメーション
 	void Update(Skeleton& skeleton);
 
+	void ChangeAnimation(std::shared_ptr<Animation> animation, float duration);
+
 private:
 	Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
 	Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
@@ -23,5 +25,10 @@ private:
 	
 	NodeAnimation nodeAnim_;
 	std::shared_ptr<Animation> animation_ = nullptr;
+	std::shared_ptr<Animation> nextAnimation_ = nullptr;
+
+	float nextAnimationTime_ = 0;
+	float blendTime_ = 0;
+	float blendDuration_ = 0;
 };
 
