@@ -36,7 +36,6 @@ void WorldWeapon::Draw() {
 	auto& render = ctx.Render();
 
 	render.DrawModel(weapon_->GetModel());
-	render.DrawModel(weapon_->GetShadowModel());
 }
 
 void WorldWeapon::OnPickup(Player* player) {
