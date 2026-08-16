@@ -7,7 +7,7 @@ Room* FloorGenerator::GenerateFloor() {
 	first.startDirection = Direction::South;
 
 	// 続く部屋
-	int maxDepth = 3;
+	int maxDepth = 5;
 	GenerateRooms(first, 1, maxDepth);
 
 	floor_ = first;
@@ -26,7 +26,7 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 			next.type = RoomType::Goal;
 		} else {
 			// 仮置き
-			if (depth == 2) {
+			if (depth == 3) {
 				next.type = RoomType::Shop; 
 			} else {
 				next.type = RoomType::Combat;
