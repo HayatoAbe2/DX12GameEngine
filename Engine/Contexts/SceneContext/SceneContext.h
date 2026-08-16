@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Engine/Math/Vector3/Vector3.h"
 class BaseScene;
 class SceneManager;
 class SceneEditor;
@@ -11,7 +12,8 @@ public:
 	void SceneChange(std::string nextSceneName);
 
 	BaseScene* GetCurrentScene();
-	void SceneLoad(const std::string& path);
+	void SceneLoad(const std::string& path, Vector3 offset = Vector3{0,0,0});
+	void Reset();
 private:
 	SceneManager* sceneManager_ = nullptr;
 	SceneEditor* sceneEditor_ = nullptr;

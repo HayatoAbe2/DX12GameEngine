@@ -5,8 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
-#include "Engine/Scene/BaseScene/BaseScene.h"
-#include "Engine/SceneObject/SceneObject.h"
 
 MapTile::~MapTile() {
 	auto& ctx = GameContext::GetInstance();
@@ -41,33 +39,49 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 	}
 
 	map_.clear();
-	mapWidth_ = 128;
-	mapHeight_ = 128;
 	map_.assign(mapHeight_, std::vector<Tile>(mapWidth_, Tile::None));
 
 	for (auto& model : models) {
 		auto matData = model->GetMaterial(0)->GetData();
+
 		if (model->tag == "floor") {
 			for (Transform& t : model->GetTransforms()) {
-				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
-				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
-				if (map_[y][x] != Tile::Wall) {
+				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
+				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
+				int x = tileX + mapWidth_ / 2;
+				int y = tileY + mapHeight_ / 2;
+
+				if (x >= 0 && x < mapWidth_ &&
+					y >= 0 && y < mapHeight_) {
 					map_[y][x] = Tile::Floor;
 				}
 			}
 		}
 		if (model->tag == "wall") {
 			for (Transform& t : model->GetTransforms()) {
-				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
-				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
-				map_[y][x] = Tile::Wall;
+				if (t.scale == Vector3{ 0,0,0 }) continue;
+				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
+				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
+				int x = tileX + mapWidth_ / 2;
+				int y = tileY + mapHeight_ / 2;
+
+				if (x >= 0 && x < mapWidth_ &&
+					y >= 0 && y < mapHeight_) {
+					map_[y][x] = Tile::Wall;
+				}
 			}
 		}
 		if (model->tag == "barrier") {
 			for (Transform& t : model->GetTransforms()) {
-				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
-				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
-				map_[y][x] = Tile::CombatWall;
+				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
+				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
+				int x = tileX + mapWidth_ / 2;
+				int y = tileY + mapHeight_ / 2;
+
+				if (x >= 0 && x < mapWidth_ &&
+					y >= 0 && y < mapHeight_) {
+					map_[y][x] = Tile::CombatWall;
+				}
 			}
 			if (isCombat || isEditMode) {
 				matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
@@ -80,9 +94,15 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 		}
 		if (model->tag == "goal") {
 			for (Transform& t : model->GetTransforms()) {
-				int x = std::clamp(int(std::round((t.translate.x - tileSize_ * 0.5f) / tileSize_)), 0, mapWidth_);
-				int y = std::clamp(int(std::round((t.translate.z - tileSize_ * 0.5f) / tileSize_)), 0, mapHeight_);
-				map_[y][x] = Tile::Goal;
+				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
+				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
+				int x = tileX + mapWidth_ / 2;
+				int y = tileY + mapHeight_ / 2;
+
+				if (x >= 0 && x < mapWidth_ &&
+					y >= 0 && y < mapHeight_) {
+					map_[y][x] = Tile::Goal;
+				}
 
 				auto& spotLight = light.GetSpotLight(lightIndex_);
 				spotLight.position = t.translate + Vector3{ 0.0f,3.0f,0.0f };
@@ -146,6 +166,14 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 		} else if (model->tag == "enemySpawnPoint") {
 			if (scene.GetCurrentScene()->IsEditMode()) {
 				matData.color = { 1.0f, 0.0f, 0.0f, 0.5f };
+			} else {
+				matData.color.w = 0;
+			}
+			model->GetMaterial(0)->SetData(matData);
+			model->GetMaterial(1)->SetData(matData);
+		} else if (model->tag == "roomConnector") {
+			if (scene.GetCurrentScene()->IsEditMode()) {
+				matData.color = { 1.0f, 1.0f, 1.0f, 0.5f };
 			} else {
 				matData.color.w = 0;
 			}

@@ -79,7 +79,7 @@ void SceneEditor::Draw(Camera* camera) {
 			ImGui::Separator();
 
 			// 削除
-			if (ImGui::Button("Delete")) {
+			if (ImGui::Button("削除")) {
 				PushUndo();
 				scene_->RemoveObject(selected_);
 				selected_ = nullptr;
@@ -90,18 +90,39 @@ void SceneEditor::Draw(Camera* camera) {
 		// 編集中切り替え
 		ImGui::Begin("Mode");
 		bool editMode = scene_->IsEditMode();
-		if (ImGui::Checkbox("EditMode", &editMode)) {
+		if (ImGui::Checkbox("編集モード", &editMode)) {
 			scene_->SetEditMode(editMode);
 		}
 		ImGui::End();
 
-		ImGui::Begin("Save/Load");
-		if (ImGui::Button("Save")) {
+		ImGui::Begin("セーブ/ロード");
+
+		ImGui::TextUnformatted("resources/");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(200.0f);
+		ImGui::InputText("##filename", &currentFileName_);
+		ImGui::SameLine();
+		ImGui::TextUnformatted(".json");
+
+		if (ImGui::Button("セーブ")) {
 			Save();
 		}
-		if (ImGui::Button("Load")) {
+		if (ImGui::Button("ロード")) {
 			selected_ = nullptr;
-			Load("Resources/Debug/SceneEditor/SceneData.json");
+
+			scene_->Clear();
+			if (std::filesystem::exists("Resources/Debug/SceneEditor/" + currentFileName_ + ".json")) {
+				Load("Resources/Debug/SceneEditor/" + currentFileName_ + ".json");
+			}
+		}
+		if (ImGui::Button("追加ロード")) {
+			selected_ = nullptr;
+
+			if (std::filesystem::exists("Resources/Debug/SceneEditor/" + currentFileName_ + ".json")) {
+				Load("Resources/Debug/SceneEditor/" + currentFileName_ + ".json");
+			} else {
+				scene_->Clear();
+			}
 		}
 		ImGui::End();
 
@@ -109,8 +130,9 @@ void SceneEditor::Draw(Camera* camera) {
 		ImGui::Begin("Asset Brouser");
 		const char* items[]
 		{
-			"Human",
-			"Floor",
+			"WhiteCube",
+			"Wall",
+			"Floor"
 		};
 		ImGui::Combo(
 			"Model",
@@ -118,9 +140,9 @@ void SceneEditor::Draw(Camera* camera) {
 			items,
 			IM_ARRAYSIZE(items));
 
-		ImGui::InputInt("numInstance", &addInstanceNum_);
+		ImGui::InputInt("インスタンス数", &addInstanceNum_);
 
-		if (ImGui::Button("Add")) {
+		if (ImGui::Button("追加")) {
 			auto& asset = GameContext::GetInstance().Asset();
 			PushUndo();
 			scene_->AddObject(asset.LoadInstancedModel(selectedAssetDir_[selectedAssetIndex_], selectedAssetPath_[selectedAssetIndex_], addInstanceNum_));
@@ -242,11 +264,11 @@ void SceneEditor::Draw(Camera* camera) {
 					break;
 				case 1:
 					op = ImGuizmo::ROTATE;
-					gizmoCtx_.snap[1] = rotateSnap_;
+					gizmoCtx_.snap[0] = rotateSnap_;
 					break;
 				case 2:
 					op = ImGuizmo::SCALE;
-					gizmoCtx_.snap[2] = scaleSnap_;
+					gizmoCtx_.snap[0] = scaleSnap_;
 					break;
 				}
 				gizmoCtx_.isActive = selected_ != nullptr;
@@ -313,7 +335,7 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 				input.keyboard.IsTrigger(DIK_UP) || input.keyboard.IsTrigger(DIK_DOWN)) {
 
 				// 次インスタンス選択
-				if (transforms.size() > editingInstance_ && input.keyboard.IsPress(DIK_LSHIFT)) {
+				if (transforms.size() > editingInstance_ + 1 && input.keyboard.IsPress(DIK_LSHIFT)) {
 					editingInstance_++;
 
 					// 移動
@@ -348,7 +370,7 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 			Transform t = transforms[editingInstance_];
 
 			ImGui::DragFloat3("Scale", &t.scale.x, gizmoCtx_.snap[2]);
-			ImGui::DragFloat3("Rotate", &t.rotate.x, gizmoCtx_.snap[1]);
+			ImGui::DragFloat3("Rotate", &t.rotate.x, gizmoCtx_.snap[0]);
 			ImGui::DragFloat3("Translate", &t.translate.x, gizmoCtx_.snap[0]);
 
 			model->SetTransforms(editingInstance_, t);
@@ -442,16 +464,13 @@ void SceneEditor::Save() {
 		}
 	}
 
-	std::ofstream file("Resources/Debug/SceneEditor/SceneData.json");
+	std::ofstream file("Resources/Debug/SceneEditor/" + currentFileName_ + ".json");
 	file << root.dump(4);
 #endif
 }
 
-void SceneEditor::Load(const std::string& path) {
+void SceneEditor::Load(const std::string& path, Vector3 offset) {
 	auto& asset = GameContext::GetInstance().Asset();
-
-	// 現在シーンをクリア
-	scene_->Clear();
 
 	std::ifstream file(path);
 	nlohmann::json root;
@@ -475,9 +494,9 @@ void SceneEditor::Load(const std::string& path) {
 			rotate.y = objectJson["rotate"][1];
 			rotate.z = objectJson["rotate"][2];
 			Vector3 translate;
-			translate.x = objectJson["translate"][0];
-			translate.y = objectJson["translate"][1];
-			translate.z = objectJson["translate"][2];
+			translate.x = objectJson["translate"][0] + offset.x;
+			translate.y = objectJson["translate"][1] + offset.y;
+			translate.z = objectJson["translate"][2] + offset.z;
 			model->SetTransform({ scale, rotate, translate });
 
 			scene_->AddObject(std::move(model));
@@ -509,12 +528,8 @@ void SceneEditor::Load(const std::string& path) {
 					json["translate"][1],
 					json["translate"][2]
 				};
+				t.translate += offset;
 
-				if (t.translate.x == 0 &&
-					t.translate.y == 0 &&
-					t.translate.z == 0) {
-					t.scale = {};
-				}
 				transforms.push_back(t);
 			}
 

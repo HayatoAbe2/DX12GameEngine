@@ -9,6 +9,7 @@ class MapCheck {
 public:
 	void Initialize(std::vector<std::vector<MapTile::Tile>> map, float tileSize);
 	void Update(std::vector<std::vector<MapTile::Tile>> map);
+
 	bool ResolveCollisionX(Vector2& pos, float radius, bool isFlying);
 	bool ResolveCollisionY(Vector2& pos, float radius, bool isFlying);
 	bool IsHitWall(const Vector2& pos, float radius);
@@ -19,6 +20,9 @@ public:
 	void SetCombat(bool isCombat) { isCombat_ = isCombat; }
 
 private:	
+	int WorldToMapX(float x) const;
+	int WorldToMapY(float y) const;
+
 	std::vector<std::vector<MapTile::Tile>> map_;
 	float tileSize_ = 0;
 	bool isCombat_ = false;

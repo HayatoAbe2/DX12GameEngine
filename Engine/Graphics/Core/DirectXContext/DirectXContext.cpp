@@ -224,6 +224,8 @@ void DirectXContext::BeginFrame() {
 		// RenderTexture再生成
 		renderTextureResource_[0] = CreateRenderTextureResource();
 		renderTextureResource_[1] = CreatePostEffectResource();
+		renderTextureState_[0] = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		renderTextureState_[1] = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 		sceneViewResource_ = CreateSceneViewResource();
 
 		// DepthSRV再作成
@@ -413,29 +415,6 @@ void DirectXContext::EndFrame() {
 	fixFPS_->Update();
 }
 
-//void DirectXContext::BeginPass(RenderPass pass, bool clear) {
-//	auto cmdList = commandListManager_->GetCommandList();
-//
-//	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = descriptorHeapManager_->GetCPUDescriptorHandle(descriptorHeapManager_->GetDSVHeap().Get(), descriptorHeapManager_->GetDSVHeapSize(), 0);
-//
-//	// パスのRTV
-//	D3D12_CPU_DESCRIPTOR_HANDLE rtv{};
-//	switch (pass) {
-//	case RenderPass::Scene:
-//		rtv = renderTargetManager_->GetRenderTextureRTVHandle();
-//		break;
-//	case RenderPass::OutlineMask:
-//		rtv = outlineMaskRTVHandle_;
-//		break;
-//	}
-//	cmdList->OMSetRenderTargets(1, &rtv, false, &dsvHandle);
-//
-//	if (clear) {
-//		float clearColor[] = { 0,0,0,0 };
-//		cmdList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
-//	}
-//}
-
 void DirectXContext::ApplyPostEffect(PostEffectType type, const PostBuffer& src, const PostBuffer& dst) {
 	auto cmd = commandListManager_->GetCommandList();
 
@@ -447,6 +426,10 @@ void DirectXContext::ApplyPostEffect(PostEffectType type, const PostBuffer& src,
 	cmd->OMSetRenderTargets(1, &dst.rtv, false, nullptr);
 	cmd->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	cmd->SetGraphicsRootSignature(rootSignatureManager_->GetRootSignature(RootSignatures::Fullscreen).Get());
+
+	// 描画用のDescriptorHeapの設定
+	ID3D12DescriptorHeap* descriptorHeapsRaw[] = { descriptorManager_->GetHeap().Get() };
+	cmd->SetDescriptorHeaps(1, descriptorHeapsRaw);
 
 	if (type == PostEffectType::None) {
 		cmd->SetPipelineState(pipelineStateManager_->GetCopyImagePSO());

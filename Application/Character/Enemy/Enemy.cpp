@@ -31,6 +31,8 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 
 	// 初期State
 	currentState_ = std::make_unique<EnemyIdle>();
+
+	stunTimer_->Start(1.0f);
 }
 
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {

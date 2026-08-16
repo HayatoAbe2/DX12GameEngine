@@ -90,18 +90,17 @@ void GameScene::Initialize() {
 	resultCursor_->SetSize({ 48,56 });
 	resultCursor_->SetColor({ 1, 1, 1, 0.7f });
 
-#ifdef USE_IMGUI
-	//enableEditMode_ = true;
-#endif
+	// フロア生成
+	floorManager_ = std::make_unique<FloorManager>();
 
 	// マップ判定
 	mapCheck_ = std::make_unique<MapCheck>();
 	mapTile_->UpdateMapChange(false, enableEditMode_);
 	Reset();
 
-	isLoaded_ = false;
+	floorManager_->Initialize();
 
-	gpuParticle = asset.CreateGPUParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), 1024);
+	isLoaded_ = false;
 
 	player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
 	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,30,-19 };
@@ -137,6 +136,16 @@ void GameScene::Update() {
 						fadePhase_ = FadePhase::FadeOut;
 						fadeTimer_.Start(kMaxFadeoutTimer_);
 						audio.SoundPlay(L"Resources/Sounds/SE/warp.mp3", false);
+					}
+
+					// 次の部屋移動判定
+					for (auto& connector : floorManager_->GetConnector()) {
+						if (CheckCollision(ToXZ(player_->GetTransform().translate), connector.collider)) {
+							fadePhase_ = FadePhase::FadeOut;
+							fadeTimer_.Start(kMaxFadeoutTimer_);
+							isRoomMoving_ = true;
+							nextDirection_ = connector.direction;
+						}
 					}
 				}
 
@@ -191,6 +200,7 @@ void GameScene::Update() {
 				// フェードアウト
 				fadeTimer_.Update();
 				fade_->SetColor({ 1.0f,1.0f,1.0f, 1.0f - fadeTimer_.GetRemaining() / kMaxFadeoutTimer_ });
+
 				if (fadeTimer_.IsFinished()) {
 					if (player_->IsDead() || currentFloor_ == 3) {
 						if (isShowResult_) {
@@ -203,15 +213,22 @@ void GameScene::Update() {
 							fadePhase_ = FadePhase::FadeIn;
 							resultTime_ = 0;
 						}
-					} else {
-						isShowResult_ = true;
+					} else if (isRoomMoving_) {
+						Reset();
+
+						// 次の部屋
+						MoveToNextRoom(nextDirection_);
 
 						fadeTimer_.Start(kMaxFadeinTimer_);
 						fadePhase_ = FadePhase::FadeIn;
-
+						isRoomMoving_ = false;
+					} else {
 						// 次のフロア
 						currentFloor_++;
 						Reset();
+
+						fadeTimer_.Start(kMaxFadeinTimer_);
+						fadePhase_ = FadePhase::FadeIn;
 					}
 				}
 			}
@@ -312,19 +329,12 @@ void GameScene::Draw() {
 	itemManager_->Draw();
 	effectManager_->Draw(camera_.get());
 
-	//gpuParticle->UpdateEmitterForGPUParticle(ctx.GetDeltatime());
-	//render.DrawGPUParticle(gpuParticle.get(), BlendMode::Add);
-
 	// ui
 	if (!enableEditMode_) {
 		uiDrawer_->Draw();
 	}
 
-	// 結果(プレイ画面の上から)
-	if (isShowResult_) {
-		render.DrawSprite(resultBG_.get());
-		render.DrawSprite(resultCursor_.get());
-	}
+
 
 	if (!enableEditMode_) {
 		fade_->SetSize(Vector2{ 1280, 720 } + Vector2{ 20,80 });
@@ -373,20 +383,25 @@ void GameScene::Reset() {
 	auto& ctx = GameContext::GetInstance();
 	auto& scene = ctx.Scene();
 
+	scene.Reset();
 	enemyManager_->Reset();
 	itemManager_->Reset();
 	bulletManager_->Reset();
 	player_->Stop();
 
-	scene.SceneLoad("Resources/Debug/SceneEditor/SceneData.json");
-
-	Vector3 pos;
-	pos = { 5 * 1.5f,0,5 * 1.5f };
-	pos.y = 0;
-
 	// プレイヤー位置
+	Vector3 pos = { floorManager_->GetStartPos().x, 0, floorManager_->GetStartPos().y };
 	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });
 
 	isLoaded_ = false;
 	mapCheck_->Initialize(mapTile_->GetMap(), mapTile_->GetTileSize());
+}
+
+void GameScene::MoveToNextRoom(Direction direction) {
+	Reset();
+	floorManager_->LoadNextRoom(direction);
+
+	// プレイヤー位置
+	Vector3 pos = { floorManager_->GetStartPos().x, 0, floorManager_->GetStartPos().y };
+	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });
 }

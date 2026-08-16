@@ -27,8 +27,8 @@ public:
 private:
 	std::vector<std::vector<Tile>> map_;
 	float tileSize_ = 1.5f;
-	int mapWidth_ = 0;
-	int mapHeight_ = 0;
+	int mapWidth_ = 64;
+	int mapHeight_ = 64;
 	
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleSystem> particle_ = nullptr;

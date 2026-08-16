@@ -16,7 +16,6 @@ public:
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
 	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int enemyType);
 	void Reset();
-	void LoadCSV(std::string filePath, float tileSize, WeaponManager* weaponManager);
 	void Load(WeaponManager* weaponManager);
 	void SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck);
 

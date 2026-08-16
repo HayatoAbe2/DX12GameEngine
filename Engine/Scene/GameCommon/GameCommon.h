@@ -10,6 +10,8 @@
 // 配置物
 #include "Engine/Scene/Camera/Camera.h"
 #include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
+#include "Engine/Scene/BaseScene/BaseScene.h"
+#include "Engine/SceneObject/SceneObject.h"
 
 // 構造体、関数
 #include "Engine/Math/MathUtils.h"

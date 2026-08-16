@@ -38,20 +38,28 @@ public:
 	void AddObject(std::unique_ptr<SceneObject> object) { sceneObjects_.push_back(std::move(object)); }
 	// オブジェクト削除
 	void RemoveObject(SceneObject* object) {
-		pendingDelete_.push_back(object);
+		auto it = std::find_if(
+			sceneObjects_.begin(),
+			sceneObjects_.end(),
+			[&](const std::unique_ptr<SceneObject>& ptr) {
+				return ptr.get() == object;
+			}
+		);
+
+		if (it != sceneObjects_.end()) {
+			pendingDelete_.push_back(std::move(*it));
+			sceneObjects_.erase(it);
+		}
 	}
 	void Clear() {
 		for (auto& obj : sceneObjects_) {
-			pendingDelete_.push_back(obj.get());
+			pendingDelete_.push_back(std::move(obj));
 		}
+
+		sceneObjects_.clear();
 	}
 
 	void FlushDelete() {
-		for (auto* obj : pendingDelete_) {
-			std::erase_if(sceneObjects_, [&](const std::unique_ptr<SceneObject>& ptr) {
-				return ptr.get() == obj;
-				});
-		}
 		pendingDelete_.clear();
 	}
 
@@ -68,7 +76,7 @@ protected:
 
 	// オブジェクト
 	std::vector<std::unique_ptr<SceneObject>> sceneObjects_;
-	std::vector<SceneObject*> pendingDelete_;
+	std::vector<std::unique_ptr<SceneObject>> pendingDelete_;
 
 	bool enableEditMode_ = false;
 };

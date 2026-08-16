@@ -17,7 +17,7 @@ public:
 	void DrawInspector(SceneObject* object);
 
 	void Save();
-	void Load(const std::string& path);
+	void Load(const std::string& path, Vector3 offset = Vector3{0,0,0});
 
 	std::string SerializeScene();
 	void DeserializeScene(const std::string& jsonText);
@@ -36,8 +36,8 @@ private:
 
 	std::vector<std::unique_ptr<Resource>> resources_;
 	SceneObject* selected_;
-	std::string selectedAssetDir_[2] = { "Resources/Debug/human", "Resources/Floor"};
-	std::string selectedAssetPath_[2] = { "walk.gltf", "floor.obj" };
+	std::string selectedAssetDir_[3] = { "Resources/Debug/whiteCube", "Resources/block", "Resources/Floor",};
+	std::string selectedAssetPath_[3] = { "whiteCube.obj", "block.obj", "floor.obj" };
 	int selectedAssetIndex_ = 0;
 	int gizmoMode_ = 0;
 
@@ -47,7 +47,7 @@ private:
 
 	bool useSnap_ = false;
 	float moveSnap_ = 1.0f;
-	float rotateSnap_ = 15.0f;
+	float rotateSnap_ = float(std::numbers::pi) / 4.0f;
 	float scaleSnap_ = 0.1f;
 
 	int editingInstance_ = 0;
@@ -56,5 +56,8 @@ private:
 	bool redoRequest_ = false;
 
 	int addInstanceNum_ = 1;
+
+	// ファイルパス
+	std::string currentFileName_ = "SceneData";
 };
 

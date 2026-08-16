@@ -258,6 +258,8 @@
     <ClCompile Include="Application\Item\World\WorldMoney\WorldMoney.cpp" />
     <ClCompile Include="Application\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Externals\imgui\imgui_stdlib.cpp" />
+    <ClCompile Include="Application\Map\FloorGenerator\FloorGenerator.cpp" />
+    <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -577,6 +579,9 @@
     <ClInclude Include="Application\Item\World\WorldMoney\WorldMoney.h" />
     <ClInclude Include="Application\Item\World\WorldPassive\WorldPassive.h" />
     <ClInclude Include="Externals\imgui\imgui_stdlib.h" />
+    <ClInclude Include="Application\Map\Room\RoomData.h" />
+    <ClInclude Include="Application\Map\FloorGenerator\FloorGenerator.h" />
+    <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

@@ -15,7 +15,11 @@ BaseScene* SceneContext::GetCurrentScene() {
 	return sceneManager_->GetCurrentScene();
 }
 
-void SceneContext::SceneLoad(const std::string& path) {
+void SceneContext::SceneLoad(const std::string& path, Vector3 offset) {
 	sceneEditor_->scene_ = sceneManager_->GetCurrentScene();
-	sceneEditor_->Load(path);
+	sceneEditor_->Load(path, offset);
+}
+
+void SceneContext::Reset() {
+	sceneEditor_->scene_->Clear();
 }

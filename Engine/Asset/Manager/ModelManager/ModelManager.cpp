@@ -153,7 +153,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 		/// マテリアルの設定
 		/// 
 
-		for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+ 		for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
 			auto texture = std::make_shared<Texture>(textureId);
 
 			aiMaterial* aiMaterial = scene->mMaterials[materialIndex];

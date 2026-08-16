@@ -11,6 +11,7 @@
 #include "Item/ItemManager.h"
 #include "CollisionChecker/CollisionChecker.h"
 #include "UI/UIDrawer/UIDrawer.h"
+#include "Map/FloorManager/FloorManager.h"
 
 // ゲームシーン
 class GameScene : public BaseScene {
@@ -29,6 +30,9 @@ public:
 
 	// リセット
 	void Reset();
+
+	// 次の部屋に移動
+	void MoveToNextRoom(Direction direction);
 
 private:
 	// 3Dモデル
@@ -105,4 +109,9 @@ private:
 
 	std::unique_ptr<ParticleSystem> gpuParticle;
 	std::unique_ptr<MoneyUI> moneyUI_;
+
+	// フロア
+	std::unique_ptr<FloorManager> floorManager_;
+	bool isRoomMoving_ = false;
+	Direction nextDirection_;
 };

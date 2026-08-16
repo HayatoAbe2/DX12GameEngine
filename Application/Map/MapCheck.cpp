@@ -12,6 +12,14 @@ void MapCheck::Update(std::vector<std::vector<MapTile::Tile>> map) {
 	map_ = map;
 }
 
+int MapCheck::WorldToMapX(float x) const {
+	return static_cast<int>(std::floor(x / tileSize_ + 0.5f)) + static_cast<int>(map_[0].size()) / 2;
+}
+
+int MapCheck::WorldToMapY(float y) const {
+	return static_cast<int>(std::floor(y / tileSize_ + 0.5f)) + static_cast<int>(map_.size()) / 2;
+}
+
 bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 	bool isHit = false;
 	int mapH = static_cast<int>(map_.size());
@@ -24,10 +32,10 @@ bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 	float charMaxY = pos.y + radius;
 
 	// 衝突しそうな範囲だけループ（効率化）
-	int startY = std::max(0, static_cast<int>(charMinY / tileSize_));
-	int endY = std::min(mapH - 1, static_cast<int>(charMaxY / tileSize_));
-	int startX = std::max(0, static_cast<int>(charMinX / tileSize_));
-	int endX = std::min(mapW - 1, static_cast<int>(charMaxX / tileSize_));
+	int startY = std::max(0, WorldToMapY(charMinY));
+	int endY = std::min(mapH - 1, WorldToMapY(charMaxY));
+	int startX = std::max(0, WorldToMapX(charMinX));
+	int endX = std::min(mapW - 1, WorldToMapX(charMaxX));
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
@@ -44,10 +52,13 @@ bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
 
 			// タイルAABB
-			float tileMinX = x * tileSize_;
-			float tileMinY = y * tileSize_;
-			float tileMaxX = tileMinX + tileSize_;
-			float tileMaxY = tileMinY + tileSize_;
+			float tileCenterX = (x - mapW / 2) * tileSize_;
+			float tileCenterY = (y - mapH / 2) * tileSize_;
+
+			float tileMinX = tileCenterX - tileSize_ * 0.5f;
+			float tileMaxX = tileCenterX + tileSize_ * 0.5f;
+			float tileMinY = tileCenterY - tileSize_ * 0.5f;
+			float tileMaxY = tileCenterY + tileSize_ * 0.5f;
 
 			// Y方向が重なってなければ無視（X軸解決なので）
 			if (charMaxY <= tileMinY || charMinY >= tileMaxY) continue;
@@ -72,8 +83,9 @@ bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 	}
 
 	// --- マップ外チェック ---
-	float minX = 0;
-	float maxX = mapW * tileSize_;
+	float minX = -mapW * tileSize_ * 0.5f;
+	float maxX = mapW * tileSize_ * 0.5f;
+
 	pos.x = std::clamp(pos.x, minX + radius, maxX - radius);
 
 	return isHit;
@@ -89,10 +101,10 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 	float charMinY = pos.y - radius;
 	float charMaxY = pos.y + radius;
 
-	int startY = std::max(0, static_cast<int>(charMinY / tileSize_));
-	int endY = std::min(mapH - 1, static_cast<int>(charMaxY / tileSize_));
-	int startX = std::max(0, static_cast<int>(charMinX / tileSize_));
-	int endX = std::min(mapW - 1, static_cast<int>(charMaxX / tileSize_));
+	int startY = std::max(0, WorldToMapY(charMinY));
+	int endY = std::min(mapH - 1, WorldToMapY(charMaxY));
+	int startX = std::max(0, WorldToMapX(charMinX));
+	int endX = std::min(mapW - 1, WorldToMapX(charMaxX));
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
@@ -108,10 +120,13 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 			}
 			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
 
-			float tileMinX = x * tileSize_;
-			float tileMinY = y * tileSize_;
-			float tileMaxX = tileMinX + tileSize_;
-			float tileMaxY = tileMinY + tileSize_;
+			float tileCenterX = (x - mapW / 2) * tileSize_;
+			float tileCenterY = (y - mapH / 2) * tileSize_;
+
+			float tileMinX = tileCenterX - tileSize_ * 0.5f;
+			float tileMaxX = tileCenterX + tileSize_ * 0.5f;
+			float tileMinY = tileCenterY - tileSize_ * 0.5f;
+			float tileMaxY = tileCenterY + tileSize_ * 0.5f;
 
 			// X方向が重なっていなければ無視
 			if (charMaxX <= tileMinX || charMinX >= tileMaxX) continue;
@@ -137,8 +152,9 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 	}
 
 	// マップ外チェック
-	float minY = 0;
-	float maxY = mapH * tileSize_;
+	float minY = -mapH * tileSize_ * 0.5f;
+	float maxY = mapH * tileSize_ * 0.5f;
+
 	pos.y = std::clamp(pos.y, minY + radius, maxY - radius);
 
 	return isHit;
@@ -154,23 +170,26 @@ bool MapCheck::IsHitWall(const Vector2& pos, float radius) {
 	float charMinY = pos.y - radius;
 	float charMaxY = pos.y + radius;
 
-	// 衝突しそうな範囲だけループ（効率化）
-	int startY = std::max(0, static_cast<int>(charMinY / tileSize_));
-	int endY = std::min(mapH - 1, static_cast<int>(charMaxY / tileSize_));
-	int startX = std::max(0, static_cast<int>(charMinX / tileSize_));
-	int endX = std::min(mapW - 1, static_cast<int>(charMaxX / tileSize_));
+	// 衝突しそうな範囲
+	int startY = std::max(0, WorldToMapY(charMinY));
+	int endY = std::min(mapH - 1, WorldToMapY(charMaxY));
+	int startX = std::max(0, WorldToMapX(charMinX));
+	int endX = std::min(mapW - 1, WorldToMapX(charMaxX));
 
-	for (int y = startY; y <= endY; ++y) { 
+	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
 			if (map_[y][x] == MapTile::Tile::Floor) continue;
 			if (map_[y][x] == MapTile::Tile::None) continue;
 			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
 
 			// タイルAABB
-			float tileMinX = x * tileSize_;
-			float tileMinY = y * tileSize_;
-			float tileMaxX = tileMinX + tileSize_;
-			float tileMaxY = tileMinY + tileSize_;
+			float tileCenterX = (x - mapW / 2) * tileSize_;
+			float tileCenterY = (y - mapH / 2) * tileSize_;
+
+			float tileMinX = tileCenterX - tileSize_ * 0.5f;
+			float tileMaxX = tileCenterX + tileSize_ * 0.5f;
+			float tileMinY = tileCenterY - tileSize_ * 0.5f;
+			float tileMaxY = tileCenterY + tileSize_ * 0.5f;
 
 			// 重なっていれば衝突
 			if (charMaxX > tileMinX || charMinX < tileMaxX &&
@@ -192,11 +211,11 @@ bool MapCheck::IsFall(const Vector2& pos) {
 	float charMinY = pos.y - 0.1f;
 	float charMaxY = pos.y + 0.1f;
 
-	// 衝突しそうな範囲だけループ（効率化）
-	int startY = std::max(0, static_cast<int>(charMinY / tileSize_));
-	int endY = std::min(mapH - 1, static_cast<int>(charMaxY / tileSize_));
-	int startX = std::max(0, static_cast<int>(charMinX / tileSize_));
-	int endX = std::min(mapW - 1, static_cast<int>(charMaxX / tileSize_));
+	// 衝突しそうな範囲
+	int startY = std::max(0, WorldToMapY(charMinY));
+	int endY = std::min(mapH - 1, WorldToMapY(charMaxY));
+	int startX = std::max(0, WorldToMapX(charMinX));
+	int endX = std::min(mapW - 1, WorldToMapX(charMaxX));
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
@@ -221,21 +240,24 @@ bool MapCheck::IsGoal(const Vector2& pos, float radius, bool canGoal) {
 	float charMinY = pos.y - radius - 0.1f;
 	float charMaxY = pos.y + radius;
 
-	// 衝突しそうな範囲だけループ（効率化）
-	int startY = std::max(0, static_cast<int>(charMinY / tileSize_));
-	int endY = std::min(mapH - 1, static_cast<int>(charMaxY / tileSize_));
-	int startX = std::max(0, static_cast<int>(charMinX / tileSize_));
-	int endX = std::min(mapW - 1, static_cast<int>(charMaxX / tileSize_));
+	// 衝突しそうな範囲
+	int startY = std::max(0, WorldToMapY(charMinY));
+	int endY = std::min(mapH - 1, WorldToMapY(charMaxY));
+	int startX = std::max(0, WorldToMapX(charMinX));
+	int endX = std::min(mapW - 1, WorldToMapX(charMaxX));
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
 			if (map_[y][x] == MapTile::Tile::Goal) {
 
 				// タイルAABB
-				float tileMinX = x * tileSize_;
-				float tileMinY = y * tileSize_;
-				float tileMaxX = tileMinX + tileSize_;
-				float tileMaxY = tileMinY + tileSize_;
+				float tileCenterX = (x - mapW / 2) * tileSize_;
+				float tileCenterY = (y - mapH / 2) * tileSize_;
+
+				float tileMinX = tileCenterX - tileSize_ * 0.5f;
+				float tileMaxX = tileCenterX + tileSize_ * 0.5f;
+				float tileMinY = tileCenterY - tileSize_ * 0.5f;
+				float tileMaxY = tileCenterY + tileSize_ * 0.5f;
 
 				// 重なっていれば衝突
 				if (charMaxX > tileMinX || charMinX < tileMaxX &&
@@ -263,9 +285,13 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 		for (int x = startX; x <= endX; ++x) {
 			if (map_[y][x] == MapTile::Tile::Floor) { continue; }
 			if (map_[y][x] == MapTile::Tile::None) { continue; }
+
+			float tileCenterX = (x - mapW / 2) * tileSize_;
+			float tileCenterZ = (y - mapH / 2) * tileSize_;
+
 			AABB3D aabb;
-			aabb.min = { x * tileSize_,0,(mapH - 1 - y) * tileSize_ };
-			aabb.max = { (x + 1) * tileSize_,0,(mapH - y) * tileSize_ };
+			aabb.min = { tileCenterX - tileSize_ * 0.5f,0,tileCenterZ - tileSize_ * 0.5f };
+			aabb.max = { tileCenterX + tileSize_ * 0.5f,0,tileCenterZ + tileSize_ * 0.5f };
 
 			Vector3 tMin =
 			{
