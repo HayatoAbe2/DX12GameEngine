@@ -13,7 +13,7 @@
 
 #include <wrl.h>
 #include <d3d12.h>
-#include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
+#include "Editor/SceneEditor/GizmoCtx.h"
 #include "Engine/Graphics/SkinningSystem/SkinningSystem.h"
 #include "Engine/Graphics/Renderer/ParticleCompute/ParticleCompute.h"
 

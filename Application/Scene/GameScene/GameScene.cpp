@@ -15,8 +15,6 @@ void GameScene::Initialize() {
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();
 	camera_ = std::make_unique<Camera>();
-	camera_->transform_.rotate = { 1.0f,0,0 };
-	render.SetCamera(camera_.get());
 
 	audio.SoundLoad(L"Resources/Sounds/SE/explosion.mp3");
 	audio.SoundLoad(L"Resources/Sounds/SE/shoot.mp3");
@@ -73,14 +71,8 @@ void GameScene::Initialize() {
 	uiDrawer_ = std::make_unique<UIDrawer>();
 	uiDrawer_->Initialize(player_.get(), moneyUI_.get());
 
-	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,0,-cameraDistance_ };
-
 	// フェード
-	fade_ = asset.LoadSprite("resources/Debug/white1x1.png");
-	fade_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
-	fade_->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-	fadePhase_ = FadePhase::FadeIn;
-	fadeTimer_.Start(kMaxFadeinTimer_);
+	fade_ = std::make_unique<Fade>();
 
 	resultBG_ = asset.LoadSprite("resources/Result/result.png");
 	resultBG_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
@@ -89,6 +81,9 @@ void GameScene::Initialize() {
 	resultCursor_ = asset.LoadSprite("resources/Result/cursor.png");
 	resultCursor_->SetSize({ 48,56 });
 	resultCursor_->SetColor({ 1, 1, 1, 0.7f });
+
+	// カメラ制御
+	cameraController_ = std::make_unique<GameCameraController>(camera_.get());
 
 	// フロア生成
 	floorManager_ = std::make_unique<FloorManager>();
@@ -103,7 +98,6 @@ void GameScene::Initialize() {
 	isLoaded_ = false;
 
 	player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
-	camera_->transform_.translate = player_->GetTransform().translate + Vector3{ 0,30,-19 };
 }
 
 void GameScene::Update() {
@@ -120,29 +114,27 @@ void GameScene::Update() {
 				}
 
 			} else {
-				// プレイヤー処理
-				if (fadePhase_ == FadePhase::None) {
+
+				if (!fade_->IsActive()) {
+					// プレイヤー処理
 					player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
 
 					// ゲームオーバー
 					if (player_->IsDead()) {
-						fadePhase_ = FadePhase::FadeOut;
-						fadeTimer_.Start(kMaxFadeoutTimer_);
+						fade_->StartFadeOut();
 					}
 
 					// ゴール判定
 					Vector2 pos = { player_->GetTransform().translate.x,player_->GetTransform().translate.z };
 					if (mapCheck_->IsGoal(pos, player_->GetRadius(), enemyManager_->GetEnemies().size() == 0)) {
-						fadePhase_ = FadePhase::FadeOut;
-						fadeTimer_.Start(kMaxFadeoutTimer_);
+						fade_->StartFadeOut();
 						audio.SoundPlay(L"Resources/Sounds/SE/warp.mp3", false);
 					}
 
 					// 次の部屋移動判定
 					for (auto& connector : floorManager_->GetConnector()) {
 						if (CheckCollision(ToXZ(player_->GetTransform().translate), connector.collider)) {
-							fadePhase_ = FadePhase::FadeOut;
-							fadeTimer_.Start(kMaxFadeoutTimer_);
+							fade_->StartFadeOut();
 							isRoomMoving_ = true;
 							nextDirection_ = connector.direction;
 						}
@@ -188,48 +180,35 @@ void GameScene::Update() {
 				uiDrawer_->Update();
 			}
 
-			if (fadePhase_ == FadePhase::FadeIn) {
-				// フェードイン
-				fadeTimer_.Update();
-				fade_->SetColor({ 1.0f,1.0f,1.0f, fadeTimer_.GetRemaining() / kMaxFadeinTimer_ });
-				if (fadeTimer_.IsFinished()) {
-					fadePhase_ = FadePhase::None;
-				}
-
-			} else if (fadePhase_ == FadePhase::FadeOut) {
-				// フェードアウト
-				fadeTimer_.Update();
-				fade_->SetColor({ 1.0f,1.0f,1.0f, 1.0f - fadeTimer_.GetRemaining() / kMaxFadeoutTimer_ });
-
-				if (fadeTimer_.IsFinished()) {
-					if (player_->IsDead() || currentFloor_ == 3) {
-						if (isShowResult_) {
-							scene.SceneChange("Game");
-						} else {
-							// ゲームオーバーまたはクリア
-							isShowResult_ = true;
-
-							fadeTimer_.Start(kMaxFadeinTimer_);
-							fadePhase_ = FadePhase::FadeIn;
-							resultTime_ = 0;
-						}
-					} else if (isRoomMoving_) {
-						Reset();
-
-						// 次の部屋
-						MoveToNextRoom(nextDirection_);
-
-						fadeTimer_.Start(kMaxFadeinTimer_);
-						fadePhase_ = FadePhase::FadeIn;
-						isRoomMoving_ = false;
+			fade_->Update();
+			// フェードアウト終了時
+			if (fade_->GetPhase() == FadePhase::Faded) {
+				if (player_->IsDead() || currentFloor_ == 3) {
+					if (isShowResult_) {
+						scene.SceneChange("Game");
 					} else {
-						// 次のフロア
-						currentFloor_++;
-						Reset();
+						// ゲームオーバーまたはクリア
+						isShowResult_ = true;
 
-						fadeTimer_.Start(kMaxFadeinTimer_);
-						fadePhase_ = FadePhase::FadeIn;
+						fade_->StartFadeIn();
+						resultTime_ = 0;
 					}
+				} else if (isRoomMoving_) {
+					Reset();
+
+					// 次の部屋
+					MoveToNextRoom(nextDirection_);
+
+					fade_->StartFadeIn();
+					isRoomMoving_ = false;
+				} else {
+					// 次のフロア
+					currentFloor_++;
+					Reset();
+					currentFloor_ = 0;
+					Initialize();
+
+					fade_->StartFadeIn();
 				}
 			}
 
@@ -261,22 +240,6 @@ void GameScene::Update() {
 			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
 			resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
 
-			if (fadePhase_ == FadePhase::FadeIn) {
-				// フェードイン
-				fadeTimer_.Update();
-				fade_->SetColor({ 1.0f,1.0f,1.0f, fadeTimer_.GetRemaining() / kMaxFadeinTimer_ });
-				if (fadeTimer_.IsFinished()) {
-					fadePhase_ = FadePhase::None;
-				}
-			} else if (fadePhase_ == FadePhase::FadeOut) {
-				// フェードアウト
-				fadeTimer_.Update();
-				fade_->SetColor({ 1.0f,1.0f,1.0f, 1.0f - fadeTimer_.GetRemaining() / kMaxFadeoutTimer_ });
-				if (fadeTimer_.IsFinished()) {
-					fadePhase_ = FadePhase::None;
-				}
-			}
-
 			if (isShowResult_ &&
 				(input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A))) {
 				scene.SceneChange("Game");
@@ -287,10 +250,6 @@ void GameScene::Update() {
 
 	mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
 	enemyManager_->SpawnCheck(player_->GetTransform().translate, mapCheck_.get());
-
-	// カメラ行列更新
-	camera_->Update(debugCamera_.get());
-	debugCamera_->Update();
 
 	if (enableEditMode_) {
 		isLoaded_ = false;
@@ -309,6 +268,14 @@ void GameScene::Update() {
 void GameScene::Draw() {
 	BaseScene::Draw();
 
+	// カメラ移動
+	if (isLoaded_ && !fade_->IsActive()) {
+		//cameraController_->Update(player_->GetTransform().translate);
+	}
+	// カメラ行列更新
+	camera_->Update(debugCamera_.get());
+	debugCamera_->Update();
+
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 	if (isShowResult_) {
@@ -318,7 +285,7 @@ void GameScene::Draw() {
 		render.AddPostEffect(PostEffectType::Outline);
 	}
 
-	if (fadePhase_ != FadePhase::None) {
+	if (fade_->GetPhase() != FadePhase::None) {
 		render.AddPostEffect(PostEffectType::RadialBlur);
 	}
 	render.DrawSkybox(skybox_.get()); // パーティクルを後に描画したい
@@ -334,16 +301,11 @@ void GameScene::Draw() {
 		uiDrawer_->Draw();
 	}
 
-
-
-	if (!enableEditMode_) {
-		fade_->SetSize(Vector2{ 1280, 720 } + Vector2{ 20,80 });
-		render.DrawSprite(fade_.get());
-	}
-
+	fade_->Draw();
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Weapon");
+	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
 	if (ImGui::Button("Pistol")) {
 		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
 	};
@@ -376,6 +338,9 @@ void GameScene::Draw() {
 	};
 	ImGui::End();
 
+	ImGui::Begin("Camera");
+	ImGui::DragFloat3("Pos", &camera_->transform_.translate.x, 0.5f);
+	ImGui::End();
 #endif
 }
 

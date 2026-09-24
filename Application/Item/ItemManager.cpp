@@ -138,9 +138,11 @@ void ItemManager::SpawnMoney(Vector3 pos, int amount) {
 
 void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	auto& ctx = GameContext::GetInstance();
-	int r = ctx.RandomInt(0, 2);
 	auto& asset = ctx.Asset();
 	std::unique_ptr<Passive> p;
+
+	// ランダム出現
+	int r = ctx.RandomInt(0, 2);
 	switch (r) {
 	case 0:
 		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Items/16.png"));

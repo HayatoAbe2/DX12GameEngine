@@ -2,6 +2,7 @@
 #define NOMINMAX
 #include "MapTile.h"
 #include "GameCommon.h"
+#include "Timer/Timer.h"
 
 class Player;
 
@@ -17,7 +18,7 @@ public:
 	bool IsGoal(const Vector2& pos, float radius, bool canGoal);
 	bool EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerPos);
 
-	void SetCombat(bool isCombat) { isCombat_ = isCombat; }
+	void SetCombat(bool isCombat);
 
 private:	
 	int WorldToMapX(float x) const;
@@ -26,5 +27,10 @@ private:
 	std::vector<std::vector<MapTile::Tile>> map_;
 	float tileSize_ = 0;
 	bool isCombat_ = false;
+
+	Timer barrierAppierTimer_;
+	Timer barrierDisappierTimer_;
+	const float kBarrierAppierTime = 0.3f;
+	const float kBarrierDisappierTime = 0.3f;
 };
 

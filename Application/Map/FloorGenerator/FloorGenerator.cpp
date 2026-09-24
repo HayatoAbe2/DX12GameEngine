@@ -26,8 +26,8 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 			next.type = RoomType::Goal;
 		} else {
 			// 仮置き
-			if (depth == 3) {
-				next.type = RoomType::Shop; 
+			if (depth == 2) {
+				next.type = RoomType::Shop;
 			} else {
 				next.type = RoomType::Combat;
 			}
@@ -84,58 +84,52 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 	scene.SceneLoad("Resources/Debug/SceneEditor/" + roomName + std::to_string(num) + ".json");
 
 	// 接続箇所を検索
-	std::vector<InstancedModel*> models;
+	std::vector<Model*> models;
 	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
-		if (dynamic_cast<InstancedModel*>(obj)) {
-			auto* model = dynamic_cast<InstancedModel*>(obj);
+		if (dynamic_cast<Model*>(obj)) {
+			auto* model = dynamic_cast<Model*>(obj);
 			models.push_back(model);
 		}
 	}
 
+	// 出入口
 	for (auto& model : models) {
-		if (model->tag == "roomConnector") {
-			auto transforms = model->GetTransforms();
-			int connectorNum = std::clamp(model->GetNumInstance(), 1, 4);
+		if (model->tag == "westConnector" ||
+			model->tag == "eastConnector" ||
+			model->tag == "southConnector" ||
+			model->tag == "northConnector") {
+			auto transform = model->GetTransform();
+			
+			// 出入口の方向
+			Direction dir;
+			if (model->tag == "westConnector") {
+				dir = Direction::West;
+			} else if (model->tag == "eastConnector") {
+				dir = Direction::East;
+			} else if (model->tag == "southConnector") {
+				dir = Direction::South;
+			} else if (model->tag == "northConnector") {
+				dir = Direction::North;
+			}
 
-			for (int i = 0; i < connectorNum; ++i) {
-				if (transforms[i].scale == Vector3{ 0,0,0 } || transforms[i].translate == Vector3{ 0,0,0 }) { continue; }
+			// スタート地点
+			if (dir == room->startDirection) {
+				room->startPos = ToXZ(transform.translate);
+				continue;
+			} else if (room->startPos.x == 0 && room->startPos.y == 0) {
+				room->startPos = ToXZ(transform.translate);
+			}
 
-				Direction dir = GetDirection(transforms[i].rotate.y);
-				if (dir == room->startDirection) {
-					room->startPos = ToXZ(transforms[i].translate);
-					continue;
-				} else if (room->startPos.x == 0 && room->startPos.y == 0) {
-					room->startPos = ToXZ(transforms[i].translate);
-				}
-
-				if (room->connector.size() < room->nextRooms.size()) {
-					RoomConnector connector;
-					connector.collider = { ToXZ(transforms[i].translate - transforms[i].scale * 0.5f), ToXZ(transforms[i].translate + transforms[i].scale * 0.5f) };
-					connector.connectedRoom = &room->nextRooms[room->connector.size()];
-					connector.direction = dir;
-					room->connector.push_back(connector);
-				}
+			// 出入口を作成
+			if (room->connector.size() < room->nextRooms.size()) {
+				RoomConnector connector;
+				connector.collider = { ToXZ(transform.translate - transform.scale * 0.5f), ToXZ(transform.translate + transform.scale * 0.5f) };
+				connector.connectedRoom = &room->nextRooms[room->connector.size()];
+				connector.direction = dir;
+				room->connector.push_back(connector);
 			}
 		}
 	}
-}
-
-Direction FloorGenerator::GetDirection(float rotationY) {
-	// -π ～ π を 0 ～ 2π に正規化
-	rotationY = std::fmod(rotationY, 2.0f * float(std::numbers::pi));
-
-	if (rotationY < 0.0f)
-		rotationY += 2.0f * float(std::numbers::pi);
-
-	int index = int(std::round(rotationY / (float(std::numbers::pi) / 2.0f))) % 4;
-	switch (index) {
-	case 0: return Direction::North;
-	case 1: return Direction::East;
-	case 2: return Direction::South;
-	case 3: return Direction::West;
-	}
-
-	return Direction::North;
 }
 
 Direction FloorGenerator::GetOpposite(Direction direction) {
@@ -147,3 +141,4 @@ Direction FloorGenerator::GetOpposite(Direction direction) {
 	}
 	return Direction::South;
 }
+

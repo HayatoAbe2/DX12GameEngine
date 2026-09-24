@@ -9,8 +9,8 @@
 #include "Engine/Graphics/Renderer/Renderer.h"
 #include "Engine/SceneObject/LightManager/LightManager.h"
 #include "Engine/Scene/SceneManager/SceneManager.h"
-#include "Engine/Editor/Scene/SceneEditor/SceneEditor.h"
 #include "Engine/Asset/Manager/AssetManager/AssetManager.h"
+#include "Editor/SceneEditor/SceneEditor.h"
 
 #include <memory>
 #include <Windows.h>

@@ -93,5 +93,9 @@ protected:
 
 	std::unique_ptr<Timer> slowTimer_;
 
+	// 出現しおわるまでの時間
+	Timer appierTimer_;
+	const float kAppierTime = 0.7f;
+
 	Vector3 prePos_{};
 };

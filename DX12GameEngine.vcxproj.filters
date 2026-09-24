@@ -236,7 +236,7 @@
     <ClCompile Include="Application\UI\Equipment\EquipmentUI.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl" />
     <ClCompile Include="Application\Character\Enemy\Enemies\Spiker.cpp" />
-    <ClCompile Include="Engine\Editor\Scene\SceneEditor\SceneEditor.cpp" />
+    <ClCompile Include="Editor\SceneEditor\SceneEditor.cpp" />
     <ClCompile Include="Application\Effect\Hit\HitEffect.cpp" />
     <ClCompile Include="Application\Effect\Explode\ExplodeEffect.cpp" />
     <ClCompile Include="Externals\ImGuizmo\ImGuizmo.cpp" />
@@ -260,6 +260,8 @@
     <ClCompile Include="Externals\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="Application\Map\FloorGenerator\FloorGenerator.cpp" />
     <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
+    <ClCompile Include="Application\Fade\Fade.cpp" />
+    <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -553,12 +555,12 @@
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Application\Character\Enemy\Enemies\Spiker.h" />
     <ClInclude Include="Engine\SceneObject\SceneObject.h" />
-    <ClInclude Include="Engine\Editor\Scene\SceneEditor\SceneEditor.h" />
+    <ClInclude Include="Editor\SceneEditor\SceneEditor.h" />
     <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
     <ClInclude Include="Application\Effect\Explode\ExplodeEffect.h" />
     <ClInclude Include="Externals\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="Application\Character\Character.h" />
-    <ClInclude Include="Engine\Editor\Scene\SceneEditor\GizmoCtx.h" />
+    <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />
@@ -582,6 +584,8 @@
     <ClInclude Include="Application\Map\Room\RoomData.h" />
     <ClInclude Include="Application\Map\FloorGenerator\FloorGenerator.h" />
     <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
+    <ClInclude Include="Application\Fade\Fade.h" />
+    <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

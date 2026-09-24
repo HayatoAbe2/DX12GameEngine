@@ -69,7 +69,6 @@ protected:
 
 	// カメラ
 	std::unique_ptr<Camera> camera_ = nullptr;
-	float cameraDistance_ = 20.0f;
 
 	// デバッグカメラ
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;

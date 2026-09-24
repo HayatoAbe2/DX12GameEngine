@@ -15,15 +15,13 @@ public:
 
 	// 逆方向
 	Direction GetOpposite(Direction direction);
+
 private:
 	// 部屋生成
 	void GenerateRooms(Room& room, int depth, int maxDepth);
 
 	// 部屋タイプの決定
 	RoomType SelectRoomType();
-
-	// 方向決め
-	Direction GetDirection(float rotationY);
 
 	Room floor_;
 };

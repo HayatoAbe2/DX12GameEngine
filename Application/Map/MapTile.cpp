@@ -30,18 +30,21 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 	auto& light = ctx.Light();
 	auto& scene = ctx.Scene();
 
-	std::vector<InstancedModel*> models;
+	std::vector<InstancedModel*> instancingModels;
 	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
 		if (dynamic_cast<InstancedModel*>(obj)) {
 			auto* model = dynamic_cast<InstancedModel*>(obj);
-			models.push_back(model);
+			instancingModels.push_back(model);
+
+			auto& spotLight = light.GetSpotLight(lightIndex_);
+			spotLight.intensity = 0.0f;
 		}
 	}
 
 	map_.clear();
 	map_.assign(mapHeight_, std::vector<Tile>(mapWidth_, Tile::None));
 
-	for (auto& model : models) {
+	for (auto& model : instancingModels) {
 		auto matData = model->GetMaterial(0)->GetData();
 
 		if (model->tag == "floor") {
@@ -83,14 +86,10 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 					map_[y][x] = Tile::CombatWall;
 				}
 			}
-			if (isCombat || isEditMode) {
-				matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
-			} else {
-				matData.color = { 0.3f, 0.3f, 1.0f, 0.0f };
-			}
+
+			matData.color = { 0.3f, 0.3f, 1.0f, 0.5f };
 			model->GetMaterial(0)->SetData(matData);
 			model->GetMaterial(1)->SetData(matData);
-
 		}
 		if (model->tag == "goal") {
 			for (Transform& t : model->GetTransforms()) {
@@ -171,7 +170,23 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			}
 			model->GetMaterial(0)->SetData(matData);
 			model->GetMaterial(1)->SetData(matData);
-		} else if (model->tag == "roomConnector") {
+		}
+	}
+
+	std::vector<Model*> models;
+	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
+		if (dynamic_cast<Model*>(obj)) {
+			auto* model = dynamic_cast<Model*>(obj);
+			models.push_back(model);
+
+			auto& spotLight = light.GetSpotLight(lightIndex_);
+			spotLight.intensity = 0.0f;
+		}
+	}
+
+	for (auto& model : models) {
+		auto matData = model->GetMaterial(0)->GetData();
+		if (model->tag == "westConnector" || model->tag == "eastConnector" || model->tag == "southConnector" || model->tag == "northConnector") {
 			if (scene.GetCurrentScene()->IsEditMode()) {
 				matData.color = { 1.0f, 1.0f, 1.0f, 0.5f };
 			} else {

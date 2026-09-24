@@ -9,9 +9,9 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
-#include "Engine/Editor/Scene/SceneEditor/GizmoCtx.h"
+#include "Editor/SceneEditor/GizmoCtx.h"
 #endif
-#include <Engine/Math/Vector2/Vector2.h>
+#include "Engine/Math/Vector2/Vector2.h"
 #include "Engine/SceneObject/Transform.h"
 
 class ImGuiManager {

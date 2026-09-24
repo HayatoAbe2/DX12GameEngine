@@ -10,6 +10,37 @@ void MapCheck::Initialize(std::vector<std::vector<MapTile::Tile>> map, float til
 
 void MapCheck::Update(std::vector<std::vector<MapTile::Tile>> map) {
 	map_ = map;
+
+	auto& ctx = GameContext::GetInstance();
+	auto& scene = ctx.Scene();
+
+	// 戦闘中バリアの出現・消滅
+	std::vector<InstancedModel*> models;
+	for (auto& obj : scene.GetCurrentScene()->GetObjects()) {
+		if (dynamic_cast<InstancedModel*>(obj)) {
+			auto* model = dynamic_cast<InstancedModel*>(obj);
+			models.push_back(model);
+		}
+	}
+	for (auto& model : models) {
+		if (model->tag == "barrier") {
+			auto t = model->GetTransforms();
+			for (int i = 0; i < int(t.size()); ++i) {
+				float rate = 1.0f;
+				if (isCombat_) {
+					rate = 1.0f - barrierAppierTimer_.GetRemaining() / kBarrierAppierTime;
+				} else {
+					rate = barrierDisappierTimer_.GetRemaining() / kBarrierDisappierTime;
+				}
+
+				float scale = rate * tileSize_;
+				model->SetScale(i, Vector3{scale, scale, scale});
+			}
+		}
+	}
+
+	barrierAppierTimer_.Update();
+	barrierDisappierTimer_.Update();
 }
 
 int MapCheck::WorldToMapX(float x) const {
@@ -330,4 +361,17 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 		}
 	}
 	return true;
+}
+
+void MapCheck::SetCombat(bool isCombat) {
+	if (isCombat_ != isCombat) {
+		// 切り替わったとき
+		if (isCombat) {
+			barrierAppierTimer_.Start(kBarrierAppierTime);
+		} else {
+			barrierDisappierTimer_.Start(kBarrierDisappierTime);
+		}
+	}
+
+	isCombat_ = isCombat;
 }

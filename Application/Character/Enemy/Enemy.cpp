@@ -32,10 +32,23 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	// 初期State
 	currentState_ = std::make_unique<EnemyIdle>();
 
-	stunTimer_->Start(1.0f);
+	// 出現演出の間動かない
+	appierTimer_.Start(kAppierTime);
 }
 
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
+	if (appierTimer_.IsActive()) {
+		appierTimer_.Update();
+
+		if (appierTimer_.IsFinished()) {
+			Vector3 t = model_->GetTransform().translate;
+			t.y = 0;
+			model_->SetTranslate(t);
+		} else {
+			return;
+		}
+	}
+
 	auto& ctx = GameContext::GetInstance();
 
 	prePos_ = model_->GetTransform().translate;
@@ -128,6 +141,13 @@ void Enemy::Draw() {
 		shadowTransform.translate.y = 0.01f;
 		shadowModel_->SetTransform(shadowTransform);
 		render.DrawModel(shadowModel_.get());
+	}
+
+	if (appierTimer_.IsActive()) {
+		float r = appierTimer_.GetRemaining() / kAppierTime;
+		Vector3 t = model_->GetTransform().translate;
+		t.y = -r * r * r * 1.5f;
+		model_->SetTranslate(t);
 	}
 	render.DrawModel(model_.get());
 }

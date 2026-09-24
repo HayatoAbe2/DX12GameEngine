@@ -6,6 +6,7 @@ public:
 	void Initialize();
 	void LoadNextRoom(Direction exitDir);
 	Vector2 GetStartPos();
+	void Reset();
 
 	std::vector<RoomConnector> GetConnector();
 private:

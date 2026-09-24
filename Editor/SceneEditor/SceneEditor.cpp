@@ -22,6 +22,20 @@ void ToFloat16(float out[16], const Matrix4x4& m) {
 	out[15] = m.m[3][3];
 }
 
+SceneEditor::SceneEditor() {
+	// 前回使用したファイル名を読み込む
+	std::ifstream file("Resources/Debug/SceneEditor/Initialize/LastFile.json");
+
+	if (file) {
+		nlohmann::json json;
+		file >> json;
+
+		if (json.contains("fileName")) {
+			currentFileName_ = json["fileName"];
+		}
+	}
+}
+
 void SceneEditor::Update() {
 	if (scene_) {
 		scene_->FlushDelete();
@@ -145,7 +159,14 @@ void SceneEditor::Draw(Camera* camera) {
 		if (ImGui::Button("追加")) {
 			auto& asset = GameContext::GetInstance().Asset();
 			PushUndo();
-			scene_->AddObject(asset.LoadInstancedModel(selectedAssetDir_[selectedAssetIndex_], selectedAssetPath_[selectedAssetIndex_], addInstanceNum_));
+
+			if (addInstanceNum_ > 1) {
+				// インスタンシング描画用モデル
+				scene_->AddObject(asset.LoadInstancedModel(selectedAssetDir_[selectedAssetIndex_], selectedAssetPath_[selectedAssetIndex_], addInstanceNum_));
+			} else {
+				// 単体描画用モデル
+				scene_->AddObject(asset.LoadModel(selectedAssetDir_[selectedAssetIndex_], selectedAssetPath_[selectedAssetIndex_]));
+			}
 		}
 		ImGui::End();
 
@@ -222,6 +243,7 @@ void SceneEditor::Draw(Camera* camera) {
 
 				// アクセス範囲修正
 				if (int(transforms.size()) <= editingInstance_) editingInstance_ = int(transforms.size()) - 1;
+				editingInstance_ = std::clamp(editingInstance_, 0, int(transforms.size()) - 1);
 
 				float modelMat[16];
 				ToFloat16(modelMat, MakeAffineMatrix(transforms[editingInstance_]));
@@ -466,6 +488,8 @@ void SceneEditor::Save() {
 
 	std::ofstream file("Resources/Debug/SceneEditor/" + currentFileName_ + ".json");
 	file << root.dump(4);
+
+	SaveLastFileName();
 #endif
 }
 
@@ -537,6 +561,8 @@ void SceneEditor::Load(const std::string& path, Vector3 offset) {
 			scene_->AddObject(std::move(model));
 		}
 	}
+
+	SaveLastFileName();
 }
 
 std::string SceneEditor::SerializeScene() {
@@ -790,4 +816,12 @@ void SceneEditor::ClickSelect() {
 			}
 		}
 	}
+}
+
+void SceneEditor::SaveLastFileName() {
+	nlohmann::json json;
+	json["fileName"] = currentFileName_;
+	std::ofstream file("Resources/Debug/SceneEditor/Initialize/LastFile.json");
+
+	file << json.dump(4);
 }

@@ -258,6 +258,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Item\Item.cpp" />
     <ClCompile Include="Application\Map\FloorGenerator\FloorGenerator.cpp" />
     <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
+    <ClCompile Include="Application\Fade\Fade.cpp" />
+    <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Math\Matrix4x4\Matrix4x4.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\Model.cpp" />
@@ -292,7 +294,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Application\Character\Enemy\Enemies\Spiker.cpp" />
-    <ClCompile Include="Engine\Editor\Scene\SceneEditor\SceneEditor.cpp" />
+    <ClCompile Include="Editor\SceneEditor\SceneEditor.cpp" />
     <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
     <ClCompile Include="Application\Item\World\WorldWeapon\WorldWeapon.cpp" />
     <ClCompile Include="Application\Wallet\Wallet.cpp" />
@@ -456,7 +458,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Item\Passive\Counter\Counter.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
-    <ClInclude Include="Engine\Editor\Scene\SceneEditor\GizmoCtx.h" />
+    <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />
@@ -581,7 +583,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Timer\Timer.h" />
     <ClInclude Include="Externals\nlohmann\json.hpp" />
     <ClInclude Include="Application\Character\Enemy\Enemies\Spiker.h" />
-    <ClInclude Include="Engine\Editor\Scene\SceneEditor\SceneEditor.h" />
+    <ClInclude Include="Editor\SceneEditor\SceneEditor.h" />
     <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />
     <ClInclude Include="Engine\Graphics\SkinningSystem\SkinningSystem.h" />
@@ -599,6 +601,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Item\World\WorldPassive\WorldPassive.h" />
     <ClInclude Include="Application\Map\FloorGenerator\FloorGenerator.h" />
     <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
+    <ClInclude Include="Application\Fade\Fade.h" />
+    <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

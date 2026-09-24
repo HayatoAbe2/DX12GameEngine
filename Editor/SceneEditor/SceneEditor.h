@@ -4,6 +4,7 @@
 #include "Engine/Asset/Resource/Resource.h"
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include <Externals/nlohmann/json.hpp>
+
 #ifdef USE_IMGUI
 #include "imgui_stdlib.h"
 #include "GizmoCtx.h"
@@ -11,6 +12,7 @@
 
 class SceneEditor {
 public:
+	SceneEditor();
 	void Update();
 	void Draw(Camera* camera);
 
@@ -33,6 +35,9 @@ private:
 
 	// 選択
 	void ClickSelect();
+
+	// 最後に操作したファイル更新
+	void SaveLastFileName();
 
 	std::vector<std::unique_ptr<Resource>> resources_;
 	SceneObject* selected_;

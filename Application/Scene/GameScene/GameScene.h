@@ -12,6 +12,8 @@
 #include "CollisionChecker/CollisionChecker.h"
 #include "UI/UIDrawer/UIDrawer.h"
 #include "Map/FloorManager/FloorManager.h"
+#include "Fade/Fade.h"
+#include "GameCameraController/GameCameracontroller.h"
 
 // ゲームシーン
 class GameScene : public BaseScene {
@@ -41,7 +43,6 @@ private:
 	std::unique_ptr<Model> enemyModel_ = nullptr;
 
 	std::shared_ptr<Texture> skybox_ = nullptr;
-	std::unique_ptr<Sprite> fade_ = nullptr;
 
 	std::unique_ptr<Sprite> resultBG_ = nullptr;
 	std::unique_ptr<Sprite> resultCursor_ = nullptr;
@@ -78,21 +79,9 @@ private:
 
 	// カメラ
 	std::unique_ptr<Camera> camera_ = nullptr;
-	float cameraDistance_ = 20.0f;
 
 	// デバッグカメラ
 	std::unique_ptr <DebugCamera> debugCamera_ = nullptr;
-
-	// フェード
-	enum class FadePhase {
-		None,
-		FadeIn,
-		FadeOut,
-	};
-	FadePhase fadePhase_;
-	Timer fadeTimer_;
-	const float kMaxFadeinTimer_ = 1.0f;
-	const float kMaxFadeoutTimer_ = 1.0f;
 
 	// 階数
 	int currentFloor_ = 1;
@@ -114,4 +103,10 @@ private:
 	std::unique_ptr<FloorManager> floorManager_;
 	bool isRoomMoving_ = false;
 	Direction nextDirection_;
+
+	// フェード
+	std::unique_ptr<Fade> fade_ = nullptr;
+
+	// カメラ制御
+	std::unique_ptr<GameCameraController> cameraController_ = nullptr;
 };
