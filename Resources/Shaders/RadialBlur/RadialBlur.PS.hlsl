@@ -23,6 +23,10 @@ PixelShaderOutput main(VertexShaderOutput input)
     for (int32_t sampleIndex = 0; sampleIndex < kNumSamples; ++sampleIndex)
     {
         float32_t2 texcoord = input.texcoord + direction * kBlurWidth * float32_t(sampleIndex);
+        
+        // ループ防止
+        texcoord = saturate(texcoord);
+        
         outputColor.rgb += gTexture.Sample(gSampler, texcoord).rgb;
     }
     // 平均化
