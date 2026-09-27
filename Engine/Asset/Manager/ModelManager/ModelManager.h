@@ -37,7 +37,7 @@ private:
 	// 関数内で使う関数
 	std::unique_ptr<ModelNode> ReadNode(aiNode* node);
 	SubMeshRuntime CreateSubMesh(aiMesh* aiMesh);
-	SubMeshData CreateSubMeshData(aiMesh* aiMesh);
+	SubMeshData CreateSubMeshData(aiMesh* aiMesh, const Skeleton& skeleton);
 	void CreateInstancingSRV(InstancedModel* model, const int numInstance_);
 	Matrix4x4 ConvertAssimpMatrixToLHRow(const aiMatrix4x4& m);
 	Skeleton CreateSkeleton(const ModelNode& rootNode);

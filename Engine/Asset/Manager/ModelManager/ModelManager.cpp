@@ -88,14 +88,12 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 				aiQuaternion rotate;
 				bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
 				// 左手系へ変換
-				Matrix4x4 binePoseMatrix = MakeAffineMatrix({ scale.x, scale.y, scale.z },
-					{ rotate.x, -rotate.y, -rotate.z, rotate.w }, { -translate.x, translate.y, translate.z });
-				jointWeightData.InverseBindPoseMatrix = Inverse(binePoseMatrix);
+				Matrix4x4 binePoseMatrix = MakeAffineMatrix(
+					{ scale.x, scale.y, scale.z },
+					{ rotate.x, -rotate.y, -rotate.z, rotate.w },
+					{ -translate.x, translate.y, translate.z });
 
-				// 頂点Weightを取得
-				for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
-					jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
-				}
+				jointWeightData.InverseBindPoseMatrix = Inverse(binePoseMatrix);
 			}
 
 			// subMesh生成
@@ -130,16 +128,11 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 				Matrix4x4 binePoseMatrix = MakeAffineMatrix({ scale.x, scale.y, scale.z },
 					{ rotate.x, -rotate.y, -rotate.z, rotate.w }, { -translate.x, translate.y, translate.z });
 				jointWeightData.InverseBindPoseMatrix = Inverse(binePoseMatrix);
-
-				// 頂点Weightを取得
-				for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
-					jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
-				}
 			}
 
 			// subMesh生成
 			SubMeshRuntime subMeshRuntime = CreateSubMesh(aiMesh);
-			SubMeshData subMeshData = CreateSubMeshData(aiMesh);
+			SubMeshData subMeshData = CreateSubMeshData(aiMesh, skeleton);
 
 			// メッシュにsubMeshを追加
 			meshes[aiMeshIndex].subMeshes.push_back(subMeshRuntime);
@@ -153,7 +146,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 		/// マテリアルの設定
 		/// 
 
- 		for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+		for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
 			auto texture = std::make_shared<Texture>(textureId);
 
 			aiMaterial* aiMaterial = scene->mMaterials[materialIndex];
@@ -282,7 +275,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 
 		// subMesh
 		SubMeshRuntime subMesh = CreateSubMesh(aiMesh);
-		SubMeshData subMeshData = CreateSubMeshData(aiMesh);
+		SubMeshData subMeshData = CreateSubMeshData(aiMesh, skeleton);
 
 		// メッシュにsubMeshを追加
 		meshes[meshIndex].subMeshes.push_back(subMesh);
@@ -384,7 +377,7 @@ SubMeshRuntime ModelManager::CreateSubMesh(aiMesh* aiMesh) {
 	return subMesh;
 }
 
-SubMeshData ModelManager::CreateSubMeshData(aiMesh* aiMesh) {
+SubMeshData ModelManager::CreateSubMeshData(aiMesh* aiMesh, const Skeleton& skeleton) {
 	SubMeshData data;
 	data.materialIndex_ = aiMesh->mMaterialIndex;
 
@@ -470,6 +463,38 @@ SubMeshData ModelManager::CreateSubMeshData(aiMesh* aiMesh) {
 	data.vertexBufferView_.BufferLocation = data.vertexBuffer_->GetGPUVirtualAddress();
 	data.vertexBufferView_.SizeInBytes = UINT(size);
 	data.vertexBufferView_.StrideInBytes = sizeof(VertexData);
+
+	// influence
+	data.influences_.resize(aiMesh->mNumVertices);
+	for (uint32_t boneIndex = 0; boneIndex < aiMesh->mNumBones; ++boneIndex) {
+		aiBone* bone = aiMesh->mBones[boneIndex];
+
+		std::string jointName = bone->mName.C_Str();
+
+		auto jointIt = skeleton.jointMap.find(jointName);
+		if (jointIt == skeleton.jointMap.end()) {
+			continue;
+		}
+
+		uint32_t jointIndex = jointIt->second;
+
+		for (uint32_t weightIndex = 0;
+			weightIndex < bone->mNumWeights;
+			++weightIndex) {
+			uint32_t vertexIndex = bone->mWeights[weightIndex].mVertexId;
+			float weight = bone->mWeights[weightIndex].mWeight;
+
+			VertexInfluence& influence = data.influences_[vertexIndex];
+
+			for (uint32_t i = 0; i < kNumMaxInfluence; ++i) {
+				if (influence.weights[i] == 0.0f) {
+					influence.weights[i] = weight;
+					influence.jointIndices[i] = jointIndex;
+					break;
+				}
+			}
+		}
+	}
 
 	return data;
 }
@@ -618,45 +643,39 @@ SkinClusterRuntime ModelManager::CreateSkinCluster(const Skeleton& skeleton, Mod
 	skinCluster.paletteSrvHandle.second = descriptorManager_->GetGPUHandle(index);
 	descriptorManager_->CreateStructuredBufferSRV(index, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
 
+	// InverseBindPoseMatrixの格納
+	data->skinClusterData_.inverseBindPoseMatrices.resize(skeleton.joints.size());
+	std::generate(
+		data->skinClusterData_.inverseBindPoseMatrices.begin(),
+		data->skinClusterData_.inverseBindPoseMatrices.end(),
+		[]() {
+			return MakeIdentity4x4();
+		});
+
+	for (const auto& jointWeight : data->JointWeights) {
+		auto it = skeleton.jointMap.find(jointWeight.first);
+		if (it == skeleton.jointMap.end()) { continue; }
+
+		data->skinClusterData_.inverseBindPoseMatrices[(*it).second] = jointWeight.second.InverseBindPoseMatrix;
+	}
+	skinCluster.paletteSRVIndex = descriptorManager_->Allocate();
+	descriptorManager_->CreateStructuredBufferSRV(skinCluster.paletteSRVIndex, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
+
 	for (auto& mesh : data->meshes) {
 		for (auto& subMesh : mesh.subMeshes) {
-			// Influence
-			data->skinClusterData_.influenceResource = bufferManager_->CreateUploadBuffer(sizeof(VertexInfluence) * subMesh.vertices_.size());
+			size_t influenceSize = sizeof(VertexInfluence) * subMesh.influences_.size();
+
+			subMesh.influenceResource_ = bufferManager_->CreateUploadBuffer(influenceSize);
 			VertexInfluence* mappedInfluence = nullptr;
-			data->skinClusterData_.influenceResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedInfluence));
-			std::memset(mappedInfluence, 0, sizeof(VertexInfluence) * subMesh.vertices_.size());
-			data->skinClusterData_.mappedInfluence = { mappedInfluence, subMesh.vertices_.size() };
+			subMesh.influenceResource_->Map(
+				0,
+				nullptr,
+				reinterpret_cast<void**>(&mappedInfluence));
+			memcpy(mappedInfluence, subMesh.influences_.data(), influenceSize);
+			subMesh.influenceResource_->Unmap(0, nullptr);
 
-			// InverseBindPoseMatrixの格納
-			data->skinClusterData_.inverseBindPoseMatrices.resize(skeleton.joints.size());
-			std::generate(
-				data->skinClusterData_.inverseBindPoseMatrices.begin(),
-				data->skinClusterData_.inverseBindPoseMatrices.end(),
-				[]() {
-					return MakeIdentity4x4();
-				});
-
-			for (const auto& jointWeight : data->JointWeights) {
-				auto it = skeleton.jointMap.find(jointWeight.first);
-				if (it == skeleton.jointMap.end()) { continue; }
-
-				data->skinClusterData_.inverseBindPoseMatrices[(*it).second] = jointWeight.second.InverseBindPoseMatrix;
-				for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
-					auto& currentInfluence = data->skinClusterData_.mappedInfluence[vertexWeight.vertexIndex];
-					for (uint32_t index = 0; index < kNumMaxInfluence; ++index) {
-						if (currentInfluence.weights[index] == 0.0f) {
-							currentInfluence.weights[index] = vertexWeight.weight;
-							currentInfluence.jointIndices[index] = (*it).second;
-							break;
-						}
-					}
-				}
-			}
-			skinCluster.paletteSRVIndex = descriptorManager_->Allocate();
-			descriptorManager_->CreateStructuredBufferSRV(skinCluster.paletteSRVIndex, skinCluster.paletteResource.Get(), UINT(skeleton.joints.size()), sizeof(WellForGPU));
-
-			data->skinClusterData_.influenceSRVIndex = descriptorManager_->Allocate();
-			descriptorManager_->CreateStructuredBufferSRV(data->skinClusterData_.influenceSRVIndex, data->skinClusterData_.influenceResource.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexInfluence));
+			subMesh.influenceSRVIndex_ = descriptorManager_->Allocate();
+			descriptorManager_->CreateStructuredBufferSRV(subMesh.influenceSRVIndex_, subMesh.influenceResource_.Get(), UINT(subMesh.vertices_.size()), sizeof(VertexInfluence));
 
 			subMesh.skinningInformationBuffer = bufferManager_->CreateUploadBuffer(sizeof(SkinningInformation));
 			SkinningInformation skinningInformation;

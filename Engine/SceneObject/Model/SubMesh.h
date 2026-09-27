@@ -30,6 +30,11 @@ struct SubMeshData {
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer_ = nullptr;
 	D3D12_INDEX_BUFFER_VIEW ibv_{};
 
+	// skinning
+	std::vector<VertexInfluence> influences_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource_;
+	uint32_t influenceSRVIndex_ = 0;
+
 	// ComputeShader入力
 	uint32_t inputVertexSRVIndex;
 	Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformationBuffer;

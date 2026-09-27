@@ -63,9 +63,4 @@ struct SkinClusterRuntime {
 
 struct SkinClusterData {
 	std::vector<Matrix4x4> inverseBindPoseMatrices;
-
-	// influence
-	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
-	std::span<VertexInfluence> mappedInfluence;
-	uint32_t influenceSRVIndex;
 };

@@ -62,8 +62,8 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int en
 	switch (enemyType) {
 	case 1:
 	{
-		auto enemyModel = asset.LoadModel("Resources/Enemy", "bat.obj");
-		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat.obj");
+		auto enemyModel = asset.LoadModel("Resources/Enemy", "Dragon.glb");
+		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "Dragon.glb");
 		enemyModel->SetTranslate(pos);
 		enemyShadowModel->SetTranslate(pos);
 		weapons.push_back(weaponManager->GetWeapon(int(WeaponManager::WEAPON::FireBall)));

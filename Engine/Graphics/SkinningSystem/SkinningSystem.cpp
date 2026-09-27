@@ -14,7 +14,7 @@ void SkinningSystem::Dispatch(ID3D12GraphicsCommandList* cmdList, Model* model, 
 		for (int j = 0; j < subMeshData.size(); ++j) {
 			cmdList->SetComputeRootDescriptorTable(0, skinCluster.paletteSrvHandle.second);
 			cmdList->SetComputeRootDescriptorTable(1, srvManager->GetGPUHandle(subMeshData[j].inputVertexSRVIndex));
-			cmdList->SetComputeRootDescriptorTable(2, srvManager->GetGPUHandle(data.influenceSRVIndex));
+			cmdList->SetComputeRootDescriptorTable(2, srvManager->GetGPUHandle(subMeshData[j].influenceSRVIndex_));
 			cmdList->SetComputeRootDescriptorTable(4, srvManager->GetGPUHandle(subMeshRuntime[j].outputVertexUAVIndex));
 			cmdList->SetComputeRootConstantBufferView(3, subMeshData[j].skinningInformationBuffer->GetGPUVirtualAddress());
 
