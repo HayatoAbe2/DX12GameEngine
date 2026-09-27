@@ -134,6 +134,7 @@ void Enemy::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 
+	model_->Update();
 	// 影描画
 	if (!isFall_) {
 		Transform shadowTransform = model_->GetTransform();

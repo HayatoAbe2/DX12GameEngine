@@ -34,12 +34,8 @@ void Model::UpdateSkinCluster() {
 	for (size_t jointIndex = 0; jointIndex < skeleton_.joints.size(); ++jointIndex) {
 		assert(jointIndex < skeleton_.joints.size());
 
-		for (auto& mesh : meshes_) {
-			for (auto& primitive : mesh.subMeshes) {
-				skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix = data_->skinClusterData_.inverseBindPoseMatrices[jointIndex] * skeleton_.joints[jointIndex].skeletonSpaceMatrix;
-				skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix));
-			}
-		}
+		skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix = data_->skinClusterData_.inverseBindPoseMatrices[jointIndex] * skeleton_.joints[jointIndex].skeletonSpaceMatrix;
+		skinCluster_.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(skinCluster_.mappedPalette[jointIndex].skeletonSpaceMatrix));
 	}
 }
 

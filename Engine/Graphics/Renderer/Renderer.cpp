@@ -282,7 +282,13 @@ void Renderer::DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsComma
 
 	// トランスフォーム更新
 	TransformationMatrix data;
-	data.World = modelWorld;
+	if (model->GetData()->JointWeights.empty()) {
+		// 静的モデル
+		data.World = nodeWorld * modelWorld;
+	} else {
+		// スキニングモデル
+		data.World = modelWorld;
+	}
 	data.WVP = data.World
 		* camera_->viewMatrix_
 		* camera_->projectionMatrix_;
