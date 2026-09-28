@@ -49,6 +49,6 @@ std::unique_ptr<Material> AssetContext::CreateMaterial(std::shared_ptr<Texture> 
 	return assetManager_->CreateMaterial(texture);
 }
 
-std::shared_ptr<Animation> AssetContext::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
+std::vector<std::shared_ptr<Animation>> AssetContext::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
 	return assetManager_->LoadAnimation(directoryPath, filePath);
 }

@@ -75,6 +75,9 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int en
 		status.canFly = true;
 		status.attackRadius = 9;
 
+		enemyModel->SetAnimation(asset.LoadAnimation("Resources/Enemy", "Dragon.glb")[2]);
+		enemyShadowModel->SetAnimation(asset.LoadAnimation("Resources/Enemy", "Dragon.glb")[2]);
+
 		enemies.push_back(std::make_unique<Bat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}

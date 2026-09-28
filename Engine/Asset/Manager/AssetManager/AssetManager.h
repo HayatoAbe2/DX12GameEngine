@@ -27,7 +27,7 @@ public:
 	std::unique_ptr<Sprite> LoadSprite(const std::string& filePath);
 	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
 	std::unique_ptr<Material> CreateMaterial(std::shared_ptr<Texture> texture);
-	std::shared_ptr<Animation> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
+	std::vector<std::shared_ptr<Animation>> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
 
 private:
 	uint32_t GenerateID();

@@ -60,10 +60,8 @@ std::unique_ptr<Material> AssetManager::CreateMaterial(std::shared_ptr<Texture> 
 	return std::move(resource);
 }
 
-std::shared_ptr<Animation> AssetManager::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
-	auto resource = animationManager_->Load(directoryPath, filePath, GenerateID());
-	resource->name_ = filePath;
-	return resource;
+std::vector<std::shared_ptr<Animation>> AssetManager::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
+	return animationManager_->Load(directoryPath, filePath, [this]() {return GenerateID(); });
 }
 
 uint32_t AssetManager::GenerateID() {

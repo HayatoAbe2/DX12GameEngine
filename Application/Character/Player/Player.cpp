@@ -36,14 +36,14 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	transform_.translate.x = 1;
 	transform_.translate.z = 1;
 
-	walk_ = asset.LoadAnimation("Resources/Debug/human", "walk.gltf");
-	sneak_ = asset.LoadAnimation("Resources/Debug/human", "sneakWalk.gltf");
+	walk_ = asset.LoadAnimation("Resources/Debug/human", "walk.gltf")[0];
+	sneak_ = asset.LoadAnimation("Resources/Debug/human", "sneakWalk.gltf")[0];
 	model_->SetAnimation(walk_);
 
 	// 残像
 	for (int i = 0; i < 2; ++i) {
 		instancing_[i] = asset.LoadModel("Resources/Debug/human", "walk.gltf");
-		instancing_[i]->SetAnimation(asset.LoadAnimation("Resources/Debug/human", "walk.gltf"));
+		instancing_[i]->SetAnimation(asset.LoadAnimation("Resources/Debug/human", "walk.gltf")[0]);
 		MaterialData data = instancing_[i]->GetMaterial(0)->GetData();
 		data.color = { 0.5f,0.5f,0.5f, 1.0f - (i + 1) * 0.25f };
 		data.enableLighting = false;
