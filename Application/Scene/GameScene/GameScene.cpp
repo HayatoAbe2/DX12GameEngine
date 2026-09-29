@@ -177,7 +177,7 @@ void GameScene::Update() {
 
 			// フェードアウト終了時
 			if (fade_->GetPhase() == FadePhase::Faded) {
-				if (player_->IsDead() || floorManager_->GetCurrentDepth() == 3) {
+				if (player_->IsDead() || floorManager_->GetCurrentDepth() == floorManager_->kMaxDepth) {
 					// リザルト移行
 					phase_ = Phase::RESULT;
 					fade_->StartFadeIn();
@@ -228,8 +228,8 @@ void GameScene::Update() {
 			resultTimer_.Update();
 			resultTime_ += ctx.GetDeltatime();
 
-			float left = ctx.GetRenderWindowSize().x / 10.0f;
-			float width = ctx.GetRenderWindowSize().x - left * 2.0f;
+			float left = 227.0f;
+			float width = 1053.0f - left;
 			float endX = left + (float(floorManager_->GetCurrentDepth()) / float(floorManager_->kMaxDepth)) * width;
 
 			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);

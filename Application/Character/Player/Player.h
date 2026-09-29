@@ -81,8 +81,8 @@ private:
 	Vector2 attackDirection_ = {};
 
 	// hp
-	float hp_ = 1;
-	float maxHp_ = 10;
+	float hp_ = 100;
+	float maxHp_ = 100;
 
 	// スタン時間
 	std::unique_ptr<Timer> stunTimer_ = nullptr;
