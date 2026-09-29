@@ -2,7 +2,7 @@
 
 void FloorManager::Initialize() {
 	generator_ = std::make_unique<FloorGenerator>();
-	currentRoom_ = generator_->GenerateFloor();
+	currentRoom_ = generator_->GenerateFloor(kMaxDepth);
 	generator_->LoadRoom(currentRoom_, Direction::North);
 }
 
@@ -13,6 +13,7 @@ void FloorManager::LoadNextRoom(Direction enterDir) {
 
 			// 現在の部屋を移動
 			currentRoom_ = connector.connectedRoom;
+			currentDepth_++;
 			return;
 		}
 	}
@@ -25,10 +26,12 @@ Vector2 FloorManager::GetStartPos() {
 
 std::vector<RoomConnector> FloorManager::GetConnector() {
 	std::vector<RoomConnector> connectors;
-	for (auto& c : currentRoom_->connector) {
-		// 方向が違えば追加
-		if (c.direction != currentRoom_->startDirection) {
-			connectors.push_back(c);
+	if (currentRoom_) {
+		for (auto& c : currentRoom_->connector) {
+			// 方向が違えば追加
+			if (c.direction != currentRoom_->startDirection) {
+				connectors.push_back(c);
+			}
 		}
 	}
 

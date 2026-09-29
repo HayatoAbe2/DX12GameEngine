@@ -14,8 +14,8 @@ void Fade::Update() {
 	timer_.Update();
 
 	if (!timer_.IsActive()) {
-		if(fadePhase_ == FadePhase::FadeIn) fadePhase_ = FadePhase::None;
-		if(fadePhase_ == FadePhase::FadeOut) fadePhase_ = FadePhase::Faded;
+		if (fadePhase_ == FadePhase::FadeIn) fadePhase_ = FadePhase::None;
+		if (fadePhase_ == FadePhase::FadeOut) fadePhase_ = FadePhase::Faded;
 	}
 }
 
@@ -24,9 +24,17 @@ void Fade::Draw() {
 		auto& ctx = GameContext::GetInstance();
 		auto& render = ctx.Render();
 
-		float alpha = timer_.GetRemaining() / maxTime_;
-		if (fadePhase_ == FadePhase::FadeOut) {
-			alpha = 1.0f - alpha;
+		float alpha = 0;
+		switch (fadePhase_) {
+		case FadePhase::Faded:
+			alpha = 1.0f;
+			break;
+		case FadePhase::FadeIn:
+			alpha = timer_.GetRemaining() / maxTime_;
+			break;
+		case FadePhase::FadeOut:
+			alpha = 1.0f - timer_.GetRemaining() / maxTime_;
+			break;
 		}
 		sprite_->SetColor({ 0,0,0,alpha });
 		sprite_->SetSize(ctx.GetRenderWindowSize() + Vector2{ 20,80 });

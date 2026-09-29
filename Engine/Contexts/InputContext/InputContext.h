@@ -9,6 +9,7 @@ public:
 	bool IsTrigger(uint8_t keyNumber);
 	bool IsPress(uint8_t keyNumber);
 	bool IsRelease(uint8_t keyNumber);
+	bool IsAnyTrigger();
 
 private:
 	InputSystem* input_;
@@ -22,6 +23,7 @@ public:
 	bool IsTrigger(const MouseButton& button);
 	bool IsPress(const MouseButton& button);
 	bool IsRelease(const MouseButton& button);
+	bool IsAnyTrigger();
 	Vector3 GetMouseMove();
 	Vector2 GetPosition();
 
@@ -37,6 +39,7 @@ public:
 	bool IsTrigger(WORD button);
 	bool IsPress(WORD button);
 	bool IsRelease(WORD button);
+	bool IsAnyTrigger();
 	Vector2 GetLeftStick();
 	Vector2 GetRightStick();
 	float GetLTrigger();

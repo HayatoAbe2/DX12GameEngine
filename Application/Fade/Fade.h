@@ -2,8 +2,8 @@
 #include "GameCommon.h"
 #include "Timer/Timer.h"
 
-const float kMaxFadeinTimer_ = 1.0f;
-const float kMaxFadeoutTimer_ = 1.0f;
+const float kMaxFadeinTimer_ = 0.5f;
+const float kMaxFadeoutTimer_ = 0.5f;
 
 enum class FadePhase {
 	None,

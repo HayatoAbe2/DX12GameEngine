@@ -16,7 +16,4 @@ private:
 
 	HWND hwnd_ = nullptr;
 	WNDCLASS wc_ = {};
-
-	// ウィンドウサイズを表す構造体にクライアント領域を入れる
-	RECT wrc = { 0,0,1280,720 };
 };

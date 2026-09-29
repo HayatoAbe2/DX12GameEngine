@@ -1,12 +1,15 @@
 #pragma once
 #include "UI/Equipment/EquipmentUI.h"
 #include "UI/Money/MoneyUI.h"
+#include "UI/NextRoom/NextRoomUI.h"
 
 class Player;
+class FloorManager;
+
 class UIDrawer {
 public:
 	// 初期化
-	void Initialize(Player* player, MoneyUI* moneyUI);
+	void Initialize(Player* player, FloorManager* floorManager);
 	// 更新
 	void Update();
 	// 描画
@@ -33,7 +36,7 @@ private:
 	float whiteGaugeSpeed_ = 0.5f;
 
 	std::unique_ptr<EquipmentUI> equipment_;
-	// 弾数(〇とかで表示,8個*2色目とか)
+	// 弾数
 	std::unique_ptr<Sprite> ammo_ = nullptr;
 	std::unique_ptr<Sprite> magazine_ = nullptr;
 	SpriteData ammoUIData_ = { {640,380}, {100,22} }; 
@@ -48,6 +51,7 @@ private:
 	std::unique_ptr<Sprite> currentFloor_ = nullptr;
 	SpriteData floorUIData_ = { {640,320}, { 212,32 } };
 
-	MoneyUI* money_ = nullptr;
+	std::unique_ptr<MoneyUI> money_ = nullptr;
+	std::unique_ptr<NextRoomUI> nextRoom_ = nullptr;
 };
 

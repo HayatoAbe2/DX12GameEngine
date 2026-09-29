@@ -8,7 +8,7 @@
 
         "bullet": {
             "damage": 16.0,
-            "radius": 1.2,
+            "radius": 1.0,
             "speed": 24,
             "lifeTime": 300,
             "knockback": 0.5,

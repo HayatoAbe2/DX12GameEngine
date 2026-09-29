@@ -7,7 +7,6 @@ GameScene::~GameScene() {
 
 void GameScene::Initialize() {
 	auto& ctx = GameContext::GetInstance();
-	auto& audio = ctx.Audio();
 	auto& asset = ctx.Asset();
 	auto& render = ctx.Render();
 	auto& scene = ctx.Scene();
@@ -16,13 +15,7 @@ void GameScene::Initialize() {
 	debugCamera_->Initialize();
 	camera_ = std::make_unique<Camera>();
 
-	audio.SoundLoad(L"Resources/Sounds/SE/explosion.mp3");
-	audio.SoundLoad(L"Resources/Sounds/SE/shoot.mp3");
-	audio.SoundLoad(L"Resources/Sounds/SE/fire.mp3");
-	audio.SoundLoad(L"Resources/Sounds/SE/floorClear.mp3");
-	audio.SoundLoad(L"Resources/Sounds/SE/fall.mp3");
-	audio.SoundLoad(L"Resources/Sounds/SE/warp.mp3");
-	audio.SoundLoad(L"Resources/Sounds/SE/hit.mp3");
+	LoadSound();
 
 	// Skybox
 	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
@@ -65,22 +58,16 @@ void GameScene::Initialize() {
 	// 弾
 	bulletManager_ = std::make_unique<BulletManager>();
 
-	moneyUI_ = std::make_unique<MoneyUI>(player_->GetWallet());
-
-	// UI描画システム
-	uiDrawer_ = std::make_unique<UIDrawer>();
-	uiDrawer_->Initialize(player_.get(), moneyUI_.get());
-
 	// フェード
 	fade_ = std::make_unique<Fade>();
 
 	resultBG_ = asset.LoadSprite("resources/Result/result.png");
-	resultBG_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
 	resultBG_->SetColor({ 1, 1, 1, 0.7f });
 
 	resultCursor_ = asset.LoadSprite("resources/Result/cursor.png");
 	resultCursor_->SetSize({ 48,56 });
 	resultCursor_->SetColor({ 1, 1, 1, 0.7f });
+	resultCursor_->SetPivot({ 0.5f,0.5f });
 
 	// カメラ制御
 	cameraController_ = std::make_unique<GameCameraController>(camera_.get());
@@ -98,15 +85,23 @@ void GameScene::Initialize() {
 	isLoaded_ = false;
 
 	player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
+
+	// UI描画システム
+	uiDrawer_ = std::make_unique<UIDrawer>();
+	uiDrawer_->Initialize(player_.get(), floorManager_.get());
+
+	Update();
 }
 
 void GameScene::Update() {
-	if (!enableEditMode_) {
-		auto& ctx = GameContext::GetInstance();
-		auto& input = ctx.Input();
-		auto& audio = ctx.Audio();
-		auto& scene = ctx.Scene();
-		if (!isShowResult_) {
+	auto& ctx = GameContext::GetInstance();
+	auto& input = ctx.Input();
+	auto& audio = ctx.Audio();
+	auto& scene = ctx.Scene();
+
+	switch (phase_) {
+	case Phase::GAME:
+		if (!enableEditMode_) {
 			if (isPause_) {
 				// ポーズ中
 				if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
@@ -115,13 +110,13 @@ void GameScene::Update() {
 
 			} else {
 
-				if (!fade_->IsActive()) {
+				if (!fade_->IsActive() && fade_->GetPhase() == FadePhase::None) {
 					// プレイヤー処理
-					player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
+ 					player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
 
 					// ゲームオーバー
 					if (player_->IsDead()) {
-						fade_->StartFadeOut();
+						fade_->StartFadeOut(1.5f);
 					}
 
 					// ゴール判定
@@ -180,105 +175,90 @@ void GameScene::Update() {
 				uiDrawer_->Update();
 			}
 
-			fade_->Update();
 			// フェードアウト終了時
 			if (fade_->GetPhase() == FadePhase::Faded) {
-				if (player_->IsDead() || currentFloor_ == 3) {
-					if (isShowResult_) {
-						scene.SceneChange("Game");
-					} else {
-						// ゲームオーバーまたはクリア
-						isShowResult_ = true;
-
-						fade_->StartFadeIn();
-						resultTime_ = 0;
-					}
+				if (player_->IsDead() || floorManager_->GetCurrentDepth() == 3) {
+					// リザルト移行
+					phase_ = Phase::RESULT;
+					fade_->StartFadeIn();
 				} else if (isRoomMoving_) {
-					Reset();
-
 					// 次の部屋
 					MoveToNextRoom(nextDirection_);
 
-					fade_->StartFadeIn();
 					isRoomMoving_ = false;
 				} else {
 					// 次のフロア
-					currentFloor_++;
 					Reset();
-					currentFloor_ = 0;
 					Initialize();
 
 					fade_->StartFadeIn();
 				}
 			}
+		}
 
+		mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
+		enemyManager_->SpawnCheck(player_->GetTransform().translate, mapCheck_.get());
+
+		if (enableEditMode_) {
+			isLoaded_ = false;
 		} else {
+			// 編集の反映,再配置
+			if (!isLoaded_) {
+				itemManager_->Load();
+				enemyManager_->Load(weaponManager_.get());
+			}
+
+			isLoaded_ = true;
+		}
+
+		break;
+	case Phase::RESULT:
+		switch (fade_->GetPhase()) {
+		case FadePhase::None:
+		{
+			if (resultTime_ == 0) {
+				resultTimer_.Start(2.0f);
+			}
+
 			// リザルト
 			if (resultArrowMove_ < 1.0f) {
-				resultArrowMove_ += ctx.GetDeltatime() * 1;
+				resultArrowMove_ = max(resultArrowMove_ + ctx.GetDeltatime() * 1, 1.0f);
 			}
 
+			resultTimer_.Update();
 			resultTime_ += ctx.GetDeltatime();
-			float endX = 0;
-			switch (currentFloor_) {
-			case 0:
-				endX = 205;
-				break;
-			case 1:
-				endX = 471;
-				break;
-			case 2:
-				endX = 765;
-				break;
-			case 3:
-				endX = 1033;
-				break;
-			case 4:
-				endX = 1300;
-				break;
-			}
-			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
-			resultCursor_->SetPosition({ endX * resultArrowMove_,180 + sinWave_ * 10 });
 
-			if (isShowResult_ &&
+			float left = ctx.GetRenderWindowSize().x / 10.0f;
+			float width = ctx.GetRenderWindowSize().x - left * 2.0f;
+			float endX = left + (float(floorManager_->GetCurrentDepth()) / float(floorManager_->kMaxDepth)) * width;
+
+			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
+			resultCursor_->SetPosition({ endX * resultArrowMove_, 180 + sinWave_ * 10 });
+
+			if (resultTimer_.IsFinished() &&
 				(input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A))) {
-				scene.SceneChange("Game");
+				fade_->StartFadeOut();
 				return;
 			}
 		}
-	}
-
-	mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
-	enemyManager_->SpawnCheck(player_->GetTransform().translate, mapCheck_.get());
-
-	if (enableEditMode_) {
-		isLoaded_ = false;
-	} else {
-		// 編集の反映,再配置
-		if (!isLoaded_) {
-			itemManager_->Load();
-			enemyManager_->Load(weaponManager_.get());
+		break;
+		case FadePhase::Faded:
+			scene.SceneChange("Game");
 		}
-
-		isLoaded_ = true;
-
 	}
 }
 
 void GameScene::Draw() {
 	BaseScene::Draw();
+	fade_->Update();
 
-	// カメラ移動
-	if (isLoaded_ && !fade_->IsActive()) {
-		//cameraController_->Update(player_->GetTransform().translate);
-	}
 	// カメラ行列更新
 	camera_->Update(debugCamera_.get());
 	debugCamera_->Update();
 
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
-	if (isShowResult_) {
+	if (phase_ == Phase::RESULT) {
 		render.AddPostEffect(PostEffectType::Grayscale);
 		render.AddPostEffect(PostEffectType::Vignette);
 	} else {
@@ -299,6 +279,12 @@ void GameScene::Draw() {
 	// ui
 	if (!enableEditMode_) {
 		uiDrawer_->Draw();
+	}
+
+	if (phase_ == Phase::RESULT) {
+		resultBG_->SetSize(ctx.GetRenderWindowSize());
+		render.DrawSprite(resultBG_.get());
+		render.DrawSprite(resultCursor_.get());
 	}
 
 	fade_->Draw();
@@ -364,9 +350,27 @@ void GameScene::Reset() {
 
 void GameScene::MoveToNextRoom(Direction direction) {
 	Reset();
-	floorManager_->LoadNextRoom(direction);
+	fade_->StartFadeIn();
 
+	// 次の部屋ロード
+	floorManager_->LoadNextRoom(direction);
 	// プレイヤー位置
 	Vector3 pos = { floorManager_->GetStartPos().x, 0, floorManager_->GetStartPos().y };
 	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });
+}
+
+void GameScene::LoadSound() {
+	auto& ctx = GameContext::GetInstance();
+	auto& audio = ctx.Audio();
+
+	audio.SoundLoad(L"Resources/Sounds/SE/explosion.mp3");
+	audio.SoundLoad(L"Resources/Sounds/SE/shoot.mp3");
+	audio.SoundLoad(L"Resources/Sounds/SE/fire.mp3");
+	audio.SoundLoad(L"Resources/Sounds/SE/floorClear.mp3");
+	audio.SoundLoad(L"Resources/Sounds/SE/fall.mp3");
+	audio.SoundLoad(L"Resources/Sounds/SE/warp.mp3");
+	audio.SoundLoad(L"Resources/Sounds/SE/hit.mp3");
+
+	audio.SoundLoad(L"Resources/Sounds/BGM/field.mp3");
+	audio.SoundPlay(L"Resources/Sounds/BGM/field.mp3", true);
 }

@@ -20,14 +20,14 @@ private:
 	void Ease();
 
 	Vector2 pos_ = {325, 20};
-	float numSpacing_ = 27.0f;
-	float digitSize_ = 32.0f;
-	float iconSize_ = 32.0f;
+	const float numSpacing_ = 27.0f;
+	const float digitSize_ = 32.0f;
+	const float iconSize_ = 32.0f;
 	// 画像上の数字サイズ
-	float digitWidth_ = 64.0f;
+	const float digitWidth_ = 64.0f;
 
 	// オフセット
-	float valueOffsetY_ = 15.0f;
+	const float valueOffsetY_ = 15.0f;
 
 	// アイコン
 	std::unique_ptr<Sprite> icon_;

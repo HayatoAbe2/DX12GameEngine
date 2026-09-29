@@ -1,13 +1,12 @@
 #include "FloorGenerator.h"
 
-Room* FloorGenerator::GenerateFloor() {
+Room* FloorGenerator::GenerateFloor(int maxDepth) {
 	// 最初の部屋
 	Room first;
 	first.type = RoomType::Start;
 	first.startDirection = Direction::South;
 
 	// 続く部屋
-	int maxDepth = 5;
 	GenerateRooms(first, 1, maxDepth);
 
 	floor_ = first;
@@ -25,12 +24,17 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 			// 最後はゴール部屋
 			next.type = RoomType::Goal;
 		} else {
-			// 仮置き
-			if (depth == 2) {
+			if (depth == 5) {
 				next.type = RoomType::Shop;
 			} else {
-				next.type = RoomType::Combat;
+				auto& ctx = GameContext::GetInstance();
+				if (ctx.RandomInt(0, 64) < 50) {
+					next.type = RoomType::Combat;
+				} else {
+					next.type = RoomType::Shop;
+				}
 			}
+
 		}
 
 		// 再帰させて追加
@@ -101,7 +105,7 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 			auto transform = model->GetTransform();
 			
 			// 出入口の方向
-			Direction dir;
+			Direction dir = Direction::North;
 			if (model->tag == "westConnector") {
 				dir = Direction::West;
 			} else if (model->tag == "eastConnector") {

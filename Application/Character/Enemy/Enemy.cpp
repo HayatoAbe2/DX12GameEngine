@@ -55,11 +55,12 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	if (hitColorTimer_->IsActive()) {
 		hitColorTimer_->Update();
 		if (hitColorTimer_->IsFinished()) {
-			for (auto& mesh : model_->GetData()->meshes) {
-				auto data = model_->GetMaterial(0)->GetData();
-				data.color = { 1.0f,1.0f,1.0f,1.0f };
-				model_->GetMaterial(0)->SetData(data);
-				model_->GetMaterial(1)->SetData(data);
+
+			// 色を元に戻す
+			auto mat = model_->GetMaterials();
+			auto& defaultMat = model_->GetData()->defaultMaterials_;
+			for (int i = 0; i < mat.size(); ++i) {
+				mat[i]->SetData(defaultMat[i]->GetData());
 			}
 		}
 	}

@@ -50,6 +50,15 @@ public:
 	/// <param name="keyNumber">キー番号</param>
 	/// <returns>キーが離された瞬間のみtrue</returns>
 	bool IsRelease(uint8_t keyNumber) { return (preKey_[keyNumber] && !key_[keyNumber]); };
+
+	bool IsAnyKeyTrigger() {
+		for (int i = 0; i < 256; ++i) {
+			if (IsTrigger(static_cast<uint8_t>(i))) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	//
 	// マウス入力関連
@@ -58,6 +67,16 @@ public:
 	bool IsTrigger(const MouseButton& button) { return (!preMouseState_.rgbButtons[uint8_t(button)] && 0x80) && (mouseState_.rgbButtons[uint8_t(button)] && 0x80); };
 	bool IsPress(const MouseButton& button) { return mouseState_.rgbButtons[uint8_t(button)] && 0x80; };
 	bool IsRelease(const MouseButton& button) { return (preMouseState_.rgbButtons[uint8_t(button)] && 0x80) && (!mouseState_.rgbButtons[uint8_t(button)] && 0x80); };
+	bool IsAnyMouseTrigger() {
+		// マウス
+		for (int i = 0; i < 3; ++i) {
+			MouseButton button = static_cast<MouseButton>(i);
+			if (IsTrigger(button)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	Vector3 GetMouseMove() { return { float(mouseState_.lX),float(mouseState_.lY),float(mouseState_.lZ) }; };
 	Vector2 GetMousePosition() {
@@ -77,6 +96,33 @@ public:
 	bool IsTrigger(WORD button) { return !(preControllerState_.Gamepad.wButtons & button) && (controllerState_.Gamepad.wButtons & button);}
 	bool IsPress(WORD button) { return controllerState_.Gamepad.wButtons & button;}
 	bool IsRelease(WORD button) { return (preControllerState_.Gamepad.wButtons & button) && !(controllerState_.Gamepad.wButtons & button);}
+	bool IsAnyGamepadTrigger() {
+		// コントローラー
+		constexpr WORD buttons[] = {
+			XINPUT_GAMEPAD_DPAD_UP,
+			XINPUT_GAMEPAD_DPAD_DOWN,
+			XINPUT_GAMEPAD_DPAD_LEFT,
+			XINPUT_GAMEPAD_DPAD_RIGHT,
+			XINPUT_GAMEPAD_START,
+			XINPUT_GAMEPAD_BACK,
+			XINPUT_GAMEPAD_LEFT_THUMB,
+			XINPUT_GAMEPAD_RIGHT_THUMB,
+			XINPUT_GAMEPAD_LEFT_SHOULDER,
+			XINPUT_GAMEPAD_RIGHT_SHOULDER,
+			XINPUT_GAMEPAD_A,
+			XINPUT_GAMEPAD_B,
+			XINPUT_GAMEPAD_X,
+			XINPUT_GAMEPAD_Y,
+		};
+
+		for (WORD button : buttons) {
+			if (IsTrigger(button)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	Vector2 GetLeftStick() {
 		// -1000~1000の範囲を-1.0f~1.0fに正規化

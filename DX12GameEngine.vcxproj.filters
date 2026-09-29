@@ -262,6 +262,7 @@
     <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
     <ClCompile Include="Application\Fade\Fade.cpp" />
     <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
+    <ClCompile Include="Application\UI\NextRoom\NextRoomUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -586,6 +587,7 @@
     <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
     <ClInclude Include="Application\Fade\Fade.h" />
     <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
+    <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

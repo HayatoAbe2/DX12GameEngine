@@ -8,7 +8,7 @@ public:
 	/// フロア生成
 	/// </summary>
 	/// <returns>最初の部屋</returns>
-	Room* GenerateFloor();
+	Room* GenerateFloor(int maxDepth);
 
 	// 部屋の読み込み
 	void LoadRoom(Room* room, Direction exitDir);

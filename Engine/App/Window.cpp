@@ -6,7 +6,7 @@ void Window::Initialize(int32_t clientWidth, int32_t clientHeight) {
 	wc_.lpfnWndProc = WindowProc;
 
 	// ウィンドウクラス名
-	wc_.lpszClassName = L"CG2WindowClass";
+	wc_.lpszClassName = L"WindowClass";
 
 	// インスタンスハンドル
 	wc_.hInstance = GetModuleHandle(nullptr);
@@ -14,8 +14,13 @@ void Window::Initialize(int32_t clientWidth, int32_t clientHeight) {
 	// カーソル
 	wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
-	wrc.right = clientWidth;
-	wrc.bottom = clientHeight;
+	RECT rect{0, 0, clientWidth, clientHeight};
+	AdjustWindowRectEx(
+		&rect,
+		WS_OVERLAPPEDWINDOW,
+		FALSE,
+		0
+	);
 	
 	// ウィンドウクラスを登録
 	RegisterClass(&wc_);
@@ -26,8 +31,8 @@ void Window::Initialize(int32_t clientWidth, int32_t clientHeight) {
 		WS_OVERLAPPEDWINDOW,	// ウィンドウスタイル
 		CW_USEDEFAULT,			// 表示X座標
 		CW_USEDEFAULT,			// 表示Y座標
-		wrc.right - wrc.left,	// ウィンドウ横幅
-		wrc.bottom - wrc.top,	// ウィンドウ縦幅
+		rect.right - rect.left,	// ウィンドウ横幅
+		rect.bottom - rect.top,	// ウィンドウ縦幅
 		nullptr,				// 親ウィンドウハンドル
 		nullptr,				// メニューハンドル
 		wc_.hInstance,			// インスタンスハンドル

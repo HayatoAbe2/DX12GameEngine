@@ -37,6 +37,14 @@ public:
 	void MoveToNextRoom(Direction direction);
 
 private:
+	void LoadSound();
+
+	enum class Phase {
+		GAME,
+		RESULT
+	};
+	Phase phase_ = Phase::GAME;
+
 	// 3Dモデル
 	std::unique_ptr<Model> playerModel_ = nullptr;
 	std::unique_ptr<Model> playerShadowModel_ = nullptr;
@@ -83,11 +91,8 @@ private:
 	// デバッグカメラ
 	std::unique_ptr <DebugCamera> debugCamera_ = nullptr;
 
-	// 階数
-	int currentFloor_ = 1;
-
 	// リザルト
-	bool isShowResult_ = false;
+	Timer resultTimer_;
 	float resultTime_ = 0;
 	float resultArrowMove_ = 0;
 

@@ -1,9 +1,11 @@
 #include "UIDrawer.h"
 #include "Character/Player/Player.h"
 
-void UIDrawer::Initialize(Player* player, MoneyUI* moneyUI) {
+void UIDrawer::Initialize(Player* player, FloorManager* floorManager) {
 	player_ = player;
-	money_ = moneyUI;
+
+	money_ = std::make_unique<MoneyUI>(player_->GetWallet());
+	nextRoom_ = std::make_unique<NextRoomUI>(floorManager);
 
 	equipment_ = std::make_unique<EquipmentUI>();
 	equipment_->Initialize(player);
@@ -68,12 +70,15 @@ void UIDrawer::Update() {
 	}
 
 	equipment_->Update();
+	nextRoom_->Update();
 }
 
 void UIDrawer::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& input = ctx.Input();
 	auto& render = ctx.Render();
+
+	nextRoom_->Draw();
 
 	// プレイヤーUI
 #pragma region PlayerUI
@@ -99,6 +104,7 @@ void UIDrawer::Draw() {
 
 	equipment_->Draw();
 	money_->Draw();
+
 }
 
 void UIDrawer::UpdatePlayerUI() {

@@ -15,6 +15,10 @@ bool KeyboardContext::IsRelease(uint8_t keyNumber) {
 	return input_->IsRelease(keyNumber);
 }
 
+bool KeyboardContext::IsAnyTrigger() {
+	return input_->IsAnyKeyTrigger();
+}
+
 // --------------------
 // マウス
 // --------------------
@@ -29,6 +33,10 @@ bool MouseContext::IsPress(const MouseButton& button) {
 
 bool MouseContext::IsRelease(const MouseButton& button) {
 	return input_->IsRelease(button);
+}
+
+bool MouseContext::IsAnyTrigger() {
+	return input_->IsAnyMouseTrigger();
 }
 
 Vector3 MouseContext::GetMouseMove() {
@@ -52,6 +60,10 @@ bool GamepadContext::IsPress(WORD button) {
 
 bool GamepadContext::IsRelease(WORD button) {
 	return input_->IsRelease(button);
+}
+
+bool GamepadContext::IsAnyTrigger() {
+	return input_->IsAnyGamepadTrigger();
 }
 
 /// <summary>

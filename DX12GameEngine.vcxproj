@@ -288,6 +288,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Item\Passive\Passive.cpp" />
     <ClCompile Include="Application\Item\Passive\Reload\ReloadBoost.cpp" />
     <ClCompile Include="Application\UI\Money\MoneyUI.cpp" />
+    <ClCompile Include="Application\UI\NextRoom\NextRoomUI.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -603,6 +604,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
     <ClInclude Include="Application\Fade\Fade.h" />
     <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
+    <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

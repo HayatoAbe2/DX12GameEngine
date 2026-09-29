@@ -31,7 +31,8 @@ void TitleScene::Initialize() {
 
 	logo_ = asset.LoadSprite("Resources/Control/title.png");
 	logo_->SetSize({ 610,150 });
-	logo_->SetPosition({ 640 - 305,700 - 500 });
+	logo_->SetPosition({ 640,275 });
+	logo_->SetPivot({ 0.5f,0.5f });
 }
 
 void TitleScene::Update() {
@@ -40,11 +41,12 @@ void TitleScene::Update() {
 	auto& input = ctx.Input();
 	auto& scene = ctx.Scene();
 
+	camera_->transform_.rotate.y += 0.1f;
 	camera_->Update(debugCamera_.get());
 
 	debugCamera_->Update();
 
-	if ((input.mouse.IsTrigger(MouseButton::Left) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_A)) && !isFadeIn_ && !isFadeOut_) {
+	if ((input.mouse.IsTrigger(MouseButton::Left) || input.gamepad.IsAnyTrigger()) && !isFadeIn_ && !isFadeOut_) {
 		isFadeOut_ = true;
 		fadeTimer_ = 0;
 		audio.SoundPlay(L"Resources/Sounds/SE/press.mp3", false);
@@ -63,7 +65,7 @@ void TitleScene::Update() {
 		if (fadeTimer_ >= kMaxFadeoutTimer_) {
 			isFadeOut_ = false;
 
-			//scene.SceneChange("Game");
+			scene.SceneChange("Game");
 		}
 	}
 }
