@@ -14,8 +14,9 @@ Room* FloorGenerator::GenerateFloor(int maxDepth) {
 }
 
 void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
-	if (depth >= maxDepth)
+	if (depth >= maxDepth) {
 		return;
+	}
 
 	for (int i = 0; i < 3; ++i) { // 3部屋接続
 		Room next;
@@ -23,18 +24,17 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 		if (depth + 1 >= maxDepth) {
 			// 最後はゴール部屋
 			next.type = RoomType::Goal;
+		} else if (depth == 1) {
+			next.type = RoomType::Combat;
+		} else if (depth == 5) {
+			next.type = RoomType::Shop;
 		} else {
-			if (depth == 5) {
-				next.type = RoomType::Shop;
+			auto& ctx = GameContext::GetInstance();
+			if (ctx.RandomInt(0, 64) < 50) {
+				next.type = RoomType::Combat;
 			} else {
-				auto& ctx = GameContext::GetInstance();
-				if (ctx.RandomInt(0, 64) < 50) {
-					next.type = RoomType::Combat;
-				} else {
-					next.type = RoomType::Shop;
-				}
+				next.type = RoomType::Shop;
 			}
-
 		}
 
 		// 再帰させて追加
@@ -103,7 +103,7 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 			model->tag == "southConnector" ||
 			model->tag == "northConnector") {
 			auto transform = model->GetTransform();
-			
+
 			// 出入口の方向
 			Direction dir = Direction::North;
 			if (model->tag == "westConnector") {
