@@ -7,11 +7,13 @@
 
 class Player;
 class WeaponManager;
+class EnemyManager;
+class BulletManager;
 class Camera;
 
 class ItemManager {
 public:
-	void Initialize(WeaponManager* weaponManager);
+	void Initialize(WeaponManager* weaponManager, EnemyManager* enemyManager, BulletManager* bulletManager);
 	void Update(Player* player, bool isCombat);
 	void Draw();
 
@@ -39,6 +41,8 @@ private:
 	std::unique_ptr<Sprite> controlKey_ = nullptr;
 	std::unique_ptr<Sprite> controlPad_ = nullptr;
 	WeaponManager* weaponManager_ = nullptr;
+	EnemyManager* enemyManager_ = nullptr;
+	BulletManager* bulletManager_ = nullptr;
 
 	// 落ちているアイテム
 	std::vector<std::unique_ptr<WorldItem>> items_;

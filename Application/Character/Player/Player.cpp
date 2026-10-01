@@ -318,15 +318,15 @@ void Player::Hit(float damage, const Vector2& from) {
 	}
 }
 
-void Player::OnHit(const Vector2& from, BulletManager* bulletManager) {
+void Player::OnHit(const Vector2& from) {
 	for (auto& p : passives_) {
-		p->OnHit(from, bulletManager, this);
+		p->OnHit(from, this);
 	}
 }
 
-void Player::OnDealDamage(const Vector2& pos, EnemyManager* enemyManager) {
+void Player::OnDealDamage(const Vector2& pos) {
 	for (auto& p : passives_) {
-		p->OnDealDamage(pos, enemyManager);
+		p->OnDealDamage(pos);
 	}
 }
 

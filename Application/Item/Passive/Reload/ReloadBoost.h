@@ -3,7 +3,7 @@
 
 class ReloadBoost : public Passive{
 public:
-	ReloadBoost(std::unique_ptr<Sprite> sprite);
+	ReloadBoost(std::unique_ptr<Sprite> sprite, PassiveContext ctx);
 	void OnUpdate(Weapon* weapon, Weapon* subWeapon) override;
 };
 

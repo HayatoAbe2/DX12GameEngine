@@ -5,8 +5,10 @@
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include "Engine/SceneObject/SceneObject.h"
 
-void ItemManager::Initialize(WeaponManager* weaponManager) {
+void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyManager, BulletManager* bulletManager) {
 	weaponManager_ = weaponManager;
+	enemyManager_ = enemyManager;
+	bulletManager_ = bulletManager;
 
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
@@ -140,18 +142,19 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	std::unique_ptr<Passive> p;
-
+	PassiveContext passiveCtx = { enemyManager_, bulletManager_ };
+	
 	// ランダム出現
 	int r = ctx.RandomInt(0, 2);
 	switch (r) {
 	case 0:
-		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Items/16.png"));
+		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Items/16.png"), passiveCtx);
 		break;
 	case 1:
-		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Items/13.png"));
+		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Items/13.png"), passiveCtx);
 		break;
 	default:
-		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Items/21.png"));
+		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Items/21.png"), passiveCtx);
 		break;
 	}
 	auto newItem = std::make_unique<WorldPassive>(std::move(p), pos, Rarity::Rare, isForSale);

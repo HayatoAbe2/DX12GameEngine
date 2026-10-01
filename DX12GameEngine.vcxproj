@@ -169,13 +169,14 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
     <ClCompile Include="Application\Item\Passive\Counter\Counter.cpp" />
     <ClCompile Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.cpp" />
+    <ClCompile Include="Application\CollisionSystem\CollisionSystem.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\Bullet\BulletManager.cpp" />
-    <ClCompile Include="Application\CollisionChecker\CollisionChecker.cpp" />
+    <ClCompile Include="Application\CollisionSystem\CollisionChecker\CollisionChecker.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
     <ClCompile Include="Application\Character\Enemy\Enemies\Bat.cpp" />
     <ClCompile Include="Application\Character\Enemy\Enemies\HeavyKnight.cpp" />
@@ -462,6 +463,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Item\Passive\Counter\Counter.h" />
     <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />
+    <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
@@ -473,7 +475,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Asset\Resource\Animation.h" />
     <ClInclude Include="Application\Bullet\Bullet.h" />
     <ClInclude Include="Application\Bullet\BulletManager.h" />
-    <ClInclude Include="Application\CollisionChecker\CollisionChecker.h" />
+    <ClInclude Include="Application\CollisionSystem\CollisionChecker\CollisionChecker.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
     <ClInclude Include="Application\Character\Enemy\Enemies\Bat.h" />
     <ClInclude Include="Application\Character\Enemy\Enemies\HeavyKnight.h" />

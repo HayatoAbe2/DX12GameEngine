@@ -1,7 +1,6 @@
 #include "Weapon.h"
 #include <Character/Enemy/Enemy.h>
 #include <Character/Player/Player.h>
-#include <CollisionChecker/CollisionChecker.h>
 
 Weapon::Weapon(const WeaponData& data, std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel) {
 	data_ = data;

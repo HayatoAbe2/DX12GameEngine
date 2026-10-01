@@ -27,8 +27,8 @@ public:
 	// 被弾
 	void Hit(float damage, const Vector2& from);
 
-	void OnHit(const Vector2& from, BulletManager* bulletManager);
-	void OnDealDamage(const Vector2& pos, EnemyManager* enemyManager);
+	void OnHit(const Vector2& from);
+	void OnDealDamage(const Vector2& pos);
 
 	void Move(MapCheck* mapCheck);
 	void Trigger(BulletManager* bulletManager, Camera* camera);

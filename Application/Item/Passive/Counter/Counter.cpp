@@ -1,9 +1,9 @@
 #include "Counter.h"
 
-Counter::Counter(std::unique_ptr<Sprite> sprite) : Passive(std::move(sprite)) {
+Counter::Counter(std::unique_ptr<Sprite> sprite, PassiveContext ctx) : Passive(std::move(sprite), passiveCtx_) {
 }
 
-void Counter::OnHit(const Vector2& pos, BulletManager* bulletManager, Character* from) {
+void Counter::OnHit(const Vector2& pos, Character* from) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	auto& audio = ctx.Audio();
@@ -24,6 +24,6 @@ void Counter::OnHit(const Vector2& pos, BulletManager* bulletManager, Character*
 
 		// 弾生成
         std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>(pos, shotDir, data, from);
-        bulletManager->AddBullet(std::move(newBullet));
+        passiveCtx_.bulletManager->AddBullet(std::move(newBullet));
     }
 }

@@ -9,7 +9,7 @@
 #include "Map/MapCheck.h"
 #include "Weapon/WeaponManager.h"
 #include "Item/ItemManager.h"
-#include "CollisionChecker/CollisionChecker.h"
+#include "CollisionSystem/CollisionSystem.h"
 #include "UI/UIDrawer/UIDrawer.h"
 #include "Map/FloorManager/FloorManager.h"
 #include "Fade/Fade.h"
@@ -81,7 +81,7 @@ private:
 	std::unique_ptr<ItemManager> itemManager_ = nullptr;
 
 	// 当たり判定
-	std::unique_ptr<CollisionChecker> collisionChecker_ = nullptr;
+	std::unique_ptr<CollisionSystem> collisionSystem_ = nullptr;
 
 	// 確率設定
 	std::unique_ptr<RandomSettings> randomSettings_ = nullptr;

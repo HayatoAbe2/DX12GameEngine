@@ -3,7 +3,7 @@
 
 class Counter : public Passive{
 public:
-	Counter(std::unique_ptr<Sprite> sprite);
-	void OnHit(const Vector2& pos, BulletManager* bulletManager, Character* from) override;
+	Counter(std::unique_ptr<Sprite> sprite, PassiveContext ctx);
+	void OnHit(const Vector2& pos, Character* from) override;
 };
 

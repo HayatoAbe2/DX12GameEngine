@@ -5,11 +5,12 @@
 #include "Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
 
-void CollisionChecker::Initialize(EffectManager* effectManager) {
+void CollisionChecker::Initialize(EffectManager* effectManager, Camera* camera) {
 	effectManager_ = effectManager;
+	camera_ = camera;
 }
 
-void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera, BulletManager* bulletManager) {
+void CollisionChecker::CheckPlayer(Player* player, Bullet* bullet) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
@@ -29,7 +30,7 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera, Bul
 		bullet->Hit();
 		bullet->OnHitAnything(effectManager_);
 
-		camera->StartShake(1.0f, 3);
+		camera_->StartShake(1.0f, 3);
 		if (bullet->GetData().traits.onHitAnything.explode) {
 			effectManager_->SpawnExplodeEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
 		} else {
@@ -38,11 +39,11 @@ void CollisionChecker::Check(Player* player, Bullet* bullet, Camera* camera, Bul
 
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 
-		player->OnHit(bullet->GetPrePos(), bulletManager);
+		player->OnHit(bullet->GetPrePos());
 	}
 }
 
-void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera, Player* player, EnemyManager* enemyManager) {
+void CollisionChecker::CheckEnemy(Enemy* enemy, Bullet* bullet, Player* player) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
@@ -63,7 +64,7 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera, Playe
 		bullet->Hit();
 		bullet->OnHitAnything(effectManager_);
 
-		camera->StartShake(0.5f, 2);
+		camera_->StartShake(0.5f, 2);
 		if (bullet->GetData().traits.onHitAnything.explode) {
 			effectManager_->SpawnExplodeEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
 		} else {
@@ -72,11 +73,11 @@ void CollisionChecker::Check(Enemy* enemy, Bullet* bullet, Camera* camera, Playe
 
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 
-		player->OnDealDamage(circle.center, enemyManager);
+		player->OnDealDamage(circle.center);
 	}
 }
 
-void CollisionChecker::Check(Player* player, Enemy* enemy, Camera* camera) {
+void CollisionChecker::CheckContact(Player* player, Enemy* enemy) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
@@ -98,7 +99,7 @@ void CollisionChecker::Check(Player* player, Enemy* enemy, Camera* camera) {
 	if (CheckCollision(segment, circle)) {
 		player->Hit(3.0f, ToXZ(enemy->GetPrePos()));
 
-		camera->StartShake(0.5f, 2);
+		camera_->StartShake(0.5f, 2);
 		effectManager_->SpawnHitEffect(player->GetTransform().translate);
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 	}

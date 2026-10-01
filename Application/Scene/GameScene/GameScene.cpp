@@ -1,6 +1,5 @@
 #include "GameScene.h"
 #include <numbers>
-#include "Character/Enemy/Enemies/Spiker.h"
 
 GameScene::~GameScene() {
 }
@@ -30,13 +29,28 @@ void GameScene::Initialize() {
 	mapTile_ = std::make_unique<MapTile>();
 	mapTile_->Initialize();
 
+	// 弾
+	bulletManager_ = std::make_unique<BulletManager>();
+
+	// 敵
+	enemyManager_ = std::make_unique<EnemyManager>();
+	enemyManager_->Initialize();
+
 	// 武器マネージャー
 	weaponManager_ = std::make_unique<WeaponManager>();
 	weaponManager_->Initialize();
 
 	// アイテムマネージャー
 	itemManager_ = std::make_unique<ItemManager>();
-	itemManager_->Initialize(weaponManager_.get());
+	itemManager_->Initialize(weaponManager_.get(), enemyManager_.get(), bulletManager_.get());
+
+	// プレイヤー
+	player_ = std::make_unique<Player>();
+	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_), itemManager_.get());
+	player_->SetWeapon(weaponManager_->GetWeapon(0));
+
+	// 当たり判定
+	collisionSystem_ = std::make_unique<CollisionSystem>(effectManager_.get(), bulletManager_.get(), enemyManager_.get(), camera_.get());
 
 	// 確率
 	randomSettings_ = std::make_unique<RandomSettings>();
@@ -44,22 +58,6 @@ void GameScene::Initialize() {
 	// エフェクト
 	effectManager_ = std::make_unique<EffectManager>();
 	effectManager_->Initialize();
-
-	// 当たり判定
-	collisionChecker_ = std::make_unique<CollisionChecker>();
-	collisionChecker_->Initialize(effectManager_.get());
-
-	// プレイヤー
-	player_ = std::make_unique<Player>();
-	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_), itemManager_.get());
-	player_->SetWeapon(weaponManager_->GetWeapon(0));
-
-	// 敵
-	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize();
-
-	// 弾
-	bulletManager_ = std::make_unique<BulletManager>();
 
 	// フェード
 	fade_ = std::make_unique<Fade>();
@@ -150,20 +148,9 @@ void GameScene::Update() {
 
 				// 弾の処理
 				bulletManager_->Update(mapCheck_.get(), effectManager_.get());
-				for (const auto& bullet : bulletManager_->GetBullets()) {
-
-					// 当たり判定
-					collisionChecker_->Check(player_.get(), bullet, camera_.get(), bulletManager_.get());
-					for (auto enemy : enemyManager_->GetEnemies()) {
-						collisionChecker_->Check(enemy, bullet, camera_.get(), player_.get(), enemyManager_.get());
-					}
-				}
-				// 敵とプレイヤー接触
-				for (auto enemy : enemyManager_->GetEnemies()) {
-					if (dynamic_cast<Spiker*>(enemy)) {
-						collisionChecker_->Check(player_.get(), enemy, camera_.get());
-					}
-				}
+				
+				// 衝突判定
+				collisionSystem_->Update(player_.get());
 
 				// アイテム
 				itemManager_->Update(player_.get(), enemyManager_->GetEnemies().size() != 0);
