@@ -38,6 +38,9 @@ void GameScene::Initialize() {
 	itemManager_ = std::make_unique<ItemManager>();
 	itemManager_->Initialize(weaponManager_.get());
 
+	// 確率
+	randomSettings_ = std::make_unique<RandomSettings>();
+
 	// エフェクト
 	effectManager_ = std::make_unique<EffectManager>();
 	effectManager_->Initialize();
@@ -205,7 +208,7 @@ void GameScene::Update() {
 			// 編集の反映,再配置
 			if (!isLoaded_) {
 				itemManager_->Load();
-				enemyManager_->Load(weaponManager_.get());
+				enemyManager_->Load(weaponManager_.get(), randomSettings_.get());
 			}
 
 			isLoaded_ = true;

@@ -51,7 +51,7 @@ void EnemyManager::Spawn(std::vector<std::unique_ptr<Enemy>> enemy) {
 	}
 }
 
-void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int enemyType) {
+void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyType enemyType) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
@@ -60,7 +60,7 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int en
 
 	std::vector<std::unique_ptr<Enemy>> enemies;
 	switch (enemyType) {
-	case 1:
+	case EnemyType::Fly:
 	{
 		auto enemyModel = asset.LoadModel("Resources/Enemy", "Dragon.glb");
 		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "Dragon.glb");
@@ -82,7 +82,7 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int en
 		break;
 	}
 
-	case 2:
+	case EnemyType::Golem:
 	{
 		auto enemyModel = asset.LoadModel("Resources/Enemy", "knight.obj");
 		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight.obj");
@@ -100,7 +100,7 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int en
 		enemies.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
-	case 3:
+	case EnemyType::elite1:
 	{
 		auto enemyModel = asset.LoadModel("Resources/Enemy", "knight2.obj");
 		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "knight2.obj");
@@ -121,7 +121,7 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int en
 		break;
 	}
 
-	case 4:
+	case EnemyType::elite2:
 	{
 		auto enemyModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
 		auto enemyShadowModel = asset.LoadModel("Resources/Enemy", "bat2.obj");
@@ -173,7 +173,7 @@ void EnemyManager::Reset() {
 	isSpawned_.clear();
 }
 
-void EnemyManager::Load(WeaponManager* weaponManager) {
+void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 	isSpawned_.clear();
 	spawnArea_.clear();
 	spawnPos_.clear();
@@ -212,12 +212,8 @@ void EnemyManager::Load(WeaponManager* weaponManager) {
 				spawnPos_.push_back(ToXZ(t.translate));
 				isSpawned_.push_back(false);
 
-				// 敵No.
-				int num = ctx.RandomInt(1, 3);
-				if (num == 3) num = 5;
-
 				// 出現敵のロード
-				CreateEnemy({ t.translate.x, 0, t.translate.z }, weaponManager, num);
+				CreateEnemy({ t.translate.x, 0, t.translate.z }, weaponManager, random->SelectEnemy());
 			}
 		}
 	}

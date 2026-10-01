@@ -1,6 +1,8 @@
 #pragma once
 #include "GameCommon.h"
 #include "Enemy.h"
+#include "EnemyType.h"
+#include "RandomSettings/RandomSettings.h"
 
 class MapCheck;
 class Player;
@@ -14,9 +16,9 @@ public:
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager);
 	void Draw();
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
-	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, int enemyType);
+	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyType enemyType);
 	void Reset();
-	void Load(WeaponManager* weaponManager);
+	void Load(WeaponManager* weaponManager, RandomSettings* random);
 	void SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck);
 
 	std::vector<Enemy*> GetEnemies();

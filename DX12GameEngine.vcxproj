@@ -168,6 +168,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
     <ClCompile Include="Application\Item\Passive\Counter\Counter.cpp" />
+    <ClCompile Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -289,6 +290,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Item\Passive\Reload\ReloadBoost.cpp" />
     <ClCompile Include="Application\UI\Money\MoneyUI.cpp" />
     <ClCompile Include="Application\UI\NextRoom\NextRoomUI.cpp" />
+    <ClCompile Include="Application\RandomSettings\RandomSettings.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -454,10 +456,12 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyState\EnemyState.h" />
+    <ClInclude Include="Application\Character\Enemy\EnemyType.h" />
     <ClInclude Include="Application\Map\Room\RoomData.h" />
     <ClInclude Include="Application\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Application\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Item\Passive\Counter\Counter.h" />
+    <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
@@ -605,6 +609,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Fade\Fade.h" />
     <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
     <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
+    <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

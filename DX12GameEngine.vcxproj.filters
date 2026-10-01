@@ -263,6 +263,8 @@
     <ClCompile Include="Application\Fade\Fade.cpp" />
     <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
     <ClCompile Include="Application\UI\NextRoom\NextRoomUI.cpp" />
+    <ClCompile Include="Application\RandomSettings\RandomSettings.cpp" />
+    <ClCompile Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -588,6 +590,9 @@
     <ClInclude Include="Application\Fade\Fade.h" />
     <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
     <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
+    <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
+    <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />
+    <ClInclude Include="Application\Character\Enemy\EnemyType.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

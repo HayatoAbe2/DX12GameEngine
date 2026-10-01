@@ -14,6 +14,7 @@
 #include "Map/FloorManager/FloorManager.h"
 #include "Fade/Fade.h"
 #include "GameCameraController/GameCameracontroller.h"
+#include "RandomSettings/RandomSettings.h"
 
 // ゲームシーン
 class GameScene : public BaseScene {
@@ -81,6 +82,9 @@ private:
 
 	// 当たり判定
 	std::unique_ptr<CollisionChecker> collisionChecker_ = nullptr;
+
+	// 確率設定
+	std::unique_ptr<RandomSettings> randomSettings_ = nullptr;
 
 	// UI
 	std::unique_ptr<UIDrawer> uiDrawer_ = nullptr;
