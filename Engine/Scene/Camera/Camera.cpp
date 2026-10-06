@@ -2,6 +2,10 @@
 #include "Engine/Scene/DebugCamera/DebugCamera.h"
 #include "Engine/Contexts/GameContext/GameContext.h"
 
+Camera::Camera() {
+	Update();
+}
+
 void Camera::Update(DebugCamera* debugCamera) {
 	auto& ctx = GameContext::GetInstance();
 	Transform cameraTransform = transform_;

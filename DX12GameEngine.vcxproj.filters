@@ -258,7 +258,7 @@
     <ClCompile Include="Application\Item\World\WorldMoney\WorldMoney.cpp" />
     <ClCompile Include="Application\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Externals\imgui\imgui_stdlib.cpp" />
-    <ClCompile Include="Application\Map\FloorGenerator\FloorGenerator.cpp" />
+    <ClCompile Include="Application\Map\FloorManager\FloorGenerator\FloorGenerator.cpp" />
     <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
     <ClCompile Include="Application\Fade\Fade.cpp" />
     <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
@@ -266,6 +266,7 @@
     <ClCompile Include="Application\RandomSettings\RandomSettings.cpp" />
     <ClCompile Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.cpp" />
     <ClCompile Include="Application\CollisionSystem\CollisionSystem.cpp" />
+    <ClCompile Include="Application\Result\Result.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -586,7 +587,7 @@
     <ClInclude Include="Application\Item\World\WorldPassive\WorldPassive.h" />
     <ClInclude Include="Externals\imgui\imgui_stdlib.h" />
     <ClInclude Include="Application\Map\Room\RoomData.h" />
-    <ClInclude Include="Application\Map\FloorGenerator\FloorGenerator.h" />
+    <ClInclude Include="Application\Map\FloorManager\FloorGenerator\FloorGenerator.h" />
     <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
     <ClInclude Include="Application\Fade\Fade.h" />
     <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
@@ -595,6 +596,7 @@
     <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyType.h" />
     <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
+    <ClInclude Include="Application\Result\Result.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

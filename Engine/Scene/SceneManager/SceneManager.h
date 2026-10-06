@@ -17,11 +17,18 @@ public:
 
 	// シーン変更
 	void SceneChange(std::string& nextSceneName);
-	BaseScene* GetCurrentScene() { return currentScene_.get(); }
+	BaseScene* GetCurrentScene() {
+		if (nextScene_) {
+			return nextScene_.get();
+		}
+		return currentScene_.get();
+	}
 
 private:
 	// 現在のシーン
 	std::unique_ptr<BaseScene> currentScene_ = nullptr;
+	// 次シーン
+	std::unique_ptr<BaseScene> nextScene_ = nullptr;
 
 	// 基底シーンファクトリ(エンジン側)
 	std::unique_ptr<SceneFactoryBase> sceneFactory_ = nullptr;

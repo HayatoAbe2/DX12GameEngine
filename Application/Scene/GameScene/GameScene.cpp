@@ -8,7 +8,6 @@ void GameScene::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	auto& render = ctx.Render();
-	auto& scene = ctx.Scene();
 
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();
@@ -62,13 +61,8 @@ void GameScene::Initialize() {
 	// フェード
 	fade_ = std::make_unique<Fade>();
 
-	resultBG_ = asset.LoadSprite("resources/Result/result.png");
-	resultBG_->SetColor({ 1, 1, 1, 0.7f });
-
-	resultCursor_ = asset.LoadSprite("resources/Result/cursor.png");
-	resultCursor_->SetSize({ 48,56 });
-	resultCursor_->SetColor({ 1, 1, 1, 0.7f });
-	resultCursor_->SetPivot({ 0.5f,0.5f });
+	// リザルト
+	result_ = std::make_unique<Result>(fade_.get());
 
 	// カメラ制御
 	cameraController_ = std::make_unique<GameCameraController>(camera_.get());
@@ -110,6 +104,11 @@ void GameScene::Update() {
 				}
 
 			} else {
+
+				if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
+					phase_ = Phase::RESULT;
+					fade_->StartFadeIn();
+				}
 
 				if (!fade_->IsActive() && fade_->GetPhase() == FadePhase::None) {
 					// プレイヤー処理
@@ -203,38 +202,7 @@ void GameScene::Update() {
 
 		break;
 	case Phase::RESULT:
-		switch (fade_->GetPhase()) {
-		case FadePhase::None:
-		{
-			if (resultTime_ == 0) {
-				resultTimer_.Start(2.0f);
-			}
-
-			// リザルト
-			if (resultArrowMove_ < 1.0f) {
-				resultArrowMove_ = max(resultArrowMove_ + ctx.GetDeltatime() * 1, 1.0f);
-			}
-
-			resultTimer_.Update();
-			resultTime_ += ctx.GetDeltatime();
-
-			float left = 227.0f;
-			float width = 1053.0f - left;
-			float endX = left + (float(floorManager_->GetCurrentDepth()) / float(floorManager_->kMaxDepth)) * width;
-
-			float sinWave_ = sinf(10.0f * float(std::numbers::pi) * resultTime_ * 0.3f);
-			resultCursor_->SetPosition({ endX * resultArrowMove_, 180 + sinWave_ * 10 });
-
-			if (resultTimer_.IsFinished() &&
-				(input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A))) {
-				fade_->StartFadeOut();
-				return;
-			}
-		}
-		break;
-		case FadePhase::Faded:
-			scene.SceneChange("Game");
-		}
+		result_->Update(floorManager_.get());
 	}
 }
 
@@ -271,10 +239,9 @@ void GameScene::Draw() {
 		uiDrawer_->Draw();
 	}
 
+	// リザルト
 	if (phase_ == Phase::RESULT) {
-		resultBG_->SetSize(ctx.GetRenderWindowSize());
-		render.DrawSprite(resultBG_.get());
-		render.DrawSprite(resultCursor_.get());
+		result_->Draw();
 	}
 
 	fade_->Draw();

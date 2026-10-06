@@ -105,6 +105,7 @@ private:
 	void InitializeCylinder();
 	void InitializeLine();
 	void InitializeSphere();
+	void InitializeCircle();
 	void InitializeSkybox();
 
 	DirectXContext* dxContext_ = nullptr;
@@ -131,6 +132,7 @@ private:
 	ShapeData cylinder_;
 	ShapeData line_;
 	ShapeData sphere_;
+	ShapeData circle_;
 
 	// Skybox用データ
 	struct SkyboxData {

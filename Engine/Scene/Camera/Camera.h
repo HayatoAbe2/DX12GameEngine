@@ -4,6 +4,7 @@ class Renderer;
 
 class Camera {
 public:
+	Camera();
 
 	Transform transform_ = { {1,1,1} };
 	Matrix4x4 viewMatrix_;

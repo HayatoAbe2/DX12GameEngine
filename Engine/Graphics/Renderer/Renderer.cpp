@@ -646,6 +646,116 @@ void Renderer::InitializeSphere() {
 	}
 }
 
+void Renderer::InitializeCircle() {
+	auto bufferManager = dxContext_->GetBufferManager();
+
+	constexpr uint32_t kCircleDivide = 64;
+	constexpr float kRadius = 1.0f;
+
+	const uint32_t vertexCount = kCircleDivide + 1;
+	const uint32_t indexCount = kCircleDivide * 3;
+
+	// ========================================
+	// Vertex
+	// ========================================
+
+	circle_.vertexResource = bufferManager->CreateUploadBuffer(sizeof(VertexData) * vertexCount);
+	VertexData* vertexData = nullptr;
+
+	circle_.vertexResource->Map(
+		0,
+		nullptr,
+		reinterpret_cast<void**>(&vertexData)
+	);
+
+	// 中心頂点
+	vertexData[0] = {
+		{ 0.0f, 0.0f, 0.0f, 1.0f },
+		{ 0.5f, 0.5f },
+		{ 0.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f, 1.0f }
+	};
+
+	// 外周頂点
+	for (uint32_t i = 0; i < kCircleDivide; ++i) {
+
+		float theta =
+			DirectX::XM_2PI *
+			static_cast<float>(i) /
+			static_cast<float>(kCircleDivide);
+
+		float s = std::sin(theta);
+		float c = std::cos(theta);
+
+		uint32_t vertexIndex = i + 1;
+
+		float x = -s * kRadius;
+		float y = c * kRadius;
+
+		vertexData[vertexIndex] = {
+			// Position
+			{ x, y, 0.0f, 1.0f },
+
+			// UV
+			{
+				x / (kRadius * 2.0f) + 0.5f,
+				y / (kRadius * 2.0f) + 0.5f
+			},
+
+			// Normal
+			{ 0.0f, 0.0f, 1.0f },
+
+			// Color
+			{ 1.0f, 1.0f, 1.0f, 1.0f }
+		};
+	}
+
+	circle_.vertexResource->Unmap(0, nullptr);
+
+	circle_.vbv.BufferLocation =
+		circle_.vertexResource->GetGPUVirtualAddress();
+
+	circle_.vbv.SizeInBytes =
+		sizeof(VertexData) * vertexCount;
+
+	circle_.vbv.StrideInBytes =
+		sizeof(VertexData);
+
+
+	// ========================================
+	// Index
+	// ========================================
+
+	circle_.indexResource = bufferManager->CreateUploadBuffer(sizeof(uint32_t) * indexCount);
+	uint32_t* indexData = nullptr;
+
+	circle_.indexResource->Map(
+		0,
+		nullptr,
+		reinterpret_cast<void**>(&indexData)
+	);
+
+	for (uint32_t i = 0; i < kCircleDivide; ++i) {
+
+		uint32_t next = (i + 1) % kCircleDivide;
+
+		indexData[i * 3 + 0] = 0;
+		indexData[i * 3 + 1] = i + 1;
+		indexData[i * 3 + 2] = next + 1;
+	}
+
+	circle_.indexResource->Unmap(0, nullptr);
+
+	circle_.ibv.BufferLocation =
+		circle_.indexResource->GetGPUVirtualAddress();
+
+	circle_.ibv.SizeInBytes =
+		sizeof(uint32_t) * indexCount;
+
+	circle_.ibv.Format =
+		DXGI_FORMAT_R32_UINT;
+}
+
 void Renderer::InitializeSkybox() {
 	auto bufferManager = dxContext_->GetBufferManager();
 	UINT sizeInBytes = sizeof(VertexData) * 24;

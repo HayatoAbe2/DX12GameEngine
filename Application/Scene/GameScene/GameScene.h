@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Scene/BaseScene/BaseScene.h"
 
+#include "Result/Result.h"
 #include "Character/Player/Player.h"
 #include "Character/Enemy/EnemyManager.h"
 #include "Bullet/BulletManager.h"
@@ -45,6 +46,7 @@ private:
 		RESULT
 	};
 	Phase phase_ = Phase::GAME;
+	std::unique_ptr<Result> result_;
 
 	// 3Dモデル
 	std::unique_ptr<Model> playerModel_ = nullptr;
@@ -52,9 +54,6 @@ private:
 	std::unique_ptr<Model> enemyModel_ = nullptr;
 
 	std::shared_ptr<Texture> skybox_ = nullptr;
-
-	std::unique_ptr<Sprite> resultBG_ = nullptr;
-	std::unique_ptr<Sprite> resultCursor_ = nullptr;
 
 	// プレイヤー
 	std::unique_ptr<Player> player_ = nullptr;
@@ -94,11 +93,6 @@ private:
 
 	// デバッグカメラ
 	std::unique_ptr <DebugCamera> debugCamera_ = nullptr;
-
-	// リザルト
-	Timer resultTimer_;
-	float resultTime_ = 0;
-	float resultArrowMove_ = 0;
 
 	// ポーズ
 	bool isPause_ = false;

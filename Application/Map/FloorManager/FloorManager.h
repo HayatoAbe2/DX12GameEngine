@@ -1,5 +1,5 @@
 #pragma once
-#include "Map/FloorGenerator/FloorGenerator.h"
+#include "FloorGenerator/FloorGenerator.h"
 
 class FloorManager {
 public:

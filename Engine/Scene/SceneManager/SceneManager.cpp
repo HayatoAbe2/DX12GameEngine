@@ -11,6 +11,11 @@ void SceneManager::Initialize() {
 }
 
 void SceneManager::Update() {
+	if (nextScene_) {
+		currentScene_ = std::move(nextScene_);
+		nextScene_ = nullptr;
+	}
+
 	if (currentScene_) {
 		currentScene_->Update();
 	}
@@ -23,6 +28,6 @@ void SceneManager::Draw() {
 }
 
 void SceneManager::SceneChange(std::string& nextSceneName) {
-	currentScene_ = sceneFactory_->CreateScene(nextSceneName);
-	currentScene_->Initialize();
+	nextScene_ = sceneFactory_->CreateScene(nextSceneName);
+	nextScene_->Initialize();
 }
