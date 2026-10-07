@@ -16,14 +16,8 @@ void GameScene::Initialize() {
 	LoadSound();
 
 	// Skybox
-	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
-
-	playerModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
-	playerShadowModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
-	MaterialData data = playerModel_->GetMaterial(0)->GetData();
-	data.color = { 0.0f,0.0f,0.0f,1.0f };
-	data.useEnvironmentMap = true;
-	data.environmentIntensity = 1.0f;
+	//skybox_ = asset.LoadTexture("Resources/Debug/Sky/skybox.dds");
+	skybox_ = asset.LoadTexture("Resources/Images/Background/background.dds");
 
 	mapTile_ = std::make_unique<MapTile>();
 	mapTile_->Initialize();
@@ -45,18 +39,18 @@ void GameScene::Initialize() {
 
 	// プレイヤー
 	player_ = std::make_unique<Player>();
-	player_->Initialize(std::move(playerModel_), std::move(playerShadowModel_), itemManager_.get());
+	player_->Initialize(itemManager_.get());
 	player_->SetWeapon(weaponManager_->GetWeapon(0));
+
+	// エフェクト
+	effectManager_ = std::make_unique<EffectManager>();
+	effectManager_->Initialize();
 
 	// 当たり判定
 	collisionSystem_ = std::make_unique<CollisionSystem>(effectManager_.get(), bulletManager_.get(), enemyManager_.get(), camera_.get());
 
 	// 確率
 	randomSettings_ = std::make_unique<RandomSettings>();
-
-	// エフェクト
-	effectManager_ = std::make_unique<EffectManager>();
-	effectManager_->Initialize();
 
 	// フェード
 	fade_ = std::make_unique<Fade>();
@@ -104,11 +98,6 @@ void GameScene::Update() {
 				}
 
 			} else {
-
-				if (input.keyboard.IsRelease(DIK_ESCAPE) || input.gamepad.IsPress(XINPUT_GAMEPAD_START)) {
-					phase_ = Phase::RESULT;
-					fade_->StartFadeIn();
-				}
 
 				if (!fade_->IsActive() && fade_->GetPhase() == FadePhase::None) {
 					// プレイヤー処理

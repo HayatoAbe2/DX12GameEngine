@@ -1,0 +1,30 @@
+{ 
+    "Pistol": {
+        "modelName": "Pistol.obj",
+        "weight": 0.1,
+        "shootCoolTime": 0.33,
+        "maxCharge": 8.0,
+        "chargeTime": 0.15,
+
+         "bullet": {
+            "damage": 6.0,
+            "radius": 0.5,
+            "speed": 30,
+            "lifeTime": 60,
+            "knockback": 0.3,
+            "color": [0.2, 0.1, 1.0, 1.0],
+
+            "traits":{
+                "onHitWall":{
+                    "ricochet":{
+                        "count": 2,
+                        "onHitEnemy": false,
+                        "toEnemy":false
+                    }
+                }
+            }
+        },
+ 
+        "rarity": "Common"
+  }
+}

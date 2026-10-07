@@ -1,0 +1,43 @@
+{ 
+    "OrbitStaff": {
+        "modelName": "Spellbook.obj",
+        "weight": 0.4,
+        "shootCoolTime": 2.5,
+        "maxCharge": 2.0,
+        "chargeTime": 4.0,
+        
+        "bullet": {
+            "damage": 7.0,
+            "radius": 2.0,
+            "speed": 3,
+            "lifeTime": 150,
+            "knockback": 0.6,
+            "color": [0.1, 0.3, 0.8, 1.0],
+
+            "traits": {
+                "move":{
+                    "orbit":{
+                        "radius": 3.0,
+                        "speed": 2.5
+                    }
+                },
+
+                "onHitEnemy":{
+                    "piercing":{
+                        "count": 1
+                    }
+                }
+            }
+        },
+
+        "traits": {
+            "multiShot":{
+                "count": 2,
+                "maxAngle": 180,
+                "random": false
+            }
+        },
+
+        "rarity": "Rare"
+  }
+}

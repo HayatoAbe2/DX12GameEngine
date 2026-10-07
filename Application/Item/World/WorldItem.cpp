@@ -41,12 +41,12 @@ WorldItem::WorldItem(Vector3 pos, Rarity rarity, bool isForSale) {
 	if (isForSale_) {
 		price_ = 100;
 
-		coinIcon_ = asset.LoadSprite("Resources/Items/Coin.png");
+		coinIcon_ = asset.LoadSprite("Resources/Images/Items/Coin.png");
 		coinIcon_->SetSize({ iconSize_, iconSize_ });
 		coinIcon_->SetPivot({ 0.5f,0.5f });
 
 		for (int i = 0; i < numbers_.size(); ++i) {
-			numbers_[i] = asset.LoadSprite("Resources/Text/Numbers.png");
+			numbers_[i] = asset.LoadSprite("Resources/Images/Text/Numbers.png");
 			numbers_[i]->SetSize({ digitSize_, digitSize_ });
 			numbers_[i]->SetPivot({ 0.5f,0.5f });
 		}

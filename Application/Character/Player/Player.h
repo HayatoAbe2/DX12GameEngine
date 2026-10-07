@@ -18,7 +18,7 @@ public:
 	~Player();
 
 	// 初期化
-	void Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Model> playerShadow, ItemManager* itemManager);
+	void Initialize(ItemManager* itemManager);
 	// 更新
 	void Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager);
 	// 描画
@@ -27,8 +27,10 @@ public:
 	// 被弾
 	void Hit(float damage, const Vector2& from);
 
-	void OnHit(const Vector2& from);
 	void OnDealDamage(const Vector2& pos);
+	void OnEliminate(const Vector2& enemyPos);
+	void OnHit(const Vector2& from);
+	void OnDodge();
 
 	void Move(MapCheck* mapCheck);
 	void Trigger(BulletManager* bulletManager, Camera* camera);
@@ -45,7 +47,7 @@ public:
 	float GetMaxHP() { return maxHp_; }
 	Wallet& GetWallet() { return wallet_; }
 	bool IsBoosting() { return isUsingBoost_; }
-	bool IsInvincible() { return isUsingBoost_ || invincibleTimer_->IsActive(); }
+	bool IsInvincible() { return invincibleTimer_->IsActive(); }
 
 	Transform GetTransform() const override { return transform_; }
 	Vector3 GetPrePos() const override { return prePos_; }

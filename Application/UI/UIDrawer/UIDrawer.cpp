@@ -14,29 +14,29 @@ void UIDrawer::Initialize(Player* player, FloorManager* floorManager) {
 	auto& asset = ctx.Asset();
 
 #pragma region PlayerUI
-	life_ = asset.LoadSprite("Resources/UI/gauge.png");
+	life_ = asset.LoadSprite("Resources/Images/UI/gauge.png");
 	life_->SetSize({ 290,68 });
 	life_->SetPosition({ 10,10 });
 	damage_ = asset.LoadSprite("Resources/Debug/white1x1.png");
 	damage_->SetSize({ 290,68 });
 	damage_->SetPosition({ 10,10 });
-	lifeBack_ = asset.LoadSprite("Resources/UI/gauge.png");
+	lifeBack_ = asset.LoadSprite("Resources/Images/UI/gauge.png");
 	lifeBack_->SetSize({ 290,68 });
 	lifeBack_->SetPosition({ 10,10 });
 	lifeBack_->SetColor({ 0.2f,0.2f,0.2f,1 });
 
 #pragma endregion
 
-	dodgeControlKey_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	dodgeControlKey_ = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
 	dodgeControlKey_->SetSize(dodgeControlUIData_.size);
 	dodgeControlKey_->SetPosition(dodgeControlUIData_.pos);
 	dodgeControlKey_->SetTextureRect(64 * 16, 64 * 4, 64, 64);
-	dodgeControlPad_ = asset.LoadSprite("Resources/Control/XboxController.png");
+	dodgeControlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.png");
 	dodgeControlPad_->SetSize(dodgeControlUIData_.size);
 	dodgeControlPad_->SetPosition(dodgeControlUIData_.pos);
 	dodgeControlPad_->SetTextureRect(64 * 6, 64 * 8, 64, 64);
 
-	dodge_ = asset.LoadSprite("Resources/Control/Dodge.png");
+	dodge_ = asset.LoadSprite("Resources/Images/Control/Dodge.png");
 	dodge_->SetSize(dodgeUIData_.size);
 	dodge_->SetPosition(dodgeUIData_.pos);
 }

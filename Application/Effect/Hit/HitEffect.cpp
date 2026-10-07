@@ -3,7 +3,7 @@
 void HitEffect::Initialize(const Vector3& pos, const Vector4& color) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
-	spark_ = asset.LoadModel("Resources/HitEffect", "hitSpark.obj");
+	spark_ = asset.LoadModel("Resources/Models/HitEffect", "hitSpark.obj");
 	spark_->SetTranslate(pos);
 	spark_->SetScale({});
 

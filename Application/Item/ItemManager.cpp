@@ -1,9 +1,12 @@
 #include "ItemManager.h"
 #include "Character/Player/Player.h"
-#include "Weapon/WeaponManager.h"
+#include "Weapon/WeaponManager/WeaponManager.h"
 #include "Weapon/Weapon.h"
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include "Engine/SceneObject/SceneObject.h"
+#include "Item/World/WorldWeapon/WorldWeapon.h"
+#include "Item/World/WorldPassive/WorldPassive.h"
+#include "Item/World/WorldMoney/WorldMoney.h"
 
 void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyManager, BulletManager* bulletManager) {
 	weaponManager_ = weaponManager;
@@ -14,11 +17,11 @@ void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyMa
 	auto& asset = ctx.Asset();
 
 	// 操作
-	controlKey_ = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	controlKey_ = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
 	controlKey_->SetSize({ 64,64 });
 	controlKey_->SetPosition({ 640 - 32,720 - 460 });
 	controlKey_->SetTextureRect(0, 64 * 9, 64, 64);
-	controlPad_ = asset.LoadSprite("Resources/Control/XboxController.png");
+	controlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.png");
 	controlPad_->SetSize({ 64,64 });
 	controlPad_->SetPosition({ 640 - 32,720 - 460 });
 	controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
@@ -148,13 +151,13 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	int r = ctx.RandomInt(0, 2);
 	switch (r) {
 	case 0:
-		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Items/16.png"), passiveCtx);
+		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Images/Items/16.png"), nullptr, passiveCtx);
 		break;
 	case 1:
-		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Items/13.png"), passiveCtx);
+		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Images/Items/13.png"), nullptr, passiveCtx);
 		break;
 	default:
-		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Items/21.png"), passiveCtx);
+		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Images/Items/21.png"), nullptr, passiveCtx);
 		break;
 	}
 	auto newItem = std::make_unique<WorldPassive>(std::move(p), pos, Rarity::Rare, isForSale);

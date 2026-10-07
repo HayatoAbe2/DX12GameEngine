@@ -1,8 +1,6 @@
 #pragma once
 #include "GameCommon.h"
-#include "Item/World/WorldWeapon/WorldWeapon.h"
-#include "Item/World/WorldPassive/WorldPassive.h"
-#include "Item/World/WorldMoney/WorldMoney.h"
+#include "Item/World/WorldItem.h"
 #include "Rarity.h"
 
 class Player;

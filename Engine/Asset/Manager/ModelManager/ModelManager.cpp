@@ -177,7 +177,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 
 			// デフォルト環境テクスチャ
 			auto environmentTexture = std::make_shared<Texture>(envTextureId);
-			environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
+			environmentTexture->SetMtlFilePath("Resources/Debug/black.dds");
 			textureManager_->CreateTextureSRV(environmentTexture);
 
 			// マテリアル初期化
@@ -305,7 +305,7 @@ std::unique_ptr<InstancedModel> ModelManager::Load(uint32_t id, uint32_t texture
 
 		// デフォルト環境テクスチャ
 		auto environmentTexture = std::make_shared<Texture>(envTextureId);
-		environmentTexture->SetMtlFilePath("Resources/Debug/rostock_laage_airport_4k.dds");
+		environmentTexture->SetMtlFilePath("Resources/Debug/black.dds");
 		textureManager_->CreateTextureSRV(environmentTexture);
 
 		// マテリアル初期化

@@ -183,7 +183,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Character\Enemy\Enemies\Knight.cpp" />
     <ClCompile Include="Application\Character\Enemy\Enemies\RedBat.cpp" />
     <ClCompile Include="Application\Character\Enemy\Enemy.cpp" />
-    <ClCompile Include="Application\Character\Enemy\EnemyManager.cpp" />
+    <ClCompile Include="Application\Character\Enemy\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\Item\World\WorldItem.cpp" />
     <ClCompile Include="Application\Item\ItemManager.cpp" />
     <ClCompile Include="Application\Map\MapCheck.cpp" />
@@ -192,7 +192,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Scene\TitleScene\TitleScene.cpp" />
     <ClCompile Include="Application\UI\UIDrawer\UIDrawer.cpp" />
     <ClCompile Include="Application\Weapon\Weapon.cpp" />
-    <ClCompile Include="Application\Weapon\WeaponManager.cpp" />
+    <ClCompile Include="Application\Weapon\WeaponManager\WeaponManager.cpp" />
     <ClCompile Include="Engine\Contexts\AssetContext\AssetContext.cpp" />
     <ClCompile Include="Engine\Contexts\AudioContext\AudioContext.cpp" />
     <ClCompile Include="Engine\Graphics\GPUResource\BufferManager\BufferManager.cpp" />
@@ -483,7 +483,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Character\Enemy\Enemies\Knight.h" />
     <ClInclude Include="Application\Character\Enemy\Enemies\RedBat.h" />
     <ClInclude Include="Application\Character\Enemy\Enemy.h" />
-    <ClInclude Include="Application\Character\Enemy\EnemyManager.h" />
+    <ClInclude Include="Application\Character\Enemy\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Application\Character\Enemy\EnemyStatus.h" />
     <ClInclude Include="Application\Item\World\WorldItem.h" />
     <ClInclude Include="Application\Item\ItemManager.h" />
@@ -494,7 +494,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Scene\TitleScene\TitleScene.h" />
     <ClInclude Include="Application\UI\UIDrawer\UIDrawer.h" />
     <ClInclude Include="Application\Weapon\Weapon.h" />
-    <ClInclude Include="Application\Weapon\WeaponManager.h" />
+    <ClInclude Include="Application\Weapon\WeaponManager\WeaponManager.h" />
     <ClInclude Include="Application\Weapon\WeaponStatus.h" />
     <ClInclude Include="Engine\SceneObject\Model\Skeleton.h" />
     <ClInclude Include="Engine\SceneObject\SceneObject.h" />

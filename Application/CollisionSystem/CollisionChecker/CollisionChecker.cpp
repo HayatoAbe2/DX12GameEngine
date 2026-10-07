@@ -25,21 +25,25 @@ void CollisionChecker::CheckPlayer(Player* player, Bullet* bullet) {
 	Segment2D segment = { bullet->GetPrePos(), bullet->GetCollider().center };
 	Circle circle = { player->GetRadius() + bullet->GetCollider().radius, ToXZ(player->GetTransform().translate) };
 	if (CheckCollision(segment, circle)) {
-		player->Hit(bullet->GetDamage(), bullet->GetPrePos());
-
-		bullet->Hit();
-		bullet->OnHitAnything(effectManager_);
-
-		camera_->StartShake(1.0f, 3);
-		if (bullet->GetData().traits.onHitAnything.explode) {
-			effectManager_->SpawnExplodeEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
+		if (player->IsBoosting()) {
+			// 回避
+			player->OnDodge();
 		} else {
-			effectManager_->SpawnHitEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
+			// プレイヤーにヒット
+			player->Hit(bullet->GetDamage(), bullet->GetPrePos());
+			bullet->Hit();
+			bullet->OnHitAnything(effectManager_);
+
+			camera_->StartShake(1.0f, 3);
+			if (bullet->GetData().traits.onHitAnything.explode) {
+				effectManager_->SpawnExplodeEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
+			} else {
+				effectManager_->SpawnHitEffect({ bullet->GetCollider().center.x, 0.5f, bullet->GetCollider().center.y });
+			}
+
+			audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
+			player->OnHit(bullet->GetPrePos());
 		}
-
-		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
-
-		player->OnHit(bullet->GetPrePos());
 	}
 }
 
@@ -73,7 +77,12 @@ void CollisionChecker::CheckEnemy(Enemy* enemy, Bullet* bullet, Player* player) 
 
 		audio.SoundPlay(L"Resources/Sounds/SE/hit.mp3", false);
 
+		// ダメージを与えた時の効果
 		player->OnDealDamage(circle.center);
+		if (enemy->IsDead()) {
+			// 撃破時効果
+			player->OnEliminate(circle.center);
+		}
 	}
 }
 

@@ -18,18 +18,18 @@ void TitleScene::Initialize() {
 	render.SetCamera(camera_.get());
 
 	// Skybox
-	skybox_ = asset.LoadTexture("Resources/Skydome/skybox.dds");
+	skybox_ = asset.LoadTexture("Resources/Debug/Sky/skybox.dds");
 	
 	// フェード
 	fade_ = asset.LoadSprite("resources/Debug/white1x1.png");
 	fade_->SetSize(ctx.GetWindowSize() + Vector2{ 20,80 });
 	fade_->SetColor({ 1.0f,1.0f,1.0f,0.0f });
 
-	control_ = asset.LoadSprite("Resources/Control/gamestart.png");
+	control_ = asset.LoadSprite("Resources/Images/Control/gamestart.png");
 	control_->SetSize({ 270,50 });
 	control_->SetPosition({ 640 - 135,710 - 200 });
 
-	logo_ = asset.LoadSprite("Resources/Control/title.png");
+	logo_ = asset.LoadSprite("Resources/Images/Control/title.png");
 	logo_->SetSize({ 610,150 });
 	logo_->SetPosition({ 640,275 });
 	logo_->SetPivot({ 0.5f,0.5f });

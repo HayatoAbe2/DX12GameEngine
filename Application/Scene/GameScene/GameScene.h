@@ -3,12 +3,12 @@
 
 #include "Result/Result.h"
 #include "Character/Player/Player.h"
-#include "Character/Enemy/EnemyManager.h"
+#include "Character/Enemy/EnemyManager/EnemyManager.h"
 #include "Bullet/BulletManager.h"
 #include "Effect/EffectManager.h"
 #include "Map/MapTile.h"
 #include "Map/MapCheck.h"
-#include "Weapon/WeaponManager.h"
+#include "Weapon/WeaponManager/WeaponManager.h"
 #include "Item/ItemManager.h"
 #include "CollisionSystem/CollisionSystem.h"
 #include "UI/UIDrawer/UIDrawer.h"
@@ -47,11 +47,6 @@ private:
 	};
 	Phase phase_ = Phase::GAME;
 	std::unique_ptr<Result> result_;
-
-	// 3Dモデル
-	std::unique_ptr<Model> playerModel_ = nullptr;
-	std::unique_ptr<Model> playerShadowModel_ = nullptr;
-	std::unique_ptr<Model> enemyModel_ = nullptr;
 
 	std::shared_ptr<Texture> skybox_ = nullptr;
 
@@ -98,9 +93,6 @@ private:
 	bool isPause_ = false;
 
 	bool isLoaded_ = false;
-
-	std::unique_ptr<ParticleSystem> gpuParticle;
-	std::unique_ptr<MoneyUI> moneyUI_;
 
 	// フロア
 	std::unique_ptr<FloorManager> floorManager_;

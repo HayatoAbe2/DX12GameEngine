@@ -8,7 +8,7 @@ NextRoomUI::NextRoomUI(FloorManager* floorManager) {
 	// 画像ロード
 	icons_.resize(3);
 	for (int i = 0; i < 3; ++i) {
-		icons_[i] = asset.LoadSprite("Resources/UI/Icons/dice_question.png");
+		icons_[i] = asset.LoadSprite("Resources/Images/UI/Icons/dice_question.png");
 		icons_[i]->SetSize({ iconSize_, iconSize_ });
 		icons_[i]->SetPivot({ 0.5f,0.5f });
 	}
@@ -38,18 +38,13 @@ void NextRoomUI::Update() {
 			break;
 		}
 		// アイコン設定
-		icons_[i] = asset.LoadSprite(std::string("Resources/UI/Icons/") + name + std::string(".png"));
+		icons_[i] = asset.LoadSprite(std::string("Resources/Images/UI/Icons/") + name + std::string(".png"));
 		icons_[i]->SetSize({ iconSize_, iconSize_ });
 		icons_[i]->SetPivot({ 0.5f,0.5f });
 	}
-}
 
-void NextRoomUI::Draw() {
-	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 	auto camera = render.GetCamera();
-
-	auto connectors = floorManager_->GetConnector();
 	for (int i = 0; i < int(connectors.size()); ++i) {
 		// 出入口の位置
 		Vector2 position = (connectors[i].collider.min + connectors[i].collider.max) / 2.0f;
@@ -69,6 +64,15 @@ void NextRoomUI::Draw() {
 
 		// アイコン
 		icons_[i]->SetPosition(pos - icons_[i]->GetSize() / 2.0f);
+	}
+}
+
+void NextRoomUI::Draw() {
+	auto& ctx = GameContext::GetInstance();
+	auto& render = ctx.Render();
+
+	auto connectors = floorManager_->GetConnector();
+	for (int i = 0; i < int(connectors.size()); ++i) {
 		render.DrawSprite(icons_[i].get());
 	}
 }

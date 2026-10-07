@@ -8,35 +8,35 @@ void EquipmentUI::Initialize(Player* player) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	equipAssaultRifle_ = asset.LoadSprite("Resources/Control/equipmentAssaultRifle.png");
-	equipPistol_ = asset.LoadSprite("Resources/Control/equipmentPistol.png");
-	equipShotgun_ = asset.LoadSprite("Resources/Control/equipmentShotgun.png");
-	equipFireBall_ = asset.LoadSprite("Resources/Control/equipmentSpellbook.png");
-	equipWavegun_ = asset.LoadSprite("Resources/Control/equipmentWavegun.png");
+	equipAssaultRifle_ = asset.LoadSprite("Resources/Images/Control/equipmentAssaultRifle.png");
+	equipPistol_ = asset.LoadSprite("Resources/Images/Control/equipmentPistol.png");
+	equipShotgun_ = asset.LoadSprite("Resources/Images/Control/equipmentShotgun.png");
+	equipFireBall_ = asset.LoadSprite("Resources/Images/Control/equipmentSpellbook.png");
+	equipWavegun_ = asset.LoadSprite("Resources/Images/Control/equipmentWavegun.png");
 
-	equipAssaultRifle2_ = asset.LoadSprite("Resources/Control/equipmentAssaultRifle.png");
-	equipPistol2_ = asset.LoadSprite("Resources/Control/equipmentPistol.png");
-	equipShotgun2_ = asset.LoadSprite("Resources/Control/equipmentShotgun.png");
-	equipFireBall2_ = asset.LoadSprite("Resources/Control/equipmentSpellbook.png");
-	equipWavegun2_ = asset.LoadSprite("Resources/Control/equipmentWavegun.png");
+	equipAssaultRifle2_ = asset.LoadSprite("Resources/Images/Control/equipmentAssaultRifle.png");
+	equipPistol2_ = asset.LoadSprite("Resources/Images/Control/equipmentPistol.png");
+	equipShotgun2_ = asset.LoadSprite("Resources/Images/Control/equipmentShotgun.png");
+	equipFireBall2_ = asset.LoadSprite("Resources/Images/Control/equipmentSpellbook.png");
+	equipWavegun2_ = asset.LoadSprite("Resources/Images/Control/equipmentWavegun.png");
 
 	equipment_ = equipPistol_.get();
 	equipment2_ = equipShotgun_.get();
 
 	// 操作
-	shootUIKey = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	shootUIKey = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
 	shootUIKey->SetSize(shootUIData_.size);
 	shootUIKey->SetPosition(shootUIData_.pos);
 	shootUIKey->SetTextureRect(64 * 14, 64 * 2, 64, 64);
-	swapUIKey = asset.LoadSprite("Resources/Control/KeyboardAndMouse.png");
+	swapUIKey = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
 	swapUIKey->SetSize(swapUIData_.size);
 	swapUIKey->SetPosition(swapUIData_.pos);
 	swapUIKey->SetTextureRect(64 * 5, 64 * 3, 64, 64);
-	shootUIPad = asset.LoadSprite("Resources/Control/XboxController.png");
+	shootUIPad = asset.LoadSprite("Resources/Images/Control/XboxController.png");
 	shootUIPad->SetSize(shootUIData_.size);
 	shootUIPad->SetPosition(shootUIData_.pos);
 	shootUIPad->SetTextureRect(64 * 7, 64 * 2, 64, 64);
-	swapUIPad = asset.LoadSprite("Resources/Control/XboxController.png");
+	swapUIPad = asset.LoadSprite("Resources/Images/Control/XboxController.png");
 	swapUIPad->SetSize(swapUIData_.size);
 	swapUIPad->SetPosition(swapUIData_.pos);
 	swapUIPad->SetTextureRect(64 * 4, 64 * 8, 64, 64);

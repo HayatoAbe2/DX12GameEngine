@@ -3,7 +3,7 @@
 void ExplodeEffect::Initialize(const Vector3& pos, const Vector4& color, const float maxSize) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
-	dome_ = asset.LoadModel("Resources/HitEffect", "explode.obj");
+	dome_ = asset.LoadModel("Resources/Models/HitEffect", "explode.obj");
 	dome_->SetTranslate(pos);
 	dome_->SetScale({});
 

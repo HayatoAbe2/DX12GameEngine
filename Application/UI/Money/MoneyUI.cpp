@@ -9,12 +9,12 @@ MoneyUI::MoneyUI(Wallet& wallet) : wallet_(wallet) {
 	auto& asset = ctx.Asset();
 
 	// 画像ロード
-	icon_ = asset.LoadSprite("Resources/Items/Coin.png");
+	icon_ = asset.LoadSprite("Resources/Images/Items/Coin.png");
 	icon_->SetSize({ iconSize_, iconSize_ });
 	icon_->SetPivot({ 0.5f,0.5f });
 
 	for (int i = 0; i < numbers_.size(); ++i) {
-		numbers_[i] = asset.LoadSprite("Resources/Text/Numbers.png");
+		numbers_[i] = asset.LoadSprite("Resources/Images/Text/Numbers.png");
 		numbers_[i]->SetSize({ digitSize_, digitSize_ });
 		numbers_[i]->SetPivot({ 0.5f,0.5f });
 	}

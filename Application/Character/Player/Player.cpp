@@ -5,31 +5,30 @@
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponStatus.h"
 
-#include <numbers>
-#include <cmath>
-#define DIRECTINPUT_VERSION 0x0800
-#include "dinput.h"
-#include <Character/Enemy/EnemyManager.h>
-#include <Item/Passive/Counter/Counter.h>
-#include <Item/Passive/Reload/ReloadBoost.h>
-#include <Item/Passive/Lightning/Lightning.h>
+#include "Character/Enemy/EnemyManager/EnemyManager.h"
+#include "Item/Passive/Counter/Counter.h"
+#include "Item/Passive/Reload/ReloadBoost.h"
+#include "Item/Passive/Lightning/Lightning.h"
 #include "UI/Money/MoneyUI.h"
 
 Player::~Player() {
 
 }
 
-void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Model> playerShadow, ItemManager* itemManager) {
+void Player::Initialize(ItemManager* itemManager) {
 	itemManager_ = itemManager;
 
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	model_ = std::move(playerModel);
+	model_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
 	auto matData = model_->GetMaterial(0)->GetData();
 	matData.color = { 0.5f,0.5f,1,1 };
+	matData.useEnvironmentMap = true;
+	matData.environmentIntensity = 1.0f;
 	model_->GetMaterial(0)->SetData(matData);
-	shadowModel_ = std::move(playerShadow);
+
+	shadowModel_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
 	matData = shadowModel_->GetMaterial(0)->GetData();
 	matData.color = { 0,0,0,1 };
 	shadowModel_->GetMaterial(0)->SetData(matData);
@@ -51,7 +50,7 @@ void Player::Initialize(std::unique_ptr<Model> playerModel, std::unique_ptr<Mode
 	}
 
 	// 方向線
-	direction_ = asset.LoadModel("Resources/Direction", "Direction.obj");
+	direction_ = asset.LoadModel("Resources/Models/Direction", "Direction.obj");
 	auto dData = direction_->GetMaterial(0)->GetData();
 	dData.color = { 1,0,0,dirDisplayAlpha_ };
 	direction_->GetMaterial(0)->SetData(dData);
@@ -318,15 +317,24 @@ void Player::Hit(float damage, const Vector2& from) {
 	}
 }
 
-void Player::OnHit(const Vector2& from) {
-	for (auto& p : passives_) {
-		p->OnHit(from, this);
-	}
-}
-
 void Player::OnDealDamage(const Vector2& pos) {
 	for (auto& p : passives_) {
 		p->OnDealDamage(pos);
+	}
+}
+void Player::OnEliminate(const Vector2& enemyPos) {
+	for (auto& p : passives_) {
+		p->OnHit(enemyPos, this);
+	}
+}
+void Player::OnHit(const Vector2& from) {
+	for (auto& p : passives_) { 
+		p->OnHit(from, this);
+	}
+}
+void Player::OnDodge() {
+	for (auto& p : passives_) {
+		p->OnDodge(this);
 	}
 }
 

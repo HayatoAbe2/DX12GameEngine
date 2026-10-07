@@ -6,10 +6,10 @@ Result::Result(Fade* fade) {
 
 	auto& ctx = GameContext::GetInstance();
 	auto asset = ctx.Asset();
-	resultBG_ = asset.LoadSprite("resources/Result/result.png");
+	resultBG_ = asset.LoadSprite("resources/Images/Result/result.png");
 	resultBG_->SetColor({ 1, 1, 1, 0.7f });
 
-	resultCursor_ = asset.LoadSprite("resources/Result/cursor.png");
+	resultCursor_ = asset.LoadSprite("resources/Images/Result/cursor.png");
 	resultCursor_->SetSize({ 48,56 });
 	resultCursor_->SetColor({ 1, 1, 1, 0.7f });
 	resultCursor_->SetPivot({ 0.5f,0.5f });
