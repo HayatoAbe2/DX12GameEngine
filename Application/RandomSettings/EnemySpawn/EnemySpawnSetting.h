@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include "Character/Enemy/EnemyType.h"
 
 struct EnemySpawn {
@@ -12,7 +13,7 @@ public:
 	EnemySpawnSetting();
 
 	// ファイル読み込み
-	void Load();
+	void Load(std::string filePath);
 
 	const std::vector<EnemySpawn>& GetSpawnData() { return spawnData_; }
 

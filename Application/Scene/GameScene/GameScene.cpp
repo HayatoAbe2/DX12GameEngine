@@ -79,6 +79,8 @@ void GameScene::Initialize() {
 	uiDrawer_ = std::make_unique<UIDrawer>();
 	uiDrawer_->Initialize(player_.get(), floorManager_.get());
 
+	spawnEditor_ = std::make_unique<SpawnRateEditor>();
+
 	Update();
 }
 
@@ -273,6 +275,8 @@ void GameScene::Draw() {
 	ImGui::Begin("Camera");
 	ImGui::DragFloat3("Pos", &camera_->transform_.translate.x, 0.5f);
 	ImGui::End();
+
+	spawnEditor_->Draw();
 #endif
 }
 

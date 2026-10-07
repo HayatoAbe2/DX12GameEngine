@@ -17,6 +17,8 @@
 #include "GameCameraController/GameCameracontroller.h"
 #include "RandomSettings/RandomSettings.h"
 
+#include "Editor/SpawnRateEditor/SpawnRateEditor.h"
+
 // ゲームシーン
 class GameScene : public BaseScene {
 public:
@@ -104,4 +106,7 @@ private:
 
 	// カメラ制御
 	std::unique_ptr<GameCameraController> cameraController_ = nullptr;
+
+	// 敵出現確率
+	std::unique_ptr<SpawnRateEditor> spawnEditor_ = nullptr;
 };

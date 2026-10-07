@@ -306,6 +306,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Item\World\WorldMoney\WorldMoney.cpp" />
     <ClCompile Include="Application\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Application\Result\Result.cpp" />
+    <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Dissolve\Dissolve.PS.hlsl">
@@ -614,6 +615,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
     <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
     <ClInclude Include="Application\Result\Result.h" />
+    <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

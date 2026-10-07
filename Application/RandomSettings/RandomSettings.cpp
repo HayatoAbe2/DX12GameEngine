@@ -12,6 +12,8 @@ void RandomSettings::Update() {
 }
 
 EnemyType RandomSettings::SelectEnemy() {
+	enemySpawn_->Load("Resources/Data/Spawn/Enemy/Standard.json");
+
 	// 合計重み
 	float totalWeight = 0.0f;
 	for (const auto& entry : table_.enemy) {
