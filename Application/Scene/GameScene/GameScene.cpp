@@ -16,7 +16,6 @@ void GameScene::Initialize() {
 	LoadSound();
 
 	// Skybox
-	//skybox_ = asset.LoadTexture("Resources/Debug/Sky/skybox.dds");
 	skybox_ = asset.LoadTexture("Resources/Images/Background/background.dds");
 
 	mapTile_ = std::make_unique<MapTile>();

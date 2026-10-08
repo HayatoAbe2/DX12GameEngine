@@ -5,7 +5,8 @@ SpawnRateEditor::SpawnRateEditor() {
 }
 
 void SpawnRateEditor::Draw() {
-	ImGui::Begin("Spawn Rate Editor");
+#ifdef USE_IMGUI
+	ImGui::Begin("出現率エディタ");
 
 	char buffer[512];
 	std::snprintf(
@@ -16,18 +17,18 @@ void SpawnRateEditor::Draw() {
 	);
 
 	// ファイル名設定
-	if (ImGui::InputText("File",buffer,sizeof(buffer))) {
+	if (ImGui::InputText("ファイル",buffer,sizeof(buffer))) {
 		filePath_ = buffer;
 	}
 
 	// ロード
-	if (ImGui::Button("Load")) {
+	if (ImGui::Button("ロード")) {
 		Load(filePath_);
 	}
 	ImGui::SameLine();
 
 	// セーブ
-	if (ImGui::Button("Save")) {
+	if (ImGui::Button("セーブ")) {
 		Save(filePath_);
 	}
 	ImGui::Separator();
@@ -39,7 +40,7 @@ void SpawnRateEditor::Draw() {
 
 		// 敵タイプ
 		int enemyType = static_cast<int>(spawnRate.enemyType);
-		if (ImGui::InputInt("EnemyType", &enemyType)) {
+		if (ImGui::InputInt("敵タイプ", &enemyType)) {
 			if (enemyType < 0) {
 				enemyType = 0;
 			}
@@ -48,13 +49,13 @@ void SpawnRateEditor::Draw() {
 		}
 
 		// 重み
-		ImGui::InputFloat("Weight",&spawnRate.weight);
+		ImGui::InputFloat("重み(出現率)",&spawnRate.weight);
 		if (spawnRate.weight < 0.0f) {
 			spawnRate.weight = 0.0f;
 		}
 
 		// 削除
-		if (ImGui::Button("Delete")) {
+		if (ImGui::Button("削除")) {
 			RemoveSpawnRate(i);
 
 			ImGui::PopID();
@@ -85,6 +86,7 @@ void SpawnRateEditor::Draw() {
 	ImGui::Text("合計重み : %.2f", totalWeight);
 
 	ImGui::End();
+#endif
 }
 
 void SpawnRateEditor::AddSpawnRate() {
