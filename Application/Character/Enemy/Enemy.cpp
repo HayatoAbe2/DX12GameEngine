@@ -11,9 +11,15 @@
 #include <cmath>
 
 Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) {
+	status_ = status;
+	maxHp_ = status_.hp;
+	hp_ = status_.hp;
+	radius_ = status_.radius;
+
 	model_ = std::move(model);
 	model_->SetTranslate(pos);
-	status_ = status;
+	transform_.translate = pos;
+
 	shadowModel_ = std::move(shadowModel);
 	auto matData = shadowModel_->GetMaterial(0)->GetData();
 	matData.color = { 0,0,0,1 };
@@ -34,6 +40,8 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 
 	// 出現演出の間動かない
 	appierTimer_.Start(kAppierTime);
+
+	weight_ = 50;
 }
 
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
@@ -41,9 +49,7 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 		appierTimer_.Update();
 
 		if (appierTimer_.IsFinished()) {
-			Vector3 t = model_->GetTransform().translate;
-			t.y = 0;
-			model_->SetTranslate(t);
+			transform_.translate.y = 0;
 		} else {
 			return;
 		}
@@ -51,7 +57,7 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 
 	auto& ctx = GameContext::GetInstance();
 
-	prePos_ = model_->GetTransform().translate;
+	prePos_ = transform_.translate;
 	if (hitColorTimer_->IsActive()) {
 		hitColorTimer_->Update();
 		if (hitColorTimer_->IsFinished()) {
@@ -86,12 +92,14 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	}
 
 	// 速度をもとに移動
-	Vector2 pos = { model_->GetTransform().translate.x,model_->GetTransform().translate.z };
+	Vector2 pos = { transform_.translate.x, transform_.translate.z };
 	pos.x += velocity_.x;
 	mapCheck->ResolveCollisionX(pos, status_.radius, status_.canFly);
 	pos.y += velocity_.z;
 	mapCheck->ResolveCollisionY(pos, status_.radius, status_.canFly);
-	model_->SetTranslate({ pos.x,model_->GetTransform().translate.y,pos.y });
+
+	transform_.translate.x = pos.x;
+	transform_.translate.z = pos.y;
 }
 
 void Enemy::Stun(MapCheck* mapCheck) {
@@ -120,13 +128,13 @@ void Enemy::Stun(MapCheck* mapCheck) {
 		isFall_ = mapCheck->IsFall(pos);
 		if (isFall_) { audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false); }
 	}
-	model_->SetTranslate({ pos.x,model_->GetTransform().translate.y,pos.y });
+	transform_.translate = { pos.x,model_->GetTransform().translate.y,pos.y };
 }
 
 void Enemy::Fall() {
 	// 落下
-	model_->SetTranslate(model_->GetTransform().translate - Vector3{ 0,0.7f,0 });
-	if (model_->GetTransform().translate.y < -10.0f) {
+	transform_.translate -= Vector3{ 0,0.7f,0 };
+	if (transform_.translate.y < -10.0f) {
 		isDead_ = true;
 	}
 }
@@ -135,6 +143,7 @@ void Enemy::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
 
+	model_->SetTransform(transform_);
 	model_->Update();
 	// 影描画
 	if (!isFall_) {

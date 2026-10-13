@@ -223,8 +223,8 @@ bool MapCheck::IsHitWall(const Vector2& pos, float radius) {
 			float tileMaxY = tileCenterY + tileSize_ * 0.5f;
 
 			// 重なっていれば衝突
-			if (charMaxX > tileMinX || charMinX < tileMaxX &&
-				charMaxY > tileMinY || charMinY < tileMaxY) {
+			if (charMaxX > tileMinX && charMinX < tileMaxX &&
+				charMaxY > tileMinY && charMinY < tileMaxY) {
 				return true;
 			}
 		}
@@ -291,8 +291,8 @@ bool MapCheck::IsGoal(const Vector2& pos, float radius, bool canGoal) {
 				float tileMaxY = tileCenterY + tileSize_ * 0.5f;
 
 				// 重なっていれば衝突
-				if (charMaxX > tileMinX || charMinX < tileMaxX &&
-					charMaxY > tileMinY || charMinY < tileMaxY) {
+				if (charMaxX > tileMinX && charMinX < tileMaxX &&
+					charMaxY > tileMinY && charMinY < tileMaxY) {
 					return true;
 				}
 			}

@@ -21,7 +21,7 @@ public:
 	Model* GetShadowModel() { return shadowModel_.get(); }
 
 	// ステータス(強化分)
-	std::array<ModifierType, size_t(ModifierStats::count)>& GetModifier() { return data_.modifiers; }
+	std::array<ModifierValue, size_t(ModifierStats::count)>& GetModifier() { return data_.modifiers; }
 
 	// データ(基礎数値)
 	const WeaponData& GetData() const { return data_; }

@@ -268,6 +268,7 @@
     <ClCompile Include="Application\CollisionSystem\CollisionSystem.cpp" />
     <ClCompile Include="Application\Result\Result.cpp" />
     <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
+    <ClCompile Include="Application\Character\Character.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">

@@ -164,6 +164,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Character\Character.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
     <ClCompile Include="Application\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />

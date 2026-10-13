@@ -33,10 +33,6 @@ public:
 	// 敵ごとの関数
 	virtual void Attack(BulletManager* bulletManager, const Vector2& dir) = 0;
 
-	Transform GetTransform() const override { return model_->GetTransform(); };
-	Vector3 GetPrePos() const override { return prePos_; }
-	void SetTransform(const Transform& transform) const { model_->SetTransform(transform); }
-	float GetRadius() const { return status_.radius; }
 	bool IsDead() { return isDead_; }
 
 	EnemyStatus GetStatus() { return status_; }
@@ -72,9 +68,6 @@ protected:
 	// 発見範囲
 	float searchRadius_ = 8.0f;
 
-	// 死亡フラグ
-	bool isDead_ = false;
-
 	// スタン時間
 	std::unique_ptr<Timer> stunTimer_ = nullptr;
 	std::unique_ptr<Timer> hitColorTimer_ = nullptr;
@@ -97,5 +90,4 @@ protected:
 	Timer appierTimer_;
 	const float kAppierTime = 0.7f;
 
-	Vector3 prePos_{};
 };

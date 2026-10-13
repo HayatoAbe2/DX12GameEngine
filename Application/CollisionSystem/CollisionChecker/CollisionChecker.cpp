@@ -4,6 +4,7 @@
 #include "Character/Enemy/Enemy.h"
 #include "Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
+#include "Map/MapCheck.h"
 
 void CollisionChecker::Initialize(EffectManager* effectManager, Camera* camera) {
 	effectManager_ = effectManager;
@@ -86,7 +87,7 @@ void CollisionChecker::CheckEnemy(Enemy* enemy, Bullet* bullet, Player* player) 
 	}
 }
 
-void CollisionChecker::CheckContact(Player* player, Enemy* enemy) {
+void CollisionChecker::CheckContactDamage(Player* player, Enemy* enemy) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
@@ -114,3 +115,37 @@ void CollisionChecker::CheckContact(Player* player, Enemy* enemy) {
 	}
 }
 
+void CollisionChecker::CheckPush(Character* characterA, Character* characterB, MapCheck* mapCheck) {
+	Circle circleA = { characterA->GetRadius(), ToXZ(characterA->GetTransform().translate) };
+	Circle circleB = { characterB->GetRadius(), ToXZ(characterB->GetTransform().translate) };
+
+	// 衝突していなかったら終了
+	if (!CheckCollision(circleA, circleB)) { return; }
+	
+	Vector2 distance = circleA.center - circleB.center;
+	float length = Length(distance);
+	if (length > 0.001f) {
+		// 同じ位置の場合
+		distance = { 1,0 };
+	}
+
+	// 重なり量
+	float penetration = circleA.radius + circleB.radius - length;
+
+	// 押す
+	Vector2 push = Normalize(distance);
+
+	float weightA = characterA->GetWeight() / (characterA->GetWeight() + characterB->GetWeight());
+	Vector2 pushedA = circleA.center + push * weightA;
+	Vector2 pushedB = circleB.center - push * (1.0f - weightA);
+
+	// マップとの判定で修正
+	mapCheck->ResolveCollisionX(pushedA, circleA.radius, characterA->CanFly());
+	mapCheck->ResolveCollisionY(pushedA, circleA.radius, characterA->CanFly());
+	mapCheck->ResolveCollisionX(pushedB, circleB.radius, characterB->CanFly());
+	mapCheck->ResolveCollisionY(pushedB, circleB.radius, characterB->CanFly());
+
+	// 適用
+	characterA->SetPosition(pushedA);
+	characterB->SetPosition(pushedB);
+}

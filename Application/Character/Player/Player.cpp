@@ -32,8 +32,6 @@ void Player::Initialize(ItemManager* itemManager) {
 	matData = shadowModel_->GetMaterial(0)->GetData();
 	matData.color = { 0,0,0,1 };
 	shadowModel_->GetMaterial(0)->SetData(matData);
-	transform_.translate.x = 1;
-	transform_.translate.z = 1;
 
 	walk_ = asset.LoadAnimation("Resources/Debug/human", "walk.gltf")[0];
 	sneak_ = asset.LoadAnimation("Resources/Debug/human", "sneakWalk.gltf")[0];
@@ -70,11 +68,9 @@ void Player::Initialize(ItemManager* itemManager) {
 	hitColorTimer_ = std::make_unique<Timer>();
 	stunTimer_ = std::make_unique<Timer>();
 	boostTimer_ = std::make_unique<Timer>();
-	invincibleTimer_ = std::make_unique<Timer>();
 
 	attackDirection_ = Normalize(Vector2(1, 0));
 	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
-	transform_.translate.x = 5;
 }
 
 void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager) {
@@ -85,9 +81,9 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	prePos_ = model_->GetTransform().translate;
 	model_->Update();
 
-	invincibleTimer_->Update();
-	if (invincibleTimer_->IsActive() && !isUsingBoost_) {
-		float t = invincibleTimer_->GetRemaining() * 10.0f;
+	invincibleTimer_.Update();
+	if (invincibleTimer_.IsActive() && !isUsingBoost_) {
+		float t = invincibleTimer_.GetRemaining() * 10.0f;
 		float strength = (std::sin(t) + 1.0f) * 0.5f; // 0~1
 		float c = Lerp(1.0f, 2.0f, strength);
 		for (auto& mat : model_->GetMaterials()) {
@@ -293,11 +289,11 @@ void Player::Draw(Camera* camera) {
 void Player::Hit(float damage, const Vector2& from) {
 	auto& ctx = GameContext::GetInstance();
 
-	if (invincibleTimer_->IsFinished()) {
+	if (invincibleTimer_.IsFinished()) {
 
 		if (damage > 0) {
 			hp_ -= damage;
-			invincibleTimer_->Start(invincibleTimeOnHit_);
+			invincibleTimer_.Start(invincibleTimeOnHit_);
 
 			// 行動不能
 			stunTimer_->Start(stunTime_);
@@ -328,7 +324,7 @@ void Player::OnEliminate(const Vector2& enemyPos) {
 	}
 }
 void Player::OnHit(const Vector2& from) {
-	for (auto& p : passives_) { 
+	for (auto& p : passives_) {
 		p->OnHit(from, this);
 	}
 }
@@ -408,7 +404,7 @@ void Player::Move(MapCheck* mapCheck) {
 		}
 		moveParticleEmitTimer_ = 0;
 
-		invincibleTimer_->Start(invincibleTimeOnDodge_);
+		invincibleTimer_.Start(invincibleTimeOnDodge_);
 	}
 
 	// 速度をもとに移動
@@ -489,7 +485,7 @@ void Player::Fall() {
 	transform_.translate.y -= 1.0f;
 	if (transform_.translate.y < -20.0f) {
 		hp_ -= maxHp_ / 8.0f;
-		invincibleTimer_->Start(invincibleTimeOnHit_);
+		invincibleTimer_.Start(invincibleTimeOnHit_);
 
 		// その前にいた位置に戻す
 		transform_.translate = landPos_;
@@ -526,7 +522,7 @@ void Player::Stun(MapCheck* mapCheck) {
 			audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
 		}
 
-		transform_.translate = { pos.x,model_->GetTransform().translate.y,pos.y };
+		transform_.translate = { pos.x, model_->GetTransform().translate.y, pos.y };
 	}
 }
 

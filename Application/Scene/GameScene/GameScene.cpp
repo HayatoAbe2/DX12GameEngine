@@ -139,7 +139,7 @@ void GameScene::Update() {
 				bulletManager_->Update(mapCheck_.get(), effectManager_.get());
 				
 				// 衝突判定
-				collisionSystem_->Update(player_.get());
+				collisionSystem_->Update(player_.get(), mapCheck_.get());
 
 				// アイテム
 				itemManager_->Update(player_.get(), enemyManager_->GetEnemies().size() != 0);

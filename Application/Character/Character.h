@@ -1,9 +1,65 @@
 #pragma once
 #include "GameCommon.h"
+#include "Timer/Timer.h"
 
 class Character {
 public:
-	virtual Transform GetTransform() const = 0;
-	virtual Vector3 GetPrePos() const = 0;
+	// トランスフォーム
+	virtual Transform GetTransform() { return transform_; }
+	virtual void SetTransform(const Transform& transform) { transform_ = transform; }
+	virtual void SetPosition(const Vector2 position) { transform_.translate = { position.x, transform_.translate.y, position.y }; }
+
+	// 前フレーム位置
+	virtual Vector3 GetPrePos() { return prePos_; }
+
+	// 半径
+	float GetRadius() const { return radius_; }
+
+	// 重さ
+	float GetWeight() const { return weight_; }
+
+	// HP
+	float GetHP() { return hp_; }
+	float GetMaxHP() { return maxHp_; }
+
+	// 死亡状態
+	bool IsDead() { return isDead_; }
+
+	// 飛行
+	bool CanFly() { return canFly_; }
+
+	// 無敵
+	bool IsInvincible() { return invincibleTimer_.IsActive(); }
 protected:
+	// 被弾
+	virtual void Hit(float damage, const Vector2& from);
+
+	// 行動不能
+	virtual void Stun();
+
+	// 落下
+	virtual void Fall();
+
+	// トランスフォーム
+	Transform transform_;
+	Vector3 prePos_{};
+
+	// 半径
+	float radius_ = 0.5f;
+
+	// 重さ
+	float weight_ = 10;
+
+	// hp
+	float hp_ = 100;
+	float maxHp_ = 100;
+
+	// 死亡
+	bool isDead_ = false;
+
+	// 飛行する
+	bool canFly_ = false;
+
+	// 無敵タイマー
+	Timer invincibleTimer_;
 };

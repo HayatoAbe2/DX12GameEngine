@@ -150,13 +150,16 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyT
 		status.canFly = false;
 		status.attackRadius = -1;
 
-		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.obj");
-		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.obj");
-		Vector3 spawnPos = pos + Vector3{ ctx.RandomFloat(-1,1), 0, ctx.RandomFloat(-1,1) };
-		enemyModel->SetTranslate(spawnPos);
-		enemyShadowModel->SetTranslate(spawnPos);
+		int num = ctx.RandomInt(2, 4);
+		for (int i = 0; i < num; ++i) {
+			auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.obj");
+			auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.obj");
+			Vector3 spawnPos = pos + Vector3{ ctx.RandomFloat(-1,1), 0, ctx.RandomFloat(-1,1) };
+			enemyModel->SetTranslate(spawnPos);
+			enemyShadowModel->SetTranslate(spawnPos);
 
-		enemies.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+			enemies.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
+		}
 		break;
 	}
 	}

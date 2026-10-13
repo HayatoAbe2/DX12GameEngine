@@ -90,9 +90,12 @@ enum class ModifierStats {
 };
 
 // 計算方法
-struct ModifierType {
+struct ModifierValue {
 	float add = 0;
 	float multiply = 1;
+
+	float time = 0;
+	bool isPermanent = true;
 };
 
 struct WeaponData {
@@ -106,7 +109,7 @@ struct WeaponData {
 	WeaponTrait traits;
 
 	// ステータス変化
-	std::array<ModifierType, size_t(ModifierStats::count)> modifiers;
+	std::array<ModifierValue, size_t(ModifierStats::count)> modifiers;
 
 	// 弾のデータ
 	BulletData bullet;
