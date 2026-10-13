@@ -124,7 +124,7 @@ void CollisionChecker::CheckPush(Character* characterA, Character* characterB, M
 	
 	Vector2 distance = circleA.center - circleB.center;
 	float length = Length(distance);
-	if (length > 0.001f) {
+	if (length < 0.001f) {
 		// 同じ位置の場合
 		distance = { 1,0 };
 	}
@@ -135,9 +135,11 @@ void CollisionChecker::CheckPush(Character* characterA, Character* characterB, M
 	// 押す
 	Vector2 push = Normalize(distance);
 
-	float weightA = characterA->GetWeight() / (characterA->GetWeight() + characterB->GetWeight());
-	Vector2 pushedA = circleA.center + push * weightA;
-	Vector2 pushedB = circleB.center - push * (1.0f - weightA);
+	float totalWeight = characterA->GetWeight() + characterB->GetWeight();
+	float pushA = characterB->GetWeight() / totalWeight;
+	float pushB = characterA->GetWeight() / totalWeight;
+	Vector2 pushedA = circleA.center + push * penetration * pushA * kPushRate;
+	Vector2 pushedB = circleB.center - push * penetration * pushB * kPushRate;
 
 	// マップとの判定で修正
 	mapCheck->ResolveCollisionX(pushedA, circleA.radius, characterA->CanFly());
@@ -146,6 +148,10 @@ void CollisionChecker::CheckPush(Character* characterA, Character* characterB, M
 	mapCheck->ResolveCollisionY(pushedB, circleB.radius, characterB->CanFly());
 
 	// 適用
-	characterA->SetPosition(pushedA);
-	characterB->SetPosition(pushedB);
+	if (Length(pushedA - circleA.center) < maxDistance) {
+		characterA->SetPosition(pushedA);
+	}
+	if (Length(pushedB - circleB.center) < maxDistance) {
+		characterB->SetPosition(pushedB);
+	}
 }

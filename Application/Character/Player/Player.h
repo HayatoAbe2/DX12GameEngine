@@ -114,8 +114,6 @@ private:
 	std::unique_ptr<Sprite> shootCooldownSprite_;
 	Vector2 scSize_ = {70,20};
 
-	Vector3 prePos_{};
-
 	std::vector<std::unique_ptr<Passive>> passives_;
 
 	bool usePassive_[3];

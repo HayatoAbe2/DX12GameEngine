@@ -30,5 +30,11 @@ public:
 private:
 	EffectManager* effectManager_;
 	Camera* camera_;
+
+	// 重なり量に対して押し出す大きさ
+	const float kPushRate = 0.2f;
+
+	// 最大移動距離(元の位置から移動しすぎるのを抑制)
+	float maxDistance = 0.25f;
 };
 

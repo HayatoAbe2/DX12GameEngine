@@ -35,7 +35,7 @@ public:
 
 	bool IsDead() { return isDead_; }
 
-	EnemyStatus GetStatus() { return status_; }
+	EnemyStatus GetStatus() const { return status_; }
 
 	void SetState(std::unique_ptr<EnemyState> state) { currentState_ = std::move(state); }
 	bool IsAttacking() { return isAttacking_; }

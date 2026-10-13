@@ -11,7 +11,7 @@
 #include <cmath>
 
 Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) {
-	status_ = status;
+ 	status_ = status;
 	maxHp_ = status_.hp;
 	hp_ = status_.hp;
 	radius_ = status_.radius;

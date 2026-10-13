@@ -78,7 +78,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
 
-	prePos_ = model_->GetTransform().translate;
+	prePos_ = transform_.translate;
 	model_->Update();
 
 	invincibleTimer_.Update();

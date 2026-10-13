@@ -50,7 +50,8 @@ void CollisionSystem::Update(Player* player, MapCheck* mapCheck) {
 			// Aより後ろのキャラクターだけを調べる
 			for (size_t j = i + 1; j < characters.size(); ++j) {
 				Character* characterB = characters[j];
-				if (!characterB || characterB->IsDead() || characterB->IsInvincible()) {
+				if (!characterB || characterB->IsDead() || characterB->IsInvincible() ||
+					(characterA->CanFly() != characterB->CanFly())) { // 地上と空中では当たらない
 					continue;
 				}
 
