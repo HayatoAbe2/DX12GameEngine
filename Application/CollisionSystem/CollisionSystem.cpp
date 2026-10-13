@@ -1,8 +1,8 @@
 #include "CollisionSystem.h"
-#include "Bullet/BulletManager.h"
-#include "Character/Player/Player.h"
-#include "Character/Enemy/EnemyManager/EnemyManager.h"
-#include "Character/Enemy/Enemies/Spiker.h"
+#include "Objects/Bullet/BulletManager.h"
+#include "Objects/Character/Player/Player.h"
+#include "Objects/Character/Enemy/EnemyManager/EnemyManager.h"
+#include "Objects/Character/Enemy/Enemies/Spiker.h"
 #include "Map/MapCheck.h"
 
 CollisionSystem::CollisionSystem(EffectManager* effectManager, BulletManager* bulletManager, EnemyManager* enemyManager, Camera* camera) {

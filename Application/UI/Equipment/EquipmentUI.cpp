@@ -1,6 +1,6 @@
 #include "EquipmentUI.h"
-#include "Character/Player/Player.h"
-#include "Weapon/Weapon.h"
+#include "Objects/Character/Player/Player.h"
+#include "Objects/Weapon/Weapon.h"
 
 void EquipmentUI::Initialize(Player* player) {
 	player_ = player;

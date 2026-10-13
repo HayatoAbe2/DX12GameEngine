@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "Character/Enemy/EnemyType.h"
+#include "Objects/Character/Enemy/EnemyType.h"
 
 struct EnemySpawn {
 	EnemyType type;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Character/Character.h"
+#include "Objects/Character/Character.h"
 
 class Player;
 class Enemy;

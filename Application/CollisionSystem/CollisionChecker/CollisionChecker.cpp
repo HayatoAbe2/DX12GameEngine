@@ -1,8 +1,8 @@
 #include "CollisionChecker.h"
 #include "GameCommon.h"
-#include "Character/Player/Player.h"
-#include "Character/Enemy/Enemy.h"
-#include "Bullet/Bullet.h"
+#include "Objects/Character/Player/Player.h"
+#include "Objects/Character/Enemy/Enemy.h"
+#include "Objects/Bullet/Bullet.h"
 #include "Effect/EffectManager.h"
 #include "Map/MapCheck.h"
 
