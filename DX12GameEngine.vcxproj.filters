@@ -269,6 +269,7 @@
     <ClCompile Include="Application\Result\Result.cpp" />
     <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
     <ClCompile Include="Application\Objects\Character\Character.cpp" />
+    <ClCompile Include="Application\Objects\Chest\Chest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -600,6 +601,7 @@
     <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
     <ClInclude Include="Application\Result\Result.h" />
     <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />
+    <ClInclude Include="Application\Objects\Chest\Chest.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
