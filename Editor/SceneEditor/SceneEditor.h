@@ -41,7 +41,7 @@ private:
 
 	std::vector<std::unique_ptr<Resource>> resources_;
 	SceneObject* selected_;
-	std::string selectedAssetDir_[3] = { "Resources/Debug/whiteCube", "Resources/block", "Resources/Floor",};
+	std::string selectedAssetDir_[3] = { "Resources/Debug/whiteCube", "Resources/Models/block", "Resources/Models/Floor",};
 	std::string selectedAssetPath_[3] = { "whiteCube.obj", "block.obj", "floor.obj" };
 	int selectedAssetIndex_ = 0;
 	int gizmoMode_ = 0;

@@ -242,7 +242,6 @@ void SceneEditor::Draw(Camera* camera) {
 				auto transforms = model->GetTransforms();
 
 				// アクセス範囲修正
-				if (int(transforms.size()) <= editingInstance_) editingInstance_ = int(transforms.size()) - 1;
 				editingInstance_ = std::clamp(editingInstance_, 0, int(transforms.size()) - 1);
 
 				float modelMat[16];
@@ -386,7 +385,8 @@ void SceneEditor::DrawInspector(SceneObject* object) {
 			int count = model->GetNumInstance();
 			ImGui::DragInt("Instance", &editingInstance_, 1, 0, count - 1);
 
-			if (int(transforms.size()) <= editingInstance_) editingInstance_ = int(transforms.size()) - 1;
+			// アクセス範囲修正
+			editingInstance_ = std::clamp(editingInstance_, 0, int(transforms.size()) - 1);
 			gizmoCtx_.editingInstance = editingInstance_;
 
 			Transform t = transforms[editingInstance_];

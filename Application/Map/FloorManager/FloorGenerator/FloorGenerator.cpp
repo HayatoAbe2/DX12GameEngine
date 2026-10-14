@@ -30,7 +30,7 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 			next.type = RoomType::Shop;
 		} else {
 			auto& ctx = GameContext::GetInstance();
-			if (ctx.RandomInt(0, 64) < 50) {
+			if (ctx.RandomInt(0, 100) <  90) {
 				next.type = RoomType::Combat;
 			} else {
 				next.type = RoomType::Shop;
