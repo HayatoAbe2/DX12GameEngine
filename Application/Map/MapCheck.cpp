@@ -285,10 +285,10 @@ bool MapCheck::IsGoal(const Vector2& pos, float radius, bool canGoal) {
 				float tileCenterX = (x - mapW / 2) * tileSize_;
 				float tileCenterY = (y - mapH / 2) * tileSize_;
 
-				float tileMinX = tileCenterX - tileSize_ * 0.5f;
-				float tileMaxX = tileCenterX + tileSize_ * 0.5f;
-				float tileMinY = tileCenterY - tileSize_ * 0.5f;
-				float tileMaxY = tileCenterY + tileSize_ * 0.5f;
+				float tileMinX = tileCenterX - tileSize_ * 0.6f;
+				float tileMaxX = tileCenterX + tileSize_ * 0.6f;
+				float tileMinY = tileCenterY - tileSize_ * 0.6f;
+				float tileMaxY = tileCenterY + tileSize_ * 0.6f;
 
 				// 重なっていれば衝突
 				if (charMaxX > tileMinX && charMinX < tileMaxX &&

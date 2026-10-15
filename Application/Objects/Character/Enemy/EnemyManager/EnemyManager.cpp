@@ -24,6 +24,11 @@ void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bul
 			[&](const std::unique_ptr<Enemy>& enemy) {
 				if (enemy->IsDead()) {
 					itemManager->SpawnMoney(enemy->GetTransform().translate, 15);
+
+					if (GameContext::GetInstance().RandomInt(0, 100) >= 95) {
+						itemManager->SpawnWeapon(enemy->GetTransform().translate, -1, Common, false);
+					}
+
 					return true;
 				}
 				return false;
@@ -201,7 +206,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 			}
 		} else if (model->tag == "enemySpawnPoint") {
 			for (auto& t : model->GetTransforms()) {
-				if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) {
+				if (t.scale == Vector3{ 0,0,0 }) {
 					continue;
 				}
 
@@ -212,8 +217,18 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 	}
 
 	// 出現数
-	int spawnCount = min(3, int(positions.size()));
-	if (floorManager_->GetCurrentDepth() == 9) { spawnCount = 1; }
+	int spawnCount = 3;
+	if (floorManager_->GetCurrentDepth() > 2) {
+		spawnCount++;
+	}
+	if (floorManager_->GetCurrentDepth() > 4) {
+		spawnCount++;
+	}
+	if (floorManager_->GetCurrentDepth() > 6) {
+		spawnCount++;
+	}
+	spawnCount = min(spawnCount, int(positions.size()));
+	if (floorManager_->GetCurrentDepth() == 7) { spawnCount = 1; }
 
 	for (size_t i = 0; i < spawnCount; ++i) {
 		// 残っている候補からランダムに1つ選ぶ

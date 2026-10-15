@@ -154,7 +154,8 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Images/Items/16.png"), nullptr, passiveCtx);
 		break;
 	case 1:
-		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Images/Items/13.png"), nullptr, passiveCtx);
+		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Images/Items/16.png"), nullptr, passiveCtx);
+		//p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Images/Items/13.png"), nullptr, passiveCtx);
 		break;
 	default:
 		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Images/Items/21.png"), nullptr, passiveCtx);

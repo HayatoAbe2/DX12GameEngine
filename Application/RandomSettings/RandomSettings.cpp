@@ -12,11 +12,12 @@ void RandomSettings::Update() {
 }
 
 EnemyType RandomSettings::SelectEnemy(int depth) {
-	if (depth == 9) {
+	if (depth == 7) {
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Boss.json");
 	} else {
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Standard.json");
 	}
+	table_.enemy = enemySpawn_->GetSpawnData();
 
 	// 合計重み
 	float totalWeight = 0.0f;
