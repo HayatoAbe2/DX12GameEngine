@@ -3,6 +3,7 @@
 #include "Objects/Character/Enemy/Enemy.h"
 #include "Objects/Character/Enemy/EnemyType.h"
 #include "RandomSettings/RandomSettings.h"
+#include "Map/FloorManager/FloorManager.h"
 
 class MapCheck;
 class Player;
@@ -12,7 +13,7 @@ class WeaponManager;
 
 class EnemyManager {
 public:
-	void Initialize();
+	EnemyManager(FloorManager* floorManager) { floorManager_ = floorManager; }
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager);
 	void Draw();
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
@@ -23,6 +24,8 @@ public:
 
 	std::vector<Enemy*> GetEnemies();
 private:
+	FloorManager* floorManager_ = nullptr;
+
 	std::vector<std::unique_ptr<Enemy>> activeEnemies_ = {};
 	std::vector<std::vector<std::unique_ptr<Enemy>>> inactiveEnemies_ = {};
 

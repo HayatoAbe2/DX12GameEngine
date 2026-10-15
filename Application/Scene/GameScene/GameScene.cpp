@@ -18,15 +18,21 @@ void GameScene::Initialize() {
 	// Skybox
 	skybox_ = asset.LoadTexture("Resources/Images/Background/background.dds");
 
+	// タイル
 	mapTile_ = std::make_unique<MapTile>();
 	mapTile_->Initialize();
+
+	// 確率
+	randomSettings_ = std::make_unique<RandomSettings>();
+
+	// フロア生成
+	floorManager_ = std::make_unique<FloorManager>();
 
 	// 弾
 	bulletManager_ = std::make_unique<BulletManager>();
 
 	// 敵
-	enemyManager_ = std::make_unique<EnemyManager>();
-	enemyManager_->Initialize();
+	enemyManager_ = std::make_unique<EnemyManager>(floorManager_.get());
 
 	// 武器マネージャー
 	weaponManager_ = std::make_unique<WeaponManager>();
@@ -48,9 +54,6 @@ void GameScene::Initialize() {
 	// 当たり判定
 	collisionSystem_ = std::make_unique<CollisionSystem>(effectManager_.get(), bulletManager_.get(), enemyManager_.get(), camera_.get());
 
-	// 確率
-	randomSettings_ = std::make_unique<RandomSettings>();
-
 	// フェード
 	fade_ = std::make_unique<Fade>();
 
@@ -60,14 +63,12 @@ void GameScene::Initialize() {
 	// カメラ制御
 	cameraController_ = std::make_unique<GameCameraController>(camera_.get());
 
-	// フロア生成
-	floorManager_ = std::make_unique<FloorManager>();
-
 	// マップ判定
 	mapCheck_ = std::make_unique<MapCheck>();
 	mapTile_->UpdateMapChange(false, enableEditMode_);
 	Reset();
 
+	// マップ生成より後
 	floorManager_->Initialize();
 
 	isLoaded_ = false;

@@ -14,9 +14,6 @@
 #include "Engine/SceneObject/SceneObject.h"
 #include "Objects/Item/ItemManager.h"
 
-void EnemyManager::Initialize() {
-}
-
 void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager) {
 	for (const auto& enemy : activeEnemies_) {
 		enemy->Update(mapCheck, player, bulletManager);
@@ -216,6 +213,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 
 	// 出現数
 	int spawnCount = min(3, int(positions.size()));
+	if (floorManager_->GetCurrentDepth() == 9) { spawnCount = 1; }
 
 	for (size_t i = 0; i < spawnCount; ++i) {
 		// 残っている候補からランダムに1つ選ぶ
@@ -229,7 +227,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 		spawnPos_.push_back(spawnPos);
 		isSpawned_.push_back(false);
 
-		CreateEnemy({ spawnPos.x, 0, spawnPos.y }, weaponManager, random->SelectEnemy());
+		CreateEnemy({ spawnPos.x, 0, spawnPos.y }, weaponManager, random->SelectEnemy(floorManager_->GetCurrentDepth()));
 	}
 }
 

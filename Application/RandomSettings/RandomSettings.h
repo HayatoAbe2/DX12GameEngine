@@ -14,7 +14,7 @@ public:
 	void Update();
 
 	// 敵を抽選
-	EnemyType SelectEnemy();
+	EnemyType SelectEnemy(int depth);
 
 private:
 	std::unique_ptr<EnemySpawnSetting> enemySpawn_;
