@@ -30,6 +30,12 @@ public:
 
 	// 無敵
 	bool IsInvincible() { return invincibleTimer_.IsActive(); }
+
+	// 回復
+	void Heal(int addHP, int addMaxHP = 0) {
+		hp_ += addHP;
+		maxHp_ += addMaxHP;
+	}
 protected:
 	// 被弾
 	virtual void Hit(float damage, const Vector2& from);

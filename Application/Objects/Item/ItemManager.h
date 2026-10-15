@@ -47,11 +47,14 @@ private:
 
 	bool canInteract_ = true;
 
-	std::vector<bool> spawned_;
-	std::vector<bool> spawnedSale_;
-	std::vector<bool> spawnedPassive_;
-	std::vector<bool> spawnedPassiveSale_;
+	std::vector<bool> weaponSpawned_;
+	std::vector<bool> weaponSaleSpawned_;
+	std::vector<bool> passiveSpawned_;
+	std::vector<bool> passiveSaleSpawned_;
 	int nextSpawnIndex_ = -1;
 	Vector3 nextSpawnPos_{};
+
+	std::vector<int> usedPassiveNumbers_;
+	std::vector<int> pickedPassiveNumbers_;
 };
 

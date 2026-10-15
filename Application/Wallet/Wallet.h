@@ -16,7 +16,7 @@ public:
 private:
 	static constexpr int kMaxMoney = 9999;
 
-	int money_ = 50;
+	int money_ = 9999;
 
 	MoneyUI* ui_;
 };

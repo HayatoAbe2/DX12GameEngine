@@ -270,6 +270,8 @@
     <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
     <ClCompile Include="Application\Objects\Character\Character.cpp" />
     <ClCompile Include="Application\Objects\Chest\Chest.cpp" />
+    <ClCompile Include="Application\Objects\Item\Passive\Heal\Heal.cpp" />
+    <ClCompile Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -602,6 +604,9 @@
     <ClInclude Include="Application\Result\Result.h" />
     <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />
     <ClInclude Include="Application\Objects\Chest\Chest.h" />
+    <ClInclude Include="Application\Objects\Item\Passive\Heal\Heal.h" />
+    <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
+    <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

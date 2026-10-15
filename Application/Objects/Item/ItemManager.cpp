@@ -7,6 +7,7 @@
 #include "Objects/Item/World/WorldWeapon/WorldWeapon.h"
 #include "Objects/Item/World/WorldPassive/WorldPassive.h"
 #include "Objects/Item/World/WorldMoney/WorldMoney.h"
+#include "Objects/Item/Passive/PassiveItems.h"
 
 void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyManager, BulletManager* bulletManager) {
 	weaponManager_ = weaponManager;
@@ -69,7 +70,7 @@ void ItemManager::Update(Player* player, bool isCombat) {
 			// アイテム毎の取得処理
 			items_[closestIndex]->OnPickup(player);
 		}
-		
+
 		// インタラクト可能
 		if (items_[closestIndex]->CanInteract()) {
 			canInteract_ = true;
@@ -146,23 +147,45 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	auto& asset = ctx.Asset();
 	std::unique_ptr<Passive> p;
 	PassiveContext passiveCtx = { enemyManager_, bulletManager_ };
-	
-	// ランダム出現
-	int r = ctx.RandomInt(0, 2);
+
+	// 全て出現済みならスキップ
+	if (usedPassiveNumbers_.size() > int(PASSIVEITEM::Count)) return;
+
+	// 出現済は出ない
+	bool isUsed = false;
+	PASSIVEITEM r = PASSIVEITEM::Counter;
+	do {
+		// ランダム出現
+		r = PASSIVEITEM(ctx.RandomInt(0, int(PASSIVEITEM::Count) - 1));
+
+		for (int used : usedPassiveNumbers_) {
+			if (int(r) == used) isUsed = true;
+		}
+		usedPassiveNumbers_.push_back(int(r));
+	} while (isUsed);
+
 	switch (r) {
-	case 0:
+	case PASSIVEITEM::Counter:
 		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Images/Items/16.png"), nullptr, passiveCtx);
 		break;
-	case 1:
-		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Images/Items/16.png"), nullptr, passiveCtx);
-		//p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Images/Items/13.png"), nullptr, passiveCtx);
+	case PASSIVEITEM::Lightning:
+		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Images/Items/13.png"), nullptr, passiveCtx);
+		break;
+	case PASSIVEITEM::Reload:
+		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Images/Items/21.png"), nullptr, passiveCtx);
+		break;
+	case PASSIVEITEM::Heal:
+		p = std::make_unique<ExtraAttack>(asset.LoadSprite("Resources/Images/Items/6.png"), nullptr, passiveCtx);
 		break;
 	default:
-		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Images/Items/21.png"), nullptr, passiveCtx);
+		p = std::make_unique<Heal>(asset.LoadSprite("Resources/Images/Items/14.png"), nullptr, passiveCtx);
 		break;
 	}
 	auto newItem = std::make_unique<WorldPassive>(std::move(p), pos, Rarity::Rare, isForSale);
 	items_.push_back(std::move(newItem));
+
+	// 拾った場合に出せなくする
+	pickedPassiveNumbers_ = usedPassiveNumbers_;
 }
 
 void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
@@ -181,8 +204,13 @@ void ItemManager::SetSpawn(Vector3 pos, int index) {
 
 void ItemManager::Reset() {
 	items_.clear();
-	spawned_.clear();
-	spawnedSale_.clear();
+	weaponSpawned_.clear();
+	weaponSaleSpawned_.clear();
+	passiveSpawned_.clear();
+	passiveSaleSpawned_.clear();
+
+	// 出現して取得していないパッシブを再出現可能に
+	usedPassiveNumbers_ = pickedPassiveNumbers_;
 }
 
 void ItemManager::Load() {
@@ -200,12 +228,12 @@ void ItemManager::Load() {
 				for (int i = 0; i < size; ++i) {
 					Transform t = model->GetTransforms()[i];
 					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
-					if (int(spawned_.size()) < i + 1) spawned_.resize(i + 1);
+					if (int(weaponSpawned_.size()) < i + 1) weaponSpawned_.resize(i + 1);
 
 					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-					if (!spawned_[i]) {
+					if (!weaponSpawned_[i]) {
 						SpawnWeapon(pos, -1, Common, false);
-						spawned_[i] = true;
+						weaponSpawned_[i] = true;
 					}
 				}
 			}
@@ -216,11 +244,11 @@ void ItemManager::Load() {
 				for (int i = 0; i < size; ++i) {
 					Transform t = model->GetTransforms()[i];
 					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
-					if (int(spawnedSale_.size()) < i + 1) spawnedSale_.resize(i + 1);
+					if (int(weaponSaleSpawned_.size()) < i + 1) weaponSaleSpawned_.resize(i + 1);
 					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-					if (!spawnedSale_[i]) {
+					if (!weaponSaleSpawned_[i]) {
 						SpawnWeapon(pos, -1, Common, true);
-						spawnedSale_[i] = true;
+						weaponSaleSpawned_[i] = true;
 					}
 				}
 			}
@@ -231,11 +259,11 @@ void ItemManager::Load() {
 				for (int i = 0; i < size; ++i) {
 					Transform t = model->GetTransforms()[i];
 					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
-					if (int(spawnedPassive_.size()) < i + 1) spawnedPassive_.resize(i + 1);
+					if (int(passiveSpawned_.size()) < i + 1) passiveSpawned_.resize(i + 1);
 					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-					if (!spawnedPassive_[i]) {
+					if (!passiveSpawned_[i]) {
 						SpawnPassive(pos, false);
-						spawnedPassive_[i] = true;
+						passiveSpawned_[i] = true;
 					}
 				}
 			}
@@ -246,11 +274,11 @@ void ItemManager::Load() {
 				for (int i = 0; i < size; ++i) {
 					Transform t = model->GetTransforms()[i];
 					if (t.scale == Vector3{ 0,0,0 } || t.translate == Vector3{ 0,0,0 }) continue;
-					if (int(spawnedPassiveSale_.size()) < i + 1) spawnedPassiveSale_.resize(i + 1);
+					if (int(passiveSaleSpawned_.size()) < i + 1) passiveSaleSpawned_.resize(i + 1);
 					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
-					if (!spawnedPassiveSale_[i]) {
+					if (!passiveSaleSpawned_[i]) {
 						SpawnPassive(pos, true);
-						spawnedPassiveSale_[i] = true;
+						passiveSaleSpawned_[i] = true;
 					}
 				}
 			}

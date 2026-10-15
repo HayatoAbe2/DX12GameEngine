@@ -5,6 +5,8 @@
 #include "Objects/Item/Passive/Counter/Counter.h"
 #include "Objects/Item/Passive/Lightning/Lightning.h"
 #include "Objects/Item/Passive/Reload/ReloadBoost.h"
+#include "Objects/Item/Passive/Heal/Heal.h"
+#include "Objects/Item/Passive/ExtraAttack/ExtraAttack.h"
 
 // 落ちている状態
 class WorldPassive : public WorldItem {

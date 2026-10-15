@@ -10,7 +10,7 @@
 class MapCheck;
 class Player;
 
-class Enemy : public Character{
+class Enemy : public Character {
 public:
 	virtual ~Enemy() = default;
 	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons);

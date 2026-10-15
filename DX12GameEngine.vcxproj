@@ -264,6 +264,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
     <ClCompile Include="Application\Fade\Fade.cpp" />
     <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
+    <ClCompile Include="Application\Objects\Item\Passive\Heal\Heal.cpp" />
+    <ClCompile Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Math\Matrix4x4\Matrix4x4.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\Model.cpp" />
@@ -463,6 +465,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyType.h" />
     <ClInclude Include="Application\Map\Room\RoomData.h" />
+    <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
     <ClInclude Include="Application\Objects\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Application\Objects\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Objects\Item\Passive\Counter\Counter.h" />
@@ -619,6 +622,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
     <ClInclude Include="Application\Result\Result.h" />
     <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />
+    <ClInclude Include="Application\Objects\Item\Passive\Heal\Heal.h" />
+    <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
