@@ -189,7 +189,7 @@ void GameScene::Update() {
 
 			isLoaded_ = true;
 		}
-
+		
 		break;
 	case Phase::RESULT:
 		result_->Update(floorManager_.get());

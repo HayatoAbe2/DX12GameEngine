@@ -4,6 +4,7 @@
 enum class RoomType {
 	Start,
 	Combat,
+	Boss,
 	Shop,
 	Event,
 	Goal,
@@ -34,4 +35,4 @@ struct Room {
 };
 
 // 抽選範囲の数
-constexpr unsigned int roomNumberRange[5] = {1,7,1,1,1};
+constexpr unsigned int roomNumberRange[6] = {1,7,1,1,1,1};

@@ -191,6 +191,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 		}
 	}
 
+	std::vector<Vector2> positions; // 全ての出現位置
 	for (auto& model : models) {
 		if (model->tag == "enemySpawn") {
 			for (auto& t : model->GetTransforms()) {
@@ -208,13 +209,27 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 				}
 
 				// 出現座標追加
-				spawnPos_.push_back(ToXZ(t.translate));
-				isSpawned_.push_back(false);
-
-				// 出現敵のロード
-				CreateEnemy({ t.translate.x, 0, t.translate.z }, weaponManager, random->SelectEnemy());
+				positions.push_back(ToXZ(t.translate));
 			}
 		}
+	}
+
+	// 出現数
+	int spawnCount = min(3, int(positions.size()));
+
+	for (size_t i = 0; i < spawnCount; ++i) {
+		// 残っている候補からランダムに1つ選ぶ
+		const int index = ctx.RandomInt(0, int(positions.size()) - 1);
+		const auto spawnPos = positions[index];
+
+		// 重複を防ぐため削除
+		positions.erase(positions.begin() + index);
+
+		// 実際に出現させる地点
+		spawnPos_.push_back(spawnPos);
+		isSpawned_.push_back(false);
+
+		CreateEnemy({ spawnPos.x, 0, spawnPos.y }, weaponManager, random->SelectEnemy());
 	}
 }
 

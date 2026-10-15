@@ -68,6 +68,10 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 		roomName = "combatRoom";
 		break;
 
+	case RoomType::Boss:
+		roomName = "bossRoom";
+		break;
+
 	case RoomType::Shop:
 		roomName = "shopRoom";
 		break;
