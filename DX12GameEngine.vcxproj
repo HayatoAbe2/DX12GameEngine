@@ -311,6 +311,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Objects\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Application\Result\Result.cpp" />
     <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
+    <ClCompile Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Dissolve\Dissolve.PS.hlsl">
@@ -624,6 +625,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />
     <ClInclude Include="Application\Objects\Item\Passive\Heal\Heal.h" />
     <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
+    <ClInclude Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

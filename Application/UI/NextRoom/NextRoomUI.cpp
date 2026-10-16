@@ -30,6 +30,9 @@ void NextRoomUI::Update() {
 		case RoomType::Combat:
 			name = "sword";
 			break;
+		case RoomType::Boss:
+			name = "skull";
+			break;
 		case RoomType::Shop:
 			name = "pouch";
 			break;

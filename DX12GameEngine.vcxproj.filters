@@ -272,6 +272,7 @@
     <ClCompile Include="Application\Objects\Chest\Chest.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\Heal\Heal.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.cpp" />
+    <ClCompile Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -607,6 +608,7 @@
     <ClInclude Include="Application\Objects\Item\Passive\Heal\Heal.h" />
     <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
     <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
+    <ClInclude Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
