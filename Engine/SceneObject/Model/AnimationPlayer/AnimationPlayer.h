@@ -15,7 +15,11 @@ public:
 	// ボーンアニメーション
 	void Update(Skeleton& skeleton);
 
+	// アニメーション変更
 	void ChangeAnimation(std::shared_ptr<Animation> animation, float duration);
+	
+	// アニメーション終了済み
+	bool IsAnimationEnded();
 
 private:
 	Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);

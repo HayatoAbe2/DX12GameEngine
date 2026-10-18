@@ -25,7 +25,7 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 			// 最後はゴール部屋
 			next.type = RoomType::Goal;
 		} else if (depth == 1) {
-			next.type = RoomType::Shop;
+			next.type = RoomType::Combat;
 		} else if (depth == 4) {
 			next.type = RoomType::Shop;
 		} else if (depth == 7) {
@@ -33,7 +33,7 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 		} else {
 			auto& ctx = GameContext::GetInstance();
 			if (ctx.RandomInt(0, 100) < 90) {
-				next.type = RoomType::Shop;
+				next.type = RoomType::Combat;
 			} else {
 				next.type = RoomType::Shop;
 			}

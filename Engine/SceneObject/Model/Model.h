@@ -30,6 +30,7 @@ public:
 	void ChangeAnimation(std::shared_ptr<Animation> animation, float time);
 	
 	void CopyModelData(std::shared_ptr<ModelData> data, BufferManager* bufferManager);
+	void InitializePose();
 	void SetRootNode(std::unique_ptr<ModelNode> rootNode) { rootNode_ = std::move(rootNode); } 
 	void SetMeshes(std::vector<MeshRuntime> meshes) { meshes_ = meshes; }
 	void SetSkeleton(const Skeleton& skeleton) { skeleton_ = skeleton; }
@@ -55,6 +56,8 @@ public:
 		return result;
 	}
 
+	// アニメーション長さ
+	bool IsAnimationEnded() { if (animationPlayer_) return animationPlayer_->IsAnimationEnded(); return false; }
 
 	std::shared_ptr<const ModelData> GetData() { return data_; }
 	const SkinClusterRuntime& GetSkinCluster() { return skinCluster_; }

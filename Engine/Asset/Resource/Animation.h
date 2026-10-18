@@ -26,4 +26,5 @@ struct Animation : public Resource{
 
 	float duration; // 全体時間
 	std::map<std::string, NodeAnimation> nodeAnimations;
+	bool isRoop = false;
 };

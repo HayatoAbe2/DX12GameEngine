@@ -171,7 +171,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Objects\Item\Passive\Counter\Counter.cpp" />
     <ClCompile Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.cpp" />
     <ClCompile Include="Application\CollisionSystem\CollisionSystem.cpp" />
-    <ClCompile Include="Application\Objects\Chest\Chest.cpp" />
+    <ClCompile Include="Application\Objects\Item\World\Chest\Chest.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -466,13 +466,14 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyState.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyType.h" />
     <ClInclude Include="Application\Map\Room\RoomData.h" />
+    <ClInclude Include="Application\Objects\Item\World\Interactable.h" />
     <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
     <ClInclude Include="Application\Objects\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Application\Objects\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Objects\Item\Passive\Counter\Counter.h" />
     <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />
     <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
-    <ClInclude Include="Application\Objects\Chest\Chest.h" />
+    <ClInclude Include="Application\Objects\Item\World\Chest\Chest.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />

@@ -53,6 +53,13 @@ void Model::CopyModelData(std::shared_ptr<ModelData> data, BufferManager* buffer
 	}
 }
 
+void Model::InitializePose() {
+	// アニメーションがあるモデルのポーズ初期化
+	if (!data_ || skeleton_.joints.size() <= 1) { return; }
+	UpdateSkeleton();
+	UpdateSkinCluster();
+}
+
 void Model::ChangeAnimation(std::shared_ptr<Animation> animation, float time) {
 	if (animationPlayer_) {
 		animationPlayer_->ChangeAnimation(animation, time);

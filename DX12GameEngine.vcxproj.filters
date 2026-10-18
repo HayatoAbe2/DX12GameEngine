@@ -269,7 +269,7 @@
     <ClCompile Include="Application\Result\Result.cpp" />
     <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
     <ClCompile Include="Application\Objects\Character\Character.cpp" />
-    <ClCompile Include="Application\Objects\Chest\Chest.cpp" />
+    <ClCompile Include="Application\Objects\Item\World\Chest\Chest.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\Heal\Heal.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.cpp" />
     <ClCompile Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.cpp" />
@@ -604,11 +604,12 @@
     <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
     <ClInclude Include="Application\Result\Result.h" />
     <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />
-    <ClInclude Include="Application\Objects\Chest\Chest.h" />
+    <ClInclude Include="Application\Objects\Item\World\Chest\Chest.h" />
     <ClInclude Include="Application\Objects\Item\Passive\Heal\Heal.h" />
     <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
     <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
     <ClInclude Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.h" />
+    <ClInclude Include="Application\Objects\Item\World\Interactable.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

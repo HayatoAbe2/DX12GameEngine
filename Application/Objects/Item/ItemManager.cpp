@@ -44,22 +44,48 @@ void ItemManager::Update(Player* player, bool isCombat) {
 		),
 		items_.end()
 	);
+	chests_.erase(
+		std::remove_if(chests_.begin(), chests_.end(),
+			[](const std::unique_ptr<Chest>& chest) {
+				return chest->IsDead();
+			}
+		),
+		chests_.end()
+	);
 
 	for (auto& i : items_) {
 		i->Update();
+		// 自動取得アイテムの移動
 		if (i->CanAutoGet() && !isCombat) {
 			i->MoveToPlayer(ToXZ(player->GetTransform().translate));
 		}
 	}
+	for (auto& c : chests_) {
+		c->Update();
+
+		if (c->CheckDrop()) {
+			// アイテム出現
+			ChestItemDrop(c.get());
+		}
+	}
+
+	// 敵全滅時にチェスト出現
+	if (isCombat_ && !isCombat) {
+		std::unique_ptr<Chest> chest = std::make_unique<Chest>(ToXZ(player->GetTransform().translate));
+		chests_.push_back(std::move(chest));
+	}
+	isCombat_ = isCombat;
 
 	// 最短距離にあるアイテムを探す
 	int closestIndex = -1;
+	bool interactItem = false;
 	float closestDistance = FLT_MAX;
 	for (auto& item : items_) {
 		float distance = Length(item->GetPosition() - ToXZ(player->GetTransform().translate));
-		if (distance < closestDistance && distance < 2.0f) {
+		if (distance < closestDistance && distance < kInteractRange) {
 			closestDistance = distance;
 			closestIndex = int(&item - &items_[0]);
+			interactItem = true;
 		}
 	}
 
@@ -71,8 +97,12 @@ void ItemManager::Update(Player* player, bool isCombat) {
 			items_[closestIndex]->OnPickup(player);
 		}
 
-		// インタラクト可能
-		if (items_[closestIndex]->CanInteract()) {
+		if (interactItem) {
+			// インタラクト可能
+			if (items_[closestIndex]->CanInteract()) {
+				canInteract_ = true;
+			}
+		} else {
 			canInteract_ = true;
 		}
 	} else {
@@ -87,6 +117,9 @@ void ItemManager::Draw() {
 
 	for (const auto& i : items_) {
 		i->Draw();
+	}
+	for (auto& c : chests_) {
+		c->Draw();
 	}
 
 	if (canInteract_ && !ctx.Scene().GetCurrentScene()->IsEditMode()) {
@@ -188,6 +221,9 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	pickedPassiveNumbers_ = usedPassiveNumbers_;
 }
 
+void ItemManager::SpawnChest(Vector3 pos) {
+}
+
 void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
 	// 武器を落とす
 	if (weapon) {
@@ -283,5 +319,23 @@ void ItemManager::Load() {
 				}
 			}
 		}
+	}
+}
+
+void ItemManager::ChestItemDrop(Chest* chest) {
+	Vector3 pos = { chest->GetPosition().x, 0, chest->GetPosition().y };
+
+	// ランダム出現
+	auto& ctx = GameContext::GetInstance();
+	switch (ctx.RandomInt(0, 2)) {
+	case 0:
+		SpawnMoney(pos, 30);
+		break;
+	case 1:
+		SpawnPassive(pos, false);
+		break;
+	case 2:
+		SpawnWeapon(pos, -1, Common, false);
+		break;
 	}
 }

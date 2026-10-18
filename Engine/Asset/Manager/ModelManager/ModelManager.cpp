@@ -210,6 +210,7 @@ std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint3
 		modelDataCache_.insert({ fullPath, modelData });
 	}
 
+	model->InitializePose();
 	return model;
 }
 

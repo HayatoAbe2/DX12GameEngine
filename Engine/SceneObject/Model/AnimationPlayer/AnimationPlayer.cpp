@@ -21,7 +21,13 @@ void AnimationPlayer::Update(ModelNode& rootNode) {
 void AnimationPlayer::Update(Skeleton& skeleton) {
 	float deltaTime = GameContext::GetInstance().GetDeltatime();
 	animationTime_ += deltaTime;
-	animationTime_ = std::fmod(animationTime_, animation_->duration);
+
+	if (animation_->isRoop) {
+		// ループ
+		animationTime_ = std::fmod(animationTime_, animation_->duration);
+	} else {
+		animationTime_ = min(animationTime_, animation_->duration);
+	}
 
 	// 次のアニメーションへの補間
 	if (nextAnimation_) {
@@ -120,6 +126,13 @@ void AnimationPlayer::ChangeAnimation(std::shared_ptr<Animation> animation, floa
 	nextAnimationTime_ = 0;
 	blendTime_ = 0;
 	blendDuration_ = duration;
+}
+
+bool AnimationPlayer::IsAnimationEnded() {
+	if (!animation_->isRoop && animationTime_ == animation_->duration) {
+		return true;
+	}
+	return false;
 }
 
 Vector3 AnimationPlayer::CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {

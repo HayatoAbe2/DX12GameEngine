@@ -1,6 +1,7 @@
 #pragma once
 #include "GameCommon.h"
 #include "Objects/Item/World/WorldItem.h"
+#include "Objects/Item/World/Chest/Chest.h"
 #include "Rarity.h"
 
 class Player;
@@ -22,6 +23,7 @@ public:
 	void SpawnWeapon(Vector3 pos,int index,Rarity rarity, bool isForSale);
 	void SpawnMoney(Vector3 pos,int amount);
 	void SpawnPassive(Vector3 pos, bool isForSale);
+	void SpawnChest(Vector3 pos);
 
 	// 持っていたものを落とす
 	void Drop(Vector3 pos,std::unique_ptr<Weapon> weapon);
@@ -36,6 +38,12 @@ public:
 	void Load();
 	
 private:
+	// 宝箱からの出現
+	void ChestItemDrop(Chest* chest);
+
+	// 戦闘中
+	bool isCombat_ = false;
+
 	std::unique_ptr<Sprite> controlKey_ = nullptr;
 	std::unique_ptr<Sprite> controlPad_ = nullptr;
 	WeaponManager* weaponManager_ = nullptr;
@@ -44,8 +52,11 @@ private:
 
 	// 落ちているアイテム
 	std::vector<std::unique_ptr<WorldItem>> items_;
+	std::vector<std::unique_ptr<Chest>> chests_;
 
+	// インタラクト可能
 	bool canInteract_ = true;
+	const float kInteractRange = 2.0f; // インタラクト範囲
 
 	std::vector<bool> weaponSpawned_;
 	std::vector<bool> weaponSaleSpawned_;
