@@ -548,7 +548,7 @@ void Player::SetWeapon(std::unique_ptr<Weapon> weapon) {
 void Player::AddPassive(std::unique_ptr<Passive> passive) {
 	Sprite* sprite = passive->GetSprite();
 	int index = int(passives_.size());
-	sprite->SetPosition({ 500.0f + 55 * index, sprite->GetSize().y / 2.0f}); // 画面上位置の押し出し
+	sprite->SetPosition({ 500.0f + 80 * index, sprite->GetSize().y / 2.0f}); // 画面上位置の押し出し
 
 	passives_.push_back(std::move(passive));
 }

@@ -22,9 +22,9 @@ void ChargeEffect::Update(Vector2 center, float radius) {
 		ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
 		};
 		Transform transform = {
-			Vector3{radius ,radius, radius} * 2.0f,
+			Vector3{radius, radius, radius} * 2.0f,
 			{0,0,0},
-			Vector3{center.x, radius, center.y} + randomVector };
+			Vector3{center.x, 0.5f, center.y} + randomVector };
 		particle_->Emit(transform, Vector3{});
 	}
 	particle_->Update();

@@ -67,7 +67,7 @@ void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulle
 
 		if (chargeEffect_) {
 			float rate = data_.traits.charge->currentTime / data_.traits.charge->time;
-			Vector2 shootPos = ToXZ(pos) + ToXZ(model_->GetTransform().scale) / 2.0f;
+			Vector2 shootPos = ToXZ(pos) + dir * (model_->GetTransform().scale.x) + Vector2{ data_.bullet.radius, data_.bullet.radius };
 			chargeEffect_->Update(shootPos, rate * chargeRatio_);
 		}
 	}
@@ -105,7 +105,7 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 		}
 	}
 
-	Vector2 shootPos = ToXZ(pos) + dir * (model_->GetTransform().scale.x) / 2.0f;
+	Vector2 shootPos = ToXZ(pos) + dir * (model_->GetTransform().scale.x) + Vector2{data_.bullet.radius, data_.bullet.radius};
 
 	// 複数弾
 	if (data_.traits.multiShot && data_.traits.multiShot->count > 1) {
@@ -171,5 +171,6 @@ void Weapon::SetChargeStartTimer() {
 }
 
 void Weapon::SpawnChargeEffect() {
+	if (chargeEffect_) { return; }
 	chargeEffect_ = std::make_unique<ChargeEffect>(data_.bullet.color);
 }

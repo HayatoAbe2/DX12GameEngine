@@ -11,7 +11,7 @@ public:
 	int GetCurrentDepth() { return currentDepth_; }
 	std::vector<RoomConnector> GetConnector();
 
-	const int kMaxDepth = 8;
+	const int kMaxDepth = 10;
 private:
 	std::unique_ptr<FloorGenerator> generator_ = nullptr;
 	Room* currentRoom_;

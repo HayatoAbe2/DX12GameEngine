@@ -14,6 +14,10 @@ void WeaponManager::Initialize() {
 	LoadJson("Resources/Data/Weapons/Accelgun.json");
 	LoadJson("Resources/Data/Weapons/Sniper.json");
 	LoadJson("Resources/Data/Weapons/Burstgun.json");
+
+	LoadJson("Resources/Data/Weapons/Fireball_Enemy.json", true);
+	LoadJson("Resources/Data/Weapons/AssaultRifle_Enemy.json", true);
+	LoadJson("Resources/Data/Weapons/Pistol_Enemy.json", true);
 }
 
 std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
@@ -38,7 +42,29 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
 }
 
-void WeaponManager::LoadJson(const std::string& path) {
+std::unique_ptr<Weapon> WeaponManager::GetEnemyAttack(int index) {
+	auto& ctx = GameContext::GetInstance();
+	auto& asset = ctx.Asset();
+
+	WeaponData data;
+
+	// ランダム
+	if (index == -1) { index = ctx.RandomInt(0, int(ENEMYATTACK::Count) - 1); }
+
+	// 武器データ
+	data = enemyAttackDataMap[EnemyAttackNames[index] + "_Enemy"];
+
+	auto model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	auto shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	MaterialData matData = model->GetMaterial(0)->GetData();
+	matData.color = { 0.2f,0.2f,0.2f,1 };
+	model->GetMaterial(0)->SetData(matData);
+	model->GetMaterial(1)->SetData(matData);
+
+	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
+}
+
+void WeaponManager::LoadJson(const std::string& path, bool isEnemyAttack) {
 	std::ifstream file(path);
 	assert(file.is_open());
 
@@ -211,6 +237,10 @@ void WeaponManager::LoadJson(const std::string& path) {
 			}
 		}
 
-		weaponDataMap[name] = weapon;
+		if (isEnemyAttack) {
+			enemyAttackDataMap[name] = weapon;
+		} else {
+			weaponDataMap[name] = weapon;
+		}
 	}
 }

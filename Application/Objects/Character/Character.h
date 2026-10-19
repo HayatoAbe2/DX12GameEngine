@@ -35,6 +35,7 @@ public:
 	void Heal(int addHP, int addMaxHP = 0) {
 		hp_ += addHP;
 		maxHp_ += addMaxHP;
+		hp_ = (std::min)(hp_, maxHp_);
 	}
 protected:
 	// 被弾

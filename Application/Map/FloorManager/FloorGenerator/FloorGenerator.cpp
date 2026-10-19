@@ -21,14 +21,14 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 	for (int i = 0; i < 3; ++i) { // 3部屋接続
 		Room next;
 
-		if (depth + 1 >= maxDepth) {
+		if (depth >= maxDepth) {
 			// 最後はゴール部屋
 			next.type = RoomType::Goal;
 		} else if (depth == 1) {
 			next.type = RoomType::Combat;
-		} else if (depth == 4) {
+		} else if (depth == 5) {
 			next.type = RoomType::Shop;
-		} else if (depth == 7) {
+		} else if (depth == 9) {
 			next.type = RoomType::Boss;
 		} else {
 			auto& ctx = GameContext::GetInstance();

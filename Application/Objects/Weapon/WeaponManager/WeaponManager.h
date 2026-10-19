@@ -9,12 +9,13 @@ public:
 	void Initialize();
 
 	std::unique_ptr<Weapon> GetWeapon(int index, Rarity rarity = Rarity::Common);
+	std::unique_ptr<Weapon> GetEnemyAttack(int index);
 
 	enum class WEAPON {
 		Pistol,
 		AssaultRifle,
 		Shotgun,
-		FireBall,
+		Fireball,
 		Wavegun,
 		OrbitStaff,
 		ChargeGun,
@@ -25,12 +26,21 @@ public:
 		Count
 	};
 
+	enum class ENEMYATTACK {
+		Fireball, 
+		AssaultRifle,
+		Pistol,
+
+		Count
+	};
+
 private:
 
 	// json読み込み
-	void LoadJson(const std::string& path);
+	void LoadJson(const std::string& path, bool isEnemyAttack = false);
 	// 読み込んだデータ
 	std::unordered_map<std::string, WeaponData> weaponDataMap;
+	std::unordered_map<std::string, WeaponData> enemyAttackDataMap;
 
 	const std::string WeaponNames[(int)WEAPON::Count]{
 		"Pistol",
@@ -43,6 +53,12 @@ private:
 		"AccelGun",
 		"Sniper",
 		"Burstgun"
+	};
+
+	const std::string EnemyAttackNames[(int)ENEMYATTACK::Count]{
+	"Fireball",
+	"AssaultRifle",
+	"Pistol"
 	};
 };
 

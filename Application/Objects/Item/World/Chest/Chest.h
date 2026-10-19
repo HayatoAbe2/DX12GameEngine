@@ -38,7 +38,7 @@ private:
 	// タイマー
 	Timer appierTimer_;
 	Timer dyingTimer_;
-	const float kAppierTime = 1.0f;
-	const float kDyingTime = 1.5f;
+	const float kAppierTime = 0.5f;
+	const float kDyingTime = 0.5f;
 };
 

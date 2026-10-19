@@ -32,7 +32,6 @@ Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& d
 
 	if (dynamic_cast<Enemy*>(from)) {
 		isEnemyBullet_ = true;
-		velocity_ /= 3.0f;
 	}
 	lifeTime_ = data_.lifeTime;
 
