@@ -184,34 +184,44 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	// 全て出現済みならスキップ
 	if (usedPassiveNumbers_.size() > int(PASSIVEITEM::Count)) return;
 
-	// 出現済は出ない
-	bool isUsed = false;
-	PASSIVEITEM r = PASSIVEITEM::Counter;
+	// 未使用の番号が出るまで抽選
+	PASSIVEITEM r;
 	do {
-		// ランダム出現
-		r = PASSIVEITEM(ctx.RandomInt(0, int(PASSIVEITEM::Count) - 1));
-
-		for (int used : usedPassiveNumbers_) {
-			if (int(r) == used) isUsed = true;
-		}
-		usedPassiveNumbers_.push_back(int(r));
-	} while (isUsed);
+		r = static_cast<PASSIVEITEM>(ctx.RandomInt(0, int(PASSIVEITEM::Count) - 1));
+	} while (usedPassiveNumbers_.contains(static_cast<int>(r)));
+	// 未使用の番号だけを登録
+	usedPassiveNumbers_.insert(static_cast<int>(r));
 
 	switch (r) {
 	case PASSIVEITEM::Counter:
-		p = std::make_unique<Counter>(asset.LoadSprite("Resources/Images/Items/16.png"), nullptr, passiveCtx);
+		p = std::make_unique<Counter>(
+			asset.LoadSprite("Resources/Images/Items/16.png"), 
+			asset.LoadSprite("Resources/Images/Items/Explain/item_counterAttack.png"),
+			passiveCtx);
 		break;
 	case PASSIVEITEM::Lightning:
-		p = std::make_unique<Lightning>(asset.LoadSprite("Resources/Images/Items/13.png"), nullptr, passiveCtx);
+		p = std::make_unique<Lightning>(
+			asset.LoadSprite("Resources/Images/Items/13.png"),
+			asset.LoadSprite("Resources/Images/Items/Explain/item_chainDamage.png"),
+			passiveCtx);
 		break;
 	case PASSIVEITEM::Reload:
-		p = std::make_unique<ReloadBoost>(asset.LoadSprite("Resources/Images/Items/21.png"), nullptr, passiveCtx);
+		p = std::make_unique<ReloadBoost>(
+			asset.LoadSprite("Resources/Images/Items/21.png"),
+			asset.LoadSprite("Resources/Images/Items/Explain/item_reload.png"),
+			passiveCtx);
 		break;
 	case PASSIVEITEM::Heal:
-		p = std::make_unique<ExtraAttack>(asset.LoadSprite("Resources/Images/Items/6.png"), nullptr, passiveCtx);
+		p = std::make_unique<ExtraAttack>(
+			asset.LoadSprite("Resources/Images/Items/6.png"),
+			asset.LoadSprite("Resources/Images/Items/Explain/item_extraAttack.png"),
+			passiveCtx);
 		break;
 	default:
-		p = std::make_unique<Heal>(asset.LoadSprite("Resources/Images/Items/14.png"), nullptr, passiveCtx);
+		p = std::make_unique<Heal>(
+			asset.LoadSprite("Resources/Images/Items/14.png"),
+			asset.LoadSprite("Resources/Images/Items/Explain/item_lifeSteal.png"),
+			passiveCtx);
 		break;
 	}
 	auto newItem = std::make_unique<WorldPassive>(std::move(p), pos, Rarity::Rare, isForSale);

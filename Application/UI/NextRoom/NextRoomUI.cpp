@@ -66,7 +66,7 @@ void NextRoomUI::Update() {
 		pos.y = (1.0f - ndc.y) * 0.5f * window.y;
 
 		// アイコン
-		icons_[i]->SetPosition(pos - icons_[i]->GetSize() / 2.0f);
+		icons_[i]->SetPosition(pos);
 	}
 }
 

@@ -24,6 +24,7 @@ float Weapon::Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bul
 		data_.traits.charge->currentTime += ctx.GetDeltatime();
 		data_.traits.charge->currentTime = (std::min)(data_.traits.charge->currentTime, data_.traits.charge->time);
 		data_.traits.charge->charging = true;
+		SpawnChargeEffect();
 		canChange_ = false;
 		return 0;
 	}
@@ -55,6 +56,7 @@ void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulle
 
 		if (!isPress && data_.traits.charge->charging) {
 			data_.traits.charge->charging = false;
+			chargeEffect_ = nullptr;
 		}
 		// チャージしていて離したら1回だけ発射 
 		if (!data_.traits.charge->charging && data_.traits.charge->currentTime > 0.0f) {
@@ -62,10 +64,22 @@ void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulle
 			data_.traits.charge->currentTime = 0.0f; 
 			canChange_ = true;
 		}
+
+		if (chargeEffect_) {
+			float rate = data_.traits.charge->currentTime / data_.traits.charge->time;
+			Vector2 shootPos = ToXZ(pos) + ToXZ(model_->GetTransform().scale) / 2.0f;
+			chargeEffect_->Update(shootPos, rate * chargeRatio_);
+		}
 	}
 
 	// modifireリセット
 	data_.modifiers[int(ModifierStats::coolTime)].multiply = 1.0f;
+}
+
+void Weapon::Draw() {
+	if (chargeEffect_) {
+		chargeEffect_->Draw();
+	}
 }
 
 float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from) {
@@ -91,6 +105,8 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 		}
 	}
 
+	Vector2 shootPos = ToXZ(pos) + dir * (model_->GetTransform().scale.x) / 2.0f;
+
 	// 複数弾
 	if (data_.traits.multiShot && data_.traits.multiShot->count > 1) {
 		int count = data_.traits.multiShot->count;
@@ -111,7 +127,7 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 				};
 
 				// 弾生成
-				std::unique_ptr<Bullet> bullet = std::make_unique<Bullet>(ToXZ(pos), rotatedDir, data_.bullet, from);
+				std::unique_ptr<Bullet> bullet = std::make_unique<Bullet>(shootPos, rotatedDir, data_.bullet, from);
 				// BulletManagerの管理下に移動
 				bulletManager->AddBullet(std::move(bullet));
 			}
@@ -120,12 +136,12 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 	} else {
 
 		// 弾生成
-		std::unique_ptr<Bullet> bullet = std::make_unique<Bullet>(ToXZ(pos), dir, data_.bullet, from);
+		std::unique_ptr<Bullet> bullet = std::make_unique<Bullet>(shootPos, dir, data_.bullet, from);
 
 		if (data_.traits.charge) {
 			float rate = data_.traits.charge->currentTime / data_.traits.charge->time;
 			bullet->GetData().damage += data_.traits.charge->damage * rate;
-			bullet->GetData().radius += rate * 3.0f;
+			bullet->GetData().radius += rate * chargeRatio_;
 		}
 
 		// BulletManagerの管理下に移動
@@ -152,4 +168,8 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 void Weapon::SetChargeStartTimer() {
 	// 回復開始までの時間
 	reloadStartTimer_.Start(0.75f);
+}
+
+void Weapon::SpawnChargeEffect() {
+	chargeEffect_ = std::make_unique<ChargeEffect>(data_.bullet.color);
 }

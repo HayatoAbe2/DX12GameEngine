@@ -3,6 +3,7 @@
 #include "Objects/Item/World/WorldItem.h"
 #include "Objects/Item/World/Chest/Chest.h"
 #include "Rarity.h"
+#include <unordered_set>
 
 class Player;
 class WeaponManager;
@@ -65,7 +66,7 @@ private:
 	int nextSpawnIndex_ = -1;
 	Vector3 nextSpawnPos_{};
 
-	std::vector<int> usedPassiveNumbers_;
-	std::vector<int> pickedPassiveNumbers_;
+	std::unordered_set<int> usedPassiveNumbers_;
+	std::unordered_set<int> pickedPassiveNumbers_;
 };
 

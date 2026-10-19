@@ -5,6 +5,7 @@
 #include "Timer/Timer.h"
 #include "Objects/Bullet/Bullet.h"
 #include "Objects/Item/Item.h"
+#include "Effect/Charge/ChargeEffect.h"
 
 class BulletManager;
 
@@ -31,6 +32,8 @@ public:
 protected:
 	float Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
 	void SetChargeStartTimer();
+	// 溜めエフェクト
+	void SpawnChargeEffect();
 
 	WeaponData data_;
 	std::unique_ptr<Model> model_;
@@ -40,5 +43,9 @@ protected:
 	float charge_ = 0;
 
 	bool canChange_ = true;
+
+	// チャージショット用パーティクル
+	std::unique_ptr<ChargeEffect> chargeEffect_;
+	float chargeRatio_ = 2.0f;
 };
 

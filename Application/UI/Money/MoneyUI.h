@@ -19,7 +19,7 @@ private:
 	void Shake(Vector2& drawPos);
 	void Ease();
 
-	Vector2 pos_ = {325, 20};
+	Vector2 pos_ = {350, 20};
 	const float numSpacing_ = 27.0f;
 	const float digitSize_ = 32.0f;
 	const float iconSize_ = 32.0f;

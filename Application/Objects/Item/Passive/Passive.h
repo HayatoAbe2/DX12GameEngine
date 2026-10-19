@@ -19,8 +19,8 @@ public:
 
 	Sprite* GetSprite() { return sprite_.get(); }
 	Sprite* GetExplain() { return explain_.get(); }
-	void Update();
 	void Draw();
+	void DrawExplain(); // 説明の表示
 
 	// 常時
 	virtual void OnUpdate(Weapon* weapon, Weapon* subWeapon) {}
@@ -35,8 +35,9 @@ public:
 
 private:
 	std::unique_ptr<Sprite> sprite_;
-	std::unique_ptr<Sprite> explain_;
-
+	std::unique_ptr<Sprite> explain_; // アイテム説明
+	const Vector2 kSpriteSize = {80.0f, 80.0f};
+	const float kExplainScale = 0.2f;
 protected:
 	PassiveContext passiveCtx_;
 

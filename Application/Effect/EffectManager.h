@@ -14,6 +14,7 @@ public:
 
 	void SpawnHitEffect(const Vector3& pos);
 	void SpawnExplodeEffect(const Vector3& pos);
+	void SpawnChargeEffect(const Vector3 pos, const float radius);
 private:
 	std::vector<std::unique_ptr<Model>> hitEffect_;
 	std::vector<std::unique_ptr<HitEffect>> hitSpark_;

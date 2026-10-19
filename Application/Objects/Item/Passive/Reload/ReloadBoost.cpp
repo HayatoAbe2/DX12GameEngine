@@ -1,6 +1,6 @@
 #include "ReloadBoost.h"
 
-ReloadBoost::ReloadBoost(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx) : Passive(std::move(sprite), std::move(explain), passiveCtx_) {
+ReloadBoost::ReloadBoost(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx) : Passive(std::move(sprite), std::move(explain), ctx) {
 }
 
 void ReloadBoost::OnUpdate(Weapon* weapon, Weapon* subWeapon) {

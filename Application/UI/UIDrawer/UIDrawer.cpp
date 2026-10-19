@@ -6,6 +6,7 @@ void UIDrawer::Initialize(Player* player, FloorManager* floorManager) {
 
 	money_ = std::make_unique<MoneyUI>(player_->GetWallet());
 	nextRoom_ = std::make_unique<NextRoomUI>(floorManager);
+	passive_ = std::make_unique<PassiveUI>(player);
 
 	equipment_ = std::make_unique<EquipmentUI>();
 	equipment_->Initialize(player);
@@ -104,6 +105,7 @@ void UIDrawer::Draw() {
 
 	equipment_->Draw();
 	money_->Draw();
+	passive_->Draw();
 
 }
 

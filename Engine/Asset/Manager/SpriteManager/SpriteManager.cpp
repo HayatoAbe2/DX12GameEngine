@@ -119,6 +119,7 @@ std::unique_ptr<Sprite> SpriteManager::Load(const std::string& texturePath, uint
 	material->Initialize(bufferManager_, true, false);
 	material->SetTexture(texture);
 	sprite->SetMaterial(std::move(material));
+	sprite->SetSize(texture->GetSize());
 
 	return sprite;
 }

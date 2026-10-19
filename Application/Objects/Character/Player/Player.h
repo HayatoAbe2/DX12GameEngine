@@ -11,7 +11,7 @@ class BulletManager;
 class EnemyManager;
 class MoneyUI;
 
-class Player : public Character{
+class Player : public Character {
 public:
 	~Player();
 
@@ -40,6 +40,13 @@ public:
 	float GetInteractRadius() const { return interactRadius_; }
 	Weapon* GetWeapon() const { return weapon_.get(); }
 	Weapon* GetSubWeapon() const { return subWeapon_.get(); }
+	std::vector<Passive*> GetPassives() const {
+		std::vector<Passive*> result;
+		for (auto& p : passives_) {
+			result.push_back(p.get());
+		};
+		return result;
+	}
 	Wallet& GetWallet() { return wallet_; }
 	bool IsBoosting() { return isUsingBoost_; }
 
@@ -112,11 +119,9 @@ private:
 
 	// クールダウン表示
 	std::unique_ptr<Sprite> shootCooldownSprite_;
-	Vector2 scSize_ = {70,20};
+	Vector2 scSize_ = { 70,20 };
 
 	std::vector<std::unique_ptr<Passive>> passives_;
-
-	bool usePassive_[3];
 
 	// 所持金
 	Wallet wallet_;

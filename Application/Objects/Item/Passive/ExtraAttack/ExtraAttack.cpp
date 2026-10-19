@@ -1,6 +1,6 @@
 #include "ExtraAttack.h"
 
-ExtraAttack::ExtraAttack(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx) : Passive(std::move(sprite), std::move(explain), passiveCtx_) {
+ExtraAttack::ExtraAttack(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx) : Passive(std::move(sprite), std::move(explain), ctx) {
 }
 
 void ExtraAttack::OnEliminate(const Vector2& enemyPos, Character* self) {

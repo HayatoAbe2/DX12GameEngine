@@ -172,6 +172,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.cpp" />
     <ClCompile Include="Application\CollisionSystem\CollisionSystem.cpp" />
     <ClCompile Include="Application\Objects\Item\World\Chest\Chest.cpp" />
+    <ClCompile Include="Application\Effect\Charge\ChargeEffect.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -296,6 +297,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\UI\Money\MoneyUI.cpp" />
     <ClCompile Include="Application\UI\NextRoom\NextRoomUI.cpp" />
     <ClCompile Include="Application\RandomSettings\RandomSettings.cpp" />
+    <ClCompile Include="Application\UI\Passive\PassiveUI.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -474,6 +476,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />
     <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
     <ClInclude Include="Application\Objects\Item\World\Chest\Chest.h" />
+    <ClInclude Include="Application\Effect\Charge\ChargeEffect.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
@@ -627,6 +630,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Item\Passive\Heal\Heal.h" />
     <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
     <ClInclude Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.h" />
+    <ClInclude Include="Application\UI\Passive\PassiveUI.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

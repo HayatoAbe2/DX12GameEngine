@@ -2,6 +2,7 @@
 #include "UI/Equipment/EquipmentUI.h"
 #include "UI/Money/MoneyUI.h"
 #include "UI/NextRoom/NextRoomUI.h"
+#include "UI/Passive/PassiveUI.h"
 
 class Player;
 class FloorManager;
@@ -53,5 +54,6 @@ private:
 
 	std::unique_ptr<MoneyUI> money_ = nullptr;
 	std::unique_ptr<NextRoomUI> nextRoom_ = nullptr;
+	std::unique_ptr<PassiveUI> passive_ = nullptr;
 };
 

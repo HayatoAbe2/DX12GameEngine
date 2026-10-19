@@ -83,9 +83,10 @@ public:
 
 	// 位置
 	const Vector2& GetPosition() const { return position_; }
-	void SetPosition(const Vector2& position) { position_ = position; }
+	void SetPosition(const Vector2& position) { position_ = position; UpdateVertex(); }
 
 	// pivot
+	const Vector2& GetPivot() { return pivot_; }
 	void SetPivot(const Vector2& pivot) { pivot_ = pivot; }
 
 	// 回転

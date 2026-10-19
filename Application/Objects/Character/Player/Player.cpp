@@ -261,6 +261,7 @@ void Player::Draw(Camera* camera) {
 		render.DrawModel(weapon_->GetShadowModel());
 
 		// 武器描画
+		weapon_->Draw();
 		weapon_->GetModel()->SetTransform(weaponTransform_);
 		render.DrawModel(weapon_->GetModel());
 
@@ -322,7 +323,7 @@ void Player::OnDealDamage(const Vector2& pos) {
 }
 void Player::OnEliminate(const Vector2& enemyPos) {
 	for (auto& p : passives_) {
-		p->OnHit(enemyPos, this);
+		p->OnEliminate(enemyPos, this);
 	}
 }
 void Player::OnHit(const Vector2& from) {
@@ -547,8 +548,7 @@ void Player::SetWeapon(std::unique_ptr<Weapon> weapon) {
 void Player::AddPassive(std::unique_ptr<Passive> passive) {
 	Sprite* sprite = passive->GetSprite();
 	int index = int(passives_.size());
-	sprite->SetSize({ 75, 75 });
-	sprite->SetPosition({ 500.0f + 55 * index, 0 });
+	sprite->SetPosition({ 500.0f + 55 * index, sprite->GetSize().y / 2.0f}); // 画面上位置の押し出し
 
 	passives_.push_back(std::move(passive));
 }

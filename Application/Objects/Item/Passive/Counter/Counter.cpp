@@ -1,6 +1,6 @@
 #include "Counter.h"
 
-Counter::Counter(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx) : Passive(std::move(sprite), std::move(explain), passiveCtx_) {
+Counter::Counter(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx) : Passive(std::move(sprite), std::move(explain), ctx) {
 }
 
 void Counter::OnHit(const Vector2& pos, Character* from) {

@@ -37,7 +37,7 @@ void WorldPassive::Draw() {
 	pos.y = (1.0f - ndc.y) * 0.5f * window.y;
 
 	// アイコン
-	sprite->SetPosition(pos - sprite->GetSize() / 2.0f);
+	sprite->SetPosition(pos);
 	render.DrawSprite(sprite);
 
 	WorldItem::Draw();
