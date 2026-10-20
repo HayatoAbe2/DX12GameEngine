@@ -15,6 +15,7 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	maxHp_ = status_.hp;
 	hp_ = status_.hp;
 	radius_ = status_.radius;
+	canFly_ = status_.canFly;
 
 	model_ = std::move(model);
 	model_->SetTranslate(pos);

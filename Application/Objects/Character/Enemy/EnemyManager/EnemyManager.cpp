@@ -103,6 +103,30 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyT
 		enemies.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
 		break;
 	}
+	case EnemyType::Hedgehog_Single:
+	{
+		status.hp = 5;
+		status.radius = 0.5f;
+		status.moveSpeed = 3.5f;
+		status.defaultSearchRadius = 100.0f;
+		status.stunResist = 0;
+		status.canFly = false;
+		status.attackRadius = -1;
+
+		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.glb");
+		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.glb");
+		Vector3 spawnPos = pos;
+		enemyModel->SetTranslate(spawnPos);
+		enemyShadowModel->SetTranslate(spawnPos);
+
+		auto anim = asset.LoadAnimation("Resources/Models/Enemy", "hedgehog.glb")[2];
+		anim->isRoop = true;
+		enemyModel->SetAnimation(anim);
+		enemyShadowModel->SetAnimation(anim);
+
+		enemies.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), spawnPos, status, std::move(weapons)));
+	}
+		break;
 	case EnemyType::elite1:
 	{
 		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "knight2.obj");

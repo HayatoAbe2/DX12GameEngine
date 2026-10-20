@@ -19,6 +19,7 @@ public:
 
 	Sprite* GetSprite() { return sprite_.get(); }
 	Sprite* GetExplain() { return explain_.get(); }
+	Sprite* GetBackground() { return background_.get(); }
 	void Draw();
 	void DrawExplain(); // 説明の表示
 
@@ -36,8 +37,10 @@ public:
 private:
 	std::unique_ptr<Sprite> sprite_;
 	std::unique_ptr<Sprite> explain_; // アイテム説明
+	std::unique_ptr<Sprite> background_;
 	const Vector2 kSpriteSize = {80.0f, 80.0f};
 	const float kExplainScale = 0.2f;
+	const float kBackgroundScale = 1.2f;
 protected:
 	PassiveContext passiveCtx_;
 

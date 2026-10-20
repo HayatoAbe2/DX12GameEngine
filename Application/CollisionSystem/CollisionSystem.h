@@ -16,6 +16,7 @@ public:
 private:
 	// 弾マネージャ
 	BulletManager* bulletManager_;
+
 	// 敵マネージャ
 	EnemyManager* enemyManager_;
 

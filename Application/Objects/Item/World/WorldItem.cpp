@@ -62,6 +62,10 @@ WorldItem::~WorldItem() {
 	}
 }
 
+void WorldItem::Update() {
+
+}
+
 void WorldItem::Draw() {
 	if (isForSale_) {
 		auto& ctx = GameContext::GetInstance();

@@ -17,9 +17,9 @@ void ExtraAttack::OnEliminate(const Vector2& enemyPos, Character* self) {
 	data.knockback = 0.3f;
 	data.color = { 1.0f,0.0f,1.0f,0.8f };
 
-	int count = 8;
+	int count = 5;
 	for (int i = 0; i < count; i++) {
-		float angle = (2.0f * float(std::numbers::pi) / count) * i;
+		float angle = (2.0f * float(std::numbers::pi) / count) * i + float(std::numbers::pi) / 2.0f;
 		Vector2 shotDir = { cosf(angle), sinf(angle) };
 
 		// 弾生成

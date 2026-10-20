@@ -13,7 +13,7 @@ private:
 	const int maxComboInterval_ = 8;
 	int comboInterval_ = 7;
 
-	int weaponChangeTimer_ = 300;
+	int weaponChangeTimer_ = 200;
 	int weaponNum_ = 0;
 };
 

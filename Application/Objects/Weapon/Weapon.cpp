@@ -146,10 +146,10 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 
 		// BulletManagerの管理下に移動
 		bulletManager->AddBullet(std::move(bullet));
-
-		// 効果音
-		audio.SoundPlay(L"Resources/Sounds/SE/shoot.mp3", false);
 	}
+
+	// 効果音
+	audio.SoundPlay(L"Resources/Sounds/SE/shoot.mp3", false);
 
 	if (dynamic_cast<Enemy*>(from)) {
 		return data_.stats.shootCoolTime * 2;

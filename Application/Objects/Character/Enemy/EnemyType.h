@@ -1,10 +1,11 @@
 #pragma once
 
 enum class EnemyType {
-	Fly,
+	Fly = 0,
 	Golem,
 	Hedgehog,
-
-	elite1,
+	Hedgehog_Single,
+	
+	elite1 = 20,
 	elite2
 };

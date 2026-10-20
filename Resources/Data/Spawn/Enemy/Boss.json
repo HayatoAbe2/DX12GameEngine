@@ -1,7 +1,7 @@
 {
     "spawnRates": [
         {
-            "enemyType": 3,
+            "enemyType": 20,
             "weight": 1.0
         }
     ]

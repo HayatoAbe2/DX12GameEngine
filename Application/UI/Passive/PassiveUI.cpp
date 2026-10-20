@@ -19,6 +19,7 @@ void PassiveUI::Draw() {
 
 		if (CheckCollision(itemArea, ctx.Input().mouse.GetPosition())) {
 			equip[i]->GetExplain()->SetPosition(itemPos + kExplainOffset);
+			equip[i]->GetBackground()->SetPosition(itemPos + kExplainOffset);
 			equip[i]->DrawExplain();
 		}
 	}

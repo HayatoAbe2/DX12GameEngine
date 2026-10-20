@@ -14,7 +14,7 @@ Room* FloorGenerator::GenerateFloor(int maxDepth) {
 }
 
 void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
-	if (depth >= maxDepth) {
+	if (depth > maxDepth) {
 		return;
 	}
 

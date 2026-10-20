@@ -9,7 +9,7 @@ public:
 	WorldItem(Vector3 pos, Rarity rarity, bool isForSale = false);
 	virtual ~WorldItem();
 
-	virtual void Update() = 0;
+	virtual void Update();
 	virtual void Draw();
 
 	// 取得されたとき

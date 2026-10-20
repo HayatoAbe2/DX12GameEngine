@@ -53,6 +53,7 @@ public:
 	bool canErase_ = false;
 
 	// 無敵時間(ヒットした敵に一定時間当たらないリストに変更予定)
+	std::vector<Character*> hitTargets_;
 	Timer noHitTimer_;
 	float invinsibleTime_ = 0.15f;
 
