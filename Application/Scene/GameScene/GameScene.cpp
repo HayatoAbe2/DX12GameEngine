@@ -31,6 +31,9 @@ void GameScene::Initialize() {
 	// 弾
 	bulletManager_ = std::make_unique<BulletManager>();
 
+	// ダメージエリア
+	damageAreaManager_ = std::make_unique<DamageAreaManager>();
+
 	// 敵
 	enemyManager_ = std::make_unique<EnemyManager>(floorManager_.get());
 
@@ -52,7 +55,7 @@ void GameScene::Initialize() {
 	effectManager_->Initialize();
 
 	// 当たり判定
-	collisionSystem_ = std::make_unique<CollisionSystem>(effectManager_.get(), bulletManager_.get(), enemyManager_.get(), camera_.get());
+	collisionSystem_ = std::make_unique<CollisionSystem>(effectManager_.get(), bulletManager_.get(), damageAreaManager_.get(), enemyManager_.get(), camera_.get());
 
 	// フェード
 	fade_ = std::make_unique<Fade>();
@@ -137,7 +140,10 @@ void GameScene::Update() {
 				}
 
 				// 弾の処理
-				bulletManager_->Update(mapCheck_.get(), effectManager_.get());
+				bulletManager_->Update(mapCheck_.get(), effectManager_.get(), damageAreaManager_.get());
+
+				// ダメージエリア処理
+				damageAreaManager_->Update();
 				
 				// 衝突判定
 				collisionSystem_->Update(player_.get(), mapCheck_.get());

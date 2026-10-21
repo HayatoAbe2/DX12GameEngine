@@ -105,7 +105,7 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 		}
 	}
 
-	Vector2 shootPos = ToXZ(pos) + dir * (model_->GetTransform().scale.x) + Vector2{data_.bullet.radius, data_.bullet.radius};
+	Vector2 shootPos = ToXZ(pos) + dir * (model_->GetTransform().scale.x + data_.bullet.radius);
 
 	// 複数弾
 	if (data_.traits.multiShot && data_.traits.multiShot->count > 1) {

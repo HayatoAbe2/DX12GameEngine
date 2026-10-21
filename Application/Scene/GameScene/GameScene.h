@@ -61,6 +61,9 @@ private:
 	// 弾
 	std::unique_ptr<BulletManager> bulletManager_ = nullptr;
 
+	// ダメージエリア
+	std::unique_ptr<DamageAreaManager> damageAreaManager_ = nullptr;
+
 	// エフェクト
 	std::unique_ptr<EffectManager> effectManager_ = nullptr;
 

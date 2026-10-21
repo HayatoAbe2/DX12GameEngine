@@ -47,11 +47,11 @@ Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& d
 	particleField_->SetCheckArea(false);
 }
 
-void Bullet::Update(MapCheck* mapCheck, EffectManager* effectManager) {
+void Bullet::Update(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager) {
 	auto& ctx = GameContext::GetInstance();
 
 	if (!isDead_) {
-		Move(mapCheck, effectManager);
+		Move(mapCheck, effectManager, damageAreaManager);
 
 		lifeTime_--;
 		if (lifeTime_ <= 0) {
@@ -144,7 +144,7 @@ void Bullet::Hit() {
 	}
 }
 
-void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
+void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager) {
 	auto& ctx = GameContext::GetInstance();
 	prePos_ = collider_.center;
 
@@ -172,7 +172,7 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 		data_.traits.move.wave->time += ctx.GetDeltatime();
 
 		if (mapCheck->IsHitWall(collider_.center, collider_.radius)) {
-			OnHitWall(effectManager);
+			OnHitWall(effectManager, damageAreaManager);
 		}
 		return;
 	}
@@ -206,13 +206,13 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager) {
 	} else {
 		collider_.center += velocity_ * ctx.GetDeltatime();
 		if (mapCheck->IsHitWall(collider_.center, collider_.radius)) {
-			OnHitWall(effectManager);
+			OnHitWall(effectManager, damageAreaManager);
 		}
 
 	}
 }
 
-void Bullet::OnHitWall(EffectManager* effectManager) {
+void Bullet::OnHitWall(EffectManager* effectManager, DamageAreaManager* damageAreaManager) {
 	Hit();
 
 	// 仮処理(貫通が壁で消えないため)
@@ -220,11 +220,20 @@ void Bullet::OnHitWall(EffectManager* effectManager) {
 		isDead_ = true;
 	}
 
-	OnHitAnything(effectManager);
+	OnHitAnything(effectManager, damageAreaManager);
 }
 
-void Bullet::OnHitAnything(EffectManager* effectManager) {
+void Bullet::OnHitAnything(EffectManager* effectManager, DamageAreaManager* damageAreaManager) {
 	if (data_.traits.onHitAnything.explode) {
 		effectManager->SpawnExplodeEffect({ collider_.center.x, 0.5f, collider_.center.y });
+
+		DamageAreaParam param;
+		param.damage = data_.damage;
+		param.circle = { 3.0f, collider_.center };
+		if (isEnemyBullet_) {
+			damageAreaManager->AddArea(param, Team::Enemy);
+		} else {
+			damageAreaManager->AddArea(param, Team::Player);
+		}
 	}
 }

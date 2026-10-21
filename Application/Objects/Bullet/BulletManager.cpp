@@ -2,9 +2,9 @@
 #include "Map/MapCheck.h"
 #include "Bullet.h"
 
-void BulletManager::Update(MapCheck* mapCheck, EffectManager* effectManager) {
+void BulletManager::Update(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager) {
 	for (const auto& bullet : bullets_) {
-			bullet->Update(mapCheck, effectManager);
+			bullet->Update(mapCheck, effectManager, damageAreaManager);
 	}
 	bullets_.erase(
 		std::remove_if(bullets_.begin(), bullets_.end(),

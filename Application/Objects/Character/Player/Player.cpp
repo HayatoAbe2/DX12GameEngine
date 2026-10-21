@@ -17,6 +17,7 @@ Player::~Player() {
 
 void Player::Initialize(ItemManager* itemManager) {
 	itemManager_ = itemManager;
+	team_ = Team::Player;
 
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();

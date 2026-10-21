@@ -5,17 +5,26 @@
 class Player;
 class Camera;
 class BulletManager;
+class DamageAreaManager;
 class EffectManager;
 class MapCheck;
 
 class CollisionSystem {
 public:
-	CollisionSystem(EffectManager* effectManager, BulletManager* bulletManager, EnemyManager* enemyManager, Camera* camera);
+	CollisionSystem(
+		EffectManager* effectManager,
+		BulletManager* bulletManager,
+		DamageAreaManager* damageAreaManager,
+		EnemyManager* enemyManager,
+		Camera* camera);
 	void Update(Player* player, MapCheck* mapCheck);
 
 private:
 	// 弾マネージャ
 	BulletManager* bulletManager_;
+
+	// ダメージエリアマネージャ
+	DamageAreaManager* damageAreaManager_;
 
 	// 敵マネージャ
 	EnemyManager* enemyManager_;

@@ -275,6 +275,8 @@
     <ClCompile Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.cpp" />
     <ClCompile Include="Application\UI\Passive\PassiveUI.cpp" />
     <ClCompile Include="Application\Effect\Charge\ChargeEffect.cpp" />
+    <ClCompile Include="Application\Objects\DamageArea\DamageArea.cpp" />
+    <ClCompile Include="Application\Objects\DamageArea\DamageAreaManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -614,6 +616,8 @@
     <ClInclude Include="Application\Objects\Item\World\Interactable.h" />
     <ClInclude Include="Application\UI\Passive\PassiveUI.h" />
     <ClInclude Include="Application\Effect\Charge\ChargeEffect.h" />
+    <ClInclude Include="Application\Objects\DamageArea\DamageArea.h" />
+    <ClInclude Include="Application\Objects\DamageArea\DamageAreaManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

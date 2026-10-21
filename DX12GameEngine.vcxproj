@@ -173,6 +173,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\CollisionSystem\CollisionSystem.cpp" />
     <ClCompile Include="Application\Objects\Item\World\Chest\Chest.cpp" />
     <ClCompile Include="Application\Effect\Charge\ChargeEffect.cpp" />
+    <ClCompile Include="Application\Objects\DamageArea\DamageArea.cpp" />
+    <ClCompile Include="Application\Objects\DamageArea\DamageAreaManager.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -477,6 +479,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
     <ClInclude Include="Application\Objects\Item\World\Chest\Chest.h" />
     <ClInclude Include="Application\Effect\Charge\ChargeEffect.h" />
+    <ClInclude Include="Application\Objects\DamageArea\DamageArea.h" />
+    <ClInclude Include="Application\Objects\DamageArea\DamageAreaManager.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />

@@ -7,7 +7,7 @@ class EffectManager;
 
 class BulletManager {
 public:
-	void Update(MapCheck* mapCheck, EffectManager* effectManager);
+	void Update(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 	void Draw(Camera* camera);
 	void Reset();
 

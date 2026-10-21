@@ -4,6 +4,7 @@
 #include <memory>
 #include <Timer/Timer.h>
 #include "Effect/EffectManager.h"
+#include "Objects/DamageArea/DamageAreaManager.h"
 #include <Objects/Character/Character.h>
 
 class MapCheck;
@@ -12,7 +13,7 @@ class Bullet {
 public:
 	Bullet(const Vector2& pos, const Vector2& direction, const BulletData& data, Character* from);
 	~Bullet() = default;
-	void Update(MapCheck* mapCheck, EffectManager* effectManager);
+	void Update(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 	void Draw(Camera* camera);
 	void Hit();
 
@@ -27,10 +28,10 @@ public:
 	bool CanHit() { return noHitTimer_.IsFinished(); }
 
 public:
-	void Move(MapCheck* mapCheck, EffectManager* effectManager);
+	void Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 
-	void OnHitWall(EffectManager* effectManager);
-	void OnHitAnything(EffectManager* effectManager);
+	void OnHitWall(EffectManager* effectManager, DamageAreaManager* damageAreaManager);
+	void OnHitAnything(EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 
 	// 弾ステータス
 	BulletData data_;

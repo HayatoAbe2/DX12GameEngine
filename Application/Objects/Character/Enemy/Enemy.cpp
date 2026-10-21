@@ -16,6 +16,7 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	hp_ = status_.hp;
 	radius_ = status_.radius;
 	canFly_ = status_.canFly;
+	team_ = Team::Enemy;
 
 	model_ = std::move(model);
 	model_->SetTranslate(pos);

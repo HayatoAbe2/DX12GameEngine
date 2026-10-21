@@ -1,15 +1,18 @@
 #include "CollisionSystem.h"
 #include "Objects/Bullet/BulletManager.h"
 #include "Objects/Character/Player/Player.h"
+#include "Objects/DamageArea/DamageAreaManager.h"
 #include "Objects/Character/Enemy/EnemyManager/EnemyManager.h"
 #include "Objects/Character/Enemy/Enemies/Spiker.h"
 #include "Map/MapCheck.h"
 
-CollisionSystem::CollisionSystem(EffectManager* effectManager, BulletManager* bulletManager, EnemyManager* enemyManager, Camera* camera) {
+CollisionSystem::CollisionSystem(EffectManager* effectManager, BulletManager* bulletManager,
+	DamageAreaManager* damageAreaManager, EnemyManager* enemyManager, Camera* camera) {
 	collisionChecker_ = std::make_unique<CollisionChecker>();
-	collisionChecker_->Initialize(effectManager, camera);
+	collisionChecker_->Initialize(effectManager, damageAreaManager, camera);
 
 	bulletManager_ = bulletManager;
+	damageAreaManager_ = damageAreaManager;
 	enemyManager_ = enemyManager;
 }
 
@@ -21,6 +24,16 @@ void CollisionSystem::Update(Player* player, MapCheck* mapCheck) {
 		for (auto enemy : enemyManager_->GetEnemies()) {
 			// 敵と自弾
 			collisionChecker_->CheckEnemy(enemy, bullet, player);
+		}
+	}
+
+	for (auto area : damageAreaManager_->GetAreas()) {
+		// プレイヤーと敵弾
+		collisionChecker_->CheckPlayer(player, area);
+
+		for (auto enemy : enemyManager_->GetEnemies()) {
+			// 敵と自弾
+			collisionChecker_->CheckEnemy(enemy, area, player);
 		}
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "GameCommon.h"
+#include "Objects/Weapon/ShooterInfo/ShooterInfo.h"
 #include "Timer/Timer.h"
 
 class Character {
@@ -17,6 +18,9 @@ public:
 
 	// 重さ
 	float GetWeight() const { return weight_; }
+
+	// チーム
+	Team GetTeam() const { return team_; }
 
 	// HP
 	float GetHP() { return hp_; }
@@ -56,6 +60,9 @@ protected:
 
 	// 重さ
 	float weight_ = 10;
+
+	// チーム
+	Team team_;
 
 	// hp
 	float hp_ = 100;
