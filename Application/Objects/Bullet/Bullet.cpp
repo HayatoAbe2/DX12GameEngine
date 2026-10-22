@@ -79,6 +79,7 @@ void Bullet::Draw(Camera* camera) {
 			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
 			ctx.RandomFloat(-particleRange_ / 2.0f, particleRange_ / 2.0f),
 			};
+
 			Transform transform = {
 				Vector3{data_.radius,data_.radius,data_.radius} * 2.0f,
 				{0,0,0},

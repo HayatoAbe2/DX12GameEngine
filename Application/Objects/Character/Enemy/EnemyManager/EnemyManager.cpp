@@ -133,10 +133,10 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyT
 		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "knight2.obj");
 		enemyModel->SetTranslate(pos);
 		enemyShadowModel->SetTranslate(pos);
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::Pistol)));
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::Pistol)));
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::Fireball)));
-		status.hp = 150;
+		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::ThreeWay)));
+		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::FourWay)));
+		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::LargeFireball)));
+		status.hp = 200;
 		status.radius = 1.5f;
 		status.moveSpeed = 3.5f;
 		status.defaultSearchRadius = 100.0f;

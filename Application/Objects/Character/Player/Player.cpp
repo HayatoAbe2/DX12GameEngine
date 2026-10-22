@@ -223,6 +223,10 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	for (int i = 0; i < 2; ++i) {
 		instancing_[i]->Update();
 	}
+
+	if (hp_ <= 0.0f) {
+		isDead_ = true;
+	}
 }
 
 void Player::Draw(Camera* camera) {

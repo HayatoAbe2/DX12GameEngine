@@ -35,6 +35,8 @@ private:
 	std::unique_ptr<Sprite> lifeBack_ = nullptr;
 	float whiteLife_ = 0;
 	float whiteGaugeSpeed_ = 0.5f;
+	// 数値
+	std::array<std::unique_ptr<Sprite>, 4> numbers_;
 
 	std::unique_ptr<EquipmentUI> equipment_;
 	// 弾数

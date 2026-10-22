@@ -27,9 +27,12 @@ public:
 	};
 
 	enum class ENEMYATTACK {
-		Fireball, 
+		Fireball,
 		AssaultRifle,
 		Pistol,
+		ThreeWay,
+		FourWay,
+		LargeFireball,
 
 		Count
 	};
@@ -56,9 +59,12 @@ private:
 	};
 
 	const std::string EnemyAttackNames[(int)ENEMYATTACK::Count]{
-	"Fireball",
-	"AssaultRifle",
-	"Pistol"
+		"Fireball",
+		"AssaultRifle",
+		"Pistol",
+		"3way",
+		"4way",
+		"LargeFireball"
 	};
 };
 

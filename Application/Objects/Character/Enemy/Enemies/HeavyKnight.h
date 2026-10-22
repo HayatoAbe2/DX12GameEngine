@@ -8,12 +8,12 @@ public:
 	void Attack(BulletManager* bulletManager, const Vector2& dir) override;
 
 private:
-	const int maxCombo_ = 8;
+	const int maxCombo_ = 4;
 	int comboCount_ = 0;
-	const int maxComboInterval_ = 8;
-	int comboInterval_ = 7;
+	const int maxComboInterval_ = 15;
+	int comboInterval_ = 15;
 
-	int weaponChangeTimer_ = 200;
+	int weaponChangeTimer_ = 60;
 	int weaponNum_ = 0;
 };
 

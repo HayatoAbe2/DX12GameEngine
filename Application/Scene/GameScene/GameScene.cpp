@@ -16,7 +16,8 @@ void GameScene::Initialize() {
 	LoadSound();
 
 	// Skybox
-	skybox_ = asset.LoadTexture("Resources/Images/Background/background.dds");
+	// skybox_ = asset.LoadTexture("Resources/Images/Background/background.dds");
+	skybox_ = asset.LoadTexture("Resources/Debug/Sky/skybox.dds");
 
 	// タイル
 	mapTile_ = std::make_unique<MapTile>();
@@ -327,6 +328,6 @@ void GameScene::LoadSound() {
 	audio.SoundLoad(L"Resources/Sounds/SE/warp.mp3");
 	audio.SoundLoad(L"Resources/Sounds/SE/hit.mp3");
 
-	audio.SoundLoad(L"Resources/Sounds/BGM/field.mp3");
-	audio.SoundPlay(L"Resources/Sounds/BGM/field.mp3", true);
+	audio.SoundLoad(L"Resources/Sounds/BGM/title.mp3");
+	audio.SoundPlay(L"Resources/Sounds/BGM/title.mp3", true, 0.7f);
 }
