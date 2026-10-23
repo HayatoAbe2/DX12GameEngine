@@ -103,7 +103,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 					map_[y][x] = Tile::Goal;
 				}
 
-				auto& spotLight = light.GetSpotLight(lightIndex_);
+				auto& spotLight = light.GetSpotLight(lightIndex_); 
 				spotLight.position = t.translate + Vector3{ 0.0f,3.0f,0.0f };
 				spotLight.direction = { 0,-1.0f,0 };
 				spotLight.intensity = 1.0f;

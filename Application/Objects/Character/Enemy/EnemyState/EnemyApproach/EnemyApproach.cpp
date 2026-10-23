@@ -27,7 +27,7 @@ void EnemyApproach::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bul
 				enemy->SetTransform(transform);
 			}
 		} else {
-			enemy->SetState(std::move(std::make_unique<EnemyAttack>()));
+			enemy->SetState(std::make_unique<EnemyAttack>());
 			return;
 		}
 	}

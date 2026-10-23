@@ -68,6 +68,7 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyT
 		enemyModel->SetTranslate(pos);
 		enemyShadowModel->SetTranslate(pos);
 		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::Fireball)));
+
 		status.hp = 10;
 		status.radius = 0.5f;
 		status.moveSpeed = 5.5f;

@@ -37,7 +37,7 @@ public:
 
 	EnemyStatus GetStatus() const { return status_; }
 
-	void SetState(std::unique_ptr<EnemyState> state) { currentState_ = std::move(state); }
+	void SetState(std::unique_ptr<EnemyState> state) { nextState_ = std::move(state); }
 	bool IsAttacking() { return isAttacking_; }
 	Weapon* GetCurrentWeapon() { return currentWeapon_; }
 	Timer* GetAttackTimer() { return attackCoolTimer_.get(); }
@@ -80,6 +80,7 @@ protected:
 
 	// 行動状態
 	std::unique_ptr<EnemyState> currentState_ = nullptr;
+	std::unique_ptr<EnemyState> nextState_ = nullptr;
 
 	// 攻撃中
 	bool isAttacking_ = false;
