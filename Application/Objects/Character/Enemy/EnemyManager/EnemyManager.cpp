@@ -14,6 +14,10 @@
 #include "Engine/SceneObject/SceneObject.h"
 #include "Objects/Item/ItemManager.h"
 
+#include <fstream>
+#include <cassert>
+#include <Externals/nlohmann/json.hpp>
+
 void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager) {
 	for (const auto& enemy : activeEnemies_) {
 		enemy->Update(mapCheck, player, bulletManager);
@@ -49,6 +53,30 @@ void EnemyManager::Spawn(std::vector<std::unique_ptr<Enemy>> enemy) {
 	// 控えの敵を出現させる
 	for (auto& e : enemy) {
 		activeEnemies_.push_back(std::move(e));
+	}
+}
+
+
+static std::string GetEnemyDataKey(EnemyType type) {
+	// ファイル内での敵名
+	switch (type) {
+	case EnemyType::Fly:
+		return "Fly";
+
+	case EnemyType::Golem:
+		return "Golem";
+
+	case EnemyType::Hedgehog_Single:
+		return "Hedgehog_Single";
+
+	case EnemyType::elite1:
+		return "elite1";
+
+	case EnemyType::elite2:
+		return "elite2";
+
+	default:
+		return "Hedgehog_Group";
 	}
 }
 
@@ -127,7 +155,7 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyT
 
 		enemies.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), spawnPos, status, std::move(weapons)));
 	}
-		break;
+	break;
 	case EnemyType::elite1:
 	{
 		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "knight2.obj");
@@ -206,6 +234,8 @@ void EnemyManager::Reset() {
 }
 
 void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
+	LoadEnemyData();
+
 	isSpawned_.clear();
 	spawnArea_.clear();
 	spawnPos_.clear();
@@ -280,7 +310,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 void EnemyManager::SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck) {
 	auto& ctx = GameContext::GetInstance();
 
-	for (int i = 0; i < spawnArea_.size(); ++i)
+	for (int i = 0; i < spawnArea_.size(); ++i) {
 		for (int j = 0; j < isSpawned_.size(); ++j) {
 			if (!isSpawned_[j]) {
 				// 入ったら出現
@@ -294,6 +324,7 @@ void EnemyManager::SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck) {
 				}
 			}
 		}
+	}
 }
 
 std::vector<Enemy*> EnemyManager::GetEnemies() {
@@ -303,4 +334,42 @@ std::vector<Enemy*> EnemyManager::GetEnemies() {
 		result.push_back(e.get());
 	}
 	return result;
+}
+
+void EnemyManager::LoadEnemyData() {
+	const std::string path = "Resources/Data/Enemies/Enemies.json";
+	std::ifstream file(path);
+
+	nlohmann::json j;
+	file >> j;
+
+	enemyDataMap_.clear();
+
+	for (const auto& [name, data] : j.items()) {
+		EnemyData enemy{};
+
+		enemy.modelName = data.at("modelName").get<std::string>();
+		enemy.animationIndex = data.value("animationIndex", -1);
+
+		enemy.hp = data.at("hp").get<int>();
+		enemy.radius = data.at("radius").get<float>();
+		enemy.moveSpeed = data.at("moveSpeed").get<float>();
+		enemy.defaultSearchRadius =
+			data.at("defaultSearchRadius").get<float>();
+		enemy.stunResist = data.at("stunResist").get<int>();
+		enemy.canFly = data.at("canFly").get<bool>();
+		enemy.attackRadius = data.at("attackRadius").get<float>();
+
+		if (data.contains("weapons")) {
+			enemy.weapons = data.at("weapons").get<std::vector<std::string>>();
+		}
+
+		if (data.contains("spawnCount")) {
+			const auto& count = data.at("spawnCount");
+			enemy.minSpawnCount = count.value("min", 1);
+			enemy.maxSpawnCount = count.value("max", 1);
+		}
+
+		enemyDataMap_.emplace(name, std::move(enemy));
+	}
 }

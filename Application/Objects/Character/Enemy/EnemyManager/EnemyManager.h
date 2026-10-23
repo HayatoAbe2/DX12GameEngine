@@ -24,6 +24,8 @@ public:
 
 	std::vector<Enemy*> GetEnemies();
 private:
+	void LoadEnemyData();
+
 	FloorManager* floorManager_ = nullptr;
 
 	std::vector<std::unique_ptr<Enemy>> activeEnemies_ = {};
@@ -34,5 +36,8 @@ private:
 	std::vector<bool> isSpawned_;
 	std::vector<AABB2D> spawnArea_;
 	std::vector<Vector2> spawnPos_;
+
+	// 敵データ
+	std::unordered_map<std::string, EnemyData> enemyDataMap_;
 };
 

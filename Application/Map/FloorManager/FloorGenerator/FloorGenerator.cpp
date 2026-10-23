@@ -1,4 +1,5 @@
 #include "FloorGenerator.h"
+#include "Map/FloorSetting.h" 
 
 Room* FloorGenerator::GenerateFloor(int maxDepth) {
 	// 最初の部屋
@@ -24,11 +25,11 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 		if (depth >= maxDepth) {
 			// 最後はゴール部屋
 			next.type = RoomType::Goal;
-		} else if (depth == 1) {
+		} else if (depth == kStartFloorNumber) {
 			next.type = RoomType::Combat;
-		} else if (depth == 5) {
+		} else if (depth == kRestFloorNumber) {
 			next.type = RoomType::Shop;
-		} else if (depth == 9) {
+		} else if (depth == kGoalFloorNumber - 1) {
 			next.type = RoomType::Boss;
 		} else {
 			auto& ctx = GameContext::GetInstance();

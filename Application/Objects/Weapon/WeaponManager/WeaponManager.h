@@ -10,6 +10,7 @@ public:
 
 	std::unique_ptr<Weapon> GetWeapon(int index, Rarity rarity = Rarity::Common);
 	std::unique_ptr<Weapon> GetEnemyAttack(int index);
+	std::unique_ptr<Weapon> GetEnemyAttack(const std::string& name);
 
 	enum class WEAPON {
 		Pistol,
@@ -36,6 +37,7 @@ public:
 
 		Count
 	};
+
 
 private:
 

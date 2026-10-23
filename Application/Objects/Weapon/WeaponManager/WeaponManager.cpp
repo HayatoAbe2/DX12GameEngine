@@ -67,6 +67,30 @@ std::unique_ptr<Weapon> WeaponManager::GetEnemyAttack(int index) {
 	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
 }
 
+
+std::unique_ptr<Weapon> WeaponManager::GetEnemyAttack(const std::string& name) {
+	auto& ctx = GameContext::GetInstance();
+	auto& asset = ctx.Asset();
+
+	// JSONのキーと同じ名前
+	const std::string key = name + "_Enemy";
+
+	auto it = enemyAttackDataMap.find(key);
+	WeaponData data = it->second;
+
+	auto model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	auto shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+
+	MaterialData matData = model->GetMaterial(0)->GetData();
+	matData.color = { 0.2f, 0.2f, 0.2f, 1.0f };
+
+	model->GetMaterial(0)->SetData(matData);
+	model->GetMaterial(1)->SetData(matData);
+
+	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
+}
+
+
 void WeaponManager::LoadJson(const std::string& path, bool isEnemyAttack) {
 	std::ifstream file(path);
 	assert(file.is_open());

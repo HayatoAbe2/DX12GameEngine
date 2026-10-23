@@ -1,4 +1,5 @@
 #include "RandomSettings.h"
+#include "Map/FloorSetting.h"
 #include "GameCommon.h"
 
 RandomSettings::RandomSettings() {
@@ -12,9 +13,9 @@ void RandomSettings::Update() {
 }
 
 EnemyType RandomSettings::SelectEnemy(int depth) {
-	if (depth == 9) {
+	if (depth == kBossFloorNumber) {
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Boss.json");
-	} else if (depth >= 1 && depth <= 3) {
+	} else if (depth <= kEarlyFloorNumber) {
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/First.json");
 	}else{
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Standard.json");

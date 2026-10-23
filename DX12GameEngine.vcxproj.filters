@@ -618,6 +618,7 @@
     <ClInclude Include="Application\Effect\Charge\ChargeEffect.h" />
     <ClInclude Include="Application\Objects\DamageArea\DamageArea.h" />
     <ClInclude Include="Application\Objects\DamageArea\DamageAreaManager.h" />
+    <ClInclude Include="Application\Map\FloorSetting.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

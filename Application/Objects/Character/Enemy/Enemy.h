@@ -10,6 +10,24 @@
 class MapCheck;
 class Player;
 
+struct EnemyData {
+	std::string modelName;
+	int animationIndex = -1;
+
+	int hp = 0;
+	float radius = 0.5f;
+	float moveSpeed = 0.0f;
+	float defaultSearchRadius = 100.0f;
+	int stunResist = 0;
+	bool canFly = false;
+	float attackRadius = -1.0f;
+
+	std::vector<std::string> weapons;
+
+	int minSpawnCount = 1;
+	int maxSpawnCount = 1;
+};
+
 class Enemy : public Character {
 public:
 	virtual ~Enemy() = default;

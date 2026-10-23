@@ -1,0 +1,110 @@
+
+{
+    "Fly": {
+        "modelName": "Dragon.glb",
+        "animationIndex": 2,
+        "hp": 10,
+        "radius": 0.5,
+        "moveSpeed": 5.5,
+        "defaultSearchRadius": 100.0,
+        "stunResist": 0,
+        "canFly": true,
+        "attackRadius": 9.0,
+        "weapons": [
+            "Fireball"
+        ],
+        "spawnCount": {
+            "min": 1,
+            "max": 1
+        }
+    },
+    "Golem": {
+        "modelName": "knight.obj",
+        "animationIndex": -1,
+        "hp": 23,
+        "radius": 0.9,
+        "moveSpeed": 1.5,
+        "defaultSearchRadius": 100.0,
+        "stunResist": 2,
+        "canFly": false,
+        "attackRadius": 9.0,
+        "weapons": [
+            "Pistol"
+        ],
+        "spawnCount": {
+            "min": 1,
+            "max": 1
+        }
+    },
+    "Hedgehog_Single": {
+        "modelName": "hedgehog.glb",
+        "animationIndex": 2,
+        "hp": 5,
+        "radius": 0.5,
+        "moveSpeed": 3.5,
+        "defaultSearchRadius": 100.0,
+        "stunResist": 0,
+        "canFly": false,
+        "attackRadius": -1.0,
+        "weapons": [],
+        "spawnCount": {
+            "min": 1,
+            "max": 1
+        }
+    },
+    "elite1": {
+        "modelName": "knight2.obj",
+        "animationIndex": -1,
+        "hp": 200,
+        "radius": 1.5,
+        "moveSpeed": 3.5,
+        "defaultSearchRadius": 100.0,
+        "stunResist": 30,
+        "canFly": false,
+        "attackRadius": 9.0,
+        "weapons": [
+            "ThreeWay",
+            "FourWay",
+            "LargeFireball"
+        ],
+        "spawnCount": {
+            "min": 1,
+            "max": 1
+        }
+    },
+    "elite2": {
+        "modelName": "bat2.obj",
+        "animationIndex": -1,
+        "hp": 110,
+        "radius": 0.75,
+        "moveSpeed": 7.0,
+        "defaultSearchRadius": 100.0,
+        "stunResist": 30,
+        "canFly": true,
+        "attackRadius": 9.0,
+        "weapons": [
+            "Fireball",
+            "AssaultRifle"
+        ],
+        "spawnCount": {
+            "min": 1,
+            "max": 1
+        }
+    },
+    "Hedgehog_Group": {
+        "modelName": "hedgehog.glb",
+        "animationIndex": 2,
+        "hp": 5,
+        "radius": 0.5,
+        "moveSpeed": 3.5,
+        "defaultSearchRadius": 100.0,
+        "stunResist": 0,
+        "canFly": false,
+        "attackRadius": -1.0,
+        "weapons": [],
+        "spawnCount": {
+            "min": 2,
+            "max": 4
+        }
+    }
+}
