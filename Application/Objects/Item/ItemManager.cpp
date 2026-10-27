@@ -18,11 +18,11 @@ void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyMa
 	auto& asset = ctx.Asset();
 
 	// 操作
-	controlKey_ = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
+	controlKey_ = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.dds");
 	controlKey_->SetSize({ 64,64 });
 	controlKey_->SetPosition({ 640 - 32,720 - 460 });
 	controlKey_->SetTextureRect(0, 64 * 9, 64, 64);
-	controlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.png");
+	controlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.dds");
 	controlPad_->SetSize({ 64,64 });
 	controlPad_->SetPosition({ 640 - 32,720 - 460 });
 	controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);

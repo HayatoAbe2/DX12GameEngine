@@ -42,6 +42,7 @@ public:
 
 private:
 	void LoadSound();
+	void SpawnForDebug(); // デバッグ用アイテム出現
 
 	enum class Phase {
 		GAME,

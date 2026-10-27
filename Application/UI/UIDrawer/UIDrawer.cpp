@@ -28,11 +28,11 @@ void UIDrawer::Initialize(Player* player, FloorManager* floorManager) {
 
 #pragma endregion
 
-	dodgeControlKey_ = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
+	dodgeControlKey_ = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.dds");
 	dodgeControlKey_->SetSize(dodgeControlUIData_.size);
 	dodgeControlKey_->SetPosition(dodgeControlUIData_.pos);
 	dodgeControlKey_->SetTextureRect(64 * 16, 64 * 4, 64, 64);
-	dodgeControlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.png");
+	dodgeControlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.dds");
 	dodgeControlPad_->SetSize(dodgeControlUIData_.size);
 	dodgeControlPad_->SetPosition(dodgeControlUIData_.pos);
 	dodgeControlPad_->SetTextureRect(64 * 6, 64 * 8, 64, 64);

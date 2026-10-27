@@ -10,6 +10,7 @@
 #include "Objects/Item/Passive/Reload/ReloadBoost.h"
 #include "Objects/Item/Passive/Lightning/Lightning.h"
 #include "UI/Money/MoneyUI.h"
+#include "Controller.h"
 
 Player::~Player() {
 
@@ -163,7 +164,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 		if (weapon_) {
 
 
-			if (input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > 0.2f) {
+			if (input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > kTriggerThreshold) {
 				weapon_->Update(transform_.translate, attackDirection_, bulletManager, this, true);
 			} else {
 				weapon_->Update(transform_.translate, attackDirection_, bulletManager, this, false);
@@ -350,7 +351,7 @@ void Player::Move(MapCheck* mapCheck) {
 	Vector2 dir = { 0,0 };
 
 	// 移動
-	if (Length(input.gamepad.GetLeftStick()) > 0.3f) {
+	if (Length(input.gamepad.GetLeftStick()) > kStickDeadzone) {
 		dir.x = input.gamepad.GetLeftStick().x;
 		dir.y = -input.gamepad.GetLeftStick().y;
 	}
@@ -371,7 +372,7 @@ void Player::Move(MapCheck* mapCheck) {
 		dir.y = 1;
 	}
 
-	if (input.mouse.IsPress(MouseButton::Right) || input.gamepad.GetLTrigger() > 0.2f) {
+	if (input.mouse.IsPress(MouseButton::Right) || input.gamepad.GetLTrigger() > kTriggerThreshold) {
 		model_->ChangeAnimation(sneak_, 0.15f);
 		moveSpeed_ /= 2.0f;
 		for (int i = 0; i < 2; ++i) {

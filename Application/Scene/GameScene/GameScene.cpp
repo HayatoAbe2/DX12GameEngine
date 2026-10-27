@@ -16,7 +16,6 @@ void GameScene::Initialize() {
 	LoadSound();
 
 	// Skybox
-	// skybox_ = asset.LoadTexture("Resources/Images/Background/background.dds");
 	skybox_ = asset.LoadTexture("Resources/Debug/Sky/skybox.dds");
 
 	// タイル
@@ -245,39 +244,7 @@ void GameScene::Draw() {
 	fade_->Draw();
 
 #ifdef USE_IMGUI
-	ImGui::Begin("Weapon");
-	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
-	if (ImGui::Button("Pistol")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
-	};
-	if (ImGui::Button("AssaultRifle")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 1);
-	};
-	if (ImGui::Button("Shotgun")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 2);
-	};
-	if (ImGui::Button("Flame")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 3);
-	};
-	if (ImGui::Button("Wave")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 4);
-	};
-	if (ImGui::Button("Orbit")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 5);
-	};
-	if (ImGui::Button("Charge")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 6);
-	};
-	if (ImGui::Button("Accel")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 7);
-	};
-	if (ImGui::Button("Sniper")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 8);
-	};
-	if (ImGui::Button("Burst")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 9);
-	};
-	ImGui::End();
+	SpawnForDebug();
 
 	ImGui::Begin("Camera");
 	ImGui::DragFloat3("Pos", &camera_->transform_.translate.x, 0.5f);
@@ -330,4 +297,49 @@ void GameScene::LoadSound() {
 
 	audio.SoundLoad(L"Resources/Sounds/BGM/title.mp3");
 	audio.SoundPlay(L"Resources/Sounds/BGM/title.mp3", true, 0.7f);
+}
+
+void GameScene::SpawnForDebug() {
+#ifdef USE_IMGUI
+	ImGui::Begin("Weapon");
+	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
+	if (ImGui::Button("Pistol")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
+	};
+	if (ImGui::Button("AssaultRifle")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 1);
+	};
+	if (ImGui::Button("Shotgun")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 2);
+	};
+	if (ImGui::Button("Flame")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 3);
+	};
+	if (ImGui::Button("Wave")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 4);
+	};
+	if (ImGui::Button("Orbit")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 5);
+	};
+	if (ImGui::Button("Charge")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 6);
+	};
+	if (ImGui::Button("Accel")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 7);
+	};
+	if (ImGui::Button("Sniper")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 8);
+	};
+	if (ImGui::Button("Burst")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 9);
+	};
+	ImGui::End();
+
+	ImGui::Begin("Weapon");
+	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
+	if (ImGui::Button("Pistol")) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
+	};
+	ImGui::End();
+#endif
 }

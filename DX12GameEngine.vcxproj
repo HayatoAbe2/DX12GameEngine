@@ -463,6 +463,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Controller.h" />
     <ClInclude Include="Application\Map\FloorSetting.h" />
     <ClInclude Include="Application\Objects\Character\Character.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />

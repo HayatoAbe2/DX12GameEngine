@@ -13,7 +13,7 @@ void RandomSettings::Update() {
 }
 
 EnemyType RandomSettings::SelectEnemy(int depth) {
-	if (depth == kBossFloorNumber) {
+	if (depth == kBossFloorNumber) { 
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Boss.json");
 	} else if (depth <= kEarlyFloorNumber) {
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/First.json");

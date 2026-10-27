@@ -3,7 +3,7 @@
 
 SceneManager::SceneManager() {
 	sceneFactory_ = std::make_unique<SceneFactory>();
-	currentScene_ = sceneFactory_->CreateScene("Game");
+	currentScene_ = sceneFactory_->CreateScene("Title");
 }
 
 void SceneManager::Initialize() {

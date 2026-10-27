@@ -24,19 +24,19 @@ void EquipmentUI::Initialize(Player* player) {
 	equipment2_ = equipShotgun_.get();
 
 	// 操作
-	shootUIKey = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
+	shootUIKey = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.dds");
 	shootUIKey->SetSize(shootUIData_.size);
 	shootUIKey->SetPosition(shootUIData_.pos);
 	shootUIKey->SetTextureRect(64 * 14, 64 * 2, 64, 64);
-	swapUIKey = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.png");
+	swapUIKey = asset.LoadSprite("Resources/Images/Control/KeyboardAndMouse.dds");
 	swapUIKey->SetSize(swapUIData_.size);
 	swapUIKey->SetPosition(swapUIData_.pos);
 	swapUIKey->SetTextureRect(64 * 5, 64 * 3, 64, 64);
-	shootUIPad = asset.LoadSprite("Resources/Images/Control/XboxController.png");
+	shootUIPad = asset.LoadSprite("Resources/Images/Control/XboxController.dds");
 	shootUIPad->SetSize(shootUIData_.size);
 	shootUIPad->SetPosition(shootUIData_.pos);
 	shootUIPad->SetTextureRect(64 * 7, 64 * 2, 64, 64);
-	swapUIPad = asset.LoadSprite("Resources/Images/Control/XboxController.png");
+	swapUIPad = asset.LoadSprite("Resources/Images/Control/XboxController.dds");
 	swapUIPad->SetSize(swapUIData_.size);
 	swapUIPad->SetPosition(swapUIData_.pos);
 	swapUIPad->SetTextureRect(64 * 4, 64 * 8, 64, 64);

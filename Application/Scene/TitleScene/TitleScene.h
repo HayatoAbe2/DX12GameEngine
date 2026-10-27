@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Scene/BaseScene/BaseScene.h"
-
+#include "Timer/Timer.h"
+#include "Fade/Fade.h"
 #include <memory>
 
 class Renderer;
@@ -23,22 +24,25 @@ public:
 private:
 	std::shared_ptr<Texture> skybox_ = nullptr;
 
+	std::unique_ptr<Fade> fade_ = nullptr;
+
 	// スプライト
-	std::unique_ptr<Sprite> fade_ = nullptr;
-	std::unique_ptr<Sprite> control_ = nullptr;
 	std::unique_ptr<Sprite> logo_ = nullptr;
+	Vector2 kLogoOffset = { 0, -80 };
+	Vector2 kLogoSize = { 400, 237 };
+	std::unique_ptr<Sprite> control_ = nullptr;
+	Vector2 kControlOffset = { 0, 100 };
+	Vector2 kControlSize = { 1300 * 0.5f, 250 * 0.5f };
 
 	// カメラ
 	std::unique_ptr<Camera> camera_ = nullptr;
 	float cameraDistance_ = 20.0f;
+	Vector3 kCameraPos = { 0,30,-19 };
+	Vector3 kCameraRot = { 1.0f,0.0f,0.0f };
 
 	// デバッグカメラ
 	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
 
-	// フェード
-	bool isFadeIn_ = true;
-	bool isFadeOut_ = false;
-	int fadeTimer_ = 0;
-	const int kMaxFadeinTimer_ = 30;
-	const int kMaxFadeoutTimer_ = 30;
+	// タイマー
+	Timer sceneChangeTimer_;
 };
