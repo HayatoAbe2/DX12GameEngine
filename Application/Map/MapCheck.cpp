@@ -3,12 +3,12 @@
 #include "Objects/Character/Player/Player.h"
 #include <algorithm>
 
-void MapCheck::Initialize(std::vector<std::vector<MapTile::Tile>> map, float tileSize) {
+void MapCheck::Initialize(std::vector<std::vector<Tile>> map, float tileSize) {
 	map_ = map;
 	tileSize_ = tileSize;
 }
 
-void MapCheck::Update(std::vector<std::vector<MapTile::Tile>> map) {
+void MapCheck::Update(std::vector<std::vector<Tile>> map) {
 	map_ = map;
 
 	auto& ctx = GameContext::GetInstance();
@@ -70,8 +70,8 @@ bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
-			if (map_[y][x] == MapTile::Tile::Floor) continue;
-			if (map_[y][x] == MapTile::Tile::None) {
+			if (map_[y][x] == Tile::Floor) continue;
+			if (map_[y][x] == Tile::None) {
 				if (isFlying) { continue; }
 
 				// 中心で判定
@@ -80,7 +80,7 @@ bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 				charMinY = pos.y - 0.1f;
 				charMaxY = pos.y + 0.1f;
 			}
-			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
+			if (!isCombat_ && map_[y][x] == Tile::CombatWall) continue;
 
 			// タイルAABB
 			float tileCenterX = (x - mapW / 2) * tileSize_;
@@ -139,8 +139,8 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
-			if (map_[y][x] == MapTile::Tile::Floor) continue;
-			if (map_[y][x] == MapTile::Tile::None) {
+			if (map_[y][x] == Tile::Floor) continue;
+			if (map_[y][x] == Tile::None) {
 				if (isFlying) { continue; }
 
 				// 中心で判定
@@ -149,7 +149,7 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 				charMinY = pos.y - 0.1f;
 				charMaxY = pos.y + 0.1f;
 			}
-			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
+			if (!isCombat_ && map_[y][x] == Tile::CombatWall) continue;
 
 			float tileCenterX = (x - mapW / 2) * tileSize_;
 			float tileCenterY = (y - mapH / 2) * tileSize_;
@@ -209,9 +209,9 @@ bool MapCheck::IsHitWall(const Vector2& pos, float radius) {
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
-			if (map_[y][x] == MapTile::Tile::Floor) continue;
-			if (map_[y][x] == MapTile::Tile::None) continue;
-			if (!isCombat_ && map_[y][x] == MapTile::CombatWall) continue;
+			if (map_[y][x] == Tile::Floor) continue;
+			if (map_[y][x] == Tile::None) continue;
+			if (!isCombat_ && map_[y][x] == Tile::CombatWall) continue;
 
 			// タイルAABB
 			float tileCenterX = (x - mapW / 2) * tileSize_;
@@ -250,7 +250,7 @@ bool MapCheck::IsFall(const Vector2& pos) {
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
-			if (map_[y][x] != MapTile::Tile::None) {
+			if (map_[y][x] != Tile::None) {
 
 				return false;
 			}
@@ -279,7 +279,7 @@ bool MapCheck::IsGoal(const Vector2& pos, float radius, bool canGoal) {
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
-			if (map_[y][x] == MapTile::Tile::Goal) {
+			if (map_[y][x] == Tile::Goal) {
 
 				// タイルAABB
 				float tileCenterX = (x - mapW / 2) * tileSize_;
@@ -314,8 +314,8 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 
 	for (int y = startY; y <= endY; ++y) {
 		for (int x = startX; x <= endX; ++x) {
-			if (map_[y][x] == MapTile::Tile::Floor) { continue; }
-			if (map_[y][x] == MapTile::Tile::None) { continue; }
+			if (map_[y][x] == Tile::Floor) { continue; }
+			if (map_[y][x] == Tile::None) { continue; }
 
 			float tileCenterX = (x - mapW / 2) * tileSize_;
 			float tileCenterZ = (y - mapH / 2) * tileSize_;

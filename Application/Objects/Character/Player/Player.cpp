@@ -74,7 +74,7 @@ void Player::Initialize(ItemManager* itemManager) {
 	boostTimer_ = std::make_unique<Timer>();
 
 	attackDirection_ = Normalize(Vector2(1, 0));
-	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
+	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + std::numbers::pi_v<float> / 2.0f;
 }
 
 void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager) {
@@ -151,7 +151,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 			attackDirection_ = { dir.x,dir.y };
 		}
 		// プレイヤーの向き
-		transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + float(std::numbers::pi) / 2.0f;
+		transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + std::numbers::pi_v<float> / 2.0f;
 
 		// 減速
 		if (weapon_) {
@@ -429,7 +429,7 @@ void Player::Move(MapCheck* mapCheck) {
 
 	if (velocity_.x != 0 || velocity_.z != 0) {
 		// 移動による向き変更
-		transform_.rotate.y = -std::atan2(velocity_.z, velocity_.x) + float(std::numbers::pi) / 2.0f;
+		transform_.rotate.y = -std::atan2(velocity_.z, velocity_.x) + std::numbers::pi_v<float> / 2.0f;
 
 		// パーティクル
 		moveParticleEmitTimer_++;

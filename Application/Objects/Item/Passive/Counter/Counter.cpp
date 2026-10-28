@@ -19,7 +19,7 @@ void Counter::OnHit(const Vector2& pos, Character* from) {
 
 	int count = 8;
     for (int i = 0; i < count; i++) {
-        float angle = (2.0f * float(std::numbers::pi) / count) * i;
+        float angle = (2.0f * std::numbers::pi_v<float> / count) * i;
         Vector2 shotDir = {cosf(angle), sinf(angle)};
 
 		// 弾生成

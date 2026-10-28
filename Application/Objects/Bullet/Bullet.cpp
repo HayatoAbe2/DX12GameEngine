@@ -125,7 +125,7 @@ void Bullet::Hit() {
 			};
 			Transform transform;
 			transform.translate = Vector3(collider_.center.x, 0.5f, collider_.center.y) + randomVector;
-			transform.rotate = { 0,0,ctx.RandomFloat(0, float(std::numbers::pi) * 2.0f) };
+			transform.rotate = { 0,0,ctx.RandomFloat(0, std::numbers::pi_v<float> * 2.0f) };
 			transform.scale = Vector3(collider_.radius, collider_.radius, collider_.radius) * 3.0f;
 			hitParticle_->Emit(transform, {});
 		}
@@ -165,9 +165,9 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaMa
 		Vector2 currentVel = velocity_;
 		float amplitude = data_.traits.move.wave->amplitude;
 		float speed = data_.traits.move.wave->speed;
-		float maxAngle = data_.traits.move.wave->maxAngle * float(std::numbers::pi) / 180.0f;
-		float sinWave_ = sinf(speed * float(std::numbers::pi) * data_.traits.move.wave->time) * amplitude;
-		float angle = std::sin(data_.traits.move.wave->time * data_.traits.move.wave->speed * 2.0f * float(std::numbers::pi)) * maxAngle;
+		float maxAngle = data_.traits.move.wave->maxAngle * std::numbers::pi_v<float> / 180.0f;
+		float sinWave_ = sinf(speed * std::numbers::pi_v<float> * data_.traits.move.wave->time) * amplitude;
+		float angle = std::sin(data_.traits.move.wave->time * data_.traits.move.wave->speed * 2.0f * std::numbers::pi_v<float>) * maxAngle;
 		currentVel = ToXZ(TransformVector(Vector3(velocity_.x, 0, velocity_.y), MakeRotateYMatrix(angle)));
 		collider_.center += currentVel * ctx.GetDeltatime();
 		data_.traits.move.wave->time += ctx.GetDeltatime();

@@ -8,8 +8,8 @@ class Player;
 
 class MapCheck {
 public:
-	void Initialize(std::vector<std::vector<MapTile::Tile>> map, float tileSize);
-	void Update(std::vector<std::vector<MapTile::Tile>> map);
+	void Initialize(std::vector<std::vector<Tile>> map, float tileSize);
+	void Update(std::vector<std::vector<Tile>> map);
 
 	bool ResolveCollisionX(Vector2& pos, float radius, bool isFlying);
 	bool ResolveCollisionY(Vector2& pos, float radius, bool isFlying);
@@ -24,7 +24,7 @@ private:
 	int WorldToMapX(float x) const;
 	int WorldToMapY(float y) const;
 
-	std::vector<std::vector<MapTile::Tile>> map_;
+	std::vector<std::vector<Tile>> map_;
 	float tileSize_ = 0;
 	bool isCombat_ = false;
 

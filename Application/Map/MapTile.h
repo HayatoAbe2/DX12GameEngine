@@ -3,15 +3,16 @@
 
 class Camera;
 
+enum class Tile {
+	None,
+	Floor,
+	Wall,
+	Goal,
+	CombatWall
+};
+
 class MapTile {
 public:
-	enum Tile {
-		None,
-		Floor,
-		Wall,
-		Goal,
-		CombatWall
-	};
 
 	~MapTile();
 	void Initialize();

@@ -54,7 +54,7 @@ void EffectManager::Draw(Camera* camera) {
 
 	for (const auto& effect : hitEffect_) {
 		Vector3 rotate = camera->transform_.rotate;
-		rotate.x += float(std::numbers::pi);
+		rotate.x += std::numbers::pi_v<float>;
 		effect->SetRotate(rotate);
 		render.DrawModel(effect.get(), BlendMode::Add);
 	}

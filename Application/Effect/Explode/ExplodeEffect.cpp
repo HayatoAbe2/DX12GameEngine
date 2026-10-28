@@ -25,7 +25,7 @@ void ExplodeEffect::Update() {
 
 		dome_->SetScale({ size_, size_, size_ });
 		auto data = dome_->GetMaterial(1)->GetData();
-		Matrix4x4 rot = MakeRotateYMatrix(x * float(std::numbers::pi) * 2.0f);
+		Matrix4x4 rot = MakeRotateYMatrix(x * std::numbers::pi_v<float> * 2.0f);
 		data.uvTransform = Multiply(MakeIdentity4x4(), rot);
 		if (x > alphaStart_) {
 			data.color.w = 1.0f - (x - alphaStart_) / (1.0f - alphaStart_) - 0.2f;

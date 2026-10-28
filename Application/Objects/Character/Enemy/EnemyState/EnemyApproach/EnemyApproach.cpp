@@ -23,7 +23,7 @@ void EnemyApproach::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bul
 
 			if (velocity_.x != 0 || velocity_.z != 0) {
 				Transform transform = enemy->GetTransform();
-				transform.rotate = { 0,-std::atan2(velocity_.z, velocity_.x) + float(std::numbers::pi) / 2.0f,0 }; 
+				transform.rotate = { 0,-std::atan2(velocity_.z, velocity_.x) + std::numbers::pi_v<float> / 2.0f,0 }; 
 				enemy->SetTransform(transform);
 			}
 		} else {

@@ -27,11 +27,10 @@ public:
 	Vector2 GetPrePos() { return prePos_; }
 	bool CanHit() { return noHitTimer_.IsFinished(); }
 
-public:
-	void Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager);
-
 	void OnHitWall(EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 	void OnHitAnything(EffectManager* effectManager, DamageAreaManager* damageAreaManager);
+private:
+	void Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 
 	// 弾ステータス
 	BulletData data_;

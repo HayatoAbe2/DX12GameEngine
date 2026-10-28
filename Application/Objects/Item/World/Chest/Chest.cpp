@@ -6,7 +6,7 @@ Chest::Chest(Vector2 position) {
 
 	// モデル
 	model_ = asset.LoadModel("Resources/Models/Chest", "Chest.glb");
-	model_->SetRotate(Vector3(0, float(std::numbers::pi), 0));
+	model_->SetRotate(Vector3(0, std::numbers::pi_v<float>, 0));
 
 	// アニメーション
 	auto animation = asset.LoadAnimation("Resources/Models/Chest", "Chest.glb");

@@ -41,7 +41,7 @@ void HitEffect::Draw(Camera* camera) {
 	auto& render = GameContext::GetInstance().Render();
 
 	Vector3 rotate = camera->transform_.rotate;
-	rotate.x += float(std::numbers::pi);
+	rotate.x += std::numbers::pi_v<float>;
 	spark_->SetRotate(rotate);
 	render.DrawModel(spark_.get());
 }

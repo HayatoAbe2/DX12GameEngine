@@ -54,16 +54,16 @@ void EquipmentUI::Update() {
 		// 所持武器レア度
 		auto weapon = player_->GetWeapon();
 		switch (weapon->GetData().rarity) {
-		case static_cast<int>(Rarity::Common):
+		case Rarity::Common:
 			equipment_->SetColor({ 0.5f,0.5f,0.5f,1.0f });
 			break;
-		case static_cast<int>(Rarity::Rare):
+		case Rarity::Rare:
 			equipment_->SetColor({ 0.1f,0.1f,0.7f,1.0f });
 			break;
-		case static_cast<int>(Rarity::Epic):
+		case Rarity::Epic:
 			equipment_->SetColor({ 0.8f,0.1f,0.8f,1.0f });
 			break;
-		case static_cast<int>(Rarity::Legendary):
+		case Rarity::Legendary:
 			equipment_->SetColor({ 1.0f,0.8f,0.0f,1.0f });
 			break;
 		}
@@ -87,16 +87,16 @@ void EquipmentUI::Update() {
 		if (weapon2 != nullptr) {
 			// 二個目
 			switch (weapon2->GetData().rarity) {
-			case static_cast<int>(Rarity::Common):
+			case Rarity::Common:
 				equipment2_->SetColor({ 0.5f,0.5f,0.5f,1.0f });
 				break;
-			case static_cast<int>(Rarity::Rare):
+			case Rarity::Rare:
 				equipment2_->SetColor({ 0.1f,0.1f,0.7f,1.0f });
 				break;
-			case static_cast<int>(Rarity::Epic):
+			case Rarity::Epic:
 				equipment2_->SetColor({ 0.8f,0.1f,0.8f,1.0f });
 				break;
-			case static_cast<int>(Rarity::Legendary):
+			case Rarity::Legendary:
 				equipment2_->SetColor({ 1.0f,0.8f,0.0f,1.0f });
 				break;
 			}

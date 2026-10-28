@@ -29,7 +29,7 @@ public:
 	
 	float GetCharge() { return charge_; }
 	bool CanChange() { return canChange_; }
-protected:
+private:
 	float Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
 	void SetChargeStartTimer();
 	// 溜めエフェクト

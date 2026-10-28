@@ -30,7 +30,7 @@ void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bul
 					itemManager->SpawnMoney(enemy->GetTransform().translate, 15);
 
 					if (GameContext::GetInstance().RandomInt(0, 100) >= 95) {
-						itemManager->SpawnWeapon(enemy->GetTransform().translate, -1, Common, false);
+						itemManager->SpawnWeapon(enemy->GetTransform().translate, -1, Rarity::Common, false);
 					}
 
 					return true;

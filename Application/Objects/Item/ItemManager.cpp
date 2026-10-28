@@ -257,7 +257,7 @@ void ItemManager::Load() {
 
 					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
 					if (!weaponSpawned_[i]) {
-						SpawnWeapon(pos, -1, Common, false);
+						SpawnWeapon(pos, -1, Rarity::Common, false);
 						weaponSpawned_[i] = true;
 					}
 				}
@@ -272,7 +272,7 @@ void ItemManager::Load() {
 					if (int(weaponSaleSpawned_.size()) < i + 1) weaponSaleSpawned_.resize(i + 1);
 					Vector3 pos = Vector3{ t.translate.x, 0.5f, t.translate.z };
 					if (!weaponSaleSpawned_[i]) {
-						SpawnWeapon(pos, -1, Common, true);
+						SpawnWeapon(pos, -1, Rarity::Common, true);
 						weaponSaleSpawned_[i] = true;
 					}
 				}
@@ -324,7 +324,7 @@ void ItemManager::ChestItemDrop(Chest* chest) {
 		SpawnPassive(pos, false);
 		break;
 	case 2:
-		SpawnWeapon(pos, -1, Common, false);
+		SpawnWeapon(pos, -1, Rarity::Common, false);
 		break;
 	}
 }

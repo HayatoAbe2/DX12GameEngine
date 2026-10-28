@@ -9,7 +9,7 @@ WorldWeapon::WorldWeapon(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rar
 
 	if (weapon_ && weapon_->GetData().name == "Spellbook") {
 	} else {
-		weapon_->GetModel()->SetRotate({ 0,float(std::numbers::pi) / 2.0f,0 });
+		weapon_->GetModel()->SetRotate({ 0,std::numbers::pi_v<float> / 2.0f,0 });
 	}
 
 	if (isForSale_) {

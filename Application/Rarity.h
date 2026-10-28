@@ -1,7 +1,7 @@
 #pragma once
 #include <Externals/nlohmann/json.hpp>
 
-enum Rarity {
+enum class Rarity {
 	None,
 	Common,
 	Rare,

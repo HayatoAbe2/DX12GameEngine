@@ -111,7 +111,7 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 	if (data_.traits.multiShot && data_.traits.multiShot->count > 1) {
 		int count = data_.traits.multiShot->count;
 		// 度からラジアンに変換
-		float maxAngle = data_.traits.multiShot->maxAngle * float(std::numbers::pi) / 180.0f;
+		float maxAngle = data_.traits.multiShot->maxAngle * std::numbers::pi_v<float> / 180.0f;
 
 		if (!data_.traits.multiShot->random) {
 			// 角度の間隔

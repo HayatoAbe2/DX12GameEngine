@@ -19,7 +19,7 @@ void ExtraAttack::OnEliminate(const Vector2& enemyPos, Character* self) {
 
 	int count = 5;
 	for (int i = 0; i < count; i++) {
-		float angle = (2.0f * float(std::numbers::pi) / count) * i + float(std::numbers::pi) / 2.0f;
+		float angle = (2.0f * std::numbers::pi_v<float> / count) * i + std::numbers::pi_v<float> / 2.0f;
 		Vector2 shotDir = { cosf(angle), sinf(angle) };
 
 		// 弾生成

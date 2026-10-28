@@ -20,16 +20,16 @@ WorldItem::WorldItem(Vector3 pos, Rarity rarity, bool isForSale) {
 			pointLight.intensity = 1.0f;
 			pointLight.radius = 3.0f;
 			switch (rarity) {
-			case static_cast<int>(Rarity::Common):
+			case Rarity::Common:
 				pointLight.color = { 0.5f,0.5f,0.5f,1.0f };
 				break;
-			case static_cast<int>(Rarity::Rare):
+			case Rarity::Rare:
 				pointLight.color = { 0.1f,0.1f,0.7f,1.0f };
 				break;
-			case static_cast<int>(Rarity::Epic):
+			case Rarity::Epic:
 				pointLight.color = { 0.8f,0.1f,0.8f,1.0f };
 				break;
-			case static_cast<int>(Rarity::Legendary):
+			case Rarity::Legendary:
 				pointLight.color = { 1.0f,0.8f,0.0f,1.0f };
 				break;
 			}

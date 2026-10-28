@@ -554,8 +554,8 @@ void Renderer::InitializeSphere() {
 
 	// 分割数
 	const uint32_t kSubdivision = 16;
-	const float kLonEvery = 2.0f * float(std::numbers::pi) / float(kSubdivision);
-	const float kLatEvery = float(std::numbers::pi) / float(kSubdivision);
+	const float kLonEvery = 2.0f * std::numbers::pi_v<float> / float(kSubdivision);
+	const float kLatEvery = std::numbers::pi_v<float> / float(kSubdivision);
 
 	UINT sizeInBytes = sizeof(VertexData) * kSubdivision * kSubdivision * 6;
 	// 頂点リソース
@@ -571,7 +571,7 @@ void Renderer::InitializeSphere() {
 	// 頂点データの書き込み
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
 		// 各バンドの南端緯度と北端緯度
-		float lat = -0.5f * float(std::numbers::pi) + kLatEvery * float(latIndex);
+		float lat = -0.5f * std::numbers::pi_v<float> + kLatEvery * float(latIndex);
 		float latN = lat + kLatEvery;
 		// sin/cos を一度だけ計算
 		float cosLat = cos(lat);

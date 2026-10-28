@@ -12,7 +12,7 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 
 	// 攻撃の向き
 	Vector2 attackDirection = ToXZ(Normalize(player->GetTransform().translate - transform.translate));
-	transform.rotate = { 0,-std::atan2(attackDirection.y, attackDirection.x) + float(std::numbers::pi) / 2.0f,0 };
+	transform.rotate = { 0,-std::atan2(attackDirection.y, attackDirection.x) + std::numbers::pi_v<float> / 2.0f,0 };
 
 	float remain = attackTimer->GetRemaining();
 	if (remain <= attackMotionStart_) {
@@ -60,6 +60,6 @@ float EnemyAttack::EaseIn(float start, float end, float t) {
 	if (t > 1.0f)t = 1.0f;
 	else if (t < 0.0f)t = 0.0f;
 
-	float easedT = 1.0f - cosf((t * float(std::numbers::pi)) / 2.0f);
+	float easedT = 1.0f - cosf((t * std::numbers::pi_v<float>) / 2.0f);
 	return (1.0f - easedT) * start + easedT * end;
 }

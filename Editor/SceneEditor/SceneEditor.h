@@ -52,7 +52,7 @@ private:
 
 	bool useSnap_ = false;
 	float moveSnap_ = 1.0f;
-	float rotateSnap_ = float(std::numbers::pi) / 4.0f;
+	float rotateSnap_ = std::numbers::pi_v<float> / 4.0f;
 	float scaleSnap_ = 0.1f;
 
 	int editingInstance_ = 0;
