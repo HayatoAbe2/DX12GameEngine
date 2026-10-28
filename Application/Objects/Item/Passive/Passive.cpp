@@ -7,14 +7,14 @@ Passive::Passive(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain
 
 	// 説明
 	if (explain) {
-		explain_ = std::move(explain);
-		explain_->SetPivot({ 0.5f,0.5f });
-		explain_->SetSize(explain_->GetSize() * kExplainScale);
+		description_ = std::move(explain);
+		description_->SetPivot({ 0.5f,0.5f });
+		description_->SetSize(description_->GetSize() * kDescriptionScale);
 
 		background_ = GameContext::GetInstance().Asset().LoadSprite("Resources/Debug/white1x1.png");
 		background_->SetPivot({ 0.5f,0.5f });
 		background_->SetColor({ 0,0,0,0.5f });
-		background_->SetSize(explain_->GetSize() * kBackgroundScale);
+		background_->SetSize(description_->GetSize() * kBackgroundScale);
 	}
 
 	passiveCtx_ = ctx;
@@ -25,10 +25,10 @@ void Passive::Draw() {
 	render.DrawSprite(sprite_.get());
 }
 
-void Passive::DrawExplain() {
+void Passive::DrawDescription() {
 	auto render = GameContext::GetInstance().Render();
-	if (explain_) {
+	if (description_) {
 		render.DrawSprite(background_.get());
-		render.DrawSprite(explain_.get());
+		render.DrawSprite(description_.get());
 	}
 }

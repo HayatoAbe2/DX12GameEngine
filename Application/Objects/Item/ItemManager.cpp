@@ -53,6 +53,7 @@ void ItemManager::Update(Player* player, bool isCombat) {
 		chests_.end()
 	);
 
+	// 更新
 	for (auto& i : items_) {
 		i->Update();
 		// 自動取得アイテムの移動
@@ -77,36 +78,21 @@ void ItemManager::Update(Player* player, bool isCombat) {
 	isCombat_ = isCombat;
 
 	// 最短距離にあるアイテムを探す
-	int closestIndex = -1;
-	bool interactItem = false;
+	interactive_ = nullptr;
 	float closestDistance = FLT_MAX;
 	for (auto& item : items_) {
 		float distance = Length(item->GetPosition() - ToXZ(player->GetTransform().translate));
-		if (distance < closestDistance && distance < kInteractRange) {
-			closestDistance = distance;
-			closestIndex = int(&item - &items_[0]);
-			interactItem = true;
-		}
-	}
+		if (distance < kInteractRange) {
+			if (item->CanInteract() && distance < closestDistance) {
+				// インタラクト可能アイテムをセット
+				closestDistance = distance;
+				interactive_ = item.get();
 
-	// 取得範囲内
-	if (player->GetInteractRadius() >= closestDistance) {
-		// 自動取得
-		if (items_[closestIndex]->CanAutoGet()) {
-			// アイテム毎の取得処理
-			items_[closestIndex]->OnPickup(player);
-		}
-
-		if (interactItem) {
-			// インタラクト可能
-			if (items_[closestIndex]->CanInteract()) {
-				canInteract_ = true;
+			} else if (item->CanAutoGet()) {
+				// 自動取得する
+				item->OnPickup(player);
 			}
-		} else {
-			canInteract_ = true;
 		}
-	} else {
-		canInteract_ = false;
 	}
 }
 
@@ -121,45 +107,38 @@ void ItemManager::Draw() {
 	for (auto& c : chests_) {
 		c->Draw();
 	}
+	
+	// インタラクト可能状態の表示
+	if (interactive_) {
+		// アイテム説明
+		if (WorldPassive* passive = dynamic_cast<WorldPassive*>(interactive_)) {
+			passive->DrawDescription();
+		}
 
-	if (canInteract_ && !ctx.Scene().GetCurrentScene()->IsEditMode()) {
-		if (input.gamepad.IsConnected()) {
-			if (input.gamepad.IsPress(XINPUT_GAMEPAD_A)) {
-				controlPad_->SetTextureRect(64 * 3, 64 * 8, 64, 64);
+		// 操作表示
+		if (!ctx.Scene().GetCurrentScene()->IsEditMode()) {
+			if (input.gamepad.IsConnected()) {
+				if (input.gamepad.IsPress(XINPUT_GAMEPAD_A)) {
+					controlPad_->SetTextureRect(64 * 3, 64 * 8, 64, 64);
+				} else {
+					controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
+				}
+				render.DrawSprite(controlPad_.get());
 			} else {
-				controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
+				if (input.keyboard.IsPress(DIK_F)) {
+					controlKey_->SetTextureRect(64 * 0, 64 * 9, 64, 64);
+				} else {
+					controlKey_->SetTextureRect(64 * 1, 64 * 9, 64, 64);
+				}
+				render.DrawSprite(controlKey_.get());
 			}
-			render.DrawSprite(controlPad_.get());
-		} else {
-			if (input.keyboard.IsPress(DIK_F)) {
-				controlKey_->SetTextureRect(64 * 0, 64 * 9, 64, 64);
-			} else {
-				controlKey_->SetTextureRect(64 * 1, 64 * 9, 64, 64);
-			}
-			render.DrawSprite(controlKey_.get());
 		}
 	}
 }
 
 void ItemManager::Interact(Player* player) {
-	// 最短のアイテムを探す
-	int closestIndex = -1;
-	float closestDistance = FLT_MAX;
-	for (auto& item : items_) {
-		if (!item->CanInteract()) { continue; }
-
-		float distance = Length(item->GetPosition() - ToXZ(player->GetTransform().translate));
-		if (distance < closestDistance && distance < 2.0f) {
-			closestDistance = distance;
-			closestIndex = int(&item - &items_[0]);
-		}
-	}
-
-	// 取得範囲内なら取る
-	if (player->GetInteractRadius() >= closestDistance) {
-		// アイテム毎の取得処理
-		items_[closestIndex]->OnPickup(player);
-	}
+	// アイテム毎の取得処理
+	if(interactive_) interactive_->OnPickup(player);
 }
 
 void ItemManager::SpawnWeapon(Vector3 pos, int index, Rarity rarity, bool isForSale) {
@@ -195,7 +174,7 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	switch (r) {
 	case PASSIVEITEM::Counter:
 		p = std::make_unique<Counter>(
-			asset.LoadSprite("Resources/Images/Items/16.png"), 
+			asset.LoadSprite("Resources/Images/Items/16.png"),
 			asset.LoadSprite("Resources/Images/Items/Explain/item_counterAttack.png"),
 			passiveCtx);
 		break;

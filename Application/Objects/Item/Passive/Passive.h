@@ -18,10 +18,10 @@ public:
 	Passive(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx);
 
 	Sprite* GetSprite() { return sprite_.get(); }
-	Sprite* GetExplain() { return explain_.get(); }
+	Sprite* GetDescription() { return description_.get(); }
 	Sprite* GetBackground() { return background_.get(); }
 	void Draw();
-	void DrawExplain(); // 説明の表示
+	void DrawDescription(); // 説明の表示
 
 	// 常時
 	virtual void OnUpdate(Weapon* weapon, Weapon* subWeapon) {}
@@ -36,10 +36,10 @@ public:
 
 private:
 	std::unique_ptr<Sprite> sprite_;
-	std::unique_ptr<Sprite> explain_; // アイテム説明
+	std::unique_ptr<Sprite> description_; // アイテム説明
 	std::unique_ptr<Sprite> background_;
 	const Vector2 kSpriteSize = {80.0f, 80.0f};
-	const float kExplainScale = 0.2f;
+	const float kDescriptionScale = 0.2f;
 	const float kBackgroundScale = 1.2f;
 protected:
 	PassiveContext passiveCtx_;

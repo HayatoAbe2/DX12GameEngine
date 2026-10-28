@@ -37,11 +37,11 @@ void PassiveUI::Draw() {
 		}
 
 		select_ = std::clamp(select_, 0, int(equip.size()) - 1);
-		if (isSelectShow_ && equip[select_]->GetExplain()) {
+		if (isSelectShow_ && equip[select_]->GetDescription()) {
 			Vector2 pos = equip[select_]->GetSprite()->GetPosition();
-			equip[select_]->GetExplain()->SetPosition(pos + kExplainOffset);
-			equip[select_]->GetBackground()->SetPosition(pos + kExplainOffset);
-			equip[select_]->DrawExplain();
+			equip[select_]->GetDescription()->SetPosition(pos + kDescriptionOffset);
+			equip[select_]->GetBackground()->SetPosition(pos + kDescriptionOffset);
+			equip[select_]->DrawDescription();
 		}
 
 	} else {
@@ -53,10 +53,10 @@ void PassiveUI::Draw() {
 
 			if (CheckCollision(itemArea, ctx.Input().mouse.GetPosition())) {
 				// マウスが重なっている間表示
-				if (equip[i]->GetExplain()) {
-					equip[i]->GetExplain()->SetPosition(itemPos + kExplainOffset);
-					equip[i]->GetBackground()->SetPosition(itemPos + kExplainOffset);
-					equip[i]->DrawExplain();
+				if (equip[i]->GetDescription()) {
+					equip[i]->GetDescription()->SetPosition(itemPos + kDescriptionOffset);
+					equip[i]->GetBackground()->SetPosition(itemPos + kDescriptionOffset);
+					equip[i]->DrawDescription();
 				}
 			}
 		}

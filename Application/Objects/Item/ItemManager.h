@@ -55,8 +55,8 @@ private:
 	std::vector<std::unique_ptr<WorldItem>> items_;
 	std::vector<std::unique_ptr<Chest>> chests_;
 
-	// インタラクト可能
-	bool canInteract_ = true;
+	// インタラクト対称
+	WorldItem* interactive_ = nullptr;
 	const float kInteractRange = 2.0f; // インタラクト範囲
 
 	std::vector<bool> weaponSpawned_;
@@ -69,4 +69,4 @@ private:
 	std::unordered_set<int> usedPassiveNumbers_;
 	std::unordered_set<int> pickedPassiveNumbers_;
 };
-
+ 

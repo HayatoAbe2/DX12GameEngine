@@ -18,9 +18,13 @@ public:
 
 	void Update() override;
 	void Draw() override;
+	void DrawDescription();
 
 	void OnPickup(Player* player) override;
 private:
+	// 説明文位置
+	const Vector2 kDescriptionOffset = { 0,80 };
+
 	std::unique_ptr<Passive> passive_ = nullptr;
 };
 

@@ -43,6 +43,13 @@ void WorldPassive::Draw() {
 	WorldItem::Draw();
 }
 
+void WorldPassive::DrawDescription() {
+	Vector2 pos = passive_->GetSprite()->GetPosition() + kDescriptionOffset;
+	passive_->GetDescription()->SetPosition(pos);
+	passive_->GetBackground()->SetPosition(pos);
+	passive_->DrawDescription();
+}
+
 void WorldPassive::OnPickup(Player* player) {
 	if (isForSale_) {
 		Wallet& wallet = player->GetWallet();

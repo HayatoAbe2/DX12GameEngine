@@ -14,7 +14,7 @@ private:
 	// プレイヤー
 	Player* player_ = nullptr;
 
-	const Vector2 kExplainOffset = { 0,75 };
+	const Vector2 kDescriptionOffset = { 0,75 };
 
 	int select_ = 0;
 	bool isSelectShow_ = false;
