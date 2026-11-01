@@ -295,9 +295,6 @@ void GameScene::LoadSound() {
 	audio.SoundLoad(L"Resources/Sounds/SE/fall.mp3");
 	audio.SoundLoad(L"Resources/Sounds/SE/warp.mp3");
 	audio.SoundLoad(L"Resources/Sounds/SE/hit.mp3");
-
-	audio.SoundLoad(L"Resources/Sounds/BGM/title.mp3");
-	audio.SoundPlay(L"Resources/Sounds/BGM/title.mp3", true, 0.7f);
 }
 
 void GameScene::SpawnForDebug() {

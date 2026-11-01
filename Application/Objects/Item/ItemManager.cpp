@@ -161,7 +161,7 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 	PassiveContext passiveCtx = { enemyManager_, bulletManager_ };
 
 	// 全て出現済みならスキップ
-	if (usedPassiveNumbers_.size() > int(PASSIVEITEM::Count)) return;
+	if (usedPassiveNumbers_.size() >= int(PASSIVEITEM::Count)) return;
 
 	// 未使用の番号が出るまで抽選
 	PASSIVEITEM r;
