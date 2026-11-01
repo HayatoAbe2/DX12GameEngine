@@ -1,6 +1,7 @@
 #pragma once
 #include "GameCommon.h"
 
+// 部屋タイプ
 enum class RoomType {
 	Start,
 	Combat,
@@ -12,6 +13,7 @@ enum class RoomType {
 	Count
 };
 
+// 方角
 enum class Direction {
 	North,
 	East,
@@ -20,12 +22,14 @@ enum class Direction {
 };
 
 struct Room;
+// 出入口
 struct RoomConnector {
 	AABB2D collider;
 	Direction direction;
 	Room* connectedRoom = nullptr;
 };
 
+// 部屋構造体
 struct Room {
 	RoomType type;
 	std::vector<Room> nextRooms;

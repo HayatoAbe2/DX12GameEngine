@@ -2,6 +2,9 @@
 #include "GameCommon.h"
 #include "Timer/Timer.h"
 
+/// <summary>
+/// ヒットエフェクト
+/// </summary>
 class HitEffect {
 public:
 	void Initialize(const Vector3& pos, const Vector4& color);

@@ -14,7 +14,6 @@
 #include "UI/UIDrawer/UIDrawer.h"
 #include "Map/FloorManager/FloorManager.h"
 #include "Fade/Fade.h"
-#include "GameCameraController/GameCameracontroller.h"
 #include "RandomSettings/RandomSettings.h"
 
 #include "Editor/SpawnRateEditor/SpawnRateEditor.h"
@@ -107,9 +106,6 @@ private:
 
 	// フェード
 	std::unique_ptr<Fade> fade_ = nullptr;
-
-	// カメラ制御
-	std::unique_ptr<GameCameraController> cameraController_ = nullptr;
 
 	// 敵出現確率
 	std::unique_ptr<SpawnRateEditor> spawnEditor_ = nullptr;

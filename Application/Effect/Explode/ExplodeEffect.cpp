@@ -1,6 +1,6 @@
 #include "ExplodeEffect.h"
 
-void ExplodeEffect::Initialize(const Vector3& pos, const Vector4& color, const float maxSize) {
+ExplodeEffect::ExplodeEffect(const Vector3 pos, const Vector4 color, const float maxSize) : maxSize_(maxSize) {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	dome_ = asset.LoadModel("Resources/Models/HitEffect", "explode.obj");
@@ -13,8 +13,6 @@ void ExplodeEffect::Initialize(const Vector3& pos, const Vector4& color, const f
 
 	timer_ = std::make_unique<Timer>();
 	timer_->Start(duration_);
-
-	maxSize_ = maxSize;
 }
 
 void ExplodeEffect::Update() {

@@ -1,6 +1,9 @@
 #pragma once
 #include "FloorGenerator/FloorGenerator.h"
 
+/// <summary>
+/// 部屋と進度管理
+/// </summary>
 class FloorManager {
 public:
 	void Initialize();

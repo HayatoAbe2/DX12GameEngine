@@ -1,7 +1,7 @@
 #pragma once
 #include "Objects/Character/Enemy/Enemy.h"
 #include <memory>
-class Knight : public Enemy {
+class Knight final : public Enemy {
 public:
 	Knight(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, const Vector3& pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) :
 		Enemy(std::move(model), std::move(shadowModel), pos, status, move(rWeapons)) {

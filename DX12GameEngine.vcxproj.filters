@@ -254,14 +254,12 @@
     <ClCompile Include="Application\Objects\Item\Item.cpp" />
     <ClCompile Include="Application\Wallet\Wallet.cpp" />
     <ClCompile Include="Application\UI\Money\MoneyUI.cpp" />
-    <ClCompile Include="Application\Event\Shop\Shop.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldMoney\WorldMoney.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Externals\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="Application\Map\FloorManager\FloorGenerator\FloorGenerator.cpp" />
     <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
     <ClCompile Include="Application\Fade\Fade.cpp" />
-    <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
     <ClCompile Include="Application\UI\NextRoom\NextRoomUI.cpp" />
     <ClCompile Include="Application\RandomSettings\RandomSettings.cpp" />
     <ClCompile Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.cpp" />
@@ -592,7 +590,6 @@
     <ClInclude Include="Application\Objects\Item\Item.h" />
     <ClInclude Include="Application\Wallet\Wallet.h" />
     <ClInclude Include="Application\UI\Money\MoneyUI.h" />
-    <ClInclude Include="Application\Event\Shop\Shop.h" />
     <ClInclude Include="Application\Objects\Item\World\WorldMoney\WorldMoney.h" />
     <ClInclude Include="Application\Objects\Item\World\WorldPassive\WorldPassive.h" />
     <ClInclude Include="Externals\imgui\imgui_stdlib.h" />
@@ -600,7 +597,6 @@
     <ClInclude Include="Application\Map\FloorManager\FloorGenerator\FloorGenerator.h" />
     <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
     <ClInclude Include="Application\Fade\Fade.h" />
-    <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
     <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
     <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
     <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />

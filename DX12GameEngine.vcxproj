@@ -266,7 +266,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Map\FloorManager\FloorGenerator\FloorGenerator.cpp" />
     <ClCompile Include="Application\Map\FloorManager\FloorManager.cpp" />
     <ClCompile Include="Application\Fade\Fade.cpp" />
-    <ClCompile Include="Application\GameCameraController\GameCameraController.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\Heal\Heal.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.cpp" />
     <ClCompile Include="main.cpp" />
@@ -310,7 +309,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldWeapon\WorldWeapon.cpp" />
     <ClCompile Include="Application\Wallet\Wallet.cpp" />
-    <ClCompile Include="Application\Event\Shop\Shop.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldMoney\WorldMoney.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Application\Result\Result.cpp" />
@@ -622,13 +620,11 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Item\Item.h" />
     <ClInclude Include="Application\Wallet\Wallet.h" />
     <ClInclude Include="Application\UI\Money\MoneyUI.h" />
-    <ClInclude Include="Application\Event\Shop\Shop.h" />
     <ClInclude Include="Application\Objects\Item\World\WorldMoney\WorldMoney.h" />
     <ClInclude Include="Application\Objects\Item\World\WorldPassive\WorldPassive.h" />
     <ClInclude Include="Application\Map\FloorManager\FloorGenerator\FloorGenerator.h" />
     <ClInclude Include="Application\Map\FloorManager\FloorManager.h" />
     <ClInclude Include="Application\Fade\Fade.h" />
-    <ClInclude Include="Application\GameCameraController\GameCameraController.h" />
     <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
     <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
     <ClInclude Include="Application\Result\Result.h" />

@@ -5,6 +5,9 @@
 const float kMaxFadeinTimer_ = 0.5f;
 const float kMaxFadeoutTimer_ = 0.5f;
 
+/// <summary>
+/// フェードの段階
+/// </summary>
 enum class FadePhase {
 	None,
 	FadeOut,
@@ -12,6 +15,9 @@ enum class FadePhase {
 	FadeIn
 };
 
+/// <summary>
+/// フェード演出
+/// </summary>
 class Fade {
 private:
 	FadePhase fadePhase_ = FadePhase::None;

@@ -6,9 +6,14 @@
 
 class Player;
 
+/// <summary>
+/// マップとの衝突判定、衝突した場合の座標修正
+/// </summary>
 class MapCheck {
 public:
-	void Initialize(std::vector<std::vector<Tile>> map, float tileSize);
+	MapCheck(std::vector<std::vector<Tile>> map, float tileSize);
+	void Reset(std::vector<std::vector<Tile>> map, float tileSize);
+
 	void Update(std::vector<std::vector<Tile>> map);
 
 	bool ResolveCollisionX(Vector2& pos, float radius, bool isFlying);

@@ -4,10 +4,8 @@
 #include "Map/MapCheck.h"
 #include <numbers>
 
-Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& data, Character* from) {
-	data_ = data;
-	user_ = from;
-
+Bullet::Bullet(const Vector2& pos, const Vector2& direction, const BulletData& data, Character* from) :
+data_(data), user_(from){
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 

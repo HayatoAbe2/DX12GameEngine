@@ -12,6 +12,8 @@ void GameScene::Initialize() {
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();
 	camera_ = std::make_unique<Camera>();
+	camera_->transform_.rotate = { 1.0f,0,0 };
+	render.SetCamera(camera_.get());
 
 	LoadSound();
 
@@ -63,11 +65,8 @@ void GameScene::Initialize() {
 	// リザルト
 	result_ = std::make_unique<Result>(fade_.get());
 
-	// カメラ制御
-	cameraController_ = std::make_unique<GameCameraController>(camera_.get());
-
 	// マップ判定
-	mapCheck_ = std::make_unique<MapCheck>();
+	mapCheck_ = std::make_unique<MapCheck>(mapTile_->GetMap(), mapTile_->GetTileSize());
 	mapTile_->UpdateMapChange(false, enableEditMode_);
 	Reset();
 
@@ -212,6 +211,8 @@ void GameScene::Draw() {
 	debugCamera_->Update();
 
 	auto& ctx = GameContext::GetInstance();
+	auto& light = ctx.Light();
+	light.DrawLightImGui();
 	auto& render = ctx.Render();
 	if (phase_ == Phase::RESULT) {
 		render.AddPostEffect(PostEffectType::Grayscale);
@@ -269,7 +270,7 @@ void GameScene::Reset() {
 	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });
 
 	isLoaded_ = false;
-	mapCheck_->Initialize(mapTile_->GetMap(), mapTile_->GetTileSize());
+	mapCheck_->Reset(mapTile_->GetMap(), mapTile_->GetTileSize());
 }
 
 void GameScene::MoveToNextRoom(Direction direction) {

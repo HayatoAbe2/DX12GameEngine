@@ -12,9 +12,14 @@ class DamageArea;
 class EnemyManager;
 class MapCheck;
 
+/// <summary>
+/// 詳細な衝突判定と衝突時処理
+/// </summary>
 class CollisionChecker {
 public:
-	void Initialize(EffectManager* effectManager, DamageAreaManager* damageAreaManager, Camera* camera);
+	CollisionChecker(EffectManager* effectManager, DamageAreaManager* damageAreaManager, Camera* camera) :
+		effectManager_(effectManager), damageAreaManager_(damageAreaManager), camera_(camera) {
+	}
 
 	// プレイヤーと敵弾
 	void CheckPlayer(Player* player, Bullet* bullet);

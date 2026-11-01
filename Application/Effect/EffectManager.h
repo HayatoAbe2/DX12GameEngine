@@ -5,7 +5,9 @@
 
 class Camera;
 
-// 敵や弾が消えたあとで続くエフェクト/パーティクルの管理
+/// <summary>
+/// 敵や弾が消えたあとで続くエフェクト/パーティクルの管理
+/// </summary>
 class EffectManager {
 public:
 	void Initialize();
@@ -13,7 +15,7 @@ public:
 	void Draw(Camera*camera);
 
 	void SpawnHitEffect(const Vector3& pos);
-	void SpawnExplodeEffect(const Vector3& pos);
+	void SpawnExplodeEffect(const Vector3 pos);
 	void SpawnChargeEffect(const Vector3 pos, const float radius);
 private:
 	std::vector<std::unique_ptr<Model>> hitEffect_;

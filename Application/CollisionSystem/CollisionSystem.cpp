@@ -6,14 +6,9 @@
 #include "Objects/Character/Enemy/Enemies/Spiker.h"
 #include "Map/MapCheck.h"
 
-CollisionSystem::CollisionSystem(EffectManager* effectManager, BulletManager* bulletManager,
-	DamageAreaManager* damageAreaManager, EnemyManager* enemyManager, Camera* camera) {
-	collisionChecker_ = std::make_unique<CollisionChecker>();
-	collisionChecker_->Initialize(effectManager, damageAreaManager, camera);
-
-	bulletManager_ = bulletManager;
-	damageAreaManager_ = damageAreaManager;
-	enemyManager_ = enemyManager;
+CollisionSystem::CollisionSystem(EffectManager* effectManager, BulletManager* bulletManager,DamageAreaManager* damageAreaManager, EnemyManager* enemyManager, Camera* camera) :
+	bulletManager_(bulletManager), damageAreaManager_(damageAreaManager), enemyManager_(enemyManager),
+	collisionChecker_(std::make_unique<CollisionChecker>(effectManager, damageAreaManager, camera)) {
 }
 
 void CollisionSystem::Update(Player* player, MapCheck* mapCheck) {

@@ -7,12 +7,6 @@
 #include "Effect/EffectManager.h"
 #include "Map/MapCheck.h"
 
-void CollisionChecker::Initialize(EffectManager* effectManager, DamageAreaManager* damageAreaManager, Camera* camera) {
-	effectManager_ = effectManager;
-	damageAreaManager_ = damageAreaManager;
-	camera_ = camera;
-}
-
 void CollisionChecker::CheckPlayer(Player* player, Bullet* bullet) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();

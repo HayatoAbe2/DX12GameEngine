@@ -5,6 +5,9 @@
 class MapCheck;
 class EffectManager;
 
+/// <summary>
+/// 弾の更新・描画
+/// </summary>
 class BulletManager {
 public:
 	void Update(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager);

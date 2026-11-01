@@ -2,6 +2,9 @@
 #include "GameCommon.h"
 #include "Map/Room/RoomData.h"
 
+/// <summary>
+/// フロアをロードして生成
+/// </summary>
 class FloorGenerator {
 public:
 	/// <summary>

@@ -9,6 +9,9 @@ class DamageAreaManager;
 class EffectManager;
 class MapCheck;
 
+/// <summary>
+/// 衝突判定を一括するクラス
+/// </summary>
 class CollisionSystem {
 public:
 	CollisionSystem(

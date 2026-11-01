@@ -9,6 +9,9 @@
 
 class MapCheck;
 
+/// <summary>
+/// 発射された弾
+/// </summary>
 class Bullet {
 public:
 	Bullet(const Vector2& pos, const Vector2& direction, const BulletData& data, Character* from);

@@ -3,6 +3,7 @@
 
 class Camera;
 
+// マップタイル
 enum class Tile {
 	None,
 	Floor,
@@ -11,11 +12,15 @@ enum class Tile {
 	CombatWall
 };
 
+/// <summary>
+/// マップ作成
+/// </summary>
 class MapTile {
 public:
 
 	~MapTile();
 	void Initialize();
+	// シーンデータからマップ更新
 	void UpdateMapChange(bool isCombat, bool isEditMode);
 	void Update(bool canGoal);
 	void Draw(Camera* camera);

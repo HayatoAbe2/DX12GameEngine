@@ -80,8 +80,7 @@ void EffectManager::SpawnHitEffect(const Vector3& pos) {
 	hitSpark_.push_back(std::move(spark));
 }
 
-void EffectManager::SpawnExplodeEffect(const Vector3& pos) {
-	auto explode = std::make_unique<ExplodeEffect>();
-	explode->Initialize(pos, { 1,1,1,1 }, 3.0f);
+void EffectManager::SpawnExplodeEffect(const Vector3 pos) {
+	auto explode = std::make_unique<ExplodeEffect>(pos, Vector4{ 1,1,1,1 }, 3.0f);
 	explode_.push_back(std::move(explode));
 }

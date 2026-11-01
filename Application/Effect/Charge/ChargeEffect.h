@@ -1,6 +1,9 @@
 #pragma once
 #include "GameCommon.h"
 
+/// <summary>
+/// チャージ中の弾の表示
+/// </summary>
 class ChargeEffect {
 public:
 	ChargeEffect(Vector4 color);

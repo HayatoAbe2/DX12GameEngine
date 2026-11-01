@@ -3,7 +3,10 @@
 #include "Objects/Character/Player/Player.h"
 #include <algorithm>
 
-void MapCheck::Initialize(std::vector<std::vector<Tile>> map, float tileSize) {
+MapCheck::MapCheck(std::vector<std::vector<Tile>> map, float tileSize) : map_(map), tileSize_(tileSize){
+}
+
+void MapCheck::Reset(std::vector<std::vector<Tile>> map, float tileSize){
 	map_ = map;
 	tileSize_ = tileSize;
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Objects/Character/Enemy/Enemy.h"
 #include <memory>
-class Spiker : public Enemy {
+class Spiker final : public Enemy {
 public:
 	Spiker(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, const Vector3& pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) :
 		Enemy(std::move(model), std::move(shadowModel), pos, status, move(rWeapons)) {

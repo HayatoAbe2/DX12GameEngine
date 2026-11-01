@@ -2,9 +2,12 @@
 #include "GameCommon.h"
 #include "Timer/Timer.h"
 
+/// <summary>
+/// 爆発エフェクト
+/// </summary>
 class ExplodeEffect {
 public:
-	void Initialize(const Vector3& pos, const Vector4& color, const float maxSize);
+	ExplodeEffect(const Vector3 pos, const Vector4 color, const float maxSize);
 	void Update();
 	void Draw(Camera* camera);
 
