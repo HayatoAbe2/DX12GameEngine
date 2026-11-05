@@ -33,6 +33,9 @@ data_(data), user_(from){
 	}
 	lifeTime_ = data_.lifeTime;
 
+	// ヒット範囲表示
+	hitboxDisplay_ = std::make_unique<HitboxDisplay>(user_->GetTeam());
+
 	// パーティクル
 	particle_ = asset.CreateParticleSystem(asset.CreateMaterial(asset.LoadTexture("Resources/Particle/Fire/circle.png")), particleNum_);
 	particle_->SetLifeTime(2);
@@ -88,9 +91,12 @@ void Bullet::Draw(Camera* camera) {
 	particle_->Update();
 	hitParticle_->Update();
 
-	// パーティクル
 	render.DrawParticle(particle_.get(), BlendMode::Add);
 	render.DrawParticle(hitParticle_.get(), BlendMode::Add);
+
+	// 当たり判定表示
+	hitboxDisplay_->Update(data_.radius, collider_.center);
+	hitboxDisplay_->Draw();
 }
 
 void Bullet::Hit() {

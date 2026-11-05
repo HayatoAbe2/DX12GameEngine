@@ -275,6 +275,7 @@
     <ClCompile Include="Application\Effect\Charge\ChargeEffect.cpp" />
     <ClCompile Include="Application\Objects\DamageArea\DamageArea.cpp" />
     <ClCompile Include="Application\Objects\DamageArea\DamageAreaManager.cpp" />
+    <ClCompile Include="Application\HitboxDisplay\HitboxDisplay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -616,6 +617,7 @@
     <ClInclude Include="Application\Objects\DamageArea\DamageAreaManager.h" />
     <ClInclude Include="Application\Map\FloorSetting.h" />
     <ClInclude Include="Application\Controller.h" />
+    <ClInclude Include="Application\HitboxDisplay\HitboxDisplay.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

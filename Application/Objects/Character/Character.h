@@ -2,6 +2,7 @@
 #include "GameCommon.h"
 #include "Objects/Weapon/ShooterInfo/ShooterInfo.h"
 #include "Timer/Timer.h"
+#include "HitboxDisplay/HitboxDisplay.h"
 
 class Character {
 public:
@@ -76,4 +77,7 @@ protected:
 
 	// 無敵タイマー
 	Timer invincibleTimer_;
+
+	// ヒット範囲表示
+	std::unique_ptr<HitboxDisplay> hitboxDisplay_;
 };

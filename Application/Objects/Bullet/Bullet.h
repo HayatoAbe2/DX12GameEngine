@@ -6,6 +6,7 @@
 #include "Effect/EffectManager.h"
 #include "Objects/DamageArea/DamageAreaManager.h"
 #include <Objects/Character/Character.h>
+#include <HitboxDisplay/HitboxDisplay.h>
 
 class MapCheck;
 
@@ -38,8 +39,10 @@ private:
 	// 弾ステータス
 	BulletData data_;
 
-	// 座標
+	// 衝突判定
 	Circle collider_;
+	// ヒット範囲表示
+	std::unique_ptr<HitboxDisplay> hitboxDisplay_;
 
 	// 前フレーム座標
 	Vector2 prePos_{};

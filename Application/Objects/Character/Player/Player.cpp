@@ -75,6 +75,9 @@ void Player::Initialize(ItemManager* itemManager) {
 
 	attackDirection_ = Normalize(Vector2(1, 0));
 	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + std::numbers::pi_v<float> / 2.0f;
+
+	// ヒット範囲表示
+	hitboxDisplay_ = std::make_unique<HitboxDisplay>(team_);
 }
 
 void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager) {
@@ -283,6 +286,10 @@ void Player::Draw(Camera* camera) {
 
 	// パーティクル
 	render.DrawParticle(moveParticle_.get(), BlendMode::Add);
+
+	// 当たり判定表示
+	hitboxDisplay_->Update(radius_, ToXZ(transform_.translate));
+	hitboxDisplay_->Draw();
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Player Info");

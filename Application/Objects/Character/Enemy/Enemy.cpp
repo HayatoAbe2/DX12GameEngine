@@ -44,6 +44,10 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	appierTimer_.Start(kAppierTime);
 
 	weight_ = 50;
+
+	// ヒット範囲表示
+	hitboxDisplay_ = std::make_unique<HitboxDisplay>(team_);
+
 }
 
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
@@ -167,6 +171,10 @@ void Enemy::Draw() {
 		model_->SetTranslate(t);
 	}
 	render.DrawModel(model_.get());
+
+	// 当たり判定表示
+	hitboxDisplay_->Update(radius_, ToXZ(transform_.translate));
+	hitboxDisplay_->Draw();
 }
 
 void Enemy::Hit(float damage, const Vector2& from, const float knockback) {

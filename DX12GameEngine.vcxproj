@@ -268,6 +268,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Fade\Fade.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\Heal\Heal.cpp" />
     <ClCompile Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.cpp" />
+    <ClCompile Include="Application\HitboxDisplay\HitboxDisplay.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Math\Matrix4x4\Matrix4x4.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\Model.cpp" />
@@ -633,6 +634,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
     <ClInclude Include="Application\RandomSettings\WeaponSpawn\WeaponSpawnSetting.h" />
     <ClInclude Include="Application\UI\Passive\PassiveUI.h" />
+    <ClInclude Include="Application\HitboxDisplay\HitboxDisplay.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
