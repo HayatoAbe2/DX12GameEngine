@@ -1,14 +1,14 @@
 #include "ParticleManager.h"
 #include "Engine/Graphics/Core/DirectXContext/DirectXContext.h"
 
-ParticleManager::ParticleManager(DirectXContext* dxContext) {
-	dxContext_ = dxContext;
+ParticleManager::ParticleManager(DirectXContext* dxContext) :
+	dxContext_(dxContext) {
 }
 
 std::unique_ptr<ParticleSystem> ParticleManager::CreateParticle(uint32_t size, uint32_t id) {
 	auto descriptorManager = dxContext_->GetSRVManager();
 	auto bufferManager = dxContext_->GetBufferManager();
-	
+
 	std::unique_ptr<ParticleSystem> particleSystem = std::make_unique<ParticleSystem>(id);
 
 	// リソース

@@ -50,6 +50,9 @@ private:
 	InputSystem* input_;
 };
 
+/// <summary>
+/// 入力を取得する窓口
+/// </summary>
 class InputContext {
 public:
 	explicit InputContext(InputSystem* input)

@@ -2,7 +2,7 @@
 
 HitboxDisplay::HitboxDisplay(Team team) {
 	auto& ctx = GameContext::GetInstance();
-	auto asset = ctx.Asset();
+	auto& asset = ctx.Asset();
 	primitive_ = asset.CreatePrimitive(asset.CreateMaterial(asset.LoadTexture("Resources/Debug/gradationLine.png")), PrimitiveShape::Ring);
 	primitive_->transform_.rotate.x = std::numbers::pi_v<float> / 2.0f;
 
@@ -26,6 +26,6 @@ void HitboxDisplay::Update(float radius, Vector2 pos) {
 
 void HitboxDisplay::Draw() {
 	auto& ctx = GameContext::GetInstance();
-	auto render = ctx.Render();
+	auto& render = ctx.Render();
 	render.DrawPrimitive(primitive_.get());
 }

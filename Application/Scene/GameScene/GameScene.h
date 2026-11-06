@@ -19,7 +19,7 @@
 #include "Editor/SpawnRateEditor/SpawnRateEditor.h"
 
 // ゲームシーン
-class GameScene : public BaseScene {
+class GameScene final : public BaseScene {
 public:
 
 	~GameScene() override;

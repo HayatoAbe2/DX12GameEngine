@@ -5,7 +5,7 @@
 /// <summary>
 /// ヒットエフェクト
 /// </summary>
-class HitEffect {
+class HitEffect final {
 public:
 	void Initialize(const Vector3& pos, const Vector4& color);
 	void Update();

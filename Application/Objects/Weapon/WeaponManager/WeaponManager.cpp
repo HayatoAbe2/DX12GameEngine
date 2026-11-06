@@ -35,8 +35,8 @@ std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 	// 武器データ
 	data = weaponDataMap[WeaponNames[index]];
 
-	auto model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	auto shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	std::unique_ptr<Model> model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	std::unique_ptr<Model> shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
 	MaterialData matData = model->GetMaterial(0)->GetData();
 	matData.color = { 0.2f,0.2f,0.2f,1 };
 	model->GetMaterial(0)->SetData(matData);
@@ -57,8 +57,8 @@ std::unique_ptr<Weapon> WeaponManager::GetEnemyAttack(int index) {
 	// 武器データ
 	data = enemyAttackDataMap[EnemyAttackNames[index] + "_Enemy"];
 
-	auto model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	auto shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	std::unique_ptr<Model> model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	std::unique_ptr<Model> shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
 	MaterialData matData = model->GetMaterial(0)->GetData();
 	matData.color = { 0.2f,0.2f,0.2f,1 };
 	model->GetMaterial(0)->SetData(matData);
@@ -78,8 +78,8 @@ std::unique_ptr<Weapon> WeaponManager::GetEnemyAttack(const std::string& name) {
 	auto it = enemyAttackDataMap.find(key);
 	WeaponData data = it->second;
 
-	auto model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	auto shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	std::unique_ptr<Model> model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	std::unique_ptr<Model> shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
 
 	MaterialData matData = model->GetMaterial(0)->GetData();
 	matData.color = { 0.2f, 0.2f, 0.2f, 1.0f };

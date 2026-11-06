@@ -104,7 +104,7 @@ void ItemManager::Draw() {
 	for (const auto& i : items_) {
 		i->Draw();
 	}
-	for (auto& c : chests_) {
+	for (const auto& c : chests_) {
 		c->Draw();
 	}
 	
@@ -143,14 +143,14 @@ void ItemManager::Interact(Player* player) {
 
 void ItemManager::SpawnWeapon(Vector3 pos, int index, Rarity rarity, bool isForSale) {
 	// 設置する
-	auto weapon = std::move(weaponManager_->GetWeapon(index, rarity));
-	auto newItem = std::make_unique<WorldWeapon>(std::move(weapon), pos, rarity, isForSale);
+	std::unique_ptr<Weapon> weapon = weaponManager_->GetWeapon(index, rarity);
+	std::unique_ptr<WorldItem> newItem = std::make_unique<WorldWeapon>(std::move(weapon), pos, rarity, isForSale);
 	items_.push_back(std::move(newItem));
 }
 
 void ItemManager::SpawnMoney(Vector3 pos, int amount) {
 	pos.y = 0.5f;
-	auto money = std::make_unique<WorldMoney>(pos, amount);
+	std::unique_ptr<WorldMoney> money = std::make_unique<WorldMoney>(pos, amount);
 	items_.push_back(std::move(money));
 }
 

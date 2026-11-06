@@ -16,21 +16,21 @@
 #include <assimp/postprocess.h>
 #include <Engine/Graphics/GPUData/InstanceGPUData.h>
 
-ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager) {
+ModelManager::ModelManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager) :
 	// デバイス
-	device_ = dxContext->GetDeviceManager()->GetDevice().Get();
+	device_(dxContext->GetDeviceManager()->GetDevice().Get()),
 	// CommandList管理クラス
-	commandListManager_ = dxContext->GetCommandListManager();
+	commandListManager_(dxContext->GetCommandListManager()),
 	// DescriptorHeap管理クラス
-	descriptorHeapManager_ = dxContext->GetDescriptorHeapManager();
+	descriptorHeapManager_(dxContext->GetDescriptorHeapManager()),
 	// SRV管理クラス
-	descriptorManager_ = dxContext->GetSRVManager();
+	descriptorManager_(dxContext->GetSRVManager()),
 	// バッファ管理クラス
-	bufferManager_ = dxContext->GetBufferManager();
+	bufferManager_(dxContext->GetBufferManager()),
 	// ログ出力クラス
-	logger_ = logger;
+	logger_(logger),
 	// テクスチャ管理クラス
-	textureManager_ = textureManager;
+	textureManager_(textureManager) {
 }
 
 std::unique_ptr<Model> ModelManager::Load(uint32_t id, uint32_t textureId, uint32_t envTextureId, uint32_t materialId, const std::string& directoryPath, const std::string& filename) {

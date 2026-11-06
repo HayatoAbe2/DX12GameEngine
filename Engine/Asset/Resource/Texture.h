@@ -5,7 +5,7 @@
 #include "Engine/Math/MathUtils.h"
 #include "Engine/Asset/Resource/Resource.h"
 
-class Texture : public Resource {
+class Texture final : public Resource {
 public:
 	Texture(uint32_t id) : Resource(id) {};
 

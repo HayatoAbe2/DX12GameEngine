@@ -1,7 +1,7 @@
 #include "AudioContext.h"
 
-AudioContext::AudioContext(AudioSystem* audio) {
-	audio_ = audio;
+AudioContext::AudioContext(AudioSystem* audio) :
+	audio_(audio){
 }
 
 void AudioContext::SoundLoad(const wchar_t* filename) {

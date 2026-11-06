@@ -19,7 +19,11 @@ class Renderer;
 class Camera;
 class BufferManager;
 class ConstantBufferManager;
-class InstancedModel : public SceneObject {
+
+/// <summary>
+/// インスタンシング描画用のモデル
+/// </summary>
+class InstancedModel final : public SceneObject {
 public:
 	InstancedModel(uint32_t id) : SceneObject(id) {};
 

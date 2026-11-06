@@ -8,7 +8,10 @@
 #include <memory>
 #include <Engine/Math/Vector4/Vector4.h>
 
-class Sprite : public SceneObject {
+/// <summary>
+/// スプライト
+/// </summary>
+class Sprite final : public SceneObject {
 public:
 	Sprite(uint32_t id) : SceneObject(id) {};
 

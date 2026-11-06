@@ -8,6 +8,10 @@ class SceneManager;
 class SceneEditor;
 class Model;
 class InstancedModel;
+
+/// <summary>
+/// シーン変更やシーンオブジェクト取得の窓口
+/// </summary>
 class SceneContext {
 public:
 	SceneContext(SceneManager* sceneManager, SceneEditor* sceneEditor);

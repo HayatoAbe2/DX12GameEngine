@@ -1,8 +1,8 @@
 #include "AssetContext.h"
 #include "Engine/Asset/Manager/AssetManager/AssetManager.h"
 
-AssetContext::AssetContext(AssetManager* assetManager) {
-	assetManager_ = assetManager;
+AssetContext::AssetContext(AssetManager* assetManager) :
+	assetManager_(assetManager){
 }
 
 std::unique_ptr<Model> AssetContext::LoadModel(const std::string& directoryPath, const std::string& filename) {

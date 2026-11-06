@@ -9,21 +9,21 @@
 #include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
 #include <Externals/DirectXTex/d3dx12.h>
 
-TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) {
+TextureManager::TextureManager(DirectXContext* dxContext, Logger* logger) :
 	// デバイス
-	device_ = dxContext->GetDeviceManager()->GetDevice().Get();
+	device_(dxContext->GetDeviceManager()->GetDevice().Get()),
 	// CommandList管理クラス
-	commandListManager_ = dxContext->GetCommandListManager();
+	commandListManager_(dxContext->GetCommandListManager()),
 	// DescriptorHeap管理クラス
-	descriptorHeapManager_ = dxContext->GetDescriptorHeapManager();
+	descriptorHeapManager_(dxContext->GetDescriptorHeapManager()),
 	// SRV管理クラス
-	descriptorManager_ = dxContext->GetSRVManager();
+	descriptorManager_(dxContext->GetSRVManager()),
 	// バッファ管理クラス
-	bufferManager_ = dxContext->GetBufferManager();
+	bufferManager_(dxContext->GetBufferManager()),
 	// CB管理クラス
-	cbManager_ = dxContext->GetConstantBufferManager();
+	cbManager_(dxContext->GetConstantBufferManager()),
 	// ログ出力クラス
-	logger_ = logger;
+	logger_(logger) {
 }
 
 std::shared_ptr<Texture> TextureManager::Load(const std::string& texturePath, uint32_t id) {

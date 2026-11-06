@@ -2,9 +2,9 @@
 #include "Engine/Scene/SceneManager/SceneManager.h"
 #include "Editor/SceneEditor/SceneEditor.h"
 
-SceneContext::SceneContext(SceneManager* sceneManager, SceneEditor* sceneEditor) {
-	sceneManager_ = sceneManager;
-	sceneEditor_ = sceneEditor;
+SceneContext::SceneContext(SceneManager* sceneManager, SceneEditor* sceneEditor) :
+	sceneManager_(sceneManager),
+	sceneEditor_(sceneEditor) {
 }
 
 void SceneContext::SceneChange(std::string nextSceneName) {
@@ -25,27 +25,27 @@ void SceneContext::Reset() {
 }
 
 std::vector<Model*> SceneContext::FindModelsByTag(const std::string& tag) {
-    std::vector<Model*> result;
+	std::vector<Model*> result;
 
-    for (auto& obj : sceneManager_->GetCurrentScene()->GetObjects()) {
-        auto* model = dynamic_cast<Model*>(obj);
-        if (model && model->tag == tag) {
-            result.push_back(model);
-        }
-    }
+	for (auto& obj : sceneManager_->GetCurrentScene()->GetObjects()) {
+		auto* model = dynamic_cast<Model*>(obj);
+		if (model && model->tag == tag) {
+			result.push_back(model);
+		}
+	}
 
-    return result;
+	return result;
 }
 
 std::vector<InstancedModel*> SceneContext::FindInstancedModelsByTag(const std::string& tag) {
-    std::vector<InstancedModel*> result;
+	std::vector<InstancedModel*> result;
 
-    for (auto& obj : sceneManager_->GetCurrentScene()->GetObjects()) {
-        auto* model = dynamic_cast<InstancedModel*>(obj);
-        if (model && model->tag == tag) {
-            result.push_back(model);
-        }
-    }
+	for (auto& obj : sceneManager_->GetCurrentScene()->GetObjects()) {
+		auto* model = dynamic_cast<InstancedModel*>(obj);
+		if (model && model->tag == tag) {
+			result.push_back(model);
+		}
+	}
 
-    return result;
+	return result;
 }

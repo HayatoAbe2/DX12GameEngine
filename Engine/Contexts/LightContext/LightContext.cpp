@@ -1,7 +1,7 @@
 #include "LightContext.h"
 
-LightContext::LightContext(LightManager* lightManager) {
-	lightManager_ = lightManager;
+LightContext::LightContext(LightManager* lightManager) :
+	lightManager_(lightManager) {
 }
 
 int LightContext::AddPointLight() {

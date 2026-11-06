@@ -9,7 +9,7 @@ PassiveUI::PassiveUI(Player* player) {
 
 void PassiveUI::Draw() {
 	auto& ctx = GameContext::GetInstance();
-	auto input = ctx.Input();
+	auto& input = ctx.Input();
 
 	// 所持中アイテム
 	auto equip = player_->GetPassives();

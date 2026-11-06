@@ -1,12 +1,15 @@
 #pragma once
 #include <string>
 
+/// <summary>
+/// シーン上の描画オブジェクト
+/// </summary>
 class SceneObject {
 public:
 	explicit SceneObject(uint32_t id) : id_(id) {}
 	virtual ~SceneObject() = default;
 
-	uint32_t GetID() { return id_; }
+	const uint32_t GetID() const { return id_; }
 
 	// 名前(エディタで表示)
 	std::string name;
@@ -15,5 +18,5 @@ public:
 	std::string tag;
 
 protected:
-	uint32_t id_;
+	const uint32_t id_;
 };

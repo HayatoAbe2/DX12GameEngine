@@ -2,6 +2,9 @@
 #include "Engine/Graphics/Renderer/Renderer.h"
 #include "Engine/Graphics/Pipeline/BlendMode.h"
 
+/// <summary>
+/// 描画関数を呼び出す窓口
+/// </summary>
 class RenderContext {
 public:
 	RenderContext(Renderer* renderer, LightManager* lightManager);

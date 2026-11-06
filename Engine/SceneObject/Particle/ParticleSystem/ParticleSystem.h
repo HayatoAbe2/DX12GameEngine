@@ -10,6 +10,9 @@
 class InstancedModel;
 class Camera;
 
+/// <summary>
+/// パーティクルシステム(兼エミッター)
+/// </summary>
 class ParticleSystem : public SceneObject {
 public:
     ParticleSystem(uint32_t id) : SceneObject(id) {};

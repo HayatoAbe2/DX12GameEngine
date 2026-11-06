@@ -9,23 +9,23 @@
 #include "Engine/Graphics/GPUResource/BufferManager/BufferManager.h"
 #include "Engine/Graphics/GPUResource/ConstantBufferManager/ConstantBufferManager.h"
 
-SpriteManager::SpriteManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager) {
+SpriteManager::SpriteManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager) :
 	// デバイス
-	device_ = dxContext->GetDeviceManager()->GetDevice().Get();
+	device_(dxContext->GetDeviceManager()->GetDevice().Get()),
 	// CommandList管理クラス
-	commandListManager_ = dxContext->GetCommandListManager();
+	commandListManager_(dxContext->GetCommandListManager()),
 	// DescriptorHeap管理クラス
-	descriptorHeapManager_ = dxContext->GetDescriptorHeapManager();
+	descriptorHeapManager_(dxContext->GetDescriptorHeapManager()),
 	// SRV管理クラス
-	descriptorManager_ = dxContext->GetSRVManager();
+	descriptorManager_(dxContext->GetSRVManager()),
 	// バッファ管理クラス
-	bufferManager_ = dxContext->GetBufferManager();
+	bufferManager_(dxContext->GetBufferManager()),
 	// CB管理クラス
-	cbManager_ = dxContext->GetConstantBufferManager();
+	cbManager_(dxContext->GetConstantBufferManager()),
 	// ログ出力クラス
-	logger_ = logger;
+	logger_(logger),
 	// テクスチャ管理クラス
-	textureManager_ = textureManager;
+	textureManager_(textureManager) {
 }
 
 std::unique_ptr<Sprite> SpriteManager::Load(const std::string& texturePath, uint32_t id, uint32_t textureId, uint32_t materialId) {

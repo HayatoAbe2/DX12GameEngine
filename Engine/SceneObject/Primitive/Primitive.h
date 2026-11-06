@@ -9,7 +9,10 @@ enum class PrimitiveShape {
 	Cylinder,
 };
 
-class Primitive : public SceneObject {
+/// <summary>
+/// 簡単な図形
+/// </summary>
+class Primitive final : public SceneObject {
 public:
 	Primitive(uint32_t id) : SceneObject(id) {};
 	void Initialize(std::unique_ptr<Material> material) {

@@ -505,7 +505,7 @@ void SceneEditor::Load(const std::string& path, Vector3 offset) {
 
 		// モデル
 		if (type == "Model") {
-			auto model = asset.LoadModel(objectJson["path"], objectJson["name"]);
+			std::unique_ptr<Model> model = asset.LoadModel(objectJson["path"], objectJson["name"]);
 			model->tag = objectJson["tag"];
 
 			// Transform
@@ -651,7 +651,7 @@ void SceneEditor::DeserializeScene(const std::string& jsonText) {
 		// モデル
 		if (type == "Model") {
 			auto& asset = GameContext::GetInstance().Asset();
-			auto model = asset.LoadModel(objectJson["path"], objectJson["name"]);
+			std::unique_ptr<Model> model = asset.LoadModel(objectJson["path"], objectJson["name"]);
 			model->tag = objectJson["tag"];
 
 			// Transform
@@ -674,7 +674,7 @@ void SceneEditor::DeserializeScene(const std::string& jsonText) {
 
 			auto& asset = GameContext::GetInstance().Asset();
 			int count = static_cast<int>(objectJson["transforms"].size());
-			auto model = asset.LoadInstancedModel(
+			std::unique_ptr<InstancedModel> model = asset.LoadInstancedModel(
 				objectJson["path"],
 				objectJson["name"], count);
 			model->tag = objectJson["tag"];

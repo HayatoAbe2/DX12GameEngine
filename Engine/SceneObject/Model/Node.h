@@ -4,6 +4,9 @@
 #include <vector>
 #include <memory>
 
+/// <summary>
+/// モデルのノード
+/// </summary>
 struct ModelNode {
     QuaternionTransform transform;
 	Matrix4x4 localMatrix;

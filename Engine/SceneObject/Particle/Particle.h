@@ -2,6 +2,9 @@
 #include "Engine/SceneObject/Transform.h"
 #include "Engine/Math/MathUtils.h"
 
+/// <summary>
+/// CPUパーティクル
+/// </summary>
 struct Particle {
     Transform transform;
     Vector3 velocity;
@@ -10,6 +13,9 @@ struct Particle {
     bool alive = false;
 };
 
+/// <summary>
+/// GPUパーティクル
+/// </summary>
 struct GPUParticle {
     Vector3 scale;
     Vector3 translate;

@@ -13,7 +13,11 @@
 class Renderer;
 class Camera;
 class BufferManager;
-class Model : public SceneObject {
+
+/// <summary>
+/// 単体で描画するモデル
+/// </summary>
+class Model final : public SceneObject {
 public:
 	Model(uint32_t id) : SceneObject(id) {};
 	void Update();

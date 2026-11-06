@@ -8,7 +8,7 @@ class Renderer;
 class Camera;
 
 // タイトル
-class TitleScene : public BaseScene {
+class TitleScene final : public BaseScene {
 public:
 
 	~TitleScene() override;

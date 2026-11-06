@@ -6,7 +6,7 @@
 #include <memory>
 
 class BufferManager;
-class Material : public Resource {
+class Material final : public Resource {
 public:
 	Material(uint32_t id) : Resource(id) {};
 

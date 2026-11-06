@@ -1,11 +1,11 @@
 #include "AssetManager.h"
 
-AssetManager::AssetManager(DirectXContext* dxContext, Logger* logger) {
-	textureManager_ = std::make_unique<TextureManager>(dxContext, logger);
-	modelManager_ = std::make_unique<ModelManager>(dxContext, logger, textureManager_.get());
-	spriteManager_ = std::make_unique<SpriteManager>(dxContext, logger, textureManager_.get());
-	animationManager_ = std::make_unique<AnimationManager>();
-	particleManager_ = std::make_unique<ParticleManager>(dxContext);
+AssetManager::AssetManager(DirectXContext* dxContext, Logger* logger) :
+	textureManager_(std::make_unique<TextureManager>(dxContext, logger)),
+	modelManager_(std::make_unique<ModelManager>(dxContext, logger, textureManager_.get())),
+	spriteManager_(std::make_unique<SpriteManager>(dxContext, logger, textureManager_.get())),
+	animationManager_(std::make_unique<AnimationManager>()),
+	particleManager_(std::make_unique<ParticleManager>(dxContext)) {
 }
 
 std::unique_ptr<Model> AssetManager::LoadModelFile(const std::string& directoryPath, const std::string& filename) {

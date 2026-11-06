@@ -6,6 +6,9 @@
 #include "Engine/SceneObject/Sprite/Sprite.h"
 class AssetManager;
 
+/// <summary>
+/// モデルなどのロードを行う窓口
+/// </summary>
 class AssetContext {
 public:
 	AssetContext(AssetManager* assetManager);

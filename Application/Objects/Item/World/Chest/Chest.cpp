@@ -2,7 +2,7 @@
 
 Chest::Chest(Vector2 position) {
 	auto& ctx = GameContext::GetInstance();
-	auto asset = ctx.Asset();
+	auto& asset = ctx.Asset();
 
 	// モデル
 	model_ = asset.LoadModel("Resources/Models/Chest", "Chest.glb");
@@ -61,7 +61,7 @@ void Chest::Update() {
 
 void Chest::Draw() {
 	auto& ctx = GameContext::GetInstance();
-	auto render = ctx.Render();
+	auto& render = ctx.Render();
 	model_->SetTranslate(Vector3(position_.x, height_, position_.y));
 	render.DrawModel(model_.get());
 }

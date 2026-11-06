@@ -5,7 +5,7 @@
 /// <summary>
 /// 爆発エフェクト
 /// </summary>
-class ExplodeEffect {
+class ExplodeEffect final {
 public:
 	ExplodeEffect(const Vector3 pos, const Vector4 color, const float maxSize);
 	void Update();

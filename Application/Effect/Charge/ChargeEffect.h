@@ -4,7 +4,7 @@
 /// <summary>
 /// チャージ中の弾の表示
 /// </summary>
-class ChargeEffect {
+class ChargeEffect final {
 public:
 	ChargeEffect(Vector4 color);
 

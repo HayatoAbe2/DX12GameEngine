@@ -5,7 +5,7 @@ Result::Result(Fade* fade) {
 	fade_ = fade;
 
 	auto& ctx = GameContext::GetInstance();
-	auto asset = ctx.Asset();
+	auto& asset = ctx.Asset();
 	resultBG_ = asset.LoadSprite("resources/Images/Result/result.png");
 	resultBG_->SetColor({ 1, 1, 1, 0.7f });
 
@@ -17,8 +17,8 @@ Result::Result(Fade* fade) {
 
 void Result::Update(FloorManager* floor) {
 	auto& ctx = GameContext::GetInstance();
-	auto input = ctx.Input();
-	auto scene = ctx.Scene();
+	auto& input = ctx.Input();
+	auto& scene = ctx.Scene();
 
 	switch (fade_->GetPhase()) {
 	case FadePhase::None:

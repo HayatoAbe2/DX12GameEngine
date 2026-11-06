@@ -2,6 +2,9 @@
 #include "Engine/Math/MathUtils.h"
 #include "Engine/SceneObject/Particle/Particle.h"
 
+/// <summary>
+/// パーティクルの動きに影響する場
+/// </summary>
 class ParticleField {
 public:
 	void Update(Particle* particle);
