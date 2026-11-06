@@ -63,7 +63,7 @@ public:
 		transforms_[index].translate = translate;
 	}
 
-	std::vector<Transform> GetTransforms() { return transforms_; }
+	const std::vector<Transform>& GetTransforms() const { return transforms_; }
 	void SetInstanceTransformData(InstanceGPUData* data) { instanceTransformationData_ = data; }
 	const D3D12_GPU_VIRTUAL_ADDRESS GetInstanceCBV()const { return instanceTransformationResource_->GetGPUVirtualAddress(); }
 

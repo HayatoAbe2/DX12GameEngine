@@ -25,7 +25,7 @@ public:
 	void Update(bool canGoal);
 	void Draw(Camera* camera);
 
-	std::vector<std::vector<Tile>> GetMap() { return map_; }
+	const std::vector<std::vector<Tile>>& GetMap() const { return map_; }
 	int GetWidth() { return mapWidth_; }
 	int GetHeight() { return mapHeight_; }
 	float GetTileSize() { return tileSize_; }

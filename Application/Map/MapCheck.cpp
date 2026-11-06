@@ -3,15 +3,15 @@
 #include "Objects/Character/Player/Player.h"
 #include <algorithm>
 
-MapCheck::MapCheck(std::vector<std::vector<Tile>> map, float tileSize) : map_(map), tileSize_(tileSize){
+MapCheck::MapCheck(const std::vector<std::vector<Tile>>& map, float tileSize) : map_(map), tileSize_(tileSize){
 }
 
-void MapCheck::Reset(std::vector<std::vector<Tile>> map, float tileSize){
+void MapCheck::Reset(const std::vector<std::vector<Tile>>& map, float tileSize){
 	map_ = map;
 	tileSize_ = tileSize;
 }
 
-void MapCheck::Update(std::vector<std::vector<Tile>> map) {
+void MapCheck::Update(const std::vector<std::vector<Tile>>& map) {
 	map_ = map;
 
 	auto& ctx = GameContext::GetInstance();

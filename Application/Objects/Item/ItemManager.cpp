@@ -191,15 +191,15 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 			passiveCtx);
 		break;
 	case PASSIVEITEM::Heal:
-		p = std::make_unique<ExtraAttack>(
-			asset.LoadSprite("Resources/Images/Items/6.png"),
-			asset.LoadSprite("Resources/Images/Items/Explain/item_extraAttack.png"),
-			passiveCtx);
-		break;
-	default:
 		p = std::make_unique<Heal>(
 			asset.LoadSprite("Resources/Images/Items/14.png"),
 			asset.LoadSprite("Resources/Images/Items/Explain/item_lifeSteal.png"),
+			passiveCtx);
+		break;
+	default:
+		p = std::make_unique<ExtraAttack>(
+			asset.LoadSprite("Resources/Images/Items/6.png"),
+			asset.LoadSprite("Resources/Images/Items/Explain/item_extraAttack.png"),
 			passiveCtx);
 		break;
 	}

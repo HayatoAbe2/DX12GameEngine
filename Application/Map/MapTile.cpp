@@ -48,7 +48,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 		auto matData = model->GetMaterial(0)->GetData();
 
 		if (model->tag == "floor") {
-			for (Transform& t : model->GetTransforms()) {
+			for (const Transform& t : model->GetTransforms()) {
 				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
 				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
 				int x = tileX + mapWidth_ / 2;
@@ -61,7 +61,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			}
 		}
 		if (model->tag == "wall") {
-			for (Transform& t : model->GetTransforms()) {
+			for (const Transform& t : model->GetTransforms()) {
 				if (t.scale == Vector3{ 0,0,0 }) continue;
 				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
 				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
@@ -75,7 +75,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			}
 		}
 		if (model->tag == "barrier") {
-			for (Transform& t : model->GetTransforms()) {
+			for (const Transform& t : model->GetTransforms()) {
 				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
 				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
 				int x = tileX + mapWidth_ / 2;
@@ -92,7 +92,7 @@ void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
 			model->GetMaterial(1)->SetData(matData);
 		}
 		if (model->tag == "goal") {
-			for (Transform& t : model->GetTransforms()) {
+			for (const Transform& t : model->GetTransforms()) {
 				int tileX = static_cast<int>(std::floor(t.translate.x / tileSize_ + 0.5f));
 				int tileY = static_cast<int>(std::floor(t.translate.z / tileSize_ + 0.5f));
 				int x = tileX + mapWidth_ / 2;

@@ -11,11 +11,11 @@ class Player;
 /// </summary>
 class MapCheck {
 public:
-	MapCheck(std::vector<std::vector<Tile>> map, float tileSize);
-	void Reset(std::vector<std::vector<Tile>> map, float tileSize);
+	MapCheck(const std::vector<std::vector<Tile>>& map, float tileSize);
+	void Reset(const std::vector<std::vector<Tile>>& map, float tileSize);
 
 	// 変更の反映
-	void Update(std::vector<std::vector<Tile>> map);
+	void Update(const std::vector<std::vector<Tile>>& map);
 
 	// 衝突判定と座標修正
 	bool ResolveCollisionX(Vector2& pos, float radius, bool isFlying);

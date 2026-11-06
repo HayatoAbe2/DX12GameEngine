@@ -95,8 +95,10 @@ void Bullet::Draw(Camera* camera) {
 	render.DrawParticle(hitParticle_.get(), BlendMode::Add);
 
 	// 当たり判定表示
-	hitboxDisplay_->Update(data_.radius, collider_.center);
-	hitboxDisplay_->Draw();
+	if (!isDead_) {
+		hitboxDisplay_->Update(data_.radius, collider_.center);
+		hitboxDisplay_->Draw();
+	}
 }
 
 void Bullet::Hit() {
