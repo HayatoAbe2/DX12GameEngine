@@ -2,7 +2,9 @@
 #include "GameCommon.h"
 #include "Objects/Character/Player/Player.h"
 
-// インタラクト可能
+/// <summary>
+/// インタラクト可能
+/// </summary>
 class Interactable {
 public:
     virtual ~Interactable() = default;

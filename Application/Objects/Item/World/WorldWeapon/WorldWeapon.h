@@ -2,7 +2,9 @@
 #include "Objects/Weapon/Weapon.h"
 #include "Objects/Item/World/WorldItem.h"
 
-// 落ちている状態
+/// <summary>
+/// 落ちている武器
+/// </summary>
 class WorldWeapon : public WorldItem {
 public:
 	// コンストラクタで所有権移転

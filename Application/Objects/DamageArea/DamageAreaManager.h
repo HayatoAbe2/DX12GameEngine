@@ -1,9 +1,14 @@
 #pragma once
 #include "DamageArea.h"
+
+/// <summary>
+/// ダメージ範囲の管理
+/// </summary>
 class DamageAreaManager {
 public:
 	void Update();
 
+	// エリア追加
 	void AddArea(DamageAreaParam param, Team team);
 	std::vector<DamageArea*> GetAreas() {
 		std::vector<DamageArea*> result;

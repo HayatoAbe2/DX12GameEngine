@@ -1,5 +1,9 @@
 #pragma once
 #include "Objects/Character/Enemy/Enemy.h"
+
+/// <summary>
+/// 攻撃範囲までの接近
+/// </summary>
 class EnemyApproach : public EnemyState{
 public:
 	EnemyApproach();

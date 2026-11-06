@@ -7,6 +7,7 @@
 class Renderer;
 class Camera;
 
+// タイトル
 class TitleScene : public BaseScene {
 public:
 

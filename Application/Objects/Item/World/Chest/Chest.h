@@ -2,6 +2,9 @@
 #include "GameCommon.h"
 #include "Timer/Timer.h"
 
+/// <summary>
+/// チェスト
+/// </summary>
 class Chest {
 public:
 	Chest(Vector2 position);

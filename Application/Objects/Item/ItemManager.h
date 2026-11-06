@@ -11,6 +11,9 @@ class EnemyManager;
 class BulletManager;
 class Camera;
 
+/// <summary>
+/// ドロップしたアイテムの管理
+/// </summary>
 class ItemManager {
 public:
 	void Initialize(WeaponManager* weaponManager, EnemyManager* enemyManager, BulletManager* bulletManager);

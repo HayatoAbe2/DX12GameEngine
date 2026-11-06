@@ -11,6 +11,9 @@ class BulletManager;
 class EnemyManager;
 class MoneyUI;
 
+/// <summary>
+/// プレイヤー
+/// </summary>
 class Player : public Character {
 public:
 	~Player();

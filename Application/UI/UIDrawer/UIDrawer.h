@@ -7,6 +7,9 @@
 class Player;
 class FloorManager;
 
+/// <summary>
+/// UI描画
+/// </summary>
 class UIDrawer {
 public:
 	// 初期化

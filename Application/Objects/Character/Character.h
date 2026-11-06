@@ -4,6 +4,9 @@
 #include "Timer/Timer.h"
 #include "HitboxDisplay/HitboxDisplay.h"
 
+/// <summary>
+/// キャラクター基底
+/// </summary>
 class Character {
 public:
 	// トランスフォーム

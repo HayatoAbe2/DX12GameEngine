@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+/// 弾などの所属
+/// </summary>
 enum class Team {
 	Player,
 	Enemy

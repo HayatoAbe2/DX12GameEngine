@@ -1,6 +1,9 @@
 #pragma once
 #include "Objects/Item/Passive/Passive.h"
 
+/// <summary>
+/// 連鎖攻撃
+/// </summary>
 class Lightning : public Passive{
 public:
 	Lightning(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx);

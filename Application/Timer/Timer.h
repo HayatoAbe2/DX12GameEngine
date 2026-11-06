@@ -1,6 +1,8 @@
 #pragma once
 
-// 汎用タイマークラス
+/// <summary>
+/// 汎用タイマークラス
+/// </summary>
 class Timer {
 public:
     void Start(float duration);

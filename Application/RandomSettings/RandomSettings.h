@@ -2,10 +2,16 @@
 #include <memory>
 #include "EnemySpawn/EnemySpawnSetting.h"
 
+/// <summary>
+/// 敵出現テーブル
+/// </summary>
 struct SpawnTable {
 	std::vector<EnemySpawn> enemy;
 };
 
+/// <summary>
+/// ランダム系の統括
+/// </summary>
 class RandomSettings {
 public:
 	RandomSettings();

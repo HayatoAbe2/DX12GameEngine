@@ -30,6 +30,7 @@ public:
 	void StartFadeIn(float seconds = kMaxFadeinTimer_);
 	void StartFadeOut(float seconds = kMaxFadeoutTimer_);
 
+	// フェード中
 	bool IsActive() { return timer_.IsActive(); }
 	FadePhase GetPhase() { return fadePhase_; }
 

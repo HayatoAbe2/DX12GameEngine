@@ -14,6 +14,7 @@ public:
 	void Draw(Camera* camera);
 	void Reset();
 
+	// 弾の追加(発射)
 	void AddBullet(std::unique_ptr<Bullet> newBullet);
 	std::vector<Bullet*> GetBullets();
 private:

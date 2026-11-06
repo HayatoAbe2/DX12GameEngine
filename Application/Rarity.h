@@ -9,6 +9,7 @@ enum class Rarity {
 	Legendary,
 };
 
+// JSON用Enum
 NLOHMANN_JSON_SERIALIZE_ENUM(
 	Rarity,
 	{

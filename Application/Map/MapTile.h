@@ -36,6 +36,7 @@ private:
 	int mapWidth_ = 64;
 	int mapHeight_ = 64;
 	
+	// パーティクル
 	Transform particleTransform_{};
 	std::unique_ptr<ParticleSystem> particle_ = nullptr;
 	const int particleNum_ = 30;

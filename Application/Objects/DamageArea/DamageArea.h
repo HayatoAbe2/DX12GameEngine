@@ -11,16 +11,22 @@ enum class AreaPhase {
 	Count
 };
 
+/// <summary>
+/// 範囲攻撃パラメータ
+/// </summary>
 struct DamageAreaParam {
 	Circle circle;
 	Team team;
 
 	float damage = 0;
-	float delay = 0;
+	float delay = 0; // 判定が出るまでの時間
 	float duration = 0;
 	float hitInterval = 0.5f;
 };
 
+/// <summary>
+/// ダメージ範囲
+/// </summary>
 class DamageArea {
 public:
 	DamageArea(DamageAreaParam param, Team team);

@@ -3,6 +3,9 @@
 
 class FloorManager;
 
+/// <summary>
+/// 次の部屋説明
+/// </summary>
 class NextRoomUI {
 public:
 	NextRoomUI(FloorManager* floorManager);

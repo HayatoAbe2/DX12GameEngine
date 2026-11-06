@@ -4,6 +4,9 @@
 
 class Weapon;
 
+/// <summary>
+/// 武器生成
+/// </summary>
 class WeaponManager {
 public:
 	void Initialize();

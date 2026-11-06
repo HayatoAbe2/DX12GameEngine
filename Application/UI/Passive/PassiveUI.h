@@ -4,6 +4,9 @@
 
 class Player;
 
+/// <summary>
+/// 装備中のパッシブアイテム
+/// </summary>
 class PassiveUI {
 public:
 	PassiveUI(Player* player);

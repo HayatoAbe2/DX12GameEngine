@@ -8,7 +8,9 @@
 #include "Objects/Item/Passive/Heal/Heal.h"
 #include "Objects/Item/Passive/ExtraAttack/ExtraAttack.h"
 
-// 落ちている状態
+/// <summary>
+/// 落ちているパッシブアイテム
+/// </summary>
 class WorldPassive : public WorldItem {
 public:
 	// コンストラクタで所有権移転

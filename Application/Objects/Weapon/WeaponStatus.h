@@ -40,9 +40,7 @@ struct BurstParam {
 	Vector2 dir;
 };
 
-struct WeaponStats {
-	// 弾のブレ
-
+struct WeaponStats { 
 	// 減速率
 	float weight;
 	// 射撃クールダウン

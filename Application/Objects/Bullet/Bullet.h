@@ -34,6 +34,7 @@ public:
 	void OnHitWall(EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 	void OnHitAnything(EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 private:
+	// 移動の処理
 	void Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 
 	// 弾ステータス

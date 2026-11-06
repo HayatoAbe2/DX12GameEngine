@@ -6,11 +6,17 @@
 #include "Objects/Item/Item.h"
 #include "Timer/Timer.h"
 
+/// <summary>
+/// 渡すポインタまとめ
+/// </summary>
 struct PassiveContext {
 	EnemyManager* enemyManager;
 	BulletManager* bulletManager;
 };
 
+/// <summary>
+/// パッシブアイテム
+/// </summary>
 class Passive : public Item {
 public:
 	~Passive() = default;

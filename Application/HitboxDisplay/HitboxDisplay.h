@@ -2,7 +2,9 @@
 #include "GameCommon.h"
 #include <Objects/Weapon/ShooterInfo/ShooterInfo.h>
 
-// 当たり判定の足元表示
+/// <summary>
+/// 当たり判定の足元表示
+/// </summary>
 class HitboxDisplay {
 public:
 	HitboxDisplay(Team team);
@@ -10,8 +12,10 @@ public:
 	void Draw();
 
 private:
+	// 表示する図形(円)
 	std::unique_ptr<Primitive> primitive_;
 
+	// 表示する高さ
 	const float kHeight = 0.05f;
 };
 

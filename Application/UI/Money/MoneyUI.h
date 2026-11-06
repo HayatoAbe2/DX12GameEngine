@@ -4,6 +4,9 @@
 
 class Wallet;
 
+/// <summary>
+/// 所持金表示
+/// </summary>
 class MoneyUI {
 public:
 	MoneyUI(Wallet& wallet);

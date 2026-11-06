@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+/// 敵ステータス構造体
+/// </summary>
 struct EnemyStatus {
 	// hp
 	float hp = 10;

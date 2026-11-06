@@ -1,5 +1,9 @@
 #pragma once
 #include "Objects/Character/Enemy/Enemy.h"
+
+/// <summary>
+/// 敵の待機状態
+/// </summary>
 class EnemyIdle : public EnemyState {
 public:
 	EnemyIdle();

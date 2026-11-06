@@ -10,6 +10,9 @@
 class MapCheck;
 class Player;
 
+/// <summary>
+/// 敵データ
+/// </summary>
 struct EnemyData {
 	std::string modelName;
 	int animationIndex = -1;
@@ -28,6 +31,9 @@ struct EnemyData {
 	int maxSpawnCount = 1;
 };
 
+/// <summary>
+/// 敵キャラ
+/// </summary>
 class Enemy : public Character {
 public:
 	virtual ~Enemy() = default;

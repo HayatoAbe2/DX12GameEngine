@@ -1,6 +1,9 @@
 #pragma once
 class MoneyUI;
 
+/// <summary>
+/// 所持金の追加・消費
+/// </summary>
 class Wallet {
 public:
 	void Initialize(MoneyUI* ui);

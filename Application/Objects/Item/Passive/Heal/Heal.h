@@ -1,6 +1,9 @@
 #pragma once
 #include "Objects/Item/Passive/Passive.h"
 
+/// <summary>
+/// 敵を倒した時回復
+/// </summary>
 class Heal : public Passive {
 public:
 	Heal(std::unique_ptr<Sprite> sprite, std::unique_ptr<Sprite> explain, PassiveContext ctx);

@@ -4,6 +4,10 @@
 #include "Fade/Fade.h"
 
 class FloorManager;
+
+/// <summary>
+/// リザルト画面
+/// </summary>
 class Result {
 public:
 	Result(Fade* fade);

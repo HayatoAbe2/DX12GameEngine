@@ -2,6 +2,10 @@
 #include "GameCommon.h"
 
 class Player;
+
+/// <summary>
+/// 装備アイテムUI
+/// </summary>
 class EquipmentUI {
 public:
 	void Initialize(Player* player);

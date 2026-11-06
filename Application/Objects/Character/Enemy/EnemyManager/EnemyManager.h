@@ -11,12 +11,19 @@ class BulletManager;
 class ItemManager;
 class WeaponManager;
 
+/// <summary>
+/// 敵の管理
+/// </summary>
 class EnemyManager {
 public:
 	EnemyManager(FloorManager* floorManager) { floorManager_ = floorManager; }
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager);
 	void Draw();
+
+	// 敵スポーン
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
+
+	// 敵を抽選して出現予約
 	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyType enemyType);
 	void Reset();
 	void Load(WeaponManager* weaponManager, RandomSettings* random);

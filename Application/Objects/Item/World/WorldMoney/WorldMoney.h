@@ -1,7 +1,9 @@
 #pragma once
 #include "Objects/Item/World/WorldItem.h"
 
-// 落ちている状態
+/// <summary>
+/// 落ちているお金
+/// </summary>
 class WorldMoney : public WorldItem {
 public:
 	// 出現

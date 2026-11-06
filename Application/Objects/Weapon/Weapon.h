@@ -9,11 +9,15 @@
 
 class BulletManager;
 
+/// <summary>
+/// 武器
+/// </summary>
 class Weapon : public Item {
 public:
 	Weapon(const WeaponData& data, std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel);
 	~Weapon() = default;
 
+	// 発射入力されたときの処理
 	float Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
 	void Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from, bool isPress = false);
 	void Draw();
@@ -29,7 +33,9 @@ public:
 	
 	float GetCharge() { return charge_; }
 	bool CanChange() { return canChange_; }
+
 private:
+	// 弾の発射
 	float Fire(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from);
 	void SetChargeStartTimer();
 	// 溜めエフェクト

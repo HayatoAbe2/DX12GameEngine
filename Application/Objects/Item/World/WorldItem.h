@@ -3,7 +3,9 @@
 #include "Rarity.h"
 #include "Objects/Character/Player/Player.h"
 
-// 落ちているアイテム
+/// <summary>
+/// 落ちているアイテム
+/// </summary>
 class WorldItem {
 public:
 	WorldItem(Vector3 pos, Rarity rarity, bool isForSale = false);
@@ -15,6 +17,7 @@ public:
 	// 取得されたとき
 	virtual void OnPickup(Player* player) = 0;
 
+	// プレイヤーに向かって移動(自動取得時)
 	void MoveToPlayer(Vector2 pos);
 
 	Vector2 GetPosition() { return position_; }
