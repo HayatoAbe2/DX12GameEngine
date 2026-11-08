@@ -6,6 +6,7 @@
 #include <list>
 #include <numbers>
 #include <array>
+#include <unordered_map>
 
 // 配置物
 #include "Engine/Scene/Camera/Camera.h"

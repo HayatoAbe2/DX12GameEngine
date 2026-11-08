@@ -112,19 +112,14 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 			auto transform = model->GetTransform();
 
 			// 出入口の方向
-			Direction dir = Direction::North;
-			if (model->tag == "westConnector") {
-				dir = Direction::West;
-			} else if (model->tag == "eastConnector") {
-				dir = Direction::East;
-			} else if (model->tag == "southConnector") {
-				dir = Direction::South;
-			} else if (model->tag == "northConnector") {
-				dir = Direction::North;
+			Direction dir = Direction::North; // 初期値
+			auto it = exitDir.find(model->tag);
+			if (it != exitDir.end()) {
+				dir = it->second;
 			}
 
-			// スタート地点
 			if (dir == room->startDirection) {
+				// スタート地点には出口を作らない
 				room->startPos = ToXZ(transform.translate);
 				continue;
 			} else if (room->startPos.x == 0 && room->startPos.y == 0) {
@@ -142,14 +137,3 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 		}
 	}
 }
-
-Direction FloorGenerator::GetOpposite(Direction direction) {
-	switch (direction) {
-	case Direction::North: return Direction::South;
-	case Direction::East:  return Direction::West;
-	case Direction::South: return Direction::North;
-	case Direction::West:  return Direction::East;
-	}
-	return Direction::South;
-}
-

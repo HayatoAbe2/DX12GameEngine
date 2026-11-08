@@ -17,7 +17,7 @@ public:
 	void LoadRoom(Room* room, Direction exitDir);
 
 	// 逆方向
-	Direction GetOpposite(Direction direction);
+	Direction GetOpposite(Direction direction) { return opposite.at(direction); }
 
 private:
 	// 部屋生成
@@ -27,5 +27,21 @@ private:
 	RoomType SelectRoomType();
 
 	Room floor_;
+
+	// 出口方向の割り当て
+	std::unordered_map<std::string, Direction> exitDir{
+		{ "westConnector", Direction::West },
+		{ "eastConnector", Direction::East },
+		{ "northConnector", Direction::North },
+		{ "southConnector", Direction::South }
+	};
+
+	// 逆方向
+	std::unordered_map<Direction, Direction> opposite{
+		{ Direction::North, Direction::South },
+		{ Direction::East, Direction::West },
+		{ Direction::South, Direction::North },
+		{ Direction::West, Direction::East }
+	};
 };
 
