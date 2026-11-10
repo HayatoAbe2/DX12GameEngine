@@ -1,5 +1,5 @@
 {
-    "4way_Enemy": {
+    "FourWay_Enemy": {
         "modelName": "AssaultRifle.obj",
 
         "weight": 0.5,

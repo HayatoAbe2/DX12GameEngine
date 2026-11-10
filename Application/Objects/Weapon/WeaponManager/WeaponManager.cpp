@@ -18,8 +18,8 @@ void WeaponManager::Initialize() {
 	LoadJson("Resources/Data/Weapons/Fireball_Enemy.json", true);
 	LoadJson("Resources/Data/Weapons/AssaultRifle_Enemy.json", true);
 	LoadJson("Resources/Data/Weapons/Pistol_Enemy.json", true);
-	LoadJson("Resources/Data/Weapons/3way_Enemy.json", true);
-	LoadJson("Resources/Data/Weapons/4way_Enemy.json", true);
+	LoadJson("Resources/Data/Weapons/ThreeWay_Enemy.json", true);
+	LoadJson("Resources/Data/Weapons/FourWay_Enemy.json", true);
 	LoadJson("Resources/Data/Weapons/LargeFireball_Enemy.json", true);
 }
 

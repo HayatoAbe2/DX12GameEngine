@@ -67,8 +67,8 @@ private:
 		"Fireball",
 		"AssaultRifle",
 		"Pistol",
-		"3way",
-		"4way",
+		"Threeway",
+		"Fourway",
 		"LargeFireball"
 	};
 };

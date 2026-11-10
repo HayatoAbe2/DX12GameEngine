@@ -8,7 +8,7 @@ EnemyAttack::EnemyAttack() {
 void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
 	Transform transform = enemy->GetTransform();
-	Timer attackTimer = enemy->GetAttackTimer();
+	Timer& attackTimer = enemy->GetAttackTimer();
 
 	// 攻撃の向き
 	Vector2 attackDirection = ToXZ(Normalize(player->GetTransform().translate - transform.translate));

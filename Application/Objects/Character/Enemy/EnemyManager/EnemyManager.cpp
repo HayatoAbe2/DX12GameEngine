@@ -78,7 +78,7 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const 
 
 		// 位置をずらす
 		Vector3 spawnPos = pos;
-		if (i < 0) {
+		if (i > 0) {
 			spawnPos = pos + Vector3{ ctx.RandomFloat(-1,1), 0, ctx.RandomFloat(-1,1) };
 			model->SetTranslate(spawnPos);
 			shadow->SetTranslate(spawnPos);
