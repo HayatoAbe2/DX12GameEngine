@@ -8,6 +8,7 @@
 #include "Engine/Asset/Manager/SpriteManager/SpriteManager.h"
 #include "Engine/Asset/Manager/AnimationManager/AnimationManager.h"
 #include "Engine/Asset/Manager/ParticleManager/ParticleManager.h"
+#include <Engine/SceneObject/Video/VideoPlayer/VideoPlayer.h>
 
 class DirectXContext;
 class Logger;
@@ -28,6 +29,8 @@ public:
 	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
 	std::unique_ptr<Material> CreateMaterial(std::shared_ptr<Texture> texture);
 	std::vector<std::shared_ptr<Animation>> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
+	std::unique_ptr<VideoPlayer> LoadVideo(const std::string& filePath, bool loop = true);
+	std::unique_ptr<Sprite> LoadSprite(std::shared_ptr<Texture> texture);
 
 private:
 	uint32_t GenerateID();
@@ -46,6 +49,9 @@ private:
 
 	// パーティクル
 	std::unique_ptr<ParticleManager> particleManager_ = nullptr;
+
+	DirectXContext* dxContext_;
+	Logger* logger_;
 
 	uint32_t assetId_ = 0;
 };

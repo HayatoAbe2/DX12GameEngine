@@ -314,6 +314,10 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Objects\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Application\Result\Result.cpp" />
     <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
+    <ClCompile Include="Engine\SceneObject\Video\VideoDecoder\VideoDecoder.cpp" />
+    <ClCompile Include="Engine\SceneObject\Video\VideoTexture\VideoTexture.cpp" />
+    <ClCompile Include="Engine\SceneObject\Video\VideoPlayer\VideoPlayer.cpp" />
+    <ClCompile Include="Application\UI\WeaponSummary\WeaponSummary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Dissolve\Dissolve.PS.hlsl">
@@ -633,6 +637,10 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
     <ClInclude Include="Application\UI\Passive\PassiveUI.h" />
     <ClInclude Include="Application\HitboxDisplay\HitboxDisplay.h" />
+    <ClInclude Include="Engine\SceneObject\Video\VideoDecoder\VideoDecoder.h" />
+    <ClInclude Include="Engine\SceneObject\Video\VideoTexture\VideoTexture.h" />
+    <ClInclude Include="Engine\SceneObject\Video\VideoPlayer\VideoPlayer.h" />
+    <ClInclude Include="Application\UI\WeaponSummary\WeaponSummary.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

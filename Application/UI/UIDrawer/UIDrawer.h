@@ -3,17 +3,18 @@
 #include "UI/Money/MoneyUI.h"
 #include "UI/NextRoom/NextRoomUI.h"
 #include "UI/Passive/PassiveUI.h"
+#include "UI/WeaponSummary/WeaponSummary.h"
 
 class Player;
 class FloorManager;
+class ItemManager;
 
 /// <summary>
 /// UI描画
 /// </summary>
 class UIDrawer {
 public:
-	// 初期化
-	void Initialize(Player* player, FloorManager* floorManager);
+	UIDrawer(Player* player, FloorManager* floorManager, ItemManager* itemManager);
 	// 更新
 	void Update();
 	// 描画
@@ -25,7 +26,8 @@ public:
 	void UpdateStageUI();
 
 private:
-	Player* player_ = nullptr;
+	Player* player_;
+	ItemManager* itemManager_;
 
 	struct SpriteData {
 		Vector2 pos;
@@ -57,8 +59,9 @@ private:
 	std::unique_ptr<Sprite> currentFloor_ = nullptr;
 	SpriteData floorUIData_ = { {640,320}, { 212,32 } };
 
-	std::unique_ptr<MoneyUI> money_ = nullptr;
-	std::unique_ptr<NextRoomUI> nextRoom_ = nullptr;
-	std::unique_ptr<PassiveUI> passive_ = nullptr;
+	std::unique_ptr<MoneyUI> money_;
+	std::unique_ptr<NextRoomUI> nextRoom_;
+	std::unique_ptr<PassiveUI> passive_;
+	std::unique_ptr<WeaponSummaryUI> weaponSummary_;
 };
 

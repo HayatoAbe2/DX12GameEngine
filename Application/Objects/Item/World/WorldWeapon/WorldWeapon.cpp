@@ -22,6 +22,10 @@ std::unique_ptr<Weapon> WorldWeapon::GetWeapon() {
 	return std::move(weapon_);
 }
 
+const WeaponData& WorldWeapon::GetWeaponData() {
+	return weapon_->GetData();
+}
+
 void WorldWeapon::Update() {
 	Model* model = weapon_->GetModel();
 	Model* shadow = weapon_->GetShadowModel();

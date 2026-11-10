@@ -16,6 +16,7 @@ public:
 	SpriteManager(DirectXContext* dxContext, Logger* logger, TextureManager* textureManager);
 
 	std::unique_ptr<Sprite> Load(const std::string& texturePath, uint32_t id, uint32_t textureId, uint32_t materialId);
+	std::unique_ptr<Sprite> Create(std::shared_ptr<Texture> texture, uint32_t id, uint32_t materialId);
 
 private:
 	// デバイス

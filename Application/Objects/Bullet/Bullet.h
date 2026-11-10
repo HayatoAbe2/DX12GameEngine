@@ -21,7 +21,7 @@ public:
 	void Draw(Camera* camera);
 	void Hit();
 
-	bool IsEnemyBullet() { return isEnemyBullet_; }
+	Team GetTeam() { return user_->GetTeam(); }
 	const Circle& GetCollider() const { return collider_; }
 	BulletData& GetData() { return data_; }
 	float GetDamage() { return data_.damage; }
@@ -52,8 +52,6 @@ private:
 	// 生存時間
 	int lifeTime_ = 0;
 
-	// 敵の弾フラグ
-	bool isEnemyBullet_ = false;
 	// 死亡フラグ(判定やめる)
 	bool isDead_ = false;
 	// 弾リストから削除可能

@@ -24,7 +24,8 @@ struct Ricochet {
 struct Explode {
 	// 半径
 	float radius;
-	float t;
+	// 爆発ダメージ
+	float damage;
 };
 
 // 軌道回転

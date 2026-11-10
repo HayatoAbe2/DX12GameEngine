@@ -46,4 +46,8 @@ private:
 
 	// タイマー
 	Timer sceneChangeTimer_;
+
+	// 動画
+	std::unique_ptr<VideoPlayer> video_;
+	std::unique_ptr<Sprite> videoSprite_;
 };

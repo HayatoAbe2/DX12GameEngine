@@ -12,7 +12,7 @@ void CollisionChecker::CheckPlayer(Player* player, Bullet* bullet) {
 	auto& audio = ctx.Audio();
 
 	// 敵の弾でなかったらor無敵時間なら判定しない
-	if (!bullet->IsEnemyBullet() ||
+	if (bullet->GetTeam() == Team::Player ||
 		player->IsInvincible()) {
 		return;
 	}
@@ -80,7 +80,7 @@ void CollisionChecker::CheckEnemy(Enemy* enemy, Bullet* bullet, Player* player) 
 	auto& audio = ctx.Audio();
 
 	// 敵の弾だったら判定しない
-	if (bullet->IsEnemyBullet() || bullet->IsDead() || !bullet->CanHit()) { return; }
+	if (bullet->GetTeam() == Team::Enemy || bullet->IsDead() || !bullet->CanHit()) { return; }
 
 	Segment2D segment = { bullet->GetPrePos(), bullet->GetCollider().center };
 	Circle circle = { enemy->GetRadius() + bullet->GetCollider().radius, ToXZ(enemy->GetTransform().translate) };

@@ -40,6 +40,9 @@ public:
 
 	// シーンを見て配置
 	void Load();
+
+	// インタラクト中のアイテム
+	WorldItem* GetInteractive() { return interactive_; }
 	
 private:
 	// 宝箱からの出現

@@ -1,12 +1,13 @@
 #include "UIDrawer.h"
 #include "Objects/Character/Player/Player.h"
+#include "Objects/Item/ItemManager.h"
+#include <Objects/Item/World/WorldWeapon/WorldWeapon.h>
 
-void UIDrawer::Initialize(Player* player, FloorManager* floorManager) {
-	player_ = player;
-
+UIDrawer::UIDrawer(Player* player, FloorManager* floorManager, ItemManager* itemManager) : player_(player), itemManager_(itemManager) {
 	money_ = std::make_unique<MoneyUI>(player_->GetWallet());
 	nextRoom_ = std::make_unique<NextRoomUI>(floorManager);
 	passive_ = std::make_unique<PassiveUI>(player);
+	weaponSummary_ = std::make_unique<WeaponSummaryUI>();
 
 	equipment_ = std::make_unique<EquipmentUI>();
 	equipment_->Initialize(player);
@@ -72,6 +73,12 @@ void UIDrawer::Update() {
 
 	equipment_->Update();
 	nextRoom_->Update();
+
+	if (WorldWeapon* weapon = dynamic_cast<WorldWeapon*>(itemManager_->GetInteractive())) {
+		weaponSummary_->Update(weapon->GetWeaponData());
+	} else {
+		weaponSummary_->Update();
+	}
 }
 
 void UIDrawer::Draw() {
@@ -106,6 +113,7 @@ void UIDrawer::Draw() {
 	equipment_->Draw();
 	money_->Draw();
 	passive_->Draw();
+	weaponSummary_->Draw();
 
 }
 

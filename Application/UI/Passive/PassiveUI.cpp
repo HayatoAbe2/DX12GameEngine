@@ -3,9 +3,7 @@
 #include "Objects/Item/Passive/Passive.h"
 #include "Controller.h"
 
-PassiveUI::PassiveUI(Player* player) {
-	player_ = player;
-}
+PassiveUI::PassiveUI(Player* player) : player_(player) {}
 
 void PassiveUI::Draw() {
 	auto& ctx = GameContext::GetInstance();

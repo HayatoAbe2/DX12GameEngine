@@ -20,17 +20,11 @@ data_(data), user_(from){
 	}
 
 	// 敵弾の色統一
-	if (dynamic_cast<Enemy*>(user_)) {
-		data_.speed *= 0.5f;
-		data_.lifeTime *= 5;
+	if (user_->GetTeam() == Team::Enemy) {
 		data_.color = { 0.7f, 0.2f, 0.1f, data_.color.w };
 	}
 
 	velocity_ = direction * data_.speed;
-
-	if (dynamic_cast<Enemy*>(from)) {
-		isEnemyBullet_ = true;
-	}
 	lifeTime_ = data_.lifeTime;
 
 	// ヒット範囲表示
@@ -194,8 +188,6 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaMa
 		collider_.center.x += velocity_.x * ctx.GetDeltatime();
 		// 反射
 		if (mapCheck->IsHitWall(collider_.center, collider_.radius)) {
-			if (isEnemyBullet_) Hit();
-
 			data_.traits.onHitWall.ricochet->current++;
 			velocity_.x *= -1;
 			collider_.center.x += velocity_.x * 2 * ctx.GetDeltatime();
@@ -204,8 +196,6 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaMa
 		collider_.center.y += velocity_.y * ctx.GetDeltatime();
 		// 反射
 		if (mapCheck->IsHitWall(collider_.center, collider_.radius)) {
-			if (isEnemyBullet_) Hit();
-
 			data_.traits.onHitWall.ricochet->current++;
 			velocity_.y *= -1;
 			collider_.center.y += velocity_.y * 2 * ctx.GetDeltatime();
@@ -235,12 +225,8 @@ void Bullet::OnHitAnything(EffectManager* effectManager, DamageAreaManager* dama
 		effectManager->SpawnExplodeEffect({ collider_.center.x, 0.5f, collider_.center.y });
 
 		DamageAreaParam param;
-		param.damage = data_.damage;
-		param.circle = { 3.0f, collider_.center };
-		if (isEnemyBullet_) {
-			damageAreaManager->AddArea(param, Team::Enemy);
-		} else {
-			damageAreaManager->AddArea(param, Team::Player);
-		}
+		param.damage = data_.traits.onHitAnything.explode->damage;
+		param.circle = { data_.traits.onHitAnything.explode->radius, collider_.center };
+		damageAreaManager->AddArea(param, user_->GetTeam());
 	}
 }

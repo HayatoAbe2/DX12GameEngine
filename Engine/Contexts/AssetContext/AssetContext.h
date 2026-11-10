@@ -4,6 +4,7 @@
 #include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
 #include "Engine/SceneObject/Primitive/Primitive.h"
 #include "Engine/SceneObject/Sprite/Sprite.h"
+#include <Engine/SceneObject/Video/VideoPlayer/VideoPlayer.h>
 class AssetManager;
 
 /// <summary>
@@ -28,6 +29,7 @@ public:
 
 	// スプライト読み込み
 	std::unique_ptr<Sprite> LoadSprite(const std::string& texturePath);
+	std::unique_ptr<Sprite> LoadSprite(std::shared_ptr<Texture> texture);
 
 	// テクスチャ読み込み
 	std::shared_ptr<Texture> LoadTexture(const std::string& filePath);
@@ -38,7 +40,8 @@ public:
 	// アニメーション読み込み
 	std::vector<std::shared_ptr<Animation>> LoadAnimation(const std::string& directoryPath, const std::string& filePath);
 
-	//void SoundLoad(const wchar_t* filename);
+	// 動画スプライト読み込み
+	std::unique_ptr<VideoPlayer> LoadVideo(const std::string& filePath, bool isLoop);
 
 private:
 	AssetManager* assetManager_ = nullptr;

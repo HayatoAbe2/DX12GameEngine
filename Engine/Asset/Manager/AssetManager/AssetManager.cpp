@@ -1,6 +1,8 @@
 #include "AssetManager.h"
 
 AssetManager::AssetManager(DirectXContext* dxContext, Logger* logger) :
+	dxContext_(dxContext),
+	logger_(logger),
 	textureManager_(std::make_unique<TextureManager>(dxContext, logger)),
 	modelManager_(std::make_unique<ModelManager>(dxContext, logger, textureManager_.get())),
 	spriteManager_(std::make_unique<SpriteManager>(dxContext, logger, textureManager_.get())),
@@ -62,6 +64,18 @@ std::unique_ptr<Material> AssetManager::CreateMaterial(std::shared_ptr<Texture> 
 
 std::vector<std::shared_ptr<Animation>> AssetManager::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
 	return animationManager_->Load(directoryPath, filePath, [this]() {return GenerateID(); });
+}
+
+std::unique_ptr<VideoPlayer> AssetManager::LoadVideo(const std::string& filePath, bool loop) {
+	auto player = std::make_unique<VideoPlayer>(dxContext_, logger_, GenerateID());
+	player->Open(filePath, loop); // 失敗しても返す。呼び出し側が IsOpen() で確認する
+	return player;
+}
+
+std::unique_ptr<Sprite> AssetManager::LoadSprite(std::shared_ptr<Texture> texture) {
+	auto object = spriteManager_->Create(texture, GenerateID(), GenerateID());
+	object->name = "VideoSprite";
+	return object;
 }
 
 uint32_t AssetManager::GenerateID() {

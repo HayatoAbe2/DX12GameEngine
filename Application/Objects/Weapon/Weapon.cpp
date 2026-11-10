@@ -60,8 +60,8 @@ void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulle
 		}
 		// チャージしていて離したら1回だけ発射 
 		if (!data_.traits.charge->charging && data_.traits.charge->currentTime > 0.0f) {
-			Fire(pos, dir, bulletManager, from); 
-			data_.traits.charge->currentTime = 0.0f; 
+			Fire(pos, dir, bulletManager, from);
+			data_.traits.charge->currentTime = 0.0f;
 			canChange_ = true;
 		}
 
@@ -151,18 +151,17 @@ float Weapon::Fire(const Vector3& pos, const Vector2& dir, BulletManager* bullet
 	// 効果音
 	audio.SoundPlay(L"Resources/Sounds/SE/shoot.mp3", false);
 
-	if (dynamic_cast<Enemy*>(from)) {
-		return data_.stats.shootCoolTime * 2;
-	} else {
+	// プレイヤーが撃った場合のみ処理
+	if (from->GetTeam() == Team::Player) {
 		charge_--;
 		charge_ = (std::max)(charge_, 0.0f);
 		SetChargeStartTimer();
 
 		// カメラシェイク
 		ctx.Render().GetCamera()->StartShake(0.2f, 2);
-
-		return data_.stats.shootCoolTime;
 	}
+
+	return data_.stats.shootCoolTime;
 }
 
 void Weapon::SetChargeStartTimer() {

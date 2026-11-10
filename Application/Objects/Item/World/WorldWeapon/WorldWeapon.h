@@ -11,9 +11,11 @@ public:
 	WorldWeapon(std::unique_ptr<Weapon> weapon, Vector3 pos, Rarity rarity, bool isForSale = false);
 
 	std::unique_ptr<Weapon> GetWeapon();
+	const WeaponData& GetWeaponData();
 
 	void Update() override;
 	void Draw() override;
+	void DrawSummary();
 
 	void OnPickup(Player* player) override;
 private:

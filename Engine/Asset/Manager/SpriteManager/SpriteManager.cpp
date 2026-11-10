@@ -29,6 +29,13 @@ SpriteManager::SpriteManager(DirectXContext* dxContext, Logger* logger, TextureM
 }
 
 std::unique_ptr<Sprite> SpriteManager::Load(const std::string& texturePath, uint32_t id, uint32_t textureId, uint32_t materialId) {
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>(textureId);
+	texture->SetMtlFilePath(texturePath);
+	textureManager_->CreateTextureSRV(texture);
+	return Create(texture, id, materialId);
+}
+
+std::unique_ptr<Sprite> SpriteManager::Create(std::shared_ptr<Texture> texture, uint32_t id, uint32_t materialId) {
 	std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>(id);
 
 	// UVTransform
@@ -108,11 +115,6 @@ std::unique_ptr<Sprite> SpriteManager::Load(const std::string& texturePath, uint
 
 	sprite->SetTransformData(transformationData);
 	sprite->SetTransformResource(transformationResource);
-
-	// TexturePathを設定
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>(textureId);
-	texture->SetMtlFilePath(texturePath);
-	textureManager_->CreateTextureSRV(texture);
 
 	// Sprite用のマテリアルリソースを作る
 	std::unique_ptr<Material> material = std::make_unique<Material>(materialId);

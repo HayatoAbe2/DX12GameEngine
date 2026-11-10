@@ -35,8 +35,16 @@ void TitleScene::Initialize() {
 	// フェード
 	fade_ = std::make_unique<Fade>();
 
+	audio.SoundUnload(L"Resources/Sounds/BGM/title.mp3");
 	audio.SoundLoad(L"Resources/Sounds/BGM/title.mp3");
 	audio.SoundPlay(L"Resources/Sounds/BGM/title.mp3", true, 0.7f);
+
+	video_ = asset.LoadVideo("Resources/Debug/videoTest.mp4", true);
+	if (video_->IsOpen()) {
+		videoSprite_ = asset.LoadSprite(video_->GetTexture());
+		videoSprite_->SetSize(ctx.GetRenderWindowSize());
+		video_->Play();
+	}
 }
 
 void TitleScene::Update() {
@@ -59,14 +67,15 @@ void TitleScene::Update() {
 	if (fade_->GetPhase() == FadePhase::Faded) {
 			scene.SceneChange("Game");
 	}
+
+	if (video_ && video_->IsOpen()) { video_->Update(ctx.GetDeltatime()); }
 }
 
 void TitleScene::Draw() {
 	BaseScene::Draw();
-
 	auto& render = GameContext::GetInstance().Render();
-	render.AddPostEffect(PostEffectType::BoxFilter5x5);
 	
+	if (videoSprite_) { render.DrawSprite(videoSprite_.get()); }
 	render.DrawSprite(logo_.get());
 	render.DrawSprite(control_.get());
 	render.DrawSkybox(skybox_.get());

@@ -275,6 +275,10 @@
     <ClCompile Include="Application\Objects\DamageArea\DamageArea.cpp" />
     <ClCompile Include="Application\Objects\DamageArea\DamageAreaManager.cpp" />
     <ClCompile Include="Application\HitboxDisplay\HitboxDisplay.cpp" />
+    <ClCompile Include="Engine\SceneObject\Video\VideoDecoder\VideoDecoder.cpp" />
+    <ClCompile Include="Engine\SceneObject\Video\VideoTexture\VideoTexture.cpp" />
+    <ClCompile Include="Engine\SceneObject\Video\VideoPlayer\VideoPlayer.cpp" />
+    <ClCompile Include="Application\UI\WeaponSummary\WeaponSummary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -616,6 +620,10 @@
     <ClInclude Include="Application\Map\FloorSetting.h" />
     <ClInclude Include="Application\Controller.h" />
     <ClInclude Include="Application\HitboxDisplay\HitboxDisplay.h" />
+    <ClInclude Include="Engine\SceneObject\Video\VideoDecoder\VideoDecoder.h" />
+    <ClInclude Include="Engine\SceneObject\Video\VideoTexture\VideoTexture.h" />
+    <ClInclude Include="Engine\SceneObject\Video\VideoPlayer\VideoPlayer.h" />
+    <ClInclude Include="Application\UI\WeaponSummary\WeaponSummary.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

@@ -40,6 +40,9 @@ std::unique_ptr<Primitive> AssetContext::CreatePrimitive(std::unique_ptr<Materia
 std::unique_ptr<Sprite> AssetContext::LoadSprite(const std::string& texturePath) {
 	return std::move(assetManager_->LoadSprite(texturePath));
 }
+std::unique_ptr<Sprite> AssetContext::LoadSprite(std::shared_ptr<Texture> texture) {
+	return std::move(assetManager_->LoadSprite(texture));
+}
 
 std::shared_ptr<Texture> AssetContext::LoadTexture(const std::string& filePath) {
 	return assetManager_->LoadTexture(filePath);
@@ -51,4 +54,8 @@ std::unique_ptr<Material> AssetContext::CreateMaterial(std::shared_ptr<Texture> 
 
 std::vector<std::shared_ptr<Animation>> AssetContext::LoadAnimation(const std::string& directoryPath, const std::string& filePath) {
 	return assetManager_->LoadAnimation(directoryPath, filePath);
+}
+
+std::unique_ptr<VideoPlayer> AssetContext::LoadVideo(const std::string& filePath, bool isLoop) {
+	return assetManager_->LoadVideo(filePath, isLoop);
 }

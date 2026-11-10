@@ -78,9 +78,9 @@ void GameScene::Initialize() {
 	player_->Update(mapCheck_.get(), camera_.get(), bulletManager_.get());
 
 	// UI描画システム
-	uiDrawer_ = std::make_unique<UIDrawer>();
-	uiDrawer_->Initialize(player_.get(), floorManager_.get());
+	uiDrawer_ = std::make_unique<UIDrawer>(player_.get(), floorManager_.get(), itemManager_.get());
 
+	// エディタ
 	spawnEditor_ = std::make_unique<SpawnRateEditor>();
 
 	Update();
