@@ -12,7 +12,7 @@ Weapon::Weapon(const WeaponData& data, std::unique_ptr<Model> model, std::unique
 
 float Weapon::Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from) {
 	// 撃てない
-	if (dynamic_cast<Player*>(from) && charge_ < 1.0f) {
+	if (from->GetTeam() == Team::Player && charge_ < 1.0f) {
 		return 0;
 	}
 

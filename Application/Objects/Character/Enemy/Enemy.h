@@ -17,7 +17,7 @@ struct EnemyData {
 	std::string modelName;
 	int animationIndex = -1;
 
-	int hp = 0;
+	float hp = 0.0f;
 	float radius = 0.5f;
 	float moveSpeed = 0.0f;
 	float defaultSearchRadius = 100.0f;

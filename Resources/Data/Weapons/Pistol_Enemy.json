@@ -12,17 +12,7 @@
             "speed": 25,
             "lifeTime": 60,
             "knockback": 0.3,
-            "color": [0.2, 0.1, 1.0, 1.0],
-
-            "traits":{
-                "onHitWall":{
-                    "ricochet":{
-                        "count": 2,
-                        "onHitEnemy": false,
-                        "toEnemy":false
-                    }
-                }
-            }
+            "color": [0.7, 0.2, 0.1, 1.0]
         },
  
         "rarity": "Common"

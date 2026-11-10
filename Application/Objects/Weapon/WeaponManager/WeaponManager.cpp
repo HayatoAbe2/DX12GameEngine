@@ -217,6 +217,7 @@ void WeaponManager::LoadJson(const std::string& path, bool isEnemyAttack) {
 					Explode t;
 					auto& j = any["explode"];
 
+					t.damage = j["damage"];
 					t.radius = j["radius"];
 
 					weapon.bullet.traits.onHitAnything.explode = t;

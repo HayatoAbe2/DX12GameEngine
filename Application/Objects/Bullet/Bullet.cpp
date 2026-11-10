@@ -19,11 +19,6 @@ data_(data), user_(from){
 		data_.traits.move.orbit->angle = std::atan2(offset.y, offset.x);
 	}
 
-	// 敵弾の色統一
-	if (user_->GetTeam() == Team::Enemy) {
-		data_.color = { 0.7f, 0.2f, 0.1f, data_.color.w };
-	}
-
 	velocity_ = direction * data_.speed;
 	lifeTime_ = data_.lifeTime;
 

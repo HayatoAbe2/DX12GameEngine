@@ -17,6 +17,7 @@
             "traits":{
                 "onHitAnything":{
                     "explode":{
+                        "damage": 15.0,
                         "radius": 5.0
                     }
                 }
