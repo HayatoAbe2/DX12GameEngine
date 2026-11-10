@@ -3,7 +3,6 @@
 #include "Objects/Character/Player/Player.h"
 #include "Objects/DamageArea/DamageAreaManager.h"
 #include "Objects/Character/Enemy/EnemyManager/EnemyManager.h"
-#include "Objects/Character/Enemy/Enemies/Spiker.h"
 #include "Map/MapCheck.h"
 
 CollisionSystem::CollisionSystem(EffectManager* effectManager, BulletManager* bulletManager,DamageAreaManager* damageAreaManager, EnemyManager* enemyManager, Camera* camera) :
@@ -33,7 +32,7 @@ void CollisionSystem::Update(Player* player, MapCheck* mapCheck) {
 	}
 
 	for (auto enemy : enemyManager_->GetEnemies()) {
-		if (dynamic_cast<Spiker*>(enemy)) {
+		if (enemy->GetStatus().traits.contactDamage) {
 			// 敵とプレイヤーの接触
 			collisionChecker_->CheckContactDamage(player, enemy);
 		}

@@ -32,11 +32,6 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 		currentWeapon_ = weapons_[0].get();
 	}
 
-	stunTimer_ = std::make_unique<Timer>();
-	attackCoolTimer_ = std::make_unique<Timer>();
-	slowTimer_ = std::make_unique<Timer>();
-	hitColorTimer_ = std::make_unique<Timer>();
-
 	// 初期State
 	currentState_ = std::make_unique<EnemyIdle>();
 
@@ -51,6 +46,7 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 }
 
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
+	// 出現完了までは動かない
 	if (appierTimer_.IsActive()) {
 		appierTimer_.Update();
 
@@ -61,12 +57,11 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 		}
 	}
 
-	auto& ctx = GameContext::GetInstance();
-
 	prePos_ = transform_.translate;
-	if (hitColorTimer_->IsActive()) {
-		hitColorTimer_->Update();
-		if (hitColorTimer_->IsFinished()) {
+
+	if (hitColorTimer_.IsActive()) {
+		hitColorTimer_.Update();
+		if (hitColorTimer_.IsFinished()) {
 
 			// 色を元に戻す
 			auto mat = model_->GetMaterials();
@@ -76,7 +71,7 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 			}
 		}
 	}
-	slowTimer_->Update();
+	slowTimer_.Update();
 
 	// 落下
 	if (isFall_) {
@@ -84,10 +79,12 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 		return;
 	}
 
-	if (stunTimer_->IsActive()) {
+	if (stunTimer_.IsActive()) {
 		Stun(mapCheck);
 		return;
 	}
+
+	auto& ctx = GameContext::GetInstance();
 
 	// 現在Stateの行動
 	currentState_->Update(this, player, mapCheck, bulletManager);
@@ -97,7 +94,7 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	nextState_ = nullptr; 
 	}
 
-	if (slowTimer_->IsActive()) {
+	if (slowTimer_.IsActive()) {
 		velocity_ *= 0.4f;
 	}
 
@@ -112,11 +109,22 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	transform_.translate.z = pos.y;
 }
 
+void Enemy::Attack(BulletManager* bulletManager, const Vector2& dir) {
+	// 武器なし/クールタイム中
+	if (!currentWeapon_ || attackCoolTimer_.IsActive()) {
+		return;
+	}
+
+	// 攻撃してクールタイム設定
+	float time = currentWeapon_->Trigger(model_->GetTransform().translate, dir, bulletManager, this);
+	attackCoolTimer_.Start(time);
+}
+
 void Enemy::Stun(MapCheck* mapCheck) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
-	stunTimer_->Update();
+	stunTimer_.Update();
 
 	// ノックバック
 	model_->SetScale({ 1,1,1 });
@@ -134,7 +142,7 @@ void Enemy::Stun(MapCheck* mapCheck) {
 		mapCheck->ResolveCollisionY(pos, status_.radius, true);
 	}
 
-	if (!stunTimer_->IsActive() && !status_.canFly) {
+	if (!stunTimer_.IsActive() && !status_.canFly) {
 		isFall_ = mapCheck->IsFall(pos);
 		if (isFall_) { audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false); }
 	}
@@ -184,7 +192,7 @@ void Enemy::Hit(float damage, const Vector2& from, const float knockback) {
 
 	if (status_.stunResist < 10) {
 		// 行動不能
-		stunTimer_->Start(float(10 - status_.stunResist) / 60);
+		stunTimer_.Start(float(10 - status_.stunResist) / 60);
 
 		// ノックバック
 		knockbackVelocity_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * knockback;
@@ -200,5 +208,5 @@ void Enemy::Hit(float damage, const Vector2& from, const float knockback) {
 	data.color = { 1.0f,0.2f,0.2f,1.0f };
 	model_->GetMaterial(0)->SetData(data);
 	model_->GetMaterial(1)->SetData(data);
-	hitColorTimer_->Start(0.2f);
+	hitColorTimer_.Start(0.2f);
 }

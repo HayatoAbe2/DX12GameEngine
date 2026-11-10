@@ -1,7 +1,6 @@
 #pragma once
 #include "GameCommon.h"
 #include "Objects/Character/Enemy/Enemy.h"
-#include "Objects/Character/Enemy/EnemyType.h"
 #include "RandomSettings/RandomSettings.h"
 #include "Map/FloorManager/FloorManager.h"
 
@@ -24,7 +23,7 @@ public:
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);
 
 	// 敵を抽選して出現予約
-	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyType enemyType);
+	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
 	void Reset();
 	void Load(WeaponManager* weaponManager, RandomSettings* random);
 	void SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck);

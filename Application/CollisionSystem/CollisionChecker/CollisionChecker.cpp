@@ -161,7 +161,7 @@ void CollisionChecker::CheckContactDamage(Player* player, Enemy* enemy) {
 	};
 
 	if (CheckCollision(segment, circle)) {
-		player->Hit(3.0f, ToXZ(enemy->GetPrePos()));
+		player->Hit(enemy->GetStatus().traits.contactDamage->damage, ToXZ(enemy->GetPrePos()));
 
 		camera_->StartShake(0.5f, 2);
 		effectManager_->SpawnHitEffect(player->GetTransform().translate);

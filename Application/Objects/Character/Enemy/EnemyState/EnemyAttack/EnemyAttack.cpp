@@ -8,13 +8,13 @@ EnemyAttack::EnemyAttack() {
 void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
 	Transform transform = enemy->GetTransform();
-	Timer* attackTimer = enemy->GetAttackTimer();
+	Timer attackTimer = enemy->GetAttackTimer();
 
 	// 攻撃の向き
 	Vector2 attackDirection = ToXZ(Normalize(player->GetTransform().translate - transform.translate));
 	transform.rotate = { 0,-std::atan2(attackDirection.y, attackDirection.x) + std::numbers::pi_v<float> / 2.0f,0 };
 
-	float remain = attackTimer->GetRemaining();
+	float remain = attackTimer.GetRemaining();
 	if (remain <= attackMotionStart_) {
 		// 攻撃前警告(スケール変更)
 		float sizeEase;
@@ -46,10 +46,11 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 		rotateTimer_->Update();
 	}
 
-	if (attackTimer->IsFinished() || enemy->IsAttacking()) {
+	// 攻撃タイマー
+	if (attackTimer.IsFinished() || enemy->IsAttacking()) {
 		enemy->Attack(bulletManager, attackDirection);
 	} else {
-		attackTimer->Update();
+		attackTimer.Update();
 	}
 
 	enemy->SetTransform(transform);

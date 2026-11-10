@@ -33,8 +33,8 @@ void EnemySpawnSetting::Load(std::string filePath) {
 	for (const auto& data : root["spawnRates"]) {
 		EnemySpawn spawnRate;
 
-		if (data.contains("enemyType")) {
-			spawnRate.type = EnemyType(data["enemyType"].get<uint32_t>());
+		if (data.contains("name")) {
+			spawnRate.name = data["name"].get<std::string>();
 		}
 		if (data.contains("weight")) {
 			spawnRate.weight = data["weight"].get<float>();

@@ -4,12 +4,6 @@
 #include "Objects/Weapon/WeaponManager/WeaponManager.h"
 #include "Objects/Bullet/BulletManager.h"
 #include "Map/MapCheck.h"
-
-#include "Objects/Character/Enemy/Enemies/Bat.h"
-#include "Objects/Character/Enemy/Enemies/Knight.h"
-#include "Objects/Character/Enemy/Enemies/HeavyKnight.h"
-#include "Objects/Character/Enemy/Enemies/RedBat.h"
-#include "Objects/Character/Enemy/Enemies/Spiker.h"
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include "Engine/SceneObject/SceneObject.h"
 #include "Objects/Item/ItemManager.h"
@@ -56,175 +50,51 @@ void EnemyManager::Spawn(std::vector<std::unique_ptr<Enemy>> enemy) {
 	}
 }
 
-
-static std::string GetEnemyDataKey(EnemyType type) {
-	// ファイル内での敵名
-	switch (type) {
-	case EnemyType::Fly:
-		return "Fly";
-
-	case EnemyType::Golem:
-		return "Golem";
-
-	case EnemyType::Hedgehog_Single:
-		return "Hedgehog_Single";
-
-	case EnemyType::elite1:
-		return "elite1";
-
-	case EnemyType::elite2:
-		return "elite2";
-
-	default:
-		return "Hedgehog_Group";
+void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
+	auto it = enemyDataMap_.find(name);
+	if (it == enemyDataMap_.end()) { // 見つからない
+		return;
 	}
-}
 
-void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, EnemyType enemyType) {
+	std::vector<std::unique_ptr<Enemy>> enemies;
+	const EnemyData& data = it->second;
+
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
-	std::vector<std::unique_ptr<Weapon>> weapons;
-	EnemyStatus status;
-
-	std::vector<std::unique_ptr<Enemy>> enemies;
-	switch (enemyType) {
-	case EnemyType::Fly:
-	{
-		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "Dragon.glb");
-		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "Dragon.glb");
-		enemyModel->SetTranslate(pos);
-		enemyShadowModel->SetTranslate(pos);
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::Fireball)));
-
-		status.hp = 10;
-		status.radius = 0.5f;
-		status.moveSpeed = 5.5f;
-		status.defaultSearchRadius = 100.0f;
-		status.stunResist = 0;
-		status.canFly = true;
-		status.attackRadius = 9;
-
-		auto anim = asset.LoadAnimation("Resources/Models/Enemy", "Dragon.glb")[2];
-		anim->isRoop = true;
-		enemyModel->SetAnimation(anim);
-		enemyShadowModel->SetAnimation(anim);
-
-		enemies.push_back(std::make_unique<Bat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
-		break;
-	}
-
-	case EnemyType::Golem:
-	{
-		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "knight.obj");
-		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "knight.obj");
-		enemyModel->SetTranslate(pos);
-		enemyShadowModel->SetTranslate(pos);
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::Pistol)));
-		status.hp = 23;
-		status.radius = 0.9f;
-		status.moveSpeed = 1.5f;
-		status.defaultSearchRadius = 100.0f;
-		status.stunResist = 2;
-		status.canFly = false;
-		status.attackRadius = 9;
-
-		enemies.push_back(std::make_unique<Knight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
-		break;
-	}
-	case EnemyType::Hedgehog_Single:
-	{
-		status.hp = 5;
-		status.radius = 0.5f;
-		status.moveSpeed = 3.5f;
-		status.defaultSearchRadius = 100.0f;
-		status.stunResist = 0;
-		status.canFly = false;
-		status.attackRadius = -1;
-
-		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.glb");
-		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.glb");
-		Vector3 spawnPos = pos;
-		enemyModel->SetTranslate(spawnPos);
-		enemyShadowModel->SetTranslate(spawnPos);
-
-		auto anim = asset.LoadAnimation("Resources/Models/Enemy", "hedgehog.glb")[2];
-		anim->isRoop = true;
-		enemyModel->SetAnimation(anim);
-		enemyShadowModel->SetAnimation(anim);
-
-		enemies.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), spawnPos, status, std::move(weapons)));
-	}
-	break;
-	case EnemyType::elite1:
-	{
-		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "knight2.obj");
-		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "knight2.obj");
-		enemyModel->SetTranslate(pos);
-		enemyShadowModel->SetTranslate(pos);
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::ThreeWay)));
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::FourWay)));
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::LargeFireball)));
-		status.hp = 200;
-		status.radius = 1.5f;
-		status.moveSpeed = 3.5f;
-		status.defaultSearchRadius = 100.0f;
-		status.stunResist = 30;
-		status.canFly = false;
-		status.attackRadius = 9;
-
-		enemies.push_back(std::make_unique<HeavyKnight>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
-		break;
-	}
-
-	case EnemyType::elite2:
-	{
-		auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "bat2.obj");
-		auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "bat2.obj");
-		enemyModel->SetTranslate(pos);
-		enemyShadowModel->SetTranslate(pos);
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::Fireball)));
-		weapons.push_back(weaponManager->GetEnemyAttack(int(WeaponManager::ENEMYATTACK::AssaultRifle)));
-		status.hp = 110;
-		status.radius = 0.75f;
-		status.moveSpeed = 7.0f;
-		status.defaultSearchRadius = 100.0f;
-		status.stunResist = 30;
-		status.canFly = true;
-		status.attackRadius = 9;
-
-		enemies.push_back(std::make_unique<RedBat>(std::move(enemyModel), std::move(enemyShadowModel), pos, status, std::move(weapons)));
-		break;
-	}
-	default:
-	{
-		status.hp = 5;
-		status.radius = 0.5f;
-		status.moveSpeed = 3.5f;
-		status.defaultSearchRadius = 100.0f;
-		status.stunResist = 0;
-		status.canFly = false;
-		status.attackRadius = -1;
-
-		int num = ctx.RandomInt(2, 4);
-		for (int i = 0; i < num; ++i) {
-			auto enemyModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.glb");
-			auto enemyShadowModel = asset.LoadModel("Resources/Models/Enemy", "hedgehog.glb");
-			Vector3 spawnPos = pos + Vector3{ ctx.RandomFloat(-1,1), 0, ctx.RandomFloat(-1,1) };
-			enemyModel->SetTranslate(spawnPos);
-			enemyShadowModel->SetTranslate(spawnPos);
-
-			auto anim = asset.LoadAnimation("Resources/Models/Enemy", "hedgehog.glb")[2];
-			anim->isRoop = true;
-			enemyModel->SetAnimation(anim);
-			enemyShadowModel->SetAnimation(anim);
-
-			enemies.push_back(std::make_unique<Spiker>(std::move(enemyModel), std::move(enemyShadowModel), spawnPos, status, std::move(weapons)));
+	int n = ctx.RandomInt(data.minSpawnCount, data.maxSpawnCount);
+	for (int i = 0; i < n; ++i) {
+		auto model = asset.LoadModel("Resources/Models/Enemy", data.modelName);
+		auto shadow = asset.LoadModel("Resources/Models/Enemy", data.modelName);
+		if (data.animationIndex >= 0) {
+			// アニメーション割り当て(あれば)
+			std::vector<std::shared_ptr<Animation>> anim = asset.LoadAnimation("Resources/Models/Enemy",data.modelName);
+			if (data.animationIndex < anim.size()) {
+				anim[data.animationIndex]->isLoop = true;
+				model->SetAnimation(anim[data.animationIndex]);
+				shadow->SetAnimation(anim[data.animationIndex]);
+			}
 		}
-		break;
-	}
+
+		// 位置をずらす
+		Vector3 spawnPos = pos;
+		if (i < 0) {
+			spawnPos = pos + Vector3{ ctx.RandomFloat(-1,1), 0, ctx.RandomFloat(-1,1) };
+			model->SetTranslate(spawnPos);
+			shadow->SetTranslate(spawnPos);
+		}
+
+		// 武器割り当て
+		std::vector<std::unique_ptr<Weapon>> weapons;
+		for (auto& weaponName : data.weapons) { 
+			std::unique_ptr<Weapon> weapon;
+			weapon = weaponManager->GetEnemyAttack(weaponName);
+			weapons.push_back(std::move(weapon));
+		}
+		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons)));
 	}
 
+	// 出現待機
 	inactiveEnemies_.push_back(std::move(enemies));
 }
 
@@ -303,7 +173,13 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 		spawnPos_.push_back(spawnPos);
 		isSpawned_.push_back(false);
 
-		CreateEnemy({ spawnPos.x, 0, spawnPos.y }, weaponManager, random->SelectEnemy(floorManager_->GetCurrentDepth()));
+		// 敵の生成
+		std::string enemyName = random->SelectEnemy(floorManager_->GetCurrentDepth());
+		if (enemyName.empty()) { // 該当なしなら出さない
+			continue;
+		}
+
+		CreateEnemy({ spawnPos.x, 0, spawnPos.y }, weaponManager, enemyName);
 	}
 }
 
@@ -351,14 +227,25 @@ void EnemyManager::LoadEnemyData() {
 		enemy.modelName = data.at("modelName").get<std::string>();
 		enemy.animationIndex = data.value("animationIndex", -1);
 
-		enemy.hp = data.at("hp").get<int>();
-		enemy.radius = data.at("radius").get<float>();
-		enemy.moveSpeed = data.at("moveSpeed").get<float>();
-		enemy.defaultSearchRadius =
-			data.at("defaultSearchRadius").get<float>();
-		enemy.stunResist = data.at("stunResist").get<int>();
-		enemy.canFly = data.at("canFly").get<bool>();
-		enemy.attackRadius = data.at("attackRadius").get<float>();
+		// ステータス
+		enemy.status.hp = data.at("hp").get<float>();
+		enemy.status.radius = data.at("radius").get<float>();
+		enemy.status.moveSpeed = data.at("moveSpeed").get<float>();
+		enemy.status.defaultSearchRadius = data.at("defaultSearchRadius").get<float>();
+		enemy.status.stunResist = data.at("stunResist").get<float>();
+		enemy.status.canFly = data.at("canFly").get<bool>();
+		enemy.status.attackRadius = data.at("attackRadius").get<float>();
+
+		// 特殊性能
+		if (data.contains("traits")) {
+			auto& traits = data["traits"];
+			if (traits.contains("contactDamage")) {
+				ContactDamage t;
+				auto& j = traits["contactDamage"];
+				t.damage = j["damage"];
+				enemy.status.traits.contactDamage = t;
+			}
+		}
 
 		if (data.contains("weapons")) {
 			enemy.weapons = data.at("weapons").get<std::vector<std::string>>();

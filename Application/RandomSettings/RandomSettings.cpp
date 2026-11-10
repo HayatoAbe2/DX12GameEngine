@@ -12,7 +12,7 @@ void RandomSettings::Update() {
 	table_.enemy = enemySpawn_->GetSpawnData();
 }
 
-EnemyType RandomSettings::SelectEnemy(int depth) {
+std::string RandomSettings::SelectEnemy(int depth) {
 	if (depth == kBossFloorNumber) { 
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Boss.json");
 	} else if (depth <= kEarlyFloorNumber) {
@@ -38,10 +38,10 @@ EnemyType RandomSettings::SelectEnemy(int depth) {
 
 			// 結果
 			if (random <= 0.0f) {
-				return entry.type;
+				return entry.name;
 			}
 		}
 	}
 
-	return EnemyType::Fly;
+	return "";
 }

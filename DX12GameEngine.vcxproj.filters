@@ -207,10 +207,6 @@
     <ClCompile Include="Application\Objects\Bullet\Bullet.cpp" />
     <ClCompile Include="Application\Objects\Bullet\BulletManager.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\Bat.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\HeavyKnight.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\Knight.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\RedBat.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldItem.cpp" />
@@ -235,7 +231,6 @@
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
     <ClCompile Include="Application\UI\Equipment\EquipmentUI.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\Spiker.cpp" />
     <ClCompile Include="Editor\SceneEditor\SceneEditor.cpp" />
     <ClCompile Include="Application\Effect\Hit\HitEffect.cpp" />
     <ClCompile Include="Application\Effect\Explode\ExplodeEffect.cpp" />
@@ -531,10 +526,6 @@
     <ClInclude Include="Application\Objects\Bullet\Bullet.h" />
     <ClInclude Include="Application\Objects\Bullet\BulletManager.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\Bat.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\HeavyKnight.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\Knight.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\RedBat.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\Enemy.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyStatus.h" />
@@ -570,7 +561,6 @@
     <ClInclude Include="Application\Objects\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Objects\Weapon\ShooterInfo\ShooterInfo.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\Spiker.h" />
     <ClInclude Include="Engine\SceneObject\SceneObject.h" />
     <ClInclude Include="Editor\SceneEditor\SceneEditor.h" />
     <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
@@ -604,7 +594,6 @@
     <ClInclude Include="Application\UI\NextRoom\NextRoomUI.h" />
     <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
     <ClInclude Include="Application\RandomSettings\EnemySpawn\EnemySpawnSetting.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\EnemyType.h" />
     <ClInclude Include="Application\CollisionSystem\CollisionSystem.h" />
     <ClInclude Include="Application\Result\Result.h" />
     <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />

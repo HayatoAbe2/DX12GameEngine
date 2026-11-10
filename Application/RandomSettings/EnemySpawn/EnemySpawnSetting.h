@@ -1,13 +1,12 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "Objects/Character/Enemy/EnemyType.h"
 
 /// <summary>
 /// 敵の出現データ
 /// </summary>
 struct EnemySpawn {
-	EnemyType type;
+	std::string name;
 	float weight = 0;
 };
 

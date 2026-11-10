@@ -46,6 +46,11 @@
         "stunResist": 0,
         "canFly": false,
         "attackRadius": -1.0,
+        "traits":{
+            "contactDamage":{
+                "damage": 3.0
+            }
+        },
         "weapons": [],
         "spawnCount": {
             "min": 1,
@@ -101,6 +106,11 @@
         "stunResist": 0,
         "canFly": false,
         "attackRadius": -1.0,
+        "traits":{
+            "contactDamage":{
+                "damage": 3.0
+            }
+        },
         "weapons": [],
         "spawnCount": {
             "min": 2,

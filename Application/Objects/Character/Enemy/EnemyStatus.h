@@ -1,5 +1,15 @@
 #pragma once
 
+// 接触ダメージ
+struct ContactDamage {
+	float damage;
+};
+
+// 敵の特殊性能
+struct EnemyTrait {
+	std::optional<ContactDamage> contactDamage; // 接触ダメージ
+};
+
 /// <summary>
 /// 敵ステータス構造体
 /// </summary>
@@ -15,7 +25,9 @@ struct EnemyStatus {
 	// 攻撃開始範囲
 	float attackRadius = 9.0f;
 	// スタン時間を減らす量
-	int stunResist = 0;
+	float stunResist = 0;
 	// 飛行する
 	bool canFly = false;
+	// 特殊性能
+	EnemyTrait traits;
 };

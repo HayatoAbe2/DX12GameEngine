@@ -1,11 +1,11 @@
 {
     "spawnRates": [
         {
-            "enemyType": 0,
+            "name": "Fly",
             "weight": 1.0
         },
         {
-            "enemyType": 3,
+            "name": "Hedgehog_Single",
             "weight": 1.0
         }
     ]

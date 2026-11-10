@@ -183,10 +183,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Objects\Bullet\BulletManager.cpp" />
     <ClCompile Include="Application\CollisionSystem\CollisionChecker\CollisionChecker.cpp" />
     <ClCompile Include="Application\Effect\EffectManager.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\Bat.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\HeavyKnight.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\Knight.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\RedBat.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyManager\EnemyManager.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldItem.cpp" />
@@ -305,7 +301,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Application\Objects\Character\Enemy\Enemies\Spiker.cpp" />
     <ClCompile Include="Editor\SceneEditor\SceneEditor.cpp" />
     <ClCompile Include="Engine\Graphics\SkinningSystem\SkinningSystem.cpp" />
     <ClCompile Include="Application\Objects\Item\World\WorldWeapon\WorldWeapon.cpp" />
@@ -472,7 +467,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyState.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\EnemyType.h" />
     <ClInclude Include="Application\Map\Room\RoomData.h" />
     <ClInclude Include="Application\Objects\Item\World\Interactable.h" />
     <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
@@ -498,10 +492,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Bullet\BulletManager.h" />
     <ClInclude Include="Application\CollisionSystem\CollisionChecker\CollisionChecker.h" />
     <ClInclude Include="Application\Effect\EffectManager.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\Bat.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\HeavyKnight.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\Knight.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\RedBat.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\Enemy.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyManager\EnemyManager.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyStatus.h" />
@@ -610,7 +600,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Math\Quaternion\Quaternion.h" />
     <ClInclude Include="Application\Timer\Timer.h" />
     <ClInclude Include="Externals\nlohmann\json.hpp" />
-    <ClInclude Include="Application\Objects\Character\Enemy\Enemies\Spiker.h" />
     <ClInclude Include="Editor\SceneEditor\SceneEditor.h" />
     <ClInclude Include="Application\Effect\Hit\HitEffect.h" />
     <ClInclude Include="Engine\SceneObject\Primitive\Primitive.h" />

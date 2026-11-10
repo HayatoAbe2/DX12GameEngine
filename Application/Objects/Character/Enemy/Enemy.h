@@ -14,19 +14,17 @@ class Player;
 /// 敵データ
 /// </summary>
 struct EnemyData {
+	// モデル
 	std::string modelName;
 	int animationIndex = -1;
 
-	float hp = 0.0f;
-	float radius = 0.5f;
-	float moveSpeed = 0.0f;
-	float defaultSearchRadius = 100.0f;
-	int stunResist = 0;
-	bool canFly = false;
-	float attackRadius = -1.0f;
+	// ステータス
+	EnemyStatus status;
 
+	// 武器
 	std::vector<std::string> weapons;
 
+	// 一度の出現数幅
 	int minSpawnCount = 1;
 	int maxSpawnCount = 1;
 };
@@ -34,7 +32,7 @@ struct EnemyData {
 /// <summary>
 /// 敵キャラ
 /// </summary>
-class Enemy : public Character {
+class Enemy final : public Character {
 public:
 	virtual ~Enemy() = default;
 	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons);
@@ -55,7 +53,7 @@ public:
 	void Hit(float damage, const Vector2& from, const float knockback);
 
 	// 敵ごとの関数
-	virtual void Attack(BulletManager* bulletManager, const Vector2& dir) = 0;
+	void Attack(BulletManager* bulletManager, const Vector2& dir);
 
 	bool IsDead() { return isDead_; }
 
@@ -64,9 +62,10 @@ public:
 	void SetState(std::unique_ptr<EnemyState> state) { nextState_ = std::move(state); }
 	bool IsAttacking() { return isAttacking_; }
 	Weapon* GetCurrentWeapon() { return currentWeapon_; }
-	Timer* GetAttackTimer() { return attackCoolTimer_.get(); }
-	void Slow() { slowTimer_->Start(5.0f); }
-protected:
+	Timer& GetAttackTimer() { return attackCoolTimer_; }
+	void Slow() { slowTimer_.Start(5.0f); }
+
+private:
 
 	// 敵別ステータス
 	EnemyStatus status_;
@@ -84,7 +83,7 @@ protected:
 	Weapon* currentWeapon_ = nullptr;
 
 	// 射撃クールダウン
-	std::unique_ptr<Timer> attackCoolTimer_;
+	Timer attackCoolTimer_;
 
 	// プレイヤー
 	Player* target_ = nullptr;
@@ -93,8 +92,8 @@ protected:
 	float searchRadius_ = 8.0f;
 
 	// スタン時間
-	std::unique_ptr<Timer> stunTimer_ = nullptr;
-	std::unique_ptr<Timer> hitColorTimer_ = nullptr;
+	Timer stunTimer_;
+	Timer hitColorTimer_;
 
 	// 落下
 	bool isFall_ = false;
@@ -109,7 +108,7 @@ protected:
 	// 攻撃中
 	bool isAttacking_ = false;
 
-	std::unique_ptr<Timer> slowTimer_;
+	Timer slowTimer_;
 
 	// 出現しおわるまでの時間
 	Timer appierTimer_;

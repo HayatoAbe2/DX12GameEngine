@@ -22,7 +22,7 @@ void AnimationPlayer::Update(Skeleton& skeleton) {
 	float deltaTime = GameContext::GetInstance().GetDeltatime();
 	animationTime_ += deltaTime;
 
-	if (animation_->isRoop) {
+	if (animation_->isLoop) {
 		// ループ
 		animationTime_ = std::fmod(animationTime_, animation_->duration);
 	} else {
@@ -129,7 +129,7 @@ void AnimationPlayer::ChangeAnimation(std::shared_ptr<Animation> animation, floa
 }
 
 bool AnimationPlayer::IsAnimationEnded() {
-	if (!animation_->isRoop && animationTime_ == animation_->duration) {
+	if (!animation_->isLoop && animationTime_ == animation_->duration) {
 		return true;
 	}
 	return false;

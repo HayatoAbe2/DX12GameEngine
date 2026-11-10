@@ -1,15 +1,15 @@
 {
     "spawnRates": [
         {
-            "enemyType": 0,
+            "name": "Fly",
             "weight": 1.0
         },
         {
-            "enemyType": 1,
+            "name": "Golem",
             "weight": 1.0
         },
         {
-            "enemyType": 2,
+            "name": "Hedgehog_Group",
             "weight": 1.0
         }
     ]

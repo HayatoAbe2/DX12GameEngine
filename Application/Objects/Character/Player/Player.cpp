@@ -36,9 +36,9 @@ void Player::Initialize(ItemManager* itemManager) {
 	shadowModel_->GetMaterial(0)->SetData(matData);
 
 	walk_ = asset.LoadAnimation("Resources/Debug/human", "walk.gltf")[0];
-	walk_->isRoop = true;
+	walk_->isLoop = true;
 	sneak_ = asset.LoadAnimation("Resources/Debug/human", "sneakWalk.gltf")[0];
-	sneak_->isRoop = true;
+	sneak_->isLoop = true;
 	model_->SetAnimation(walk_);
 
 	// 残像
