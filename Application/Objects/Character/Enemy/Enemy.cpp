@@ -107,16 +107,20 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 
 	transform_.translate.x = pos.x;
 	transform_.translate.z = pos.y;
+
+	if (currentWeapon_) {
+		currentWeapon_->Update(transform_.translate, attackDir_, bulletManager, this);
+	}
 }
 
-void Enemy::Attack(BulletManager* bulletManager, const Vector2& dir) {
+void Enemy::Attack(BulletManager* bulletManager) {
 	// 武器なし/クールタイム中
 	if (!currentWeapon_ || attackCoolTimer_.IsActive()) {
 		return;
 	}
 
 	// 攻撃してクールタイム設定
-	float time = currentWeapon_->Trigger(model_->GetTransform().translate, dir, bulletManager, this);
+	float time = currentWeapon_->Trigger(model_->GetTransform().translate, attackDir_, bulletManager, this);
 	attackCoolTimer_.Start(time);
 }
 

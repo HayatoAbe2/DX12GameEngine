@@ -27,7 +27,17 @@ void EnemyApproach::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bul
 				enemy->SetTransform(transform);
 			}
 		} else {
+			// 攻撃に移行
 			enemy->SetState(std::make_unique<EnemyAttack>());
+
+			Weapon* weapon = enemy->GetCurrentWeapon();
+			if (weapon) {
+				enemy->GetAttackTimer().Start(weapon->GetData().stats.shootCoolTime);
+			}
+
+			// 攻撃の向き
+			Vector2 attackDirection = ToXZ(Normalize(player->GetTransform().translate - enemy->GetTransform().translate));
+			enemy->SetAttackDir(attackDirection);
 			return;
 		}
 	}

@@ -10,10 +10,6 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 	Transform transform = enemy->GetTransform();
 	Timer& attackTimer = enemy->GetAttackTimer();
 
-	// 攻撃の向き
-	Vector2 attackDirection = ToXZ(Normalize(player->GetTransform().translate - transform.translate));
-	transform.rotate = { 0,-std::atan2(attackDirection.y, attackDirection.x) + std::numbers::pi_v<float> / 2.0f,0 };
-
 	float remain = attackTimer.GetRemaining();
 	if (remain <= attackMotionStart_) {
 		// 攻撃前警告(スケール変更)
@@ -32,6 +28,11 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 		velocity_.x = direction.x * status.moveSpeed * (1.0f - enemy->GetCurrentWeapon()->GetData().stats.weight);
 		velocity_.z = direction.z * status.moveSpeed * (1.0f - enemy->GetCurrentWeapon()->GetData().stats.weight);
 	} else {
+		// 攻撃の向き
+		Vector2 attackDirection = ToXZ(Normalize(player->GetTransform().translate - transform.translate));
+		transform.rotate = { 0,-std::atan2(attackDirection.y, attackDirection.x) + std::numbers::pi_v<float> / 2.0f,0 };
+		enemy->SetAttackDir(attackDirection);
+
 		if (rotateTimer_->IsFinished()) {
 			// 方向転換の間隔
 			rotateTimer_->Start(ctx.RandomFloat(minRotateTimer_, maxRotateTimer_));
@@ -48,7 +49,7 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 
 	// 攻撃タイマー
 	if (attackTimer.IsFinished() || enemy->IsAttacking()) {
-		enemy->Attack(bulletManager, attackDirection);
+		enemy->Attack(bulletManager);
 	} else {
 		attackTimer.Update();
 	}

@@ -11,7 +11,7 @@
 #endif
 
 struct SpawnRate {
-    uint32_t enemyType = 0;
+    std::string name;
     float weight = 0.0f;
 };
 

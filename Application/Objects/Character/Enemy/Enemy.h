@@ -53,12 +53,13 @@ public:
 	void Hit(float damage, const Vector2& from, const float knockback);
 
 	// 敵ごとの関数
-	void Attack(BulletManager* bulletManager, const Vector2& dir);
+	void Attack(BulletManager* bulletManager);
 
 	bool IsDead() { return isDead_; }
 
 	EnemyStatus GetStatus() const { return status_; }
 
+	void SetAttackDir(Vector2 dir) { attackDir_ = dir; }
 	void SetState(std::unique_ptr<EnemyState> state) { nextState_ = std::move(state); }
 	bool IsAttacking() { return isAttacking_; }
 	Weapon* GetCurrentWeapon() { return currentWeapon_; }
@@ -84,6 +85,9 @@ private:
 
 	// 射撃クールダウン
 	Timer attackCoolTimer_;
+
+	// 攻撃方向
+	Vector2 attackDir_;
 
 	// プレイヤー
 	Player* target_ = nullptr;
