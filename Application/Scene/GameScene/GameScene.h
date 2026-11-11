@@ -17,6 +17,8 @@
 #include "RandomSettings/RandomSettings.h"
 
 #include "Editor/SpawnRateEditor/SpawnRateEditor.h"
+#include <Editor/EnemyEditor/EnemyEditor.h>
+#include <Editor/WeaponEditor/WeaponEditor.h>
 
 // ゲームシーン
 class GameScene final : public BaseScene {
@@ -107,6 +109,8 @@ private:
 	// フェード
 	std::unique_ptr<Fade> fade_ = nullptr;
 
-	// 敵出現確率
+	// エディタ
 	std::unique_ptr<SpawnRateEditor> spawnEditor_ = nullptr;
+	std::unique_ptr<EnemyEditor> enemyEditor_ = nullptr;
+	std::unique_ptr<WeaponEditor> weaponEditor_ = nullptr;
 };

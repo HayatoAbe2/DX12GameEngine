@@ -82,6 +82,8 @@ void GameScene::Initialize() {
 
 	// エディタ
 	spawnEditor_ = std::make_unique<SpawnRateEditor>();
+	enemyEditor_ = std::make_unique<EnemyEditor>();
+	weaponEditor_ = std::make_unique<WeaponEditor>();
 
 	Update();
 }
@@ -252,6 +254,7 @@ void GameScene::Draw() {
 	ImGui::End();
 
 	spawnEditor_->Draw(enemyManager_->GetEnemyNames());
+	weaponEditor_->Draw();
 #endif
 }
 

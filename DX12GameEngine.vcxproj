@@ -164,6 +164,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Data\EnemySerializer.cpp" />
+    <ClCompile Include="Application\Data\WeaponSerializer.cpp" />
     <ClCompile Include="Application\Objects\Character\Character.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
@@ -175,6 +177,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Effect\Charge\ChargeEffect.cpp" />
     <ClCompile Include="Application\Objects\DamageArea\DamageArea.cpp" />
     <ClCompile Include="Application\Objects\DamageArea\DamageAreaManager.cpp" />
+    <ClCompile Include="Editor\EnemyEditor\EnemyEditor.cpp" />
+    <ClCompile Include="Editor\WeaponEditor\WeaponEditor.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -461,8 +465,13 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Controller.h" />
+    <ClInclude Include="Application\Data\DataIssue.h" />
+    <ClInclude Include="Application\Data\EnemySerializer.h" />
+    <ClInclude Include="Application\Data\JsonFormat.h" />
+    <ClInclude Include="Application\Data\WeaponSerializer.h" />
     <ClInclude Include="Application\Map\FloorSetting.h" />
     <ClInclude Include="Application\Objects\Character\Character.h" />
+    <ClInclude Include="Application\Objects\Character\Enemy\EnemyData.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
@@ -479,6 +488,11 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Effect\Charge\ChargeEffect.h" />
     <ClInclude Include="Application\Objects\DamageArea\DamageArea.h" />
     <ClInclude Include="Application\Objects\DamageArea\DamageAreaManager.h" />
+    <ClInclude Include="Editor\EditHistory.h" />
+    <ClInclude Include="Editor\EditorFile.h" />
+    <ClInclude Include="Editor\EditorUtil.h" />
+    <ClInclude Include="Editor\EnemyEditor\EnemyEditor.h" />
+    <ClInclude Include="Editor\WeaponEditor\WeaponEditor.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />

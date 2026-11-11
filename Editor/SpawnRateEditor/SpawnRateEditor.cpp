@@ -6,7 +6,7 @@ SpawnRateEditor::SpawnRateEditor() {
 
 void SpawnRateEditor::Draw(const std::vector<std::string>& enemyNames) {
 #ifdef USE_IMGUI
-	ImGui::Begin("出現率エディタ");
+	ImGui::Begin("出現率");
 
 	char buffer[512];
 	std::snprintf(

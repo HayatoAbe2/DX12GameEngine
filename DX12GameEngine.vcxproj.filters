@@ -274,6 +274,10 @@
     <ClCompile Include="Engine\SceneObject\Video\VideoTexture\VideoTexture.cpp" />
     <ClCompile Include="Engine\SceneObject\Video\VideoPlayer\VideoPlayer.cpp" />
     <ClCompile Include="Application\UI\WeaponSummary\WeaponSummary.cpp" />
+    <ClCompile Include="Editor\WeaponEditor\WeaponEditor.cpp" />
+    <ClCompile Include="Editor\EnemyEditor\EnemyEditor.cpp" />
+    <ClCompile Include="Application\Data\EnemySerializer.cpp" />
+    <ClCompile Include="Application\Data\WeaponSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -613,6 +617,16 @@
     <ClInclude Include="Engine\SceneObject\Video\VideoTexture\VideoTexture.h" />
     <ClInclude Include="Engine\SceneObject\Video\VideoPlayer\VideoPlayer.h" />
     <ClInclude Include="Application\UI\WeaponSummary\WeaponSummary.h" />
+    <ClInclude Include="Editor\EditHistory.h" />
+    <ClInclude Include="Editor\EditorFile.h" />
+    <ClInclude Include="Editor\EditorUtil.h" />
+    <ClInclude Include="Editor\WeaponEditor\WeaponEditor.h" />
+    <ClInclude Include="Editor\EnemyEditor\EnemyEditor.h" />
+    <ClInclude Include="Application\Objects\Character\Enemy\EnemyData.h" />
+    <ClInclude Include="Application\Data\DataIssue.h" />
+    <ClInclude Include="Application\Data\EnemySerializer.h" />
+    <ClInclude Include="Application\Data\JsonFormat.h" />
+    <ClInclude Include="Application\Data\WeaponSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

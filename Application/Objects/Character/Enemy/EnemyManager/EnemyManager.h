@@ -20,6 +20,9 @@ public:
 	// 登録されている敵の名前(ソート済み)
 	std::vector<std::string> GetEnemyNames() const;
 
+	// 敵データ(Enemies.json)を読み込み直す。次に出現する敵から反映される
+	void ReloadEnemyData() { LoadEnemyData(); }
+
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager);
 	void Draw();
 

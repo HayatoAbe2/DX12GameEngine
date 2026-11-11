@@ -7,6 +7,7 @@
 #include "Engine/Scene/BaseScene/BaseScene.h"
 #include "Engine/SceneObject/SceneObject.h"
 #include "Objects/Item/ItemManager.h"
+#include "Data/EnemySerializer.h"
 
 #include <fstream>
 #include <cassert>
@@ -100,7 +101,8 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const 
 		for (auto& weaponName : data.weapons) { 
 			std::unique_ptr<Weapon> weapon;
 			weapon = weaponManager->GetEnemyAttack(weaponName);
-			weapons.push_back(std::move(weapon));
+			// 見つからない武器は持たせない(nullptr参照を防ぐ)
+			if (weapon) { weapons.push_back(std::move(weapon)); }
 		}
 		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons)));
 	}
@@ -226,48 +228,19 @@ std::vector<Enemy*> EnemyManager::GetEnemies() {
 void EnemyManager::LoadEnemyData() {
 	const std::string path = "Resources/Data/Enemies/Enemies.json";
 	std::ifstream file(path);
+	if (!file.is_open()) { return; }
 
 	nlohmann::json j;
-	file >> j;
+	try {
+		file >> j;
+	} catch (...) {
+		// 壊れたファイルのときは、今ある敵データを残す
+		return;
+	}
+	if (!j.is_object()) { return; }
 
 	enemyDataMap_.clear();
-
 	for (const auto& [name, data] : j.items()) {
-		EnemyData enemy{};
-
-		enemy.modelName = data.at("modelName").get<std::string>();
-		enemy.animationIndex = data.value("animationIndex", -1);
-
-		// ステータス
-		enemy.status.hp = data.at("hp").get<float>();
-		enemy.status.radius = data.at("radius").get<float>();
-		enemy.status.moveSpeed = data.at("moveSpeed").get<float>();
-		enemy.status.defaultSearchRadius = data.at("defaultSearchRadius").get<float>();
-		enemy.status.stunResist = data.at("stunResist").get<float>();
-		enemy.status.canFly = data.at("canFly").get<bool>();
-		enemy.status.attackRadius = data.at("attackRadius").get<float>();
-
-		// 特殊性能
-		if (data.contains("traits")) {
-			auto& traits = data["traits"];
-			if (traits.contains("contactDamage")) {
-				ContactDamage t;
-				auto& j = traits["contactDamage"];
-				t.damage = j["damage"];
-				enemy.status.traits.contactDamage = t;
-			}
-		}
-
-		if (data.contains("weapons")) {
-			enemy.weapons = data.at("weapons").get<std::vector<std::string>>();
-		}
-
-		if (data.contains("spawnCount")) {
-			const auto& count = data.at("spawnCount");
-			enemy.minSpawnCount = count.value("min", 1);
-			enemy.maxSpawnCount = count.value("max", 1);
-		}
-
-		enemyDataMap_.emplace(name, std::move(enemy));
+		enemyDataMap_.emplace(name, EnemySerializer::FromJson(data));
 	}
 }
