@@ -1,6 +1,39 @@
 #include "ImGuiManager.h"
 #include <Engine/Contexts/GameContext/GameContext.h>
 
+#ifdef USE_IMGUI
+// ImGui用SRV確保
+static void ImGuiDescriptorAlloc(
+	ImGui_ImplDX12_InitInfo* info,
+	D3D12_CPU_DESCRIPTOR_HANDLE* outCpu,
+	D3D12_GPU_DESCRIPTOR_HANDLE* outGpu) {
+	auto* srvManager = static_cast<SRVManager*>(info->UserData);
+
+	uint32_t index = srvManager->Allocate();
+
+	*outCpu = srvManager->GetCPUHandle(index);
+	*outGpu = srvManager->GetGPUHandle(index);
+}
+
+// ImGui用SRV解放
+static void ImGuiDescriptorFree(
+	ImGui_ImplDX12_InitInfo* info,
+	D3D12_CPU_DESCRIPTOR_HANDLE cpu,
+	D3D12_GPU_DESCRIPTOR_HANDLE gpu) {
+	auto* srvManager = static_cast<SRVManager*>(info->UserData);
+
+	// CPUハンドルからインデックスを計算
+	auto heap = srvManager->GetHeap();
+	auto start = heap->GetCPUDescriptorHandleForHeapStart();
+
+	uint32_t index = static_cast<uint32_t>(
+		(cpu.ptr - start.ptr) / srvManager->GetSRVHeapSize()
+		);
+
+	srvManager->Free(index);
+}
+#endif USE_IMGUI
+
 Matrix4x4 ToMatrix4x4(const float m[16]) {
 	Matrix4x4 r{};
 
@@ -28,27 +61,37 @@ Matrix4x4 ToMatrix4x4(const float m[16]) {
 }
 
 void ImGuiManager::Initialize([[maybe_unused]] HWND* hwnd, [[maybe_unused]] ID3D12Device* device, [[maybe_unused]] int bufferCount, [[maybe_unused]] DXGI_FORMAT format,
-	[[maybe_unused]] ID3D12DescriptorHeap* srvHeap, [[maybe_unused]] D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle,
-	[[maybe_unused]] D3D12_GPU_DESCRIPTOR_HANDLE srvGPUHandle, [[maybe_unused]] ID3D12CommandQueue* cmdQueue) {
+	SRVManager* srvManager, [[maybe_unused]] ID3D12CommandQueue* cmdQueue) {
 #ifdef USE_IMGUI
-	// Imguiの初期化
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
+
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.Fonts->AddFontFromFileTTF("Resources/Debug/Font/msgothic.ttc", 15.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+
 	ImGui_ImplWin32_Init(*hwnd);
 
 	ImGui_ImplDX12_InitInfo initInfo = {};
+
 	initInfo.CommandQueue = cmdQueue;
 	initInfo.Device = device;
 	initInfo.NumFramesInFlight = bufferCount;
 	initInfo.RTVFormat = format;
 	initInfo.DSVFormat = format;
-	initInfo.SrvDescriptorHeap = srvHeap;
-	initInfo.LegacySingleSrvCpuDescriptor = srvCPUHandle;
-	initInfo.LegacySingleSrvGpuDescriptor = srvGPUHandle;
+
+	// SRVManagerが管理するヒープを使用
+	initInfo.SrvDescriptorHeap = srvManager->GetHeap().Get();
+
+	// SRVの確保・解放関数
+	initInfo.SrvDescriptorAllocFn = ImGuiDescriptorAlloc;
+	initInfo.SrvDescriptorFreeFn = ImGuiDescriptorFree;
+
+	// コールバックにSRVManagerを渡す
+	initInfo.UserData = srvManager;
+
 	ImGui_ImplDX12_Init(&initInfo);
 
 #endif
@@ -190,7 +233,7 @@ void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT wind
 
 				Vector3 deltaPos = t.translate - beginTransform_.translate;
 				Vector3 deltaRot = t.rotate - beginTransform_.rotate;
-				Vector3 deltaScale = t.scale - beginTransform_.scale; 
+				Vector3 deltaScale = t.scale - beginTransform_.scale;
 				deltaTransform_ = { deltaScale, deltaRot, deltaPos };
 
 				target->SetTransforms(gizmoCtx_.editingInstance, t);
@@ -212,7 +255,7 @@ void ImGuiManager::DrawSceneWindow(D3D12_GPU_DESCRIPTOR_HANDLE handle, RECT wind
 							transforms[i].scale += deltaTransform_.scale;
 							target->SetTransforms(i, transforms[i]);
 
-						} else if(gizmoCtx_.useRangeSelect) {
+						} else if (gizmoCtx_.useRangeSelect) {
 							if (gizmoCtx_.minRange <= i && gizmoCtx_.maxRange >= i) {
 								transforms[i].translate += deltaTransform_.translate;
 								transforms[i].rotate += deltaTransform_.rotate;

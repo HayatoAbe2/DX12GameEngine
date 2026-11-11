@@ -13,10 +13,11 @@
 #endif
 #include "Engine/Math/Vector2/Vector2.h"
 #include "Engine/SceneObject/Transform.h"
+#include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
 
 class ImGuiManager {
 public:
-	void Initialize(HWND* hwnd, ID3D12Device* device, int bufferCount, DXGI_FORMAT format, ID3D12DescriptorHeap* srvHeap, D3D12_CPU_DESCRIPTOR_HANDLE srvCPUHandle, D3D12_GPU_DESCRIPTOR_HANDLE srvGPUHandle, ID3D12CommandQueue* cmdQueue);
+	void Initialize(HWND* hwnd, ID3D12Device* device, int bufferCount, DXGI_FORMAT format, SRVManager* srvManager, ID3D12CommandQueue* cmdQueue);
 	void Finalize();
 
 	void BeginFrame();

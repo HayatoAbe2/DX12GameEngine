@@ -234,15 +234,15 @@ void WeaponEditor::Draw() {
 
 void WeaponEditor::DrawList() {
 #ifdef USE_IMGUI
-	if (ImGui::Button("新規")) { openNewPopup_ = true; }
+	if (ImGui::Button("新規追加")) { openNewPopup_ = true; }
 	ImGui::SameLine();
 	ImGui::BeginDisabled(Selected() == nullptr);
-	if (ImGui::Button("複製")) { Duplicate(); }
+	if (ImGui::Button("コピー")) { Duplicate(); }
 	ImGui::SameLine();
 	if (ImGui::Button("削除")) { openDeletePopup_ = true; }
 	ImGui::EndDisabled();
 
-	if (ImGui::Button("再読込")) {
+	if (ImGui::Button("再読み込み")) {
 		const bool anyDirty = std::any_of(entries_.begin(), entries_.end(), [](const Entry& e) { return e.history.dirty || e.isNew; });
 		if (anyDirty) { openReloadPopup_ = true; } else { Scan(); }
 	}

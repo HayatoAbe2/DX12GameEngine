@@ -1,271 +1,163 @@
 #include "WeaponManager.h"
 #include "Objects/Weapon/Weapon.h"
+#include "Data/WeaponSerializer.h"
 #include <Externals/nlohmann/json.hpp>
+#include <algorithm>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <Windows.h>
+
+namespace {
+	// 武器データのフォルダ(敵用は名前の末尾が _Enemy)
+	constexpr const char* kWeaponDir = "Resources/Data/Weapons";
+	constexpr const char* kEnemySuffix = "_Enemy";
+
+	// デバッグ出力(Visual Studioの出力ウィンドウ)
+	void Log(const std::string& message) {
+		OutputDebugStringA((message + "\n").c_str());
+	}
+}
 
 void WeaponManager::Initialize() {
-	// json読み込み
-	LoadJson("Resources/Data/Weapons/Pistol.json");
-	LoadJson("Resources/Data/Weapons/AssaultRifle.json");
-	LoadJson("Resources/Data/Weapons/Shotgun.json");
-	LoadJson("Resources/Data/Weapons/Spellbook.json");
-	LoadJson("Resources/Data/Weapons/Wavegun.json");
-	LoadJson("Resources/Data/Weapons/OrbitStaff.json");
-	LoadJson("Resources/Data/Weapons/Chargegun.json");
-	LoadJson("Resources/Data/Weapons/Accelgun.json");
-	LoadJson("Resources/Data/Weapons/Sniper.json");
-	LoadJson("Resources/Data/Weapons/Burstgun.json");
+	Reload();
+}
 
-	LoadJson("Resources/Data/Weapons/Fireball_Enemy.json", true);
-	LoadJson("Resources/Data/Weapons/AssaultRifle_Enemy.json", true);
-	LoadJson("Resources/Data/Weapons/Pistol_Enemy.json", true);
-	LoadJson("Resources/Data/Weapons/ThreeWay_Enemy.json", true);
-	LoadJson("Resources/Data/Weapons/FourWay_Enemy.json", true);
-	LoadJson("Resources/Data/Weapons/LargeFireball_Enemy.json", true);
+void WeaponManager::Reload() {
+	weaponDataMap.clear();
+	enemyAttackDataMap.clear();
+
+	// フォルダ内のjsonをすべて読み込む(エディタで追加した武器もここで登録される)
+	std::vector<std::filesystem::path> files;
+	std::error_code ec;
+	for (const auto& entry : std::filesystem::directory_iterator(kWeaponDir, ec)) {
+		if (entry.is_regular_file() && entry.path().extension() == ".json") {
+			files.push_back(entry.path());
+		}
+	}
+	std::sort(files.begin(), files.end());
+
+	for (const auto& path : files) {
+		LoadJson(path.string());
+	}
+}
+
+std::vector<std::string> WeaponManager::GetWeaponNames() const {
+	std::vector<std::string> names;
+	names.reserve(weaponDataMap.size());
+	for (const auto& [name, data] : weaponDataMap) {
+		names.push_back(name);
+	}
+	std::sort(names.begin(), names.end());
+	return names;
+}
+
+std::vector<std::string> WeaponManager::GetEnemyAttackNames() const {
+	const std::string suffix = kEnemySuffix;
+	std::vector<std::string> names;
+	names.reserve(enemyAttackDataMap.size());
+	for (const auto& [key, data] : enemyAttackDataMap) {
+		// GetEnemyAttack(name) に渡す名前は末尾の _Enemy を除いたもの
+		names.push_back(key.substr(0, key.size() - suffix.size()));
+	}
+	std::sort(names.begin(), names.end());
+	return names;
+}
+
+const WeaponData* WeaponManager::GetEnemyAttackData(const std::string& name) const {
+	const auto it = enemyAttackDataMap.find(name + kEnemySuffix);
+	return it != enemyAttackDataMap.end() ? &it->second : nullptr;
+}
+
+std::unique_ptr<Weapon> WeaponManager::CreateWeapon(const WeaponData& data) {
+	auto& asset = GameContext::GetInstance().Asset();
+
+	std::unique_ptr<Model> model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	std::unique_ptr<Model> shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
+	MaterialData matData = model->GetMaterial(0)->GetData();
+	matData.color = { 0.2f,0.2f,0.2f,1 };
+	model->GetMaterial(0)->SetData(matData);
+	model->GetMaterial(1)->SetData(matData);
+
+	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
 }
 
 std::unique_ptr<Weapon> WeaponManager::GetWeapon(int index, Rarity rarity) {
 	auto& ctx = GameContext::GetInstance();
-	auto& asset = ctx.Asset();
 
-	WeaponData data;
+	// ランダム(読み込まれている武器の中から)
+	if (index == -1) {
+		const std::vector<std::string> names = GetWeaponNames();
+		if (names.empty()) { return nullptr; }
+		return GetWeaponByName(names[ctx.RandomInt(0, int(names.size()) - 1)], rarity);
+	}
 
-	// ランダム
-	if (index == -1) { index = ctx.RandomInt(0, int(WEAPON::Count) - 1); }
+	if (index < 0 || index >= int(WEAPON::Count)) {
+		Log(std::format("[WeaponManager] GetWeapon: invalid index {}", index));
+		return nullptr;
+	}
+	return GetWeaponByName(WeaponNames[index], rarity);
+}
 
-	// 武器データ
-	data = weaponDataMap[WeaponNames[index]];
-
-	std::unique_ptr<Model> model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	std::unique_ptr<Model> shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	MaterialData matData = model->GetMaterial(0)->GetData();
-	matData.color = { 0.2f,0.2f,0.2f,1 };
-	model->GetMaterial(0)->SetData(matData);
-	model->GetMaterial(1)->SetData(matData);
-
-	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
+std::unique_ptr<Weapon> WeaponManager::GetWeaponByName(const std::string& name, Rarity rarity) {
+	const auto it = weaponDataMap.find(name);
+	if (it == weaponDataMap.end()) {
+		Log(std::format("[WeaponManager] GetWeaponByName: weapon not found: {}", name));
+		return nullptr;
+	}
+	return CreateWeapon(it->second);
 }
 
 std::unique_ptr<Weapon> WeaponManager::GetEnemyAttack(int index) {
 	auto& ctx = GameContext::GetInstance();
-	auto& asset = ctx.Asset();
-
-	WeaponData data;
 
 	// ランダム
-	if (index == -1) { index = ctx.RandomInt(0, int(ENEMYATTACK::Count) - 1); }
+	if (index == -1) {
+		const std::vector<std::string> names = GetEnemyAttackNames();
+		if (names.empty()) { return nullptr; }
+		return GetEnemyAttack(names[ctx.RandomInt(0, int(names.size()) - 1)]);
+	}
 
-	// 武器データ
-	data = enemyAttackDataMap[EnemyAttackNames[index] + "_Enemy"];
-
-	std::unique_ptr<Model> model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	std::unique_ptr<Model> shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	MaterialData matData = model->GetMaterial(0)->GetData();
-	matData.color = { 0.2f,0.2f,0.2f,1 };
-	model->GetMaterial(0)->SetData(matData);
-	model->GetMaterial(1)->SetData(matData);
-
-	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
+	if (index < 0 || index >= int(ENEMYATTACK::Count)) {
+		Log(std::format("[WeaponManager] GetEnemyAttack: invalid index {}", index));
+		return nullptr;
+	}
+	return GetEnemyAttack(EnemyAttackNames[index]);
 }
-
 
 std::unique_ptr<Weapon> WeaponManager::GetEnemyAttack(const std::string& name) {
-	auto& ctx = GameContext::GetInstance();
-	auto& asset = ctx.Asset();
-
 	// JSONのキーと同じ名前
-	const std::string key = name + "_Enemy";
+	const std::string key = name + kEnemySuffix;
 
-	auto it = enemyAttackDataMap.find(key);
-	WeaponData data = it->second;
-
-	std::unique_ptr<Model> model = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-	std::unique_ptr<Model> shadowModel = asset.LoadModel("Resources/Models/Weapons", data.modelName);
-
-	MaterialData matData = model->GetMaterial(0)->GetData();
-	matData.color = { 0.2f, 0.2f, 0.2f, 1.0f };
-
-	model->GetMaterial(0)->SetData(matData);
-	model->GetMaterial(1)->SetData(matData);
-
-	return std::make_unique<Weapon>(data, std::move(model), std::move(shadowModel));
+	const auto it = enemyAttackDataMap.find(key);
+	if (it == enemyAttackDataMap.end()) {
+		Log(std::format("[WeaponManager] GetEnemyAttack: weapon not found: {}", key));
+		return nullptr;
+	}
+	return CreateWeapon(it->second);
 }
 
-
-void WeaponManager::LoadJson(const std::string& path, bool isEnemyAttack) {
+void WeaponManager::LoadJson(const std::string& path) {
 	std::ifstream file(path);
-	assert(file.is_open());
+	if (!file.is_open()) {
+		Log(std::format("[WeaponManager] cannot open: {}", path));
+		return;
+	}
 
 	nlohmann::json j;
-	file >> j;
+	try {
+		file >> j;
+	} catch (const std::exception& e) {
+		Log(std::format("[WeaponManager] parse error: {} ({})", path, e.what()));
+		return;
+	}
+	if (!j.is_object()) { return; }
 
-	for (auto& [name, data] : j.items()) {
-		WeaponData weapon{};
+	for (const auto& [name, data] : j.items()) {
+		WeaponData weapon = WeaponSerializer::FromJson(name, data);
 
-		weapon.name = name;
-		weapon.modelName = data["modelName"];
-
-		// enum変換
-		weapon.rarity = data["rarity"].get<Rarity>();
-
-		weapon.stats.weight = data["weight"];
-		weapon.stats.shootCoolTime = data["shootCoolTime"];
-		weapon.stats.maxCharge = data["maxCharge"];
-		weapon.stats.chargeTime = data["chargeTime"];
-
-		// 弾
-		auto& bullet = data["bullet"];
-		weapon.bullet.damage = bullet["damage"];
-		weapon.bullet.radius = bullet["radius"];
-		weapon.bullet.speed = bullet["speed"];
-		weapon.bullet.lifeTime = bullet["lifeTime"];
-		weapon.bullet.knockback = bullet["knockback"];
-		auto& color = bullet["color"];
-		weapon.bullet.color.x = color[0];
-		weapon.bullet.color.y = color[1];
-		weapon.bullet.color.z = color[2];
-		weapon.bullet.color.w = color[3];
-
-		///
-		/// 弾の性質
-		///
-		if (bullet.contains("traits")) {
-			auto& traits = bullet["traits"];
-
-			// 移動関連
-			if (traits.contains("move")) {
-				auto& move = traits["move"];
-
-				if (move.contains("wave")) {
-					Wave t;
-					auto& j = move["wave"];
-
-					t.amplitude = j["amplitude"];
-					t.speed = j["speed"];
-					t.maxAngle = j["maxAngle"];
-
-					weapon.bullet.traits.move.wave = t;
-				}
-
-				if (move.contains("accel")) {
-					Accel t;
-					auto& j = move["accel"];
-
-					t.rate = j["rate"];
-
-					weapon.bullet.traits.move.accel = t;
-				}
-
-				if (move.contains("orbit")) {
-					Orbit t;
-					auto& j = move["orbit"];
-
-					t.radius = j["radius"];
-					t.speed = j["speed"];
-
-					weapon.bullet.traits.move.orbit = t;
-				}
-			}
-
-			// 壁ヒット時
-			if (traits.contains("onHitWall")) {
-				auto& wall = traits["onHitWall"];
-
-				if (wall.contains("ricochet")) {
-					Ricochet t;
-					auto& j = wall["ricochet"];
-
-					t.count = j["count"];
-					t.onHitEnemy = j["onHitEnemy"];
-					t.toEnemy = j["toEnemy"];
-
-					weapon.bullet.traits.onHitWall.ricochet = t;
-				}
-			}
-
-			if (traits.contains("onHitEnemy")) {
-				auto& enemy = traits["onHitEnemy"];
-
-				if (enemy.contains("piercing")) {
-					Piercing t;
-					auto& j = enemy["piercing"];
-
-					t.count = j["count"];
-
-					weapon.bullet.traits.onHitEnemy.piercing = t;
-				}
-
-				if (enemy.contains("slow")) {
-					Slow t;
-					auto& j = enemy["slow"];
-
-					t.rate = j["rate"];
-					t.time = j["time"];
-
-					weapon.bullet.traits.onHitEnemy.slow = t;
-				}
-
-				if (enemy.contains("flame")) {}
-				if (enemy.contains("freeze")) {}
-				if (enemy.contains("volt")) {}
-
-			}
-
-			if (traits.contains("onHitAnything")) {
-				auto& any = traits["onHitAnything"];
-
-				if (any.contains("explode")) {
-					Explode t;
-					auto& j = any["explode"];
-
-					t.damage = j["damage"];
-					t.radius = j["radius"];
-
-					weapon.bullet.traits.onHitAnything.explode = t;
-				}
-			}
-		}
-
-		///
-		/// 武器の性質
-		///
-
-		if (data.contains("traits")) {
-			auto& traits = data["traits"];
-
-			// MultiShot
-			if (traits.contains("multiShot")) {
-				MultiShotParam param;
-				auto& j = traits["multiShot"];
-
-				param.count = j["count"];
-				param.maxAngle = j["maxAngle"];
-				param.random = j["random"];
-
-				weapon.traits.multiShot = param;
-			}
-			// Charge
-			if (traits.contains("charge")) {
-				ChargeParam param;
-				auto& j = traits["charge"];
-
-				param.time = j["time"];
-				param.damage = j["damage"];
-
-				weapon.traits.charge = param;
-			}
-			// Burst
-			if (traits.contains("burst")) {
-				BurstParam param;
-				auto& j = traits["burst"];
-
-				param.count = j["count"];
-				param.interval = j["interval"];
-
-				weapon.traits.burst = param;
-			}
-		}
-
-		if (isEnemyAttack) {
+		// 名前の末尾が _Enemy なら敵用
+		if (WeaponSerializer::IsEnemyWeapon(name)) {
 			enemyAttackDataMap[name] = weapon;
 		} else {
 			weaponDataMap[name] = weapon;

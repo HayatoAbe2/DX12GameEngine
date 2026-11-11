@@ -86,6 +86,9 @@ void GameScene::Initialize() {
 	weaponEditor_ = std::make_unique<WeaponEditor>();
 
 	Update();
+
+	weaponEditor_->SetOnApplied([this] { weaponManager_->Reload(); });
+	enemyEditor_->SetOnApplied([this] { enemyManager_->ReloadEnemyData(); });
 }
 
 void GameScene::Update() {
@@ -249,12 +252,13 @@ void GameScene::Draw() {
 #ifdef USE_IMGUI
 	SpawnForDebug();
 
-	ImGui::Begin("Camera");
-	ImGui::DragFloat3("Pos", &camera_->transform_.translate.x, 0.5f);
-	ImGui::End();
-
 	spawnEditor_->Draw(enemyManager_->GetEnemyNames());
 	weaponEditor_->Draw();
+	enemyEditor_->Draw(
+		weaponManager_->GetEnemyAttackNames(),
+		[this](const std::string& name) {
+			return weaponManager_->GetEnemyAttackData(name);
+		});
 #endif
 }
 

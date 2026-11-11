@@ -182,9 +182,7 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	imGuiManager_->Initialize(&hwnd, deviceManager_->GetDevice().Get(),
 		swapChainDesc_.BufferCount,
 		renderTargetManager_->GetRTVDesc_().Format,
-		descriptorManager_->GetHeap().Get(),
-		descriptorManager_->GetCPUHandle(index),
-		descriptorManager_->GetGPUHandle(index),
+		GetSRVManager(),
 		commandListManager_->GetCommandQueue().Get()
 	);
 }
