@@ -334,6 +334,17 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 	ImGui::SameLine();
 	if (entry.history.dirty || entry.isNew) { ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "未保存の変更あり"); }
 
+	// ---- テスト用:この敵をプレイヤーの近くに出す ----
+	if (onSpawn_) {
+		const bool needSave = entry.history.dirty || entry.isNew;
+		ImGui::BeginDisabled(hasError);
+		if (ImGui::Button(needSave ? "保存してプレイヤーの近くに出す" : "プレイヤーの近くに出す")) {
+			// 保存すると敵データが再読み込みされ、編集した内容で出る
+			if (!needSave || Save(entry)) { onSpawn_(entry.key); }
+		}
+		ImGui::EndDisabled();
+	}
+
 	if (!status_.empty()) { ImGui::TextDisabled("%s", status_.c_str()); }
 	EditorUtil::DrawIssues(issues);
 	ImGui::Separator();

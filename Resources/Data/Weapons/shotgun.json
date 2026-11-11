@@ -1,28 +1,25 @@
-{ 
+{
     "Shotgun": {
         "modelName": "Shotgun.obj",
         "weight": 0.5,
         "shootCoolTime": 0.66,
         "maxCharge": 2.0,
         "chargeTime": 1.75,
-       
         "bullet": {
             "damage": 6.0,
             "radius": 0.4,
-            "speed": 50,
-            "lifeTime": 6,
+            "speed": 20.0,
+            "lifeTime": 15,
             "knockback": 0.3,
             "color": [0.8, 0.2, 0.2, 1.0]
         },
-
         "traits": {
-            "multiShot":{
+            "multiShot": {
                 "count": 5,
-                "maxAngle": 30,
+                "maxAngle": 30.0,
                 "random": false
             }
         },
-
         "rarity": "Common"
-  }
+    }
 }

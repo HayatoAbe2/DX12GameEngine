@@ -31,6 +31,9 @@ public:
 
 	// 敵を抽選して出現予約
 	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
+
+	// 次の更新で、その場にすぐ出現させる(デバッグ・エディタ用。名前は GetEnemyNames() のもの)
+	void RequestSpawn(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
 	void Reset();
 	void Load(WeaponManager* weaponManager, RandomSettings* random);
 	void SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck);
@@ -38,6 +41,9 @@ public:
 	std::vector<Enemy*> GetEnemies();
 private:
 	void LoadEnemyData();
+
+	// 名前から敵を生成する(見つからなければ空)
+	std::vector<std::unique_ptr<Enemy>> MakeEnemies(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
 
 	FloorManager* floorManager_ = nullptr;
 
@@ -52,5 +58,13 @@ private:
 
 	// 敵データ
 	std::unordered_map<std::string, EnemyData> enemyDataMap_;
+
+	// すぐ出現させる予約(生成を描画の途中で行わないため、次の更新で処理する)
+	struct SpawnRequest {
+		Vector3 pos;
+		WeaponManager* weaponManager = nullptr;
+		std::string name;
+	};
+	std::vector<SpawnRequest> spawnRequests_;
 };
 

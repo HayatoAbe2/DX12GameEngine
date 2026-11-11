@@ -29,11 +29,11 @@ void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyMa
 }
 
 void ItemManager::Update(Player* player, bool isCombat) {
-	// 配置予約があれば出現
-	if (nextSpawnIndex_ > 0) {
-		Drop(nextSpawnPos_, weaponManager_->GetWeapon(nextSpawnIndex_));
-		nextSpawnIndex_ = -1;
+	// 配置予約があれば出現(見つからない名前は GetWeaponByName が nullptr を返し、Drop は何もしない)
+	for (const auto& request : weaponSpawnRequests_) {
+		Drop(request.pos, weaponManager_->GetWeaponByName(request.name));
 	}
+	weaponSpawnRequests_.clear();
 
 	// 削除
 	items_.erase(
@@ -222,9 +222,8 @@ void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
 	}
 }
 
-void ItemManager::SetSpawn(Vector3 pos, int index) {
-	nextSpawnPos_ = pos;
-	nextSpawnIndex_ = index;
+void ItemManager::SetSpawn(Vector3 pos, const std::string& weaponName) {
+	weaponSpawnRequests_.push_back({ pos, weaponName });
 }
 
 void ItemManager::Reset() {

@@ -1,0 +1,343 @@
+diff --git a/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.cpp b/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.cpp
+index 74db9af..b265f03 100644
+--- a/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.cpp
++++ b/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.cpp
+@@ -25,6 +25,12 @@ std::vector<std::string> EnemyManager::GetEnemyNames() const {
+ }
+ 
+ void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager) {
++	// すぐ出現させる予約(エディタ・デバッグ用)
++	for (const auto& request : spawnRequests_) {
++		Spawn(MakeEnemies(request.pos, request.weaponManager, request.name));
++	}
++	spawnRequests_.clear();
++
+ 	for (const auto& enemy : activeEnemies_) {
+ 		enemy->Update(mapCheck, player, bulletManager);
+ 	}
+@@ -62,13 +68,23 @@ void EnemyManager::Spawn(std::vector<std::unique_ptr<Enemy>> enemy) {
+ 	}
+ }
+ 
++void EnemyManager::RequestSpawn(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
++	spawnRequests_.push_back({ pos, weaponManager, name });
++}
++
+ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
++	// 見つからない名前でも空の枠は必ず追加する
++	// (isSpawned_ / spawnPos_ と添字を揃えないと、SpawnCheck が範囲外を読んで落ちる)
++	inactiveEnemies_.push_back(MakeEnemies(pos, weaponManager, name));
++}
++
++std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
++	std::vector<std::unique_ptr<Enemy>> enemies;
++
+ 	auto it = enemyDataMap_.find(name);
+ 	if (it == enemyDataMap_.end()) { // 見つからない
+-		return;
++		return enemies;
+ 	}
+-
+-	std::vector<std::unique_ptr<Enemy>> enemies;
+ 	const EnemyData& data = it->second;
+ 
+ 	auto& ctx = GameContext::GetInstance();
+@@ -107,11 +123,11 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const
+ 		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons)));
+ 	}
+ 
+-	// 出現待機
+-	inactiveEnemies_.push_back(std::move(enemies));
++	return enemies;
+ }
+ 
+ void EnemyManager::Reset() {
++	spawnRequests_.clear();
+ 	activeEnemies_.clear();
+ 	isSpawned_.clear();
+ }
+diff --git a/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.h b/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.h
+index fbc5870..4d54927 100644
+--- a/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.h
++++ b/Application/Objects/Character/Enemy/EnemyManager/EnemyManager.h
+@@ -31,6 +31,9 @@ public:
+ 
+ 	// 敵を抽選して出現予約
+ 	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
++
++	// 次の更新で、その場にすぐ出現させる(デバッグ・エディタ用。名前は GetEnemyNames() のもの)
++	void RequestSpawn(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
+ 	void Reset();
+ 	void Load(WeaponManager* weaponManager, RandomSettings* random);
+ 	void SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck);
+@@ -39,6 +42,9 @@ public:
+ private:
+ 	void LoadEnemyData();
+ 
++	// 名前から敵を生成する(見つからなければ空)
++	std::vector<std::unique_ptr<Enemy>> MakeEnemies(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
++
+ 	FloorManager* floorManager_ = nullptr;
+ 
+ 	std::vector<std::unique_ptr<Enemy>> activeEnemies_ = {};
+@@ -52,5 +58,13 @@ private:
+ 
+ 	// 敵データ
+ 	std::unordered_map<std::string, EnemyData> enemyDataMap_;
++
++	// すぐ出現させる予約(生成を描画の途中で行わないため、次の更新で処理する)
++	struct SpawnRequest {
++		Vector3 pos;
++		WeaponManager* weaponManager = nullptr;
++		std::string name;
++	};
++	std::vector<SpawnRequest> spawnRequests_;
+ };
+ 
+diff --git a/Application/Objects/Item/ItemManager.cpp b/Application/Objects/Item/ItemManager.cpp
+index 000f0a7..321f532 100644
+--- a/Application/Objects/Item/ItemManager.cpp
++++ b/Application/Objects/Item/ItemManager.cpp
+@@ -29,11 +29,11 @@ void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyMa
+ }
+ 
+ void ItemManager::Update(Player* player, bool isCombat) {
+-	// 配置予約があれば出現
+-	if (nextSpawnIndex_ > 0) {
+-		Drop(nextSpawnPos_, weaponManager_->GetWeapon(nextSpawnIndex_));
+-		nextSpawnIndex_ = -1;
++	// 配置予約があれば出現(見つからない名前は GetWeaponByName が nullptr を返し、Drop は何もしない)
++	for (const auto& request : weaponSpawnRequests_) {
++		Drop(request.pos, weaponManager_->GetWeaponByName(request.name));
+ 	}
++	weaponSpawnRequests_.clear();
+ 
+ 	// 削除
+ 	items_.erase(
+@@ -222,9 +222,8 @@ void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {
+ 	}
+ }
+ 
+-void ItemManager::SetSpawn(Vector3 pos, int index) {
+-	nextSpawnPos_ = pos;
+-	nextSpawnIndex_ = index;
++void ItemManager::SetSpawn(Vector3 pos, const std::string& weaponName) {
++	weaponSpawnRequests_.push_back({ pos, weaponName });
+ }
+ 
+ void ItemManager::Reset() {
+diff --git a/Application/Objects/Item/ItemManager.h b/Application/Objects/Item/ItemManager.h
+index ba5789b..4e89d17 100644
+--- a/Application/Objects/Item/ItemManager.h
++++ b/Application/Objects/Item/ItemManager.h
+@@ -35,8 +35,8 @@ public:
+ 	// 配置リセット
+ 	void Reset();
+ 
+-	// 次フレームに配置(描画段階での生成をしないため)
+-	void SetSpawn(Vector3 pos, int index);
++	// 次フレームに武器を配置(描画段階での生成をしないため)。名前は WeaponManager::GetWeaponNames() のもの
++	void SetSpawn(Vector3 pos, const std::string& weaponName);
+ 
+ 	// シーンを見て配置
+ 	void Load();
+@@ -69,8 +69,13 @@ private:
+ 	std::vector<bool> weaponSaleSpawned_;
+ 	std::vector<bool> passiveSpawned_;
+ 	std::vector<bool> passiveSaleSpawned_;
+-	int nextSpawnIndex_ = -1;
+-	Vector3 nextSpawnPos_{};
++
++	// 次フレームに配置する武器の予約(同じフレームに複数押されても全部出す)
++	struct WeaponSpawnRequest {
++		Vector3 pos;
++		std::string name;
++	};
++	std::vector<WeaponSpawnRequest> weaponSpawnRequests_;
+ 
+ 	std::unordered_set<int> usedPassiveNumbers_;
+ 	std::unordered_set<int> pickedPassiveNumbers_;
+diff --git a/Application/Scene/GameScene/GameScene.cpp b/Application/Scene/GameScene/GameScene.cpp
+index 4825781..5287265 100644
+--- a/Application/Scene/GameScene/GameScene.cpp
++++ b/Application/Scene/GameScene/GameScene.cpp
+@@ -89,6 +89,14 @@ void GameScene::Initialize() {
+ 
+ 	weaponEditor_->SetOnApplied([this] { weaponManager_->Reload(); });
+ 	enemyEditor_->SetOnApplied([this] { enemyManager_->ReloadEnemyData(); });
++
++	// エディタの「出す」ボタン(保存して出す場合も、保存で再読み込みされた後に呼ばれる)
++	weaponEditor_->SetOnSpawn([this](const std::string& name) {
++		itemManager_->SetSpawn(player_->GetTransform().translate, name);
++	});
++	enemyEditor_->SetOnSpawn([this](const std::string& name) {
++		enemyManager_->RequestSpawn(GetDebugEnemySpawnPos(), weaponManager_.get(), name);
++	});
+ }
+ 
+ void GameScene::Update() {
+@@ -306,38 +314,32 @@ void GameScene::LoadSound() {
+ 
+ void GameScene::SpawnForDebug() {
+ #ifdef USE_IMGUI
++	// 武器・敵の一覧は、読み込まれているデータから作る(エディタで追加したものも、そのまま出せる)
+ 	ImGui::Begin("Weapon");
+ 	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
+-	if (ImGui::Button("Pistol")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
+-	};
+-	if (ImGui::Button("AssaultRifle")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 1);
+-	};
+-	if (ImGui::Button("Shotgun")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 2);
+-	};
+-	if (ImGui::Button("Flame")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 3);
+-	};
+-	if (ImGui::Button("Wave")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 4);
+-	};
+-	if (ImGui::Button("Orbit")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 5);
+-	};
+-	if (ImGui::Button("Charge")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 6);
+-	};
+-	if (ImGui::Button("Accel")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 7);
+-	};
+-	if (ImGui::Button("Sniper")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 8);
+-	};
+-	if (ImGui::Button("Burst")) {
+-		itemManager_->SetSpawn(player_->GetTransform().translate, 9);
+-	};
++
++	ImGui::SeparatorText("武器(プレイヤーの足元に出す)");
++	ImGui::PushID("weapon");
++	for (const std::string& name : weaponManager_->GetWeaponNames()) {
++		if (ImGui::Button(name.c_str())) {
++			itemManager_->SetSpawn(player_->GetTransform().translate, name);
++		}
++	}
++	ImGui::PopID();
++
++	ImGui::SeparatorText("敵(プレイヤーの近くに出す)");
++	ImGui::PushID("enemy");
++	for (const std::string& name : enemyManager_->GetEnemyNames()) {
++		if (ImGui::Button(name.c_str())) {
++			enemyManager_->RequestSpawn(GetDebugEnemySpawnPos(), weaponManager_.get(), name);
++		}
++	}
++	ImGui::PopID();
+ 	ImGui::End();
+ #endif
++}
++
++Vector3 GameScene::GetDebugEnemySpawnPos() const {
++	// プレイヤーの少し奥(壁の中になる場合は、プレイヤーを動かしてから押してください)
++	return player_->GetTransform().translate + Vector3{ 0.0f, 0.0f, 8.0f };
+ }
+\ No newline at end of file
+diff --git a/Application/Scene/GameScene/GameScene.h b/Application/Scene/GameScene/GameScene.h
+index aefdf9c..dc797d5 100644
+--- a/Application/Scene/GameScene/GameScene.h
++++ b/Application/Scene/GameScene/GameScene.h
+@@ -43,7 +43,8 @@ public:
+ 
+ private:
+ 	void LoadSound();
+-	void SpawnForDebug(); // デバッグ用アイテム出現
++	void SpawnForDebug(); // デバッグ用の武器・敵の出現(読み込まれているデータの一覧から作る)
++	Vector3 GetDebugEnemySpawnPos() const; // 敵を出す位置(プレイヤーの近く)
+ 
+ 	enum class Phase {
+ 		GAME,
+diff --git a/Editor/EnemyEditor/EnemyEditor.cpp b/Editor/EnemyEditor/EnemyEditor.cpp
+index ad17f9c..c6d6a99 100644
+--- a/Editor/EnemyEditor/EnemyEditor.cpp
++++ b/Editor/EnemyEditor/EnemyEditor.cpp
+@@ -334,6 +334,17 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
+ 	ImGui::SameLine();
+ 	if (entry.history.dirty || entry.isNew) { ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "未保存の変更あり"); }
+ 
++	// ---- テスト用:この敵をプレイヤーの近くに出す ----
++	if (onSpawn_) {
++		const bool needSave = entry.history.dirty || entry.isNew;
++		ImGui::BeginDisabled(hasError);
++		if (ImGui::Button(needSave ? "保存してプレイヤーの近くに出す" : "プレイヤーの近くに出す")) {
++			// 保存すると敵データが再読み込みされ、編集した内容で出る
++			if (!needSave || Save(entry)) { onSpawn_(entry.key); }
++		}
++		ImGui::EndDisabled();
++	}
++
+ 	if (!status_.empty()) { ImGui::TextDisabled("%s", status_.c_str()); }
+ 	EditorUtil::DrawIssues(issues);
+ 	ImGui::Separator();
+diff --git a/Editor/EnemyEditor/EnemyEditor.h b/Editor/EnemyEditor/EnemyEditor.h
+index 06900fd..336c305 100644
+--- a/Editor/EnemyEditor/EnemyEditor.h
++++ b/Editor/EnemyEditor/EnemyEditor.h
+@@ -23,6 +23,9 @@ public:
+ 	// 保存・削除した後に呼ばれる(ゲームの敵データの再読み込み用)
+ 	void SetOnApplied(std::function<void()> onApplied) { onApplied_ = std::move(onApplied); }
+ 
++	// 「出す」ボタンが押されたときに呼ばれる(引数は敵の名前)。設定するとボタンが出る
++	void SetOnSpawn(std::function<void(const std::string&)> onSpawn) { onSpawn_ = std::move(onSpawn); }
++
+ private:
+ 	// 編集対象1つ分(1つのキー = 1種類の敵)
+ 	struct Entry {
+@@ -61,4 +64,5 @@ private:
+ 
+ 	std::string status_;
+ 	std::function<void()> onApplied_;
++	std::function<void(const std::string&)> onSpawn_;
+ };
+diff --git a/Editor/WeaponEditor/WeaponEditor.cpp b/Editor/WeaponEditor/WeaponEditor.cpp
+index 0a8dc31..cc055a7 100644
+--- a/Editor/WeaponEditor/WeaponEditor.cpp
++++ b/Editor/WeaponEditor/WeaponEditor.cpp
+@@ -359,6 +359,20 @@ void WeaponEditor::DrawEditor(Entry& entry) {
+ 	ImGui::SameLine();
+ 	if (entry.history.dirty || entry.isNew) { ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "未保存の変更あり"); }
+ 
++	// ---- テスト用:この武器をプレイヤーの足元に出す ----
++	if (onSpawn_) {
++		const bool needSave = entry.history.dirty || entry.isNew;
++		ImGui::BeginDisabled(hasError || isEnemy);
++		if (ImGui::Button(needSave ? "保存してプレイヤーの足元に出す" : "プレイヤーの足元に出す")) {
++			// 保存すると武器データが再読み込みされ、編集した内容で出る
++			if (!needSave || Save(entry)) { onSpawn_(entry.key); }
++		}
++		ImGui::EndDisabled();
++		if (isEnemy && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
++			ImGui::SetTooltip("敵用の武器は拾えません。敵エディタで、この武器を持つ敵を出してください");
++		}
++	}
++
+ 	if (!status_.empty()) { ImGui::TextDisabled("%s", status_.c_str()); }
+ 	EditorUtil::DrawIssues(issues);
+ 	ImGui::Separator();
+diff --git a/Editor/WeaponEditor/WeaponEditor.h b/Editor/WeaponEditor/WeaponEditor.h
+index 1ac080d..0468a8d 100644
+--- a/Editor/WeaponEditor/WeaponEditor.h
++++ b/Editor/WeaponEditor/WeaponEditor.h
+@@ -16,6 +16,9 @@ public:
+ 	// 保存・削除した後に呼ばれる(ゲームの武器データの再読み込み用)
+ 	void SetOnApplied(std::function<void()> onApplied) { onApplied_ = std::move(onApplied); }
+ 
++	// 「プレイヤーの足元に出す」ボタンが押されたときに呼ばれる(引数は武器名)。設定するとボタンが出る
++	void SetOnSpawn(std::function<void(const std::string&)> onSpawn) { onSpawn_ = std::move(onSpawn); }
++
+ private:
+ 	// 編集対象1つ分(1つのキー = 1つの武器)
+ 	struct Entry {
+@@ -66,4 +69,5 @@ private:
+ 	std::string status_;
+ 
+ 	std::function<void()> onApplied_;
++	std::function<void(const std::string&)> onSpawn_;
+ };

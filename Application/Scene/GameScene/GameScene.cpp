@@ -89,6 +89,14 @@ void GameScene::Initialize() {
 
 	weaponEditor_->SetOnApplied([this] { weaponManager_->Reload(); });
 	enemyEditor_->SetOnApplied([this] { enemyManager_->ReloadEnemyData(); });
+
+	// エディタの「出す」ボタン(保存して出す場合も、保存で再読み込みされた後に呼ばれる)
+	weaponEditor_->SetOnSpawn([this](const std::string& name) {
+		itemManager_->SetSpawn(player_->GetTransform().translate, name);
+	});
+	enemyEditor_->SetOnSpawn([this](const std::string& name) {
+		enemyManager_->RequestSpawn(GetDebugEnemySpawnPos(), weaponManager_.get(), name);
+	});
 }
 
 void GameScene::Update() {
@@ -306,38 +314,32 @@ void GameScene::LoadSound() {
 
 void GameScene::SpawnForDebug() {
 #ifdef USE_IMGUI
+	// 武器・敵の一覧は、読み込まれているデータから作る(エディタで追加したものも、そのまま出せる)
 	ImGui::Begin("Weapon");
 	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
-	if (ImGui::Button("Pistol")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
-	};
-	if (ImGui::Button("AssaultRifle")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 1);
-	};
-	if (ImGui::Button("Shotgun")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 2);
-	};
-	if (ImGui::Button("Flame")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 3);
-	};
-	if (ImGui::Button("Wave")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 4);
-	};
-	if (ImGui::Button("Orbit")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 5);
-	};
-	if (ImGui::Button("Charge")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 6);
-	};
-	if (ImGui::Button("Accel")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 7);
-	};
-	if (ImGui::Button("Sniper")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 8);
-	};
-	if (ImGui::Button("Burst")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 9);
-	};
+
+	ImGui::SeparatorText("武器(プレイヤーの足元に出す)");
+	ImGui::PushID("weapon");
+	for (const std::string& name : weaponManager_->GetWeaponNames()) {
+		if (ImGui::Button(name.c_str())) {
+			itemManager_->SetSpawn(player_->GetTransform().translate, name);
+		}
+	}
+	ImGui::PopID();
+
+	ImGui::SeparatorText("敵(プレイヤーの近くに出す)");
+	ImGui::PushID("enemy");
+	for (const std::string& name : enemyManager_->GetEnemyNames()) {
+		if (ImGui::Button(name.c_str())) {
+			enemyManager_->RequestSpawn(GetDebugEnemySpawnPos(), weaponManager_.get(), name);
+		}
+	}
+	ImGui::PopID();
 	ImGui::End();
 #endif
+}
+
+Vector3 GameScene::GetDebugEnemySpawnPos() const {
+	// デバッグ出現する位置
+	return player_->GetTransform().translate + Vector3{ 0.0f, 0.0f, 3.0f };
 }

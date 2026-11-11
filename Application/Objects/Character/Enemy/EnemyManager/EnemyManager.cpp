@@ -25,6 +25,12 @@ std::vector<std::string> EnemyManager::GetEnemyNames() const {
 }
 
 void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager) {
+	// すぐ出現させる予約(エディタ・デバッグ用)
+	for (const auto& request : spawnRequests_) {
+		Spawn(MakeEnemies(request.pos, request.weaponManager, request.name));
+	}
+	spawnRequests_.clear();
+
 	for (const auto& enemy : activeEnemies_) {
 		enemy->Update(mapCheck, player, bulletManager);
 	}
@@ -62,13 +68,23 @@ void EnemyManager::Spawn(std::vector<std::unique_ptr<Enemy>> enemy) {
 	}
 }
 
+void EnemyManager::RequestSpawn(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
+	spawnRequests_.push_back({ pos, weaponManager, name });
+}
+
 void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
+	// 見つからない名前でも空の枠は必ず追加する
+	// (isSpawned_ / spawnPos_ と添字を揃えないと、SpawnCheck が範囲外を読んで落ちる)
+	inactiveEnemies_.push_back(MakeEnemies(pos, weaponManager, name));
+}
+
+std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
+	std::vector<std::unique_ptr<Enemy>> enemies;
+
 	auto it = enemyDataMap_.find(name);
 	if (it == enemyDataMap_.end()) { // 見つからない
-		return;
+		return enemies;
 	}
-
-	std::vector<std::unique_ptr<Enemy>> enemies;
 	const EnemyData& data = it->second;
 
 	auto& ctx = GameContext::GetInstance();
@@ -107,11 +123,11 @@ void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const 
 		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons)));
 	}
 
-	// 出現待機
-	inactiveEnemies_.push_back(std::move(enemies));
+	return enemies;
 }
 
 void EnemyManager::Reset() {
+	spawnRequests_.clear();
 	activeEnemies_.clear();
 	isSpawned_.clear();
 }

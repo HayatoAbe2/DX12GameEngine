@@ -43,7 +43,8 @@ public:
 
 private:
 	void LoadSound();
-	void SpawnForDebug(); // デバッグ用アイテム出現
+	void SpawnForDebug(); // デバッグ用の武器・敵の出現(読み込まれているデータの一覧から作る)
+	Vector3 GetDebugEnemySpawnPos() const; // 敵を出す位置(プレイヤーの近く)
 
 	enum class Phase {
 		GAME,

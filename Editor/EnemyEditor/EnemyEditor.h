@@ -23,6 +23,9 @@ public:
 	// 保存・削除した後に呼ばれる(ゲームの敵データの再読み込み用)
 	void SetOnApplied(std::function<void()> onApplied) { onApplied_ = std::move(onApplied); }
 
+	// 「出す」ボタンが押されたときに呼ばれる(引数は敵の名前)。設定するとボタンが出る
+	void SetOnSpawn(std::function<void(const std::string&)> onSpawn) { onSpawn_ = std::move(onSpawn); }
+
 private:
 	// 編集対象1つ分(1つのキー = 1種類の敵)
 	struct Entry {
@@ -61,4 +64,5 @@ private:
 
 	std::string status_;
 	std::function<void()> onApplied_;
+	std::function<void(const std::string&)> onSpawn_;
 };

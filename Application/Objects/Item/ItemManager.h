@@ -35,8 +35,8 @@ public:
 	// 配置リセット
 	void Reset();
 
-	// 次フレームに配置(描画段階での生成をしないため)
-	void SetSpawn(Vector3 pos, int index);
+	// 次フレームに武器を配置(描画段階での生成をしないため)。名前は WeaponManager::GetWeaponNames() のもの
+	void SetSpawn(Vector3 pos, const std::string& weaponName);
 
 	// シーンを見て配置
 	void Load();
@@ -69,8 +69,13 @@ private:
 	std::vector<bool> weaponSaleSpawned_;
 	std::vector<bool> passiveSpawned_;
 	std::vector<bool> passiveSaleSpawned_;
-	int nextSpawnIndex_ = -1;
-	Vector3 nextSpawnPos_{};
+
+	// 次フレームに配置する武器の予約(同じフレームに複数押されても全部出す)
+	struct WeaponSpawnRequest {
+		Vector3 pos;
+		std::string name;
+	};
+	std::vector<WeaponSpawnRequest> weaponSpawnRequests_;
 
 	std::unordered_set<int> usedPassiveNumbers_;
 	std::unordered_set<int> pickedPassiveNumbers_;

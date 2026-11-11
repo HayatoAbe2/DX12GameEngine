@@ -359,6 +359,20 @@ void WeaponEditor::DrawEditor(Entry& entry) {
 	ImGui::SameLine();
 	if (entry.history.dirty || entry.isNew) { ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "未保存の変更あり"); }
 
+	// ---- テスト用:この武器をプレイヤーの足元に出す ----
+	if (onSpawn_) {
+		const bool needSave = entry.history.dirty || entry.isNew;
+		ImGui::BeginDisabled(hasError || isEnemy);
+		if (ImGui::Button(needSave ? "保存してプレイヤーの足元に出す" : "プレイヤーの足元に出す")) {
+			// 保存すると武器データが再読み込みされ、編集した内容で出る
+			if (!needSave || Save(entry)) { onSpawn_(entry.key); }
+		}
+		ImGui::EndDisabled();
+		if (isEnemy && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+			ImGui::SetTooltip("敵用の武器は拾えません。敵エディタで、この武器を持つ敵を出してください");
+		}
+	}
+
 	if (!status_.empty()) { ImGui::TextDisabled("%s", status_.c_str()); }
 	EditorUtil::DrawIssues(issues);
 	ImGui::Separator();

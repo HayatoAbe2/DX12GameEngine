@@ -16,6 +16,9 @@ public:
 	// 保存・削除した後に呼ばれる(ゲームの武器データの再読み込み用)
 	void SetOnApplied(std::function<void()> onApplied) { onApplied_ = std::move(onApplied); }
 
+	// 「プレイヤーの足元に出す」ボタンが押されたときに呼ばれる(引数は武器名)。設定するとボタンが出る
+	void SetOnSpawn(std::function<void(const std::string&)> onSpawn) { onSpawn_ = std::move(onSpawn); }
+
 private:
 	// 編集対象1つ分(1つのキー = 1つの武器)
 	struct Entry {
@@ -66,4 +69,5 @@ private:
 	std::string status_;
 
 	std::function<void()> onApplied_;
+	std::function<void(const std::string&)> onSpawn_;
 };
