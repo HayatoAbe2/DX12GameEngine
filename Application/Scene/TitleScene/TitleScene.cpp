@@ -10,7 +10,6 @@ void TitleScene::Initialize() {
 	auto& scene = ctx.Scene();
 	auto& render = ctx.Render();
 
-	scene.SceneLoad("Resources/Debug/SceneEditor/startRoom1.json");
 	audio.SoundLoad(L"Resources/Sounds/SE/press.mp3");
 
 	debugCamera_ = std::make_unique<DebugCamera>();
@@ -75,9 +74,9 @@ void TitleScene::Draw() {
 	BaseScene::Draw();
 	auto& render = GameContext::GetInstance().Render();
 	
+	render.DrawSkybox(skybox_.get());
 	if (videoSprite_) { render.DrawSprite(videoSprite_.get()); }
 	render.DrawSprite(logo_.get());
 	render.DrawSprite(control_.get());
-	render.DrawSkybox(skybox_.get());
 	fade_->Draw();
 }

@@ -1,17 +1,16 @@
-
 {
     "Fly": {
         "modelName": "Dragon.glb",
         "animationIndex": 2,
-        "hp": 10,
+        "hp": 10.0,
         "radius": 0.5,
         "moveSpeed": 5.5,
         "defaultSearchRadius": 100.0,
-        "stunResist": 0,
+        "stunResist": 0.0,
         "canFly": true,
         "attackRadius": 9.0,
         "weapons": [
-            "Fireball"
+            "Pistol"
         ],
         "spawnCount": {
             "min": 1,
@@ -46,8 +45,8 @@
         "stunResist": 0,
         "canFly": false,
         "attackRadius": -1.0,
-        "traits":{
-            "contactDamage":{
+        "traits": {
+            "contactDamage": {
                 "damage": 3.0
             }
         },
@@ -106,8 +105,8 @@
         "stunResist": 0,
         "canFly": false,
         "attackRadius": -1.0,
-        "traits":{
-            "contactDamage":{
+        "traits": {
+            "contactDamage": {
                 "damage": 3.0
             }
         },

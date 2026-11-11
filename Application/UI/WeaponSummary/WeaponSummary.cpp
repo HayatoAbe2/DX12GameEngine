@@ -31,10 +31,4 @@ void WeaponSummaryUI::Draw() {
 
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();
-
-	videoSprite_->ImGuiEdit();
-	background_->ImGuiEdit();
-
-	render.DrawSprite(background_.get());
-	if (videoSprite_) { render.DrawSprite(videoSprite_.get()); }
 }

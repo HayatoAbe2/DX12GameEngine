@@ -258,8 +258,6 @@ void GameScene::Draw() {
 	fade_->Draw();
 
 #ifdef USE_IMGUI
-	SpawnForDebug();
-
 	spawnEditor_->Draw(enemyManager_->GetEnemyNames());
 	weaponEditor_->Draw();
 	enemyEditor_->Draw(

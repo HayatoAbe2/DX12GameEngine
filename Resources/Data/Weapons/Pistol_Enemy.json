@@ -1,20 +1,18 @@
-{ 
+{
     "Pistol_Enemy": {
         "modelName": "Pistol.obj",
-        "weight": 0.1,
-        "shootCoolTime": 0.33,
+        "weight": 0.8,
+        "shootCoolTime": 3.0,
         "maxCharge": 8.0,
         "chargeTime": 0.15,
-
-         "bullet": {
+        "bullet": {
             "damage": 6.0,
             "radius": 0.5,
-            "speed": 25,
-            "lifeTime": 60,
+            "speed": 7.5,
+            "lifeTime": 180,
             "knockback": 0.3,
             "color": [0.7, 0.2, 0.1, 1.0]
         },
- 
         "rarity": "Common"
-  }
+    }
 }
