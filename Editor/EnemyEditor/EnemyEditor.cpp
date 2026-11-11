@@ -2,6 +2,7 @@
 #include "Data/EnemySerializer.h"
 #include "Data/WeaponSerializer.h"
 #include "Editor/EditorFile.h"
+#include "Editor/NameReferences.h"
 #include <algorithm>
 #include <filesystem>
 #include <format>
@@ -128,6 +129,48 @@ void EnemyEditor::DeleteSelected() {
 	selected_ = -1;
 }
 
+bool EnemyEditor::Rename(const std::string& newKey, bool updateRefs) {
+	Entry* entry = Selected();
+	if (!entry) { return false; }
+	const std::string oldKey = entry->key;
+
+	// まだファイルに無いなら、メモリ上の名前を変えるだけ
+	if (entry->isNew) {
+		entry->key = newKey;
+		status_ = "名前を変えました: " + oldKey + " → " + newKey;
+		return true;
+	}
+
+	nlohmann::ordered_json root;
+	if (!EditorFile::ReadJson(kEnemyFile, root) || !root.is_object() || !root.contains(oldKey)) {
+		status_ = std::string("名前を変えられませんでした(ファイルを読めない、または中身が変わっています): ") + kEnemyFile;
+		return false;
+	}
+
+	// 先に参照元(出現率のファイル)を書き換える。失敗したら何も変わらない
+	if (updateRefs) {
+		const NameReferences::Result r = NameReferences::FindOrRenameEnemyUsers(oldKey, newKey, true);
+		if (!r.ok) { status_ = "名前を変えられませんでした: " + r.error; return false; }
+	}
+
+	// キーの位置は保ったまま、編集中の内容で差し替える(未保存の変更も一緒に保存される)
+	nlohmann::ordered_json rebuilt = nlohmann::ordered_json::object();
+	for (const auto& [key, value] : root.items()) {
+		if (key == oldKey) { rebuilt[newKey] = EnemySerializer::ToJson(entry->data); } else { rebuilt[key] = value; }
+	}
+	if (!EditorFile::WriteJson(kEnemyFile, rebuilt)) {
+		if (updateRefs) { NameReferences::FindOrRenameEnemyUsers(newKey, oldKey, true); }
+		status_ = std::string("名前を変えられませんでした(書き込めません): ") + kEnemyFile;
+		return false;
+	}
+
+	entry->key = newKey;
+	entry->history.MarkSaved();
+	status_ = "名前を変えました: " + oldKey + " → " + newKey;
+	if (onApplied_) { onApplied_(); }
+	return true;
+}
+
 bool EnemyEditor::Save(Entry& entry) {
 	// 他の敵はそのまま残すため、いったん読み込んでから差し替える(新規は末尾に追加される)
 	nlohmann::ordered_json root;
@@ -202,6 +245,8 @@ void EnemyEditor::DrawList() {
 	ImGui::BeginDisabled(Selected() == nullptr);
 	if (ImGui::Button("複製")) { Duplicate(); }
 	ImGui::SameLine();
+	if (ImGui::Button("名前変更")) { openRenamePopup_ = true; }
+	ImGui::SameLine();
 	if (ImGui::Button("削除")) { openDeletePopup_ = true; }
 	ImGui::EndDisabled();
 
@@ -223,6 +268,12 @@ void EnemyEditor::DrawPopups() {
 #ifdef USE_IMGUI
 	if (openNewPopup_) { ImGui::OpenPopup("新規の敵"); openNewPopup_ = false; newName_.clear(); }
 	if (openDeletePopup_) { ImGui::OpenPopup("敵を削除"); openDeletePopup_ = false; }
+	if (openRenamePopup_) {
+		ImGui::OpenPopup("敵の名前変更");
+		openRenamePopup_ = false;
+		renameUpdateRefs_ = true;
+		renameName_ = Selected() ? Selected()->key : std::string();
+	}
 	if (openReloadPopup_) { ImGui::OpenPopup("再読込の確認"); openReloadPopup_ = false; }
 
 	if (ImGui::BeginPopupModal("新規の敵", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -239,6 +290,41 @@ void EnemyEditor::DrawPopups() {
 		}
 		ImGui::EndDisabled();
 		ImGui::SameLine();
+		if (ImGui::Button("キャンセル")) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopupModal("敵の名前変更", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (const Entry* e = Selected()) {
+			const std::string problem = (renameName_ == e->key) ? "今と同じ名前です" : CheckNewKey(renameName_);
+
+			ImGui::Text("「%s」の新しい名前", e->key.c_str());
+			ImGui::InputText("名前", &renameName_);
+			if (!problem.empty()) {
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s", problem.c_str());
+			}
+
+			// この敵を使っている出現率ファイル
+			const NameReferences::Result users = NameReferences::FindOrRenameEnemyUsers(e->key, std::string(), false);
+			if (!users.locations.empty()) {
+				ImGui::Checkbox("出現率のファイルも新しい名前に書き換える", &renameUpdateRefs_);
+				for (const std::string& location : users.locations) { ImGui::BulletText("%s", location.c_str()); }
+				if (!renameUpdateRefs_) {
+					ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "書き換えないと、これらのファイルでこの敵が出なくなります");
+				}
+			}
+			if (!e->isNew) {
+				ImGui::TextDisabled("編集中の内容も一緒に保存され、ゲームのデータが再読み込みされます。");
+			}
+
+			ImGui::BeginDisabled(!problem.empty());
+			if (ImGui::Button("変更する")) {
+				Rename(renameName_, renameUpdateRefs_);
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndDisabled();
+			ImGui::SameLine();
+		}
 		if (ImGui::Button("キャンセル")) { ImGui::CloseCurrentPopup(); }
 		ImGui::EndPopup();
 	}
@@ -372,8 +458,8 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 		EditorUtil::DragFloat("大きさ(半径)", &s.radius, 0.01f, 0.0f, 20.0f);
 		EditorUtil::DragFloat("移動速度", &s.moveSpeed, 0.05f, 0.0f, 100.0f);
 		EditorUtil::DragFloat("発見範囲", &s.defaultSearchRadius, 0.5f, 0.0f, 1000.0f, "%.1f");
-		EditorUtil::DragFloat("攻撃範囲(0以下で攻撃しない)", &s.attackRadius, 0.1f, -1.0f, 1000.0f, "%.1f");
-		EditorUtil::DragFloat("スタン耐性(10以上で怯まない)", &s.stunResist, 0.1f, 0.0f, 100.0f, "%.1f");
+		EditorUtil::DragFloat("攻撃範囲", &s.attackRadius, 0.1f, -1.0f, 1000.0f, "%.1f");
+		EditorUtil::DragFloat("スタン耐性", &s.stunResist, 0.1f, 0.0f, 100.0f, "%.1f");
 		ImGui::Checkbox("飛行", &s.canFly);
 
 		ContactDamage contactDefault{};
@@ -422,9 +508,9 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 			if (const WeaponData* weapon = findWeapon ? findWeapon(current) : nullptr) {
 				const float range = WeaponSerializer::EstimateRange(*weapon);
 				if (range >= WeaponSerializer::kMaxRange) {
-					ImGui::TextDisabled("    射程(目安): 壁まで / ダメージ %.1f", weapon->bullet.damage);
+					ImGui::TextDisabled("    射程: 壁まで / ダメージ %.1f", weapon->bullet.damage);
 				} else {
-					ImGui::TextDisabled("    射程(目安): %.1f / ダメージ %.1f", range, weapon->bullet.damage);
+					ImGui::TextDisabled("    射程: %.1f / ダメージ %.1f", range, weapon->bullet.damage);
 				}
 			}
 			ImGui::PopID();
@@ -436,7 +522,6 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 		ImGui::BeginDisabled(weaponNames.empty());
 		if (ImGui::Button("武器を追加")) { d.weapons.push_back(weaponNames.front()); }
 		ImGui::EndDisabled();
-		ImGui::TextDisabled("多段攻撃は、武器の「バースト」で表します(武器エディタ)");
 	}
 
 	// 操作が終わったタイミングで履歴に積む(ドラッグ・入力中は積まない)

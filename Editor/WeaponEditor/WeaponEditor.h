@@ -44,6 +44,8 @@ private:
 	void AddNew(const std::string& key);
 	void Duplicate();
 	void DeleteSelected();
+	// 選択中の武器の名前を変える(newKey は _Enemy 込み)。updateRefs: 敵がこの武器を使っている設定も書き換える
+	bool Rename(const std::string& newKey, bool updateRefs);
 	bool Save(Entry& entry);
 	void Undo(Entry& entry);
 	void Redo(Entry& entry);
@@ -63,6 +65,9 @@ private:
 	bool newIsEnemy_ = false;
 	bool openNewPopup_ = false;
 	bool openDeletePopup_ = false;
+	bool openRenamePopup_ = false;
+	std::string renameName_;
+	bool renameUpdateRefs_ = true;
 	bool openReloadPopup_ = false;
 
 	// 直前の操作結果

@@ -66,7 +66,8 @@ void Player::Initialize(ItemManager* itemManager) {
 	shootCooldownSprite_ = asset.LoadSprite("Resources/Debug/White1x1.png");
 	shootCooldownSprite_->SetPivot({ 0.0f,0.5f });
 	shootCooldownSprite_->SetSize(scSize_);
-	shootCooldownSprite_->SetPosition({ 640 - scSize_.x / 2.0f,370 });
+	Vector2 windowSize = ctx.GetRenderWindowSize();
+	shootCooldownSprite_->SetPosition({ (windowSize.x - scSize_.x) / 2.0f, windowSize.y / 2.0f - scSize_.y * 2.5f });
 
 	// タイマー類
 	hitColorTimer_ = std::make_unique<Timer>();

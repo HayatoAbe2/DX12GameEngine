@@ -51,7 +51,7 @@ EnemyData FromJson(const json& j) {
 	// 特殊性能
 	const auto traits = j.find("traits");
 	if (traits != j.end() && traits->is_object()) {
-		const auto contact = traits->find("contactDamage");
+		const auto contact = traits->find("contactDamage"); // 接触ダメージ
 		if (contact != traits->end() && contact->is_object()) {
 			ContactDamage c{};
 			c.damage = Get(*contact, "damage", 1.0f);
@@ -61,7 +61,7 @@ EnemyData FromJson(const json& j) {
 
 	e.weapons = Get<std::vector<std::string>>(j, "weapons", {});
 
-	const auto count = j.find("spawnCount");
+	const auto count = j.find("spawnCount"); // 出現数
 	if (count != j.end() && count->is_object()) {
 		e.minSpawnCount = Get(*count, "min", 1);
 		e.maxSpawnCount = Get(*count, "max", 1);

@@ -1,6 +1,7 @@
 #include "WeaponEditor.h"
 #include "Data/WeaponSerializer.h"
 #include "Editor/EditorFile.h"
+#include "Editor/NameReferences.h"
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -165,6 +166,76 @@ void WeaponEditor::DeleteSelected() {
 	selected_ = -1;
 }
 
+bool WeaponEditor::Rename(const std::string& newKey, bool updateRefs) {
+	Entry* entry = Selected();
+	if (!entry) { return false; }
+
+	const std::string oldKey = entry->key;
+	const bool isEnemy = WeaponSerializer::IsEnemyWeapon(oldKey);
+	const size_t suffixSize = std::string(kEnemySuffix).size();
+	const auto baseOf = [&](const std::string& key) { return isEnemy ? key.substr(0, key.size() - suffixSize) : key; };
+
+	// まだファイルに無いなら、メモリ上の名前と保存先を変えるだけ
+	if (entry->isNew) {
+		entry->key = newKey;
+		entry->data.name = newKey;
+		entry->path = (std::filesystem::path(kWeaponDir) / (newKey + ".json")).generic_string();
+		SortEntries();
+		status_ = "名前を変えました: " + oldKey + " → " + newKey;
+		return true;
+	}
+
+	nlohmann::ordered_json root;
+	if (!EditorFile::ReadJson(entry->path, root) || !root.is_object() || !root.contains(oldKey)) {
+		status_ = "名前を変えられませんでした(ファイルを読めない、または中身が変わっています): " + entry->path;
+		return false;
+	}
+
+	// 「武器名.json」に1つだけ入っているファイルは、ファイル名も変える
+	const std::filesystem::path oldPath(entry->path);
+	const bool moveFile = (oldPath.stem().string() == oldKey) && root.size() == 1;
+	const std::string newPath = moveFile
+		? (oldPath.parent_path() / (newKey + ".json")).generic_string() : entry->path;
+	if (moveFile && std::filesystem::exists(newPath)) {
+		status_ = "同じ名前のファイルがあります: " + newPath;
+		return false;
+	}
+
+	// 先に参照元(敵の武器設定)を書き換える。失敗したら何も変わらない
+	const bool rewriteRefs = isEnemy && updateRefs;
+	if (rewriteRefs) {
+		const NameReferences::Result r = NameReferences::FindOrRenameWeaponUsers(baseOf(oldKey), baseOf(newKey), true);
+		if (!r.ok) { status_ = "名前を変えられませんでした: " + r.error; return false; }
+	}
+
+	// キーの位置は保ったまま、編集中の内容で差し替える(未保存の変更も一緒に保存される)
+	WeaponData data = entry->data;
+	data.name = newKey;
+	nlohmann::ordered_json rebuilt = nlohmann::ordered_json::object();
+	for (const auto& [key, value] : root.items()) {
+		if (key == oldKey) { rebuilt[newKey] = WeaponSerializer::ToJson(data); } else { rebuilt[key] = value; }
+	}
+
+	if (!EditorFile::WriteJson(newPath, rebuilt)) {
+		if (rewriteRefs) { NameReferences::FindOrRenameWeaponUsers(baseOf(newKey), baseOf(oldKey), true); }
+		status_ = "名前を変えられませんでした(書き込めません): " + newPath;
+		return false;
+	}
+	if (moveFile) {
+		std::error_code ec;
+		std::filesystem::remove(oldPath, ec);
+	}
+
+	entry->key = newKey;
+	entry->path = newPath;
+	entry->data = std::move(data);
+	entry->history.MarkSaved();
+	SortEntries();
+	status_ = "名前を変えました: " + oldKey + " → " + newKey;
+	if (onApplied_) { onApplied_(); }
+	return true;
+}
+
 bool WeaponEditor::Save(Entry& entry) {
 	// 他の武器が同じファイルにあっても残すため、いったん読み込んでから差し替える
 	nlohmann::ordered_json root;
@@ -239,6 +310,8 @@ void WeaponEditor::DrawList() {
 	ImGui::BeginDisabled(Selected() == nullptr);
 	if (ImGui::Button("コピー")) { Duplicate(); }
 	ImGui::SameLine();
+	if (ImGui::Button("名前変更")) { openRenamePopup_ = true; }
+	ImGui::SameLine();
 	if (ImGui::Button("削除")) { openDeletePopup_ = true; }
 	ImGui::EndDisabled();
 
@@ -266,6 +339,16 @@ void WeaponEditor::DrawPopups() {
 #ifdef USE_IMGUI
 	if (openNewPopup_) { ImGui::OpenPopup("新規武器"); openNewPopup_ = false; newName_.clear(); newIsEnemy_ = false; }
 	if (openDeletePopup_) { ImGui::OpenPopup("武器を削除"); openDeletePopup_ = false; }
+	if (openRenamePopup_) {
+		ImGui::OpenPopup("武器の名前変更");
+		openRenamePopup_ = false;
+		renameUpdateRefs_ = true;
+		renameName_.clear();
+		if (const Entry* e = Selected()) {
+			renameName_ = WeaponSerializer::IsEnemyWeapon(e->key)
+				? e->key.substr(0, e->key.size() - std::string(kEnemySuffix).size()) : e->key;
+		}
+	}
 	if (openReloadPopup_) { ImGui::OpenPopup("再読込の確認"); openReloadPopup_ = false; }
 
 	if (ImGui::BeginPopupModal("新規武器", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -287,6 +370,51 @@ void WeaponEditor::DrawPopups() {
 		}
 		ImGui::EndDisabled();
 		ImGui::SameLine();
+		if (ImGui::Button("キャンセル")) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopupModal("武器の名前変更", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (const Entry* e = Selected()) {
+			const bool isEnemy = WeaponSerializer::IsEnemyWeapon(e->key);
+			const std::string newKey = MakeKey(renameName_, isEnemy);
+			std::string problem = (newKey == e->key) ? "今と同じ名前です" : CheckNewKey(newKey, isEnemy);
+
+			ImGui::Text("「%s」の新しい名前", e->key.c_str());
+			ImGui::InputText("名前", &renameName_);
+			if (isEnemy) { ImGui::TextDisabled("敵用なので、末尾に _Enemy が付きます: %s", newKey.c_str()); }
+
+			if (!problem.empty()) {
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s", problem.c_str());
+			}
+
+			// この武器を使っている敵
+			if (isEnemy) {
+				const std::string base = e->key.substr(0, e->key.size() - std::string(kEnemySuffix).size());
+				const NameReferences::Result users = NameReferences::FindOrRenameWeaponUsers(base, std::string(), false);
+				if (!users.locations.empty()) {
+					ImGui::Checkbox("敵の武器設定(Enemies.json)も新しい名前に書き換える", &renameUpdateRefs_);
+					for (const std::string& location : users.locations) { ImGui::BulletText("%s", location.c_str()); }
+					if (!renameUpdateRefs_) {
+						ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "書き換えないと、これらの敵は武器が見つからなくなります");
+					}
+				}
+			} else {
+				ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f),
+					"コード側(WeaponManager.h の武器名の一覧など)が名前で呼んでいる武器は、\n名前を変えると見つからなくなります。");
+			}
+			if (!e->isNew) {
+				ImGui::TextDisabled("編集中の内容も一緒に保存され、ゲームのデータが再読み込みされます。");
+			}
+
+			ImGui::BeginDisabled(!problem.empty());
+			if (ImGui::Button("変更する")) {
+				Rename(newKey, renameUpdateRefs_);
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndDisabled();
+			ImGui::SameLine();
+		}
 		if (ImGui::Button("キャンセル")) { ImGui::CloseCurrentPopup(); }
 		ImGui::EndPopup();
 	}
@@ -530,9 +658,9 @@ void WeaponEditor::DrawPreview(const WeaponData& w) {
 #ifdef USE_IMGUI
 	const float range = WeaponSerializer::EstimateRange(w);
 	if (range >= WeaponSerializer::kMaxRange) {
-		ImGui::Text("射程(目安): 壁に当たるまで");
+		ImGui::Text("射程: 壁に当たるまで");
 	} else {
-		ImGui::Text("射程(目安): %.1f", range);
+		ImGui::Text("射程: %.1f", range);
 	}
 
 	// 1回の射撃で出る弾数とダメージ

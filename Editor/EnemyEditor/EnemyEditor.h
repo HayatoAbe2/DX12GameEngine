@@ -45,6 +45,8 @@ private:
 	void AddNew(const std::string& key);
 	void Duplicate();
 	void DeleteSelected();
+	// 選択中の敵の名前を変える。updateRefs: 出現率のファイルも書き換える
+	bool Rename(const std::string& newKey, bool updateRefs);
 	bool Save(Entry& entry);
 	void Undo(Entry& entry);
 	void Redo(Entry& entry);
@@ -60,6 +62,9 @@ private:
 	std::string newName_;
 	bool openNewPopup_ = false;
 	bool openDeletePopup_ = false;
+	bool openRenamePopup_ = false;
+	std::string renameName_;
+	bool renameUpdateRefs_ = true;
 	bool openReloadPopup_ = false;
 
 	std::string status_;
