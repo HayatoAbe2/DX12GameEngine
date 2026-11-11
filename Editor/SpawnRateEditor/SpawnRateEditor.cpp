@@ -4,7 +4,7 @@ SpawnRateEditor::SpawnRateEditor() {
 	Load(filePath_);
 }
 
-void SpawnRateEditor::Draw() {
+void SpawnRateEditor::Draw(const std::vector<std::string>& enemyNames) {
 #ifdef USE_IMGUI
 	ImGui::Begin("出現率エディタ");
 
@@ -17,7 +17,7 @@ void SpawnRateEditor::Draw() {
 	);
 
 	// ファイル名設定
-	if (ImGui::InputText("ファイル",buffer,sizeof(buffer))) {
+	if (ImGui::InputText("ファイル", buffer, sizeof(buffer))) {
 		filePath_ = buffer;
 	}
 
@@ -33,25 +33,37 @@ void SpawnRateEditor::Draw() {
 	}
 	ImGui::Separator();
 
+	float totalWeight = 0.0f;
+	for (const auto& r : spawnRates_) { totalWeight += r.weight; }
+
 	for (size_t i = 0; i < spawnRates_.size(); ++i) {
 		SpawnRate& spawnRate = spawnRates_[i];
 
 		ImGui::PushID(static_cast<int>(i));
 
-		// 敵タイプ
-		int enemyType = static_cast<int>(spawnRate.enemyType);
-		if (ImGui::InputInt("敵タイプ", &enemyType)) {
-			if (enemyType < 0) {
-				enemyType = 0;
+		// 敵の名前(登録済みの敵から選ぶ)
+		const bool known = std::find(enemyNames.begin(), enemyNames.end(), spawnRate.name) != enemyNames.end();
+		std::string preview = spawnRate.name.empty() ? "(未選択)" : spawnRate.name;
+		if (ImGui::BeginCombo("敵", preview.c_str())) {
+			for (const auto& name : enemyNames) {
+				const bool selected = (name == spawnRate.name);
+				if (ImGui::Selectable(name.c_str(), selected)) {
+					spawnRate.name = name;
+				}
+				if (selected) { ImGui::SetItemDefaultFocus(); }
 			}
-
-			spawnRate.enemyType = static_cast<uint32_t>(enemyType);
+			ImGui::EndCombo();
+		}
+		if (!spawnRate.name.empty() && !known) {
+			ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "Enemies.json に存在しない名前です");
 		}
 
 		// 重み
-		ImGui::InputFloat("重み(出現率)",&spawnRate.weight);
-		if (spawnRate.weight < 0.0f) {
-			spawnRate.weight = 0.0f;
+		ImGui::InputFloat("重み(出現率)", &spawnRate.weight);
+		if (spawnRate.weight < 0.0f) { spawnRate.weight = 0.0f; }
+		if (totalWeight > 0.0f) {
+			ImGui::SameLine();
+			ImGui::Text("(%.1f%%)", spawnRate.weight / totalWeight * 100.0f);
 		}
 
 		// 削除
@@ -75,14 +87,9 @@ void SpawnRateEditor::Draw() {
 		AddSpawnRate();
 	}
 
-	// 合計重み
-	float totalWeight = 0.0f;
-	for (const auto& spawnRate : spawnRates_) {
-		totalWeight += spawnRate.weight;
-	}
-
 	ImGui::Separator();
 
+	// 合計重み
 	ImGui::Text("合計重み : %.2f", totalWeight);
 
 	ImGui::End();
@@ -92,7 +99,6 @@ void SpawnRateEditor::Draw() {
 void SpawnRateEditor::AddSpawnRate() {
 	SpawnRate spawnRate;
 
-	spawnRate.enemyType = 0;
 	spawnRate.weight = 0.0f;
 
 	spawnRates_.push_back(spawnRate);
@@ -114,7 +120,7 @@ void SpawnRateEditor::Save(const std::string& filePath) {
 	for (const auto& spawnRate : spawnRates_) {
 		nlohmann::json data;
 
-		data["enemyType"] = spawnRate.enemyType;
+		data["name"] = spawnRate.name;
 		data["weight"] = spawnRate.weight;
 		root["spawnRates"].push_back(data);
 	}
@@ -156,8 +162,8 @@ void SpawnRateEditor::Load(const std::string& filePath) {
 	for (const auto& data : root["spawnRates"]) {
 		SpawnRate spawnRate;
 
-		if (data.contains("enemyType")) {
-			spawnRate.enemyType = data["enemyType"].get<uint32_t>();
+		if (data.contains("name")) {
+			spawnRate.name = data["name"].get<std::string>();
 		}
 		if (data.contains("weight")) {
 			spawnRate.weight = data["weight"].get<float>();

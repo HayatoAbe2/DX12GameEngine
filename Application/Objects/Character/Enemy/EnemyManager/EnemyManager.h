@@ -15,7 +15,11 @@ class WeaponManager;
 /// </summary>
 class EnemyManager {
 public:
-	EnemyManager(FloorManager* floorManager) { floorManager_ = floorManager; }
+	EnemyManager(FloorManager* floorManager) { floorManager_ = floorManager; LoadEnemyData(); }
+
+	// 登録されている敵の名前(ソート済み)
+	std::vector<std::string> GetEnemyNames() const;
+
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager);
 	void Draw();
 

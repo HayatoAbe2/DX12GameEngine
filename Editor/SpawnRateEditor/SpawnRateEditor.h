@@ -18,7 +18,7 @@ struct SpawnRate {
 class SpawnRateEditor {
 public:
 	SpawnRateEditor();
-	void Draw();
+	void Draw(const std::vector<std::string>& enemyNames);
 
 private:
     void Save(const std::string& filePath);

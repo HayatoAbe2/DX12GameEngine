@@ -251,7 +251,7 @@ void GameScene::Draw() {
 	ImGui::DragFloat3("Pos", &camera_->transform_.translate.x, 0.5f);
 	ImGui::End();
 
-	spawnEditor_->Draw();
+	spawnEditor_->Draw(enemyManager_->GetEnemyNames());
 #endif
 }
 
@@ -330,13 +330,6 @@ void GameScene::SpawnForDebug() {
 	};
 	if (ImGui::Button("Burst")) {
 		itemManager_->SetSpawn(player_->GetTransform().translate, 9);
-	};
-	ImGui::End();
-
-	ImGui::Begin("Weapon");
-	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
-	if (ImGui::Button("Pistol")) {
-		itemManager_->SetSpawn(player_->GetTransform().translate, 0);
 	};
 	ImGui::End();
 #endif

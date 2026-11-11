@@ -12,6 +12,17 @@
 #include <cassert>
 #include <Externals/nlohmann/json.hpp>
 
+std::vector<std::string> EnemyManager::GetEnemyNames() const {
+	std::vector<std::string> names;
+	names.reserve(enemyDataMap_.size());
+	for (const auto& [name, data] : enemyDataMap_) {
+		names.push_back(name);
+	}
+
+	std::sort(names.begin(), names.end());
+	return names;
+}
+
 void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager) {
 	for (const auto& enemy : activeEnemies_) {
 		enemy->Update(mapCheck, player, bulletManager);
