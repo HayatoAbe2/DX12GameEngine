@@ -9,13 +9,13 @@ namespace {
 using json = nlohmann::json;
 using ojson = nlohmann::ordered_json;
 
-// float を最短の表記で数値にする(0.4f が 0.4000000059604645 にならないように)
+// 小数点以下での誤差を修正
 ojson F(float v) {
 	if (!std::isfinite(v)) { return 0.0; }
 	char buffer[64];
 	const auto result = std::to_chars(buffer, buffer + sizeof(buffer), v);
 	std::string text(buffer, result.ptr);
-	// 整数に見える値は 10.0 の形にする(既存ファイルの表記に合わせる)
+	// 整数に見える値は.0
 	if (text.find_first_of(".eE") == std::string::npos) { text += ".0"; }
 	return ojson::parse(text);
 }
@@ -319,12 +319,9 @@ std::vector<DataIssue> Validate(const WeaponData& w) {
 		const auto& m = *w.traits.multiShot;
 		if (m.count < 2) { warn("同時発射数が1以下です(単発と同じ)"); }
 		if (m.count >= 2 && m.maxAngle <= 0.0f) { warn("拡散角度が0以下のため、全弾が同じ向きに飛びます"); }
-		if (m.random) { error("multiShot の「ランダム」は未実装で、ONにすると弾が出ません"); }
 	}
 	if (w.traits.charge) {
 		if (w.traits.charge->time <= 0.0f) { error("溜め時間は0より大きくしてください"); }
-		if (w.traits.multiShot) { warn("溜め射撃と同時発射を併用すると、溜めによる威力補正は反映されません"); }
-		if (w.traits.burst) { warn("溜め射撃とバーストの併用は想定されていません"); }
 	}
 	if (w.traits.burst) {
 		const auto& bu = *w.traits.burst;
@@ -352,9 +349,6 @@ std::vector<DataIssue> Validate(const WeaponData& w) {
 	}
 	if (t.onHitWall.ricochet && t.onHitWall.ricochet->count < 1) { warn("跳弾の回数が0以下です"); }
 	if (t.onHitEnemy.piercing && t.onHitEnemy.piercing->count < 0) { error("貫通回数は0以上にしてください"); }
-	if (t.onHitEnemy.flame || t.onHitEnemy.freeze || t.onHitEnemy.volt) {
-		warn("flame / freeze / volt はゲーム側が未実装で、設定しても効果がありません");
-	}
 
 	return issues;
 }

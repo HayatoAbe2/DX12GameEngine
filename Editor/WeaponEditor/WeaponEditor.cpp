@@ -561,7 +561,7 @@ void WeaponEditor::DrawEditor(Entry& entry) {
 			int count = m.count;
 			if (EditorUtil::DragInt("発射数", &count, 0.1f, 1, 60)) { m.count = static_cast<int8_t>(count); }
 			EditorUtil::DragFloat("拡散角度(度)", &m.maxAngle, 0.5f, 0.0f, 360.0f, "%.1f");
-			ImGui::Checkbox("ランダム(未実装)", &m.random);
+			ImGui::Checkbox("角度範囲内でランダム", &m.random);
 		});
 
 		ChargeParam chargeDefault{};

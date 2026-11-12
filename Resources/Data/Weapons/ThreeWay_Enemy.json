@@ -1,29 +1,25 @@
 {
     "ThreeWay_Enemy": {
         "modelName": "AssaultRifle.obj",
-
         "weight": 0.5,
-        "shootCoolTime": 0.5,
+        "shootCoolTime": 2.5,
         "maxCharge": 10.0,
         "chargeTime": 0.5,
-
         "bullet": {
-            "damage": 6.0,
+            "damage": 4.5,
             "radius": 0.75,
-            "speed": 20,
-            "lifeTime": 120,
+            "speed": 5.0,
+            "lifeTime": 300,
             "knockback": 0.1,
-            "color": [0.5, 0.7, 0.0, 1.0]
+            "color": [1.0, 1.0, 0.0, 1.0]
         },
-
         "traits": {
-            "multiShot":{
+            "multiShot": {
                 "count": 3,
-                "maxAngle": 70,
+                "maxAngle": 70.0,
                 "random": false
             }
         },
-
         "rarity": "Common"
     }
 }

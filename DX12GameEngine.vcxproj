@@ -492,6 +492,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Editor\EditorFile.h" />
     <ClInclude Include="Editor\EditorUtil.h" />
     <ClInclude Include="Editor\EnemyEditor\EnemyEditor.h" />
+    <ClInclude Include="Editor\NameReferences.h" />
     <ClInclude Include="Editor\WeaponEditor\WeaponEditor.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />

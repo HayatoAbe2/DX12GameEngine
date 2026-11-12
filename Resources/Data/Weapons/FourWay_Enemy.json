@@ -1,29 +1,25 @@
 {
     "FourWay_Enemy": {
         "modelName": "AssaultRifle.obj",
-
         "weight": 0.5,
-        "shootCoolTime": 0.5,
+        "shootCoolTime": 2.5,
         "maxCharge": 10.0,
         "chargeTime": 0.5,
-
         "bullet": {
             "damage": 5.5,
             "radius": 1.0,
-            "speed": 20,
+            "speed": 10.0,
             "lifeTime": 120,
             "knockback": 0.1,
             "color": [0.5, 0.7, 0.0, 1.0]
         },
-
         "traits": {
-            "multiShot":{
+            "multiShot": {
                 "count": 4,
-                "maxAngle": 90,
+                "maxAngle": 90.0,
                 "random": false
             }
         },
-
         "rarity": "Common"
     }
 }

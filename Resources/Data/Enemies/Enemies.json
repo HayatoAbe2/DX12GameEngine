@@ -10,7 +10,7 @@
         "canFly": true,
         "attackRadius": 9.0,
         "weapons": [
-            "ThreeWay"
+            "Pistol"
         ],
         "spawnCount": {
             "min": 1,
@@ -20,15 +20,15 @@
     "Golem": {
         "modelName": "knight.obj",
         "animationIndex": -1,
-        "hp": 23,
+        "hp": 23.0,
         "radius": 0.9,
         "moveSpeed": 1.5,
         "defaultSearchRadius": 100.0,
-        "stunResist": 2,
+        "stunResist": 2.0,
         "canFly": false,
         "attackRadius": 9.0,
         "weapons": [
-            "Pistol"
+            "ThreeWay"
         ],
         "spawnCount": {
             "min": 1,

@@ -627,6 +627,7 @@
     <ClInclude Include="Application\Data\EnemySerializer.h" />
     <ClInclude Include="Application\Data\JsonFormat.h" />
     <ClInclude Include="Application\Data\WeaponSerializer.h" />
+    <ClInclude Include="Editor\NameReferences.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">
