@@ -278,6 +278,7 @@
     <ClCompile Include="Editor\EnemyEditor\EnemyEditor.cpp" />
     <ClCompile Include="Application\Data\EnemySerializer.cpp" />
     <ClCompile Include="Application\Data\WeaponSerializer.cpp" />
+    <ClCompile Include="Application\UI\DrawNumbers\DrawNumbers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -628,6 +629,7 @@
     <ClInclude Include="Application\Data\JsonFormat.h" />
     <ClInclude Include="Application\Data\WeaponSerializer.h" />
     <ClInclude Include="Editor\NameReferences.h" />
+    <ClInclude Include="Application\UI\DrawNumbers\DrawNumbers.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

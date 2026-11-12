@@ -90,7 +90,7 @@ public:
 
 	// pivot
 	const Vector2& GetPivot() { return pivot_; }
-	void SetPivot(const Vector2& pivot) { pivot_ = pivot; }
+	void SetPivot(const Vector2& pivot) { pivot_ = pivot; UpdateVertex();}
 
 	// 回転
 	float GetRotation() const { return rotation_; }

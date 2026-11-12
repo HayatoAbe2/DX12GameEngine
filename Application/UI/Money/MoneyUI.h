@@ -1,6 +1,7 @@
 #pragma once
 #include "GameCommon.h"
 #include "Timer/Timer.h"
+#include <UI/DrawNumbers/DrawNumbers.h>
 
 class Wallet;
 
@@ -23,11 +24,10 @@ private:
 	void Ease();
 
 	Vector2 pos_ = {350, 20};
-	const float numSpacing_ = 27.0f;
-	const float digitSize_ = 32.0f;
-	const float iconSize_ = 32.0f;
-	// 画像上の数字サイズ
-	const float digitWidth_ = 64.0f;
+	Vector4 color_ = { 1,1,1,1 };
+	float iconSize_ = 32.0f;
+	float numSpacing_ = 27.0f;
+	float digitSize_ = 32.0f;
 
 	// オフセット
 	const float valueOffsetY_ = 15.0f;
@@ -35,8 +35,8 @@ private:
 	// アイコン
 	std::unique_ptr<Sprite> icon_;
 
-	// 数値
-	std::array<std::unique_ptr<Sprite>, 4> numbers_;
+	// 数字
+	std::unique_ptr<DrawNumbers> drawNum_;
 
 	// 追跡するWallet
 	Wallet& wallet_;

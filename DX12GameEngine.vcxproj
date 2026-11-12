@@ -177,6 +177,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Effect\Charge\ChargeEffect.cpp" />
     <ClCompile Include="Application\Objects\DamageArea\DamageArea.cpp" />
     <ClCompile Include="Application\Objects\DamageArea\DamageAreaManager.cpp" />
+    <ClCompile Include="Application\UI\DrawNumbers\DrawNumbers.cpp" />
     <ClCompile Include="Editor\EnemyEditor\EnemyEditor.cpp" />
     <ClCompile Include="Editor\WeaponEditor\WeaponEditor.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
@@ -488,6 +489,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Effect\Charge\ChargeEffect.h" />
     <ClInclude Include="Application\Objects\DamageArea\DamageArea.h" />
     <ClInclude Include="Application\Objects\DamageArea\DamageAreaManager.h" />
+    <ClInclude Include="Application\UI\DrawNumbers\DrawNumbers.h" />
     <ClInclude Include="Editor\EditHistory.h" />
     <ClInclude Include="Editor\EditorFile.h" />
     <ClInclude Include="Editor\EditorUtil.h" />
