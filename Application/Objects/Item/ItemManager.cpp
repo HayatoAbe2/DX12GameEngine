@@ -29,7 +29,7 @@ void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyMa
 }
 
 void ItemManager::Update(Player* player, bool isCombat) {
-	// 配置予約があれば出現(見つからない名前は GetWeaponByName が nullptr を返し、Drop は何もしない)
+	// 配置予約があれば出現
 	for (const auto& request : weaponSpawnRequests_) {
 		Drop(request.pos, weaponManager_->GetWeaponByName(request.name));
 	}
@@ -313,17 +313,26 @@ void ItemManager::Load() {
 void ItemManager::ChestItemDrop(Chest* chest) {
 	Vector3 pos = { chest->GetPosition().x, 0, chest->GetPosition().y };
 
-	// ランダム出現
-	auto& ctx = GameContext::GetInstance();
-	switch (ctx.RandomInt(0, 2)) {
-	case 0:
-		SpawnMoney(pos, 30);
+	switch (reward_.type) {
+	case RewardType::Money:
+		SpawnMoney(pos, reward_.amount);
 		break;
-	case 1:
+	case RewardType::Weapon:
+		SpawnWeapon(pos, -1, reward_.rarity, false);
+		break;
+	case RewardType::Passive:
 		SpawnPassive(pos, false);
 		break;
-	case 2:
-		SpawnWeapon(pos, -1, Rarity::Common, false);
-		break;
+	default:
+	{
+		// 予定がない部屋(エディタなど)は従来どおり
+		auto& ctx = GameContext::GetInstance();
+		switch (ctx.RandomInt(0, 2)) {
+		case 0: SpawnMoney(pos, 30); break;
+		case 1: SpawnPassive(pos, false); break;
+		case 2: SpawnWeapon(pos, -1, Rarity::Common, false); break;
+		}
+	}
+	break;
 	}
 }

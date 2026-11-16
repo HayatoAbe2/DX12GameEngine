@@ -1,4 +1,5 @@
 #include "FloorManager.h"
+#include "RandomSettings/RandomSettings.h"
 
 void FloorManager::Initialize() {
 	generator_ = std::make_unique<FloorGenerator>();
@@ -36,4 +37,16 @@ std::vector<RoomConnector> FloorManager::GetConnector() {
 	}
 
 	return connectors;
+}
+
+void FloorManager::PlanNextRooms(RandomSettings* random) {
+	if (!currentRoom_ || !random) { return; }
+
+	auto& children = currentRoom_->nextRooms;
+	if (children.empty() || children[0].plan.planned) { return; } // 確定済み
+
+	const int childDepth = currentDepth_ + 1;
+	for (auto& child : children) {
+		child.plan = random->PlanRoom(child.type, childDepth);
+	}
 }

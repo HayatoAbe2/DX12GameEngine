@@ -1,28 +1,24 @@
-{ 
+{
     "Burstgun": {
         "modelName": "Wavegun.obj",
-
         "weight": 0.3,
         "shootCoolTime": 1.0,
-        "maxCharge": 3.0,
-        "chargeTime": 1.0,
-
+        "maxCharge": 1.0,
+        "chargeTime": 1.8,
         "bullet": {
-            "damage": 5.0,
+            "damage": 6.7,
             "radius": 0.3,
-            "speed": 30,
+            "speed": 30.0,
             "lifeTime": 60,
-            "knockback": 0.25,
+            "knockback": 0.2,
             "color": [0.2, 0.7, 0.2, 1.0]
         },
-
         "traits": {
-            "burst":{
+            "burst": {
                 "count": 3,
                 "interval": 0.1
             }
         },
-
         "rarity": "Rare"
-  }
+    }
 }

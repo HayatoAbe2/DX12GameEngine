@@ -43,7 +43,7 @@ UIDrawer::UIDrawer(Player* player, FloorManager* floorManager, ItemManager* item
 	dodge_->SetPosition(dodgeUIData_.pos);
 }
 
-void UIDrawer::Update() {
+void UIDrawer::Update(bool isCombat) {
 	auto& ctx = GameContext::GetInstance();
 	auto& input = ctx.Input();
 
@@ -72,7 +72,7 @@ void UIDrawer::Update() {
 	}
 
 	equipment_->Update();
-	nextRoom_->Update();
+	nextRoom_->Update(isCombat);
 
 	if (WorldWeapon* weapon = dynamic_cast<WorldWeapon*>(itemManager_->GetInteractive())) {
 		weaponSummary_->Update(weapon->GetWeaponData());

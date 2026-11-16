@@ -33,8 +33,13 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 			next.type = RoomType::Boss;
 		} else {
 			auto& ctx = GameContext::GetInstance();
-			if (ctx.RandomInt(0, 100) < 90) {
-				next.type = RoomType::Combat;
+			const int r = ctx.RandomInt(0, 100);
+			if (r < 90) {
+				if (ctx.RandomInt(0, 100) < 10) {
+					next.type = RoomType::Elite;
+				} else {
+					next.type = RoomType::Combat;
+				}
 			} else {
 				next.type = RoomType::Shop;
 			}
@@ -51,6 +56,8 @@ RoomType FloorGenerator::SelectRoomType() {
 	float r = (ctx.RandomFloat(0, 100));
 	if (r < 80) {
 		return RoomType::Combat;
+	} else if (r < 15) {
+		return RoomType::Elite;
 	} else {
 		return RoomType::Shop;
 	}
@@ -71,6 +78,7 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 		roomName = "combatRoom";
 		break;
 
+	case RoomType::Elite:
 	case RoomType::Boss:
 		roomName = "bossRoom";
 		break;

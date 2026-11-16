@@ -5,8 +5,15 @@ WeaponSummaryUI::WeaponSummaryUI() {
 	auto& asset = ctx.Asset();
 
 	// 画像ロード
-	background_ = asset.LoadSprite("Resources/Images/UI/WeaponSummary/Background.png");
-	background_->SetPivot({ 0.5f,0.5f });
+	summaryWindow_ = asset.LoadSprite("Resources/Images/UI/WeaponSummary/SummaryWindow.png");
+	summaryWindow_->SetPivot({ 0.5f,0.5f });
+	summaryItems_ = asset.LoadSprite("Resources/Images/UI/WeaponSummary/SummaryItems.png");
+	summaryItems_->SetPivot({ 0.5f,0.5f });
+
+	atkNums_ = std::make_unique<DrawNumbers>(kAtkDigitCount);
+	maxBulletNums_ = std::make_unique<DrawNumbers>(kBulletDigitCount);
+	reloadSpeedNumsL_ = std::make_unique<DrawNumbers>(kReloadDigitCountL);
+	reloadSpeedNumsR_ = std::make_unique<DrawNumbers>(kReloadDigitCountR);
 }
 
 void WeaponSummaryUI::Update(const WeaponData& data) {
@@ -18,6 +25,9 @@ void WeaponSummaryUI::Update() {
 
 void WeaponSummaryUI::Draw() {
 	if (!isActive_) return;
+
+	summaryWindow_->ImGuiEdit();
+	summaryItems_->ImGuiEdit();
 
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();

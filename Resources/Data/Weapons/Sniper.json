@@ -1,20 +1,27 @@
-{ 
+{
     "Sniper": {
         "modelName": "Shotgun.obj",
         "weight": 0.35,
         "shootCoolTime": 2.0,
         "maxCharge": 1.0,
-        "chargeTime": 2.0,
-
+        "chargeTime": 1.4,
         "bullet": {
-            "damage": 28.0,
+            "damage": 24.0,
             "radius": 0.3,
-            "speed": 45,
+            "speed": 40.0,
             "lifeTime": 30,
             "knockback": 0.1,
-            "color": [1.0, 1.0, 0.0, 1.0]
+            "color": [1.0, 1.0, 0.0, 1.0],
+            "traits": {
+                "onHitWall": {
+                    "ricochet": {
+                        "count": 2,
+                        "onHitEnemy": false,
+                        "toEnemy": false
+                    }
+                }
+            }
         },
-
         "rarity": "Rare"
-  }
+    }
 }

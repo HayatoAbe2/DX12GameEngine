@@ -3,7 +3,7 @@
         "modelName": "Dragon.glb",
         "animationIndex": 2,
         "hp": 10.0,
-        "radius": 0.5,
+        "radius": 1.0,
         "moveSpeed": 5.5,
         "defaultSearchRadius": 100.0,
         "stunResist": 0.0,

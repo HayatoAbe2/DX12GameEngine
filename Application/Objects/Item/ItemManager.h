@@ -3,6 +3,7 @@
 #include "Objects/Item/World/WorldItem.h"
 #include "Objects/Item/World/Chest/Chest.h"
 #include "Rarity.h"
+#include "Map/Room/RoomData.h"
 #include <unordered_set>
 
 class Player;
@@ -43,6 +44,9 @@ public:
 
 	// インタラクト中のアイテム
 	WorldItem* GetInteractive() { return interactive_; }
+
+	// 報酬セット
+	void SetReward(const RewardPlan& reward) { reward_ = reward; }
 	
 private:
 	// 宝箱からの出現
@@ -79,5 +83,8 @@ private:
 
 	std::unordered_set<int> usedPassiveNumbers_;
 	std::unordered_set<int> pickedPassiveNumbers_;
+
+	// 報酬
+	RewardPlan reward_;
 };
  

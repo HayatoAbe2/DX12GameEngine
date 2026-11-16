@@ -1,6 +1,8 @@
 #pragma once
 #include "FloorGenerator/FloorGenerator.h"
 
+class RandomSettings;
+
 /// <summary>
 /// 部屋と進度管理
 /// </summary>
@@ -13,6 +15,13 @@ public:
 
 	int GetCurrentDepth() { return currentDepth_; }
 	std::vector<RoomConnector> GetConnector();
+
+	// 部屋の内容生成
+	void PlanNextRooms(RandomSettings* random);
+	const RoomPlan& GetCurrentPlan() const {
+		static const RoomPlan kEmpty;
+		return currentRoom_ ? currentRoom_->plan : kEmpty;
+	}
 
 	const int kMaxDepth = 10;
 private:

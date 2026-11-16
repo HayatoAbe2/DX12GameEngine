@@ -72,6 +72,7 @@ void GameScene::Initialize() {
 
 	// マップ生成より後
 	floorManager_->Initialize();
+	floorManager_->PlanNextRooms(randomSettings_.get());
 
 	isLoaded_ = false;
 
@@ -170,7 +171,7 @@ void GameScene::Update() {
 
 				effectManager_->Update();
 
-				uiDrawer_->Update();
+				uiDrawer_->Update(enemyManager_->GetEnemies().size() != 0);
 			}
 
 			// フェードアウト終了時
@@ -202,6 +203,7 @@ void GameScene::Update() {
 		} else {
 			// 編集の反映,再配置
 			if (!isLoaded_) {
+				itemManager_->SetReward(floorManager_->GetCurrentPlan().reward);
 				itemManager_->Load();
 				enemyManager_->Load(weaponManager_.get(), randomSettings_.get());
 			}
@@ -292,6 +294,8 @@ void GameScene::MoveToNextRoom(Direction direction) {
 
 	// 次の部屋ロード
 	floorManager_->LoadNextRoom(direction);
+	floorManager_->PlanNextRooms(randomSettings_.get());
+
 	// プレイヤー位置
 	Vector3 pos = { floorManager_->GetStartPos().x, 0, floorManager_->GetStartPos().y };
 	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });

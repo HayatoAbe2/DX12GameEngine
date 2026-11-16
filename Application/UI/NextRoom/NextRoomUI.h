@@ -10,7 +10,7 @@ class NextRoomUI {
 public:
 	NextRoomUI(FloorManager* floorManager);
 
-	void Update();
+	void Update(bool isCombat);
 	void Draw();
 
 private:

@@ -1,29 +1,26 @@
-{ 
+{
     "Spellbook": {
         "modelName": "Spellbook.obj",
         "weight": 0.2,
         "shootCoolTime": 1.0,
         "maxCharge": 3.0,
         "chargeTime": 1.75,
-
         "bullet": {
             "damage": 16.0,
             "radius": 1.0,
-            "speed": 24,
-            "lifeTime": 300,
+            "speed": 8.5,
+            "lifeTime": 120,
             "knockback": 0.5,
             "color": [0.7, 0.2, 0.1, 1.0],
-
-            "traits":{
-                "onHitAnything":{
-                    "explode":{
+            "traits": {
+                "onHitAnything": {
+                    "explode": {
                         "damage": 16.0,
                         "radius": 3.0
                     }
                 }
             }
         },
-
         "rarity": "Common"
-  }
+    }
 }

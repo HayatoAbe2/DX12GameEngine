@@ -16,7 +16,7 @@ class UIDrawer {
 public:
 	UIDrawer(Player* player, FloorManager* floorManager, ItemManager* itemManager);
 	// 更新
-	void Update();
+	void Update(bool isCombat);
 	// 描画
 	void Draw();
 

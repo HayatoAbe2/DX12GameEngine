@@ -176,19 +176,19 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 		}
 	}
 
+	const RoomPlan& plan = floorManager_->GetCurrentPlan();
 	// 出現数
-	int spawnCount = 3;
-	if (floorManager_->GetCurrentDepth() > 2) {
-		spawnCount++;
-	}
-	if (floorManager_->GetCurrentDepth() > 4) {
-		spawnCount++;
-	}
-	if (floorManager_->GetCurrentDepth() > 6) {
-		spawnCount++;
+	int spawnCount = 0;
+	if (plan.planned) {
+		spawnCount = int(plan.enemies.size());
+	} else {
+		spawnCount = 3;
+		if (floorManager_->GetCurrentDepth() > 2) { spawnCount++; }
+		if (floorManager_->GetCurrentDepth() > 4) { spawnCount++; }
+		if (floorManager_->GetCurrentDepth() > 6) { spawnCount++; }
+		if (floorManager_->GetCurrentDepth() == 9) { spawnCount = 1; }
 	}
 	spawnCount = min(spawnCount, int(positions.size()));
-	if (floorManager_->GetCurrentDepth() == 9) { spawnCount = 1; }
 
 	for (size_t i = 0; i < spawnCount; ++i) {
 		// 残っている候補からランダムに1つ選ぶ
@@ -202,13 +202,10 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 		spawnPos_.push_back(spawnPos);
 		isSpawned_.push_back(false);
 
-		// 敵の生成
-		std::string enemyName = random->SelectEnemy(floorManager_->GetCurrentDepth());
-		if (enemyName.empty()) { // 該当なしなら出さない
-			continue;
-		}
+		const std::string enemyName = plan.planned ? plan.enemies[i] : random->SelectEnemy(floorManager_->GetCurrentDepth());
 
 		CreateEnemy({ spawnPos.x, 0, spawnPos.y }, weaponManager, enemyName);
+
 	}
 }
 
