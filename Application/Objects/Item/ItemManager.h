@@ -18,7 +18,7 @@ class Camera;
 class ItemManager {
 public:
 	void Initialize(WeaponManager* weaponManager, EnemyManager* enemyManager, BulletManager* bulletManager);
-	void Update(Player* player, bool isCombat);
+	void Update(Player* player, RoomState roomState);
 	void Draw();
 
 	// 近くのアイテムにインタラクト
@@ -28,7 +28,6 @@ public:
 	void SpawnWeapon(Vector3 pos,int index,Rarity rarity, bool isForSale);
 	void SpawnMoney(Vector3 pos,int amount);
 	void SpawnPassive(Vector3 pos, bool isForSale);
-	void SpawnChest(Vector3 pos);
 
 	// 持っていたものを落とす
 	void Drop(Vector3 pos,std::unique_ptr<Weapon> weapon);
@@ -52,8 +51,8 @@ private:
 	// 宝箱からの出現
 	void ChestItemDrop(Chest* chest);
 
-	// 戦闘中
-	bool isCombat_ = false;
+	// 部屋状態
+	RoomState prevRoomState_;
 
 	std::unique_ptr<Sprite> controlKey_ = nullptr;
 	std::unique_ptr<Sprite> controlPad_ = nullptr;

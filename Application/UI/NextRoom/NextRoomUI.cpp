@@ -16,7 +16,7 @@ NextRoomUI::NextRoomUI(FloorManager* floorManager) {
 	floorManager_ = floorManager;
 }
 
-void NextRoomUI::Update(bool isCombat) {
+void NextRoomUI::Update() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
@@ -30,6 +30,7 @@ void NextRoomUI::Update(bool isCombat) {
 		switch (connectors[i].connectedRoom->type) {
 		case RoomType::Elite:
 			color = { 1,0,0,1 };
+			[[fallthrough]];
 		case RoomType::Combat:
 			name = "sword";
 			break;
@@ -53,7 +54,8 @@ void NextRoomUI::Update(bool isCombat) {
 
 	auto& render = ctx.Render();
 	auto camera = render.GetCamera();
-	if (isCombat) {
+	roomState_ = floorManager_->GetCurrentRoomState();
+	if (roomState_ != RoomState::Cleared) {
 		// アイコンはその位置に表示
 		for (int i = 0; i < int(connectors.size()); ++i) {
 			// 出入口の位置
@@ -82,6 +84,7 @@ void NextRoomUI::Update(bool isCombat) {
 		// 画面端からアイコンを離す余白
 		const float margin = 64.0f;
 
+		rewardIcons_.resize(int(connectors.size()));
 		for (int i = 0; i < int(connectors.size()); ++i) {
 			// 出入口の位置
 			Vector2 position =
@@ -114,6 +117,34 @@ void NextRoomUI::Update(bool isCombat) {
 
 			// アイコン
 			icons_[i]->SetPosition(pos);
+
+			// 報酬内容
+			const RoomPlan& plan = connectors[i].connectedRoom->plan;
+
+			if (plan.planned && plan.reward.type != RewardType::None) {
+				std::string rewardName; // 画像名
+				switch (plan.reward.type) {
+				case RewardType::Money:   rewardName = "coin";    break;
+				case RewardType::Weapon:  rewardName = "weapon";  break;
+				case RewardType::Passive: rewardName = "item"; break;
+				}
+				rewardIcons_[i] = asset.LoadSprite(std::string("Resources/Images/UI/Icons/") + rewardName + ".png");
+				rewardIcons_[i]->SetSize({ rewardIconSize_, rewardIconSize_ });
+				rewardIcons_[i]->SetPivot({ 0.5f, 0.5f });
+				rewardIcons_[i]->SetPosition({ pos + rewardOffset_ });
+
+				// レアリティ色
+				Vector4 color = { 1, 1, 1, 1 };
+				if (plan.reward.type == RewardType::Weapon) {
+					switch (plan.reward.rarity) {
+					case Rarity::Rare:      color = { 0.4f, 0.6f, 1.0f, 1 }; break;
+					case Rarity::Epic:      color = { 0.7f, 0.4f, 1.0f, 1 }; break;
+					case Rarity::Legendary: color = { 1.0f, 0.8f, 0.2f, 1 }; break;
+					default: break;
+					}
+				}
+				rewardIcons_[i]->SetColor(color);
+			}
 		}
 	}
 }
@@ -125,5 +156,8 @@ void NextRoomUI::Draw() {
 	auto connectors = floorManager_->GetConnector();
 	for (int i = 0; i < int(connectors.size()); ++i) {
 		render.DrawSprite(icons_[i].get());
+		if (roomState_ == RoomState::Cleared && i < rewardIcons_.size() && rewardIcons_[i]) {
+			render.DrawSprite(rewardIcons_[i].get());
+		}
 	}
 }

@@ -26,6 +26,8 @@ void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
 			// 最後はゴール部屋
 			next.type = RoomType::Goal;
 		} else if (depth == kStartFloorNumber) {
+			next.type = RoomType::Start;
+		} else if (depth == kStartFloorNumber + 1) {
 			next.type = RoomType::Combat;
 		} else if (depth == kRestFloorNumber) {
 			next.type = RoomType::Shop;

@@ -67,7 +67,7 @@ void GameScene::Initialize() {
 
 	// マップ判定
 	mapCheck_ = std::make_unique<MapCheck>(mapTile_->GetMap(), mapTile_->GetTileSize());
-	mapTile_->UpdateMapChange(false, enableEditMode_);
+	mapTile_->UpdateMapChange(enableEditMode_);
 	Reset();
 
 	// マップ生成より後
@@ -108,6 +108,27 @@ void GameScene::Update() {
 
 	switch (phase_) {
 	case Phase::GAME:
+		// フェードアウト終了時
+		if (fade_->GetPhase() == FadePhase::Faded) {
+			if (player_->IsDead() || floorManager_->GetCurrentDepth() == floorManager_->kMaxDepth) {
+				// リザルト移行
+				phase_ = Phase::RESULT;
+				fade_->StartFadeIn();
+			} else if (isRoomMoving_) {
+				// 次の部屋
+				MoveToNextRoom(nextDirection_);
+
+				isRoomMoving_ = false;
+			} else {
+				// 次のフロア
+				Reset();
+				Initialize();
+
+				fade_->StartFadeIn();
+			}
+			break;
+		}
+
 		if (!enableEditMode_) {
 			if (isPause_) {
 				// ポーズ中
@@ -149,7 +170,7 @@ void GameScene::Update() {
 				// 敵
 				if (!enableEditMode_) {
 					enemyManager_->Update(mapCheck_.get(), player_.get(), bulletManager_.get(), itemManager_.get());
-					mapCheck_->SetCombat(enemyManager_->GetEnemies().size() != 0);
+					mapCheck_->SetRoomState(floorManager_->GetCurrentRoomState());
 				}
 
 				// 弾の処理
@@ -162,40 +183,22 @@ void GameScene::Update() {
 				collisionSystem_->Update(player_.get(), mapCheck_.get());
 
 				// アイテム
-				itemManager_->Update(player_.get(), enemyManager_->GetEnemies().size() != 0);
+				itemManager_->Update(player_.get(), floorManager_->GetCurrentRoomState());
 
 				// マップ
-				mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
+				mapTile_->UpdateMapChange(enableEditMode_);
 				mapTile_->Update(enemyManager_->GetEnemies().size() == 0);
 				mapCheck_->Update(mapTile_->GetMap());
 
+				floorManager_->Update(enemyManager_.get());
+
 				effectManager_->Update();
 
-				uiDrawer_->Update(enemyManager_->GetEnemies().size() != 0);
-			}
-
-			// フェードアウト終了時
-			if (fade_->GetPhase() == FadePhase::Faded) {
-				if (player_->IsDead() || floorManager_->GetCurrentDepth() == floorManager_->kMaxDepth) {
-					// リザルト移行
-					phase_ = Phase::RESULT;
-					fade_->StartFadeIn();
-				} else if (isRoomMoving_) {
-					// 次の部屋
-					MoveToNextRoom(nextDirection_);
-
-					isRoomMoving_ = false;
-				} else {
-					// 次のフロア
-					Reset();
-					Initialize();
-
-					fade_->StartFadeIn();
-				}
+				uiDrawer_->Update();
 			}
 		}
 
-		mapTile_->UpdateMapChange(!enemyManager_->GetEnemies().empty(), enableEditMode_);
+		mapTile_->UpdateMapChange(enableEditMode_);
 		enemyManager_->SpawnCheck(player_->GetTransform().translate, mapCheck_.get());
 
 		if (enableEditMode_) {
@@ -294,6 +297,7 @@ void GameScene::MoveToNextRoom(Direction direction) {
 
 	// 次の部屋ロード
 	floorManager_->LoadNextRoom(direction);
+	// その次の部屋内容を用意する
 	floorManager_->PlanNextRooms(randomSettings_.get());
 
 	// プレイヤー位置
@@ -316,7 +320,7 @@ void GameScene::LoadSound() {
 
 void GameScene::SpawnForDebug() {
 #ifdef USE_IMGUI
-	// 武器・敵の一覧は、読み込まれているデータから作る(エディタで追加したものも、そのまま出せる)
+	// 一覧は読み込まれているデータから作る
 	ImGui::Begin("Weapon");
 	ImGui::DragFloat3("cameraPos", &camera_->transform_.translate.x, 0.5f);
 

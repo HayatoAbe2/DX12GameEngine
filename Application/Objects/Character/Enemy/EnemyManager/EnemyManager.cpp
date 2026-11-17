@@ -73,8 +73,6 @@ void EnemyManager::RequestSpawn(Vector3 pos, WeaponManager* weaponManager, const
 }
 
 void EnemyManager::CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name) {
-	// 見つからない名前でも空の枠は必ず追加する
-	// (isSpawned_ / spawnPos_ と添字を揃えないと、SpawnCheck が範囲外を読んで落ちる)
 	inactiveEnemies_.push_back(MakeEnemies(pos, weaponManager, name));
 }
 
@@ -117,7 +115,6 @@ std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, Weapo
 		for (auto& weaponName : data.weapons) { 
 			std::unique_ptr<Weapon> weapon;
 			weapon = weaponManager->GetEnemyAttack(weaponName);
-			// 見つからない武器は持たせない(nullptr参照を防ぐ)
 			if (weapon) { weapons.push_back(std::move(weapon)); }
 		}
 		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons)));

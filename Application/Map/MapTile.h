@@ -21,7 +21,7 @@ public:
 	~MapTile();
 	void Initialize();
 	// シーンデータからマップ更新
-	void UpdateMapChange(bool isCombat, bool isEditMode);
+	void UpdateMapChange(bool isEditMode);
 	void Update(bool canGoal);
 	void Draw(Camera* camera);
 

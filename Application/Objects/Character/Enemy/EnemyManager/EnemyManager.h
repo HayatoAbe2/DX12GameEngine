@@ -32,13 +32,14 @@ public:
 	// 敵を抽選して出現予約
 	void CreateEnemy(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
 
-	// 次の更新で、その場にすぐ出現させる(デバッグ・エディタ用。名前は GetEnemyNames() のもの)
+	// 次の更新で出現させる(デバッグ・エディタ用。名前は GetEnemyNames() のもの)
 	void RequestSpawn(Vector3 pos, WeaponManager* weaponManager, const std::string& name);
 	void Reset();
 	void Load(WeaponManager* weaponManager, RandomSettings* random);
 	void SpawnCheck(const Vector3& playerPos, MapCheck* mapCheck);
 
 	std::vector<Enemy*> GetEnemies();
+	bool HasRemainEnemies() { if (inactiveEnemies_.empty()) return false; return true; }
 private:
 	void LoadEnemyData();
 

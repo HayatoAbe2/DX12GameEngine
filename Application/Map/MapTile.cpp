@@ -25,7 +25,7 @@ void MapTile::Initialize() {
 	lightIndex_ = light.AddSpotLight();
 }
 
-void MapTile::UpdateMapChange(bool isCombat, bool isEditMode) {
+void MapTile::UpdateMapChange(bool isEditMode) {
 	auto& ctx = GameContext::GetInstance();
 	auto& light = ctx.Light();
 	auto& scene = ctx.Scene();

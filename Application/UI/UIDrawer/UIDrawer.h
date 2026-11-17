@@ -4,6 +4,7 @@
 #include "UI/NextRoom/NextRoomUI.h"
 #include "UI/Passive/PassiveUI.h"
 #include "UI/WeaponSummary/WeaponSummary.h"
+#include "Map/Room/RoomData.h"
 
 class Player;
 class FloorManager;
@@ -16,7 +17,7 @@ class UIDrawer {
 public:
 	UIDrawer(Player* player, FloorManager* floorManager, ItemManager* itemManager);
 	// 更新
-	void Update(bool isCombat);
+	void Update();
 	// 描画
 	void Draw();
 

@@ -29,10 +29,10 @@ void MapCheck::Update(const std::vector<std::vector<Tile>>& map) {
 		if (model->tag == "barrier") {
 			auto t = model->GetTransforms();
 			for (int i = 0; i < int(t.size()); ++i) {
-				float rate = 1.0f;
-				if (isCombat_) {
+				float rate = 0.0f;
+				if (roomState_ == RoomState::InCombat) {
 					rate = 1.0f - barrierAppierTimer_.GetRemaining() / kBarrierAppierTime;
-				} else {
+				} else if(roomState_ == RoomState::Cleared){
 					rate = barrierDisappierTimer_.GetRemaining() / kBarrierDisappierTime;
 				}
 
@@ -83,7 +83,7 @@ bool MapCheck::ResolveCollisionX(Vector2& pos, float radius, bool isFlying) {
 				charMinY = pos.y - 0.1f;
 				charMaxY = pos.y + 0.1f;
 			}
-			if (!isCombat_ && map_[y][x] == Tile::CombatWall) continue;
+			if (roomState_ != RoomState::InCombat && map_[y][x] == Tile::CombatWall) continue;
 
 			// タイルAABB
 			float tileCenterX = (x - mapW / 2) * tileSize_;
@@ -152,7 +152,7 @@ bool MapCheck::ResolveCollisionY(Vector2& pos, float radius, bool isFlying) {
 				charMinY = pos.y - 0.1f;
 				charMaxY = pos.y + 0.1f;
 			}
-			if (!isCombat_ && map_[y][x] == Tile::CombatWall) continue;
+			if (roomState_ != RoomState::InCombat && map_[y][x] == Tile::CombatWall) continue;
 
 			float tileCenterX = (x - mapW / 2) * tileSize_;
 			float tileCenterY = (y - mapH / 2) * tileSize_;
@@ -214,7 +214,7 @@ bool MapCheck::IsHitWall(const Vector2& pos, float radius) {
 		for (int x = startX; x <= endX; ++x) {
 			if (map_[y][x] == Tile::Floor) continue;
 			if (map_[y][x] == Tile::None) continue;
-			if (!isCombat_ && map_[y][x] == Tile::CombatWall) continue;
+			if (roomState_ != RoomState::InCombat && map_[y][x] == Tile::CombatWall) continue;
 
 			// タイルAABB
 			float tileCenterX = (x - mapW / 2) * tileSize_;
@@ -366,15 +366,15 @@ bool MapCheck::EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerP
 	return true;
 }
 
-void MapCheck::SetCombat(bool isCombat) {
-	if (isCombat_ != isCombat) {
+void MapCheck::SetRoomState(RoomState roomState) {
+	if (roomState_ != roomState) {
 		// 切り替わったとき
-		if (isCombat) {
+		if (roomState == RoomState::InCombat) {
 			barrierAppierTimer_.Start(kBarrierAppierTime);
-		} else {
+		} else if(roomState == RoomState::Cleared) {
 			barrierDisappierTimer_.Start(kBarrierDisappierTime);
 		}
 	}
 
-	isCombat_ = isCombat;
+	roomState_ = roomState;
 }

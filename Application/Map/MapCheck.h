@@ -3,6 +3,7 @@
 #include "MapTile.h"
 #include "GameCommon.h"
 #include "Timer/Timer.h"
+#include "Map/Room/RoomData.h"
 
 class Player;
 
@@ -30,8 +31,8 @@ public:
 	// 敵からの視認
 	bool EnemyCanSeePlayer(const Vector3& enemyPos, const Vector3& playerPos);
 
-	// 戦闘状態セット
-	void SetCombat(bool isCombat);
+	// 部屋状態セット
+	void SetRoomState(RoomState roomState);
 
 private:	
 	int WorldToMapX(float x) const;
@@ -39,7 +40,7 @@ private:
 
 	std::vector<std::vector<Tile>> map_;
 	float tileSize_ = 0;
-	bool isCombat_ = false;
+	RoomState roomState_;
 
 	// バリアの出現タイマー
 	Timer barrierAppierTimer_;

@@ -28,7 +28,7 @@ void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyMa
 	controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
 }
 
-void ItemManager::Update(Player* player, bool isCombat) {
+void ItemManager::Update(Player* player, RoomState roomState) {
 	// 配置予約があれば出現
 	for (const auto& request : weaponSpawnRequests_) {
 		Drop(request.pos, weaponManager_->GetWeaponByName(request.name));
@@ -57,7 +57,7 @@ void ItemManager::Update(Player* player, bool isCombat) {
 	for (auto& i : items_) {
 		i->Update();
 		// 自動取得アイテムの移動
-		if (i->CanAutoGet() && !isCombat) {
+		if (i->CanAutoGet() && roomState == RoomState::Cleared) {
 			i->MoveToPlayer(ToXZ(player->GetTransform().translate));
 		}
 	}
@@ -71,11 +71,11 @@ void ItemManager::Update(Player* player, bool isCombat) {
 	}
 
 	// 敵全滅時にチェスト出現
-	if (isCombat_ && !isCombat) {
+	if (roomState == RoomState::Cleared && prevRoomState_ == RoomState::InCombat) {
 		std::unique_ptr<Chest> chest = std::make_unique<Chest>(ToXZ(player->GetTransform().translate));
 		chests_.push_back(std::move(chest));
 	}
-	isCombat_ = isCombat;
+	prevRoomState_ = roomState;
 
 	// 最短距離にあるアイテムを探す
 	interactive_ = nullptr;
@@ -208,9 +208,6 @@ void ItemManager::SpawnPassive(Vector3 pos, bool isForSale) {
 
 	// 拾った場合に出せなくする
 	pickedPassiveNumbers_ = usedPassiveNumbers_;
-}
-
-void ItemManager::SpawnChest(Vector3 pos) {
 }
 
 void ItemManager::Drop(Vector3 pos, std::unique_ptr<Weapon> weapon) {

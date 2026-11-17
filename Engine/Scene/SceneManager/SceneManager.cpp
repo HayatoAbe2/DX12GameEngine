@@ -3,7 +3,13 @@
 
 SceneManager::SceneManager() {
 	sceneFactory_ = std::make_unique<SceneFactory>();
+#ifdef USE_IMGUI
+	currentScene_ = sceneFactory_->CreateScene("Game");
+#endif
+#ifndef USE_IMGUI
 	currentScene_ = sceneFactory_->CreateScene("Title");
+#endif // !USE_IMGUI
+
 }
 
 void SceneManager::Initialize() {

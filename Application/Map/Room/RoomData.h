@@ -18,6 +18,13 @@ struct RoomPlan {
 	RewardPlan reward;
 };
 
+// 部屋の状態
+enum class RoomState {
+	Entered,	// 入った直後
+	InCombat,	// 戦闘中
+	Cleared		// 敵を倒した
+};
+
 // 部屋タイプ
 enum class RoomType {
 	Start,
@@ -51,6 +58,7 @@ struct RoomConnector {
 struct Room {
 	RoomType type;
 	RoomPlan plan;
+	RoomState state = RoomState::Entered;
 	std::vector<Room> nextRooms;
 	std::vector<RoomConnector> connector;
 	Direction startDirection;
