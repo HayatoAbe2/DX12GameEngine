@@ -1,0 +1,83 @@
+{
+    "goalDepth": 10,
+    "fixedRooms": [
+        {
+            "depth": 1,
+            "type": "Combat"
+        },
+        {
+            "depth": 5,
+            "type": "Shop"
+        },
+        {
+            "depth": 9,
+            "type": "Boss"
+        }
+    ],
+    "roomRates": {
+        "Combat": {
+            "weight": 80.0,
+            "repeatMultiplier": 0.9,
+            "minDepth": 1
+        },
+        "Elite": {
+            "weight": 10.0,
+            "repeatMultiplier": 0.2,
+            "minDepth": 1
+        },
+        "Shop": {
+            "weight": 10.0,
+            "repeatMultiplier": 0.05,
+            "minDepth": 1
+        },
+        "Event": {
+            "weight": 0.0,
+            "repeatMultiplier": 0.9,
+            "minDepth": 1
+        }
+    },
+    "rewards": {
+        "Combat": {
+            "kind": {
+                "Money": 50.0,
+                "Weapon": 30.0,
+                "Passive": 10.0
+            },
+            "rarity": {
+                "Common": 70.0,
+                "Rare": 25.0,
+                "Epic": 5.0,
+                "Legendary": 0.0
+            },
+            "moneyAmount": 30
+        },
+        "Elite": {
+            "kind": {
+                "Money": 20.0,
+                "Weapon": 50.0,
+                "Passive": 70.0
+            },
+            "rarity": {
+                "Common": 0.0,
+                "Rare": 5.0,
+                "Epic": 3.0,
+                "Legendary": 1.0
+            },
+            "moneyAmount": 70
+        },
+        "Boss": {
+            "kind": {
+                "Money": 1.0,
+                "Weapon": 0.0,
+                "Passive": 0.0
+            },
+            "rarity": {
+                "Common": 0.0,
+                "Rare": 0.0,
+                "Epic": 0.0,
+                "Legendary": 0.0
+            },
+            "moneyAmount": 100
+        }
+    }
+}

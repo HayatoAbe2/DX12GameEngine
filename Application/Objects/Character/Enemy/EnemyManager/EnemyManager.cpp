@@ -183,7 +183,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 		if (floorManager_->GetCurrentDepth() > 2) { spawnCount++; }
 		if (floorManager_->GetCurrentDepth() > 4) { spawnCount++; }
 		if (floorManager_->GetCurrentDepth() > 6) { spawnCount++; }
-		if (floorManager_->GetCurrentDepth() == 9) { spawnCount = 1; }
+		if (floorManager_->GetCurrentType() == RoomType::Boss) { spawnCount = 1; }
 	}
 	spawnCount = min(spawnCount, int(positions.size()));
 
@@ -199,7 +199,7 @@ void EnemyManager::Load(WeaponManager* weaponManager, RandomSettings* random) {
 		spawnPos_.push_back(spawnPos);
 		isSpawned_.push_back(false);
 
-		const std::string enemyName = plan.planned ? plan.enemies[i] : random->SelectEnemy(floorManager_->GetCurrentDepth());
+		const std::string enemyName = plan.planned ? plan.enemies[i] : random->SelectEnemy(floorManager_->GetCurrentDepth(), floorManager_->GetCurrentType());
 
 		CreateEnemy({ spawnPos.x, 0, spawnPos.y }, weaponManager, enemyName);
 

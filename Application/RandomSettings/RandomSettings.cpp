@@ -1,24 +1,8 @@
 #include "RandomSettings.h"
 #include "Map/FloorSetting.h"
 #include "GameCommon.h"
-#include <initializer_list>
-#include <utility>
 
 namespace {
-	// 重み付き抽選
-	template <class T>
-	T PickWeighted(std::initializer_list<std::pair<T, float>> table) {
-		float total = 0.0f;
-		for (const auto& e : table) { total += e.second; }
-
-		float r = GameContext::GetInstance().RandomFloat(0.0f, total);
-		for (const auto& e : table) {
-			r -= e.second;
-			if (r <= 0.0f) { return e.first; }
-		}
-		return (table.end() - 1)->first;
-	}
-
 	// 部屋タイプごとの敵の数
 	int EnemyCount(RoomType type, int depth) {
 		if (type == RoomType::Boss || type == RoomType::Elite) { return 1; }
@@ -42,7 +26,7 @@ void RandomSettings::Update() {
 }
 
 std::string RandomSettings::SelectEnemy(int depth, RoomType type) {
-	if (type == RoomType::Boss || depth == kBossFloorNumber) {
+	if (type == RoomType::Boss) { // ボスの階層は FloorConfig で決まるので、階層ではなく部屋タイプで見る
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Boss.json");
 	} else if (type == RoomType::Elite) {
 		enemySpawn_->Load("Resources/Data/Spawn/Enemy/Elite.json");
@@ -76,7 +60,7 @@ std::string RandomSettings::SelectEnemy(int depth, RoomType type) {
 	return "";
 }
 
-RoomPlan RandomSettings::PlanRoom(RoomType type, int depth) {
+RoomPlan RandomSettings::PlanRoom(RoomType type, int depth, const FloorConfig& config) {
 	RoomPlan plan;
 	plan.planned = true;
 
@@ -91,29 +75,8 @@ RoomPlan RandomSettings::PlanRoom(RoomType type, int depth) {
 		if (!name.empty()) { plan.enemies.push_back(name); }
 	}
 
-	if (type == RoomType::Boss) {
-		plan.reward.type = RewardType::Passive; // ボス報酬は固定
-	} else {
-		plan.reward = SelectReward(type);
-	}
+	// 報酬(種類・レアリティ・額は FloorConfig の確率から。ボスも同じ)
+	auto& ctx = GameContext::GetInstance();
+	plan.reward = config.ChooseReward(type, ctx.RandomFloat(0.0f, 1.0f), ctx.RandomFloat(0.0f, 1.0f));
 	return plan;
-}
-
-// 確率エディタができるまではここの数値を直接調整する
-RewardPlan RandomSettings::SelectReward(RoomType type) {
-	RewardPlan reward;
-	if (type == RoomType::Elite) {
-		reward.type = PickWeighted<RewardType>({
-			{ RewardType::Money, 20.0f }, { RewardType::Weapon, 40.0f }, { RewardType::Passive, 40.0f } });
-		reward.rarity = PickWeighted<Rarity>({
-			{ Rarity::Common, 10.0f }, { Rarity::Rare, 50.0f }, { Rarity::Epic, 30.0f }, { Rarity::Legendary, 10.0f } });
-		reward.amount = 70;
-	} else {
-		reward.type = PickWeighted<RewardType>({
-			{ RewardType::Money, 40.0f }, { RewardType::Weapon, 40.0f }, { RewardType::Passive, 20.0f } });
-		reward.rarity = PickWeighted<Rarity>({
-			{ Rarity::Common, 70.0f }, { Rarity::Rare, 25.0f }, { Rarity::Epic, 5.0f } });
-		reward.amount = 30;
-	}
-	return reward;
 }

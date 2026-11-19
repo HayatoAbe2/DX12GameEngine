@@ -165,6 +165,8 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Data\EnemySerializer.cpp" />
+    <ClCompile Include="Application\Data\FloorConfigSerializer.cpp" />
+    <ClCompile Include="Application\Data\RoomPlanSerializer.cpp" />
     <ClCompile Include="Application\Data\WeaponSerializer.cpp" />
     <ClCompile Include="Application\Objects\Character\Character.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
@@ -193,6 +195,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Objects\Item\World\WorldItem.cpp" />
     <ClCompile Include="Application\Objects\Item\ItemManager.cpp" />
     <ClCompile Include="Application\Map\MapCheck.cpp" />
+    <ClCompile Include="Application\Map\FloorConfig.cpp" />
     <ClCompile Include="Application\Map\MapTile.cpp" />
     <ClCompile Include="Application\Objects\Character\Player\Player.cpp" />
     <ClCompile Include="Application\Scene\TitleScene\TitleScene.cpp" />
@@ -314,6 +317,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\Objects\Item\World\WorldPassive\WorldPassive.cpp" />
     <ClCompile Include="Application\Result\Result.cpp" />
     <ClCompile Include="Editor\SpawnRateEditor\SpawnRateEditor.cpp" />
+    <ClCompile Include="Editor\FloorEditor\FloorEditor.cpp" />
     <ClCompile Include="Engine\SceneObject\Video\VideoDecoder\VideoDecoder.cpp" />
     <ClCompile Include="Engine\SceneObject\Video\VideoTexture\VideoTexture.cpp" />
     <ClCompile Include="Engine\SceneObject\Video\VideoPlayer\VideoPlayer.cpp" />
@@ -468,9 +472,12 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Controller.h" />
     <ClInclude Include="Application\Data\DataIssue.h" />
     <ClInclude Include="Application\Data\EnemySerializer.h" />
+    <ClInclude Include="Application\Data\FloorConfigSerializer.h" />
+    <ClInclude Include="Application\Data\RoomPlanSerializer.h" />
     <ClInclude Include="Application\Data\JsonFormat.h" />
     <ClInclude Include="Application\Data\WeaponSerializer.h" />
     <ClInclude Include="Application\Map\FloorSetting.h" />
+    <ClInclude Include="Application\Map\FloorConfig.h" />
     <ClInclude Include="Application\Objects\Character\Character.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyData.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
@@ -639,6 +646,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\RandomSettings\RandomSettings.h" />
     <ClInclude Include="Application\Result\Result.h" />
     <ClInclude Include="Editor\SpawnRateEditor\SpawnRateEditor.h" />
+    <ClInclude Include="Editor\FloorEditor\FloorEditor.h" />
     <ClInclude Include="Application\Objects\Item\Passive\Heal\Heal.h" />
     <ClInclude Include="Application\Objects\Item\Passive\ExtraAttack\ExtraAttack.h" />
     <ClInclude Include="Application\UI\Passive\PassiveUI.h" />

@@ -1,4 +1,6 @@
 #include "GameScene.h"
+#include "Map/FloorSetting.h"
+#include "Data/RoomPlanSerializer.h"
 #include <numbers>
 
 GameScene::~GameScene() {
@@ -71,8 +73,7 @@ void GameScene::Initialize() {
 	Reset();
 
 	// マップ生成より後
-	floorManager_->Initialize();
-	floorManager_->PlanNextRooms(randomSettings_.get());
+	SetupFloor();
 
 	isLoaded_ = false;
 
@@ -85,11 +86,14 @@ void GameScene::Initialize() {
 	spawnEditor_ = std::make_unique<SpawnRateEditor>();
 	enemyEditor_ = std::make_unique<EnemyEditor>();
 	weaponEditor_ = std::make_unique<WeaponEditor>();
+	floorEditor_ = std::make_unique<FloorEditor>();
 
 	Update();
 
 	weaponEditor_->SetOnApplied([this] { weaponManager_->Reload(); });
 	enemyEditor_->SetOnApplied([this] { enemyManager_->ReloadEnemyData(); });
+	floorEditor_->SetOnApplied([this] { floorManager_->ReloadConfig(); });
+	floorEditor_->SetOnRegenerate([this] { regenerateFloorRequested_ = true; });
 
 	// エディタの「出す」ボタン(保存して出す場合も、保存で再読み込みされた後に呼ばれる)
 	weaponEditor_->SetOnSpawn([this](const std::string& name) {
@@ -106,11 +110,17 @@ void GameScene::Update() {
 	auto& audio = ctx.Audio();
 	auto& scene = ctx.Scene();
 
+	// フロアエディタからの作り直し
+	if (regenerateFloorRequested_ && phase_ == Phase::GAME) {
+		regenerateFloorRequested_ = false;
+		RegenerateFloor();
+	}
+
 	switch (phase_) {
 	case Phase::GAME:
 		// フェードアウト終了時
 		if (fade_->GetPhase() == FadePhase::Faded) {
-			if (player_->IsDead() || floorManager_->GetCurrentDepth() == floorManager_->kMaxDepth) {
+			if (player_->IsDead() || floorManager_->GetCurrentDepth() == floorManager_->GetMaxDepth()) {
 				// リザルト移行
 				phase_ = Phase::RESULT;
 				fade_->StartFadeIn();
@@ -264,6 +274,7 @@ void GameScene::Draw() {
 
 #ifdef USE_IMGUI
 	spawnEditor_->Draw(enemyManager_->GetEnemyNames());
+	floorEditor_->Draw();
 	weaponEditor_->Draw();
 	enemyEditor_->Draw(
 		weaponManager_->GetEnemyAttackNames(),
@@ -299,10 +310,41 @@ void GameScene::MoveToNextRoom(Direction direction) {
 	floorManager_->LoadNextRoom(direction);
 	// その次の部屋内容を用意する
 	floorManager_->PlanNextRooms(randomSettings_.get());
+	if (kSaveFloorPlan) { floorManager_->SaveFloorPlan(kFloorPlanPath); }
 
 	// プレイヤー位置
 	Vector3 pos = { floorManager_->GetStartPos().x, 0, floorManager_->GetStartPos().y };
 	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });
+}
+
+void GameScene::SetupFloor() {
+	floorManager_->Initialize();
+
+	// 予定ファイルの内容を反映する(抽選より先に読む。ファイルにない部屋は、このあと抽選される)
+	if (kLoadFloorPlan) {
+		std::vector<DataIssue> issues;
+		if (floorManager_->LoadFloorPlan(kFloorPlanPath, &issues)) {
+			for (auto& issue : RoomPlanSerializer::ValidateTree(*floorManager_->GetRoot(), enemyManager_->GetEnemyNames())) {
+				issues.push_back(std::move(issue));
+			}
+		}
+		for (const auto& issue : issues) {
+			OutputDebugStringA(((issue.isError ? "[FloorPlan error] " : "[FloorPlan warn] ") + issue.message + "\n").c_str());
+		}
+	}
+
+	floorManager_->PlanNextRooms(randomSettings_.get());
+	if (kSaveFloorPlan) { floorManager_->SaveFloorPlan(kFloorPlanPath); }
+}
+
+void GameScene::RegenerateFloor() {
+	Reset();
+	SetupFloor();
+
+	// プレイヤー位置
+	Vector3 pos = { floorManager_->GetStartPos().x, 0, floorManager_->GetStartPos().y };
+	player_->SetTransform({ { 1,1,1 }, { 0,0,0 }, pos });
+	isLoaded_ = false;
 }
 
 void GameScene::LoadSound() {

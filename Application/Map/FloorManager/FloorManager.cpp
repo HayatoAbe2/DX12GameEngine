@@ -1,11 +1,74 @@
 #include "FloorManager.h"
 #include "RandomSettings/RandomSettings.h"
 #include "Objects/Character/Enemy/EnemyManager/EnemyManager.h"
+#include "Data/FloorConfigSerializer.h"
+#include "Data/RoomPlanSerializer.h"
+#include "Data/JsonFormat.h"
+#include <filesystem>
+#include <fstream>
 
 void FloorManager::Initialize() {
+	// 設定ファイルを読み直す(エラーのある設定は使わず、今の設定のまま)
+	std::vector<DataIssue> issues;
+	ReloadConfig(&issues);
+	for (const auto& issue : issues) {
+		OutputDebugStringA(((issue.isError ? "[FloorConfig error] " : "[FloorConfig warn] ") + issue.message + "\n").c_str());
+	}
+
+	maxDepth_ = config_.goalDepth; // 作る木に合わせて固定する
+	currentDepth_ = 0;
 	generator_ = std::make_unique<FloorGenerator>();
-	currentRoom_ = generator_->GenerateFloor(kMaxDepth);
+	currentRoom_ = generator_->GenerateFloor(config_);
+	rootRoom_ = currentRoom_;
 	generator_->LoadRoom(currentRoom_, Direction::North);
+}
+
+bool FloorManager::ReloadConfig(std::vector<DataIssue>* issues) {
+	FloorConfig loaded;
+	if (!FloorConfigSerializer::Load(kFloorConfigPath, loaded)) {
+		if (issues) { issues->push_back({ true, "FloorConfig.json を読めません(前の設定のまま)" }); }
+		return false;
+	}
+
+	bool ok = true;
+	for (auto& issue : FloorConfigSerializer::Validate(loaded)) {
+		if (issue.isError) { ok = false; }
+		if (issues) { issues->push_back(std::move(issue)); }
+	}
+	if (!ok) { return false; }
+
+	config_ = std::move(loaded);
+	return true;
+}
+
+bool FloorManager::SaveFloorPlan(const std::string& path) const {
+	if (!rootRoom_) { return false; }
+
+	const std::filesystem::path p(path);
+	std::error_code ec;
+	if (p.has_parent_path()) { std::filesystem::create_directories(p.parent_path(), ec); }
+
+	std::ofstream file(p);
+	if (!file.is_open()) { return false; }
+	file << DumpJson(RoomPlanSerializer::TreeToJson(*rootRoom_)) << '\n';
+	return file.good();
+}
+
+bool FloorManager::LoadFloorPlan(const std::string& path, std::vector<DataIssue>* issues) {
+	if (!rootRoom_) { return false; }
+
+	std::ifstream file(path);
+	if (!file.is_open()) { return false; } // ファイルがなければ何もしない
+
+	// 読む(読めなければdiscarded)
+	const nlohmann::json j = nlohmann::json::parse(file, nullptr, false);
+	if (j.is_discarded() || !j.is_object()) {
+		if (issues) { issues->push_back({ true, "JSONとして読めません: " + path }); }
+		return false;
+	}
+
+	RoomPlanSerializer::ApplyTree(*rootRoom_, j, issues);
+	return true;
 }
 
 void FloorManager::Update(EnemyManager* enemyManager) {
@@ -63,11 +126,9 @@ std::vector<RoomConnector> FloorManager::GetConnector() {
 void FloorManager::PlanNextRooms(RandomSettings* random) {
 	if (!currentRoom_ || !random) { return; }
 
-	auto& children = currentRoom_->nextRooms;
-	if (children.empty() || children[0].plan.planned) { return; } // 確定済み
-
 	const int childDepth = currentDepth_ + 1;
-	for (auto& child : children) {
-		child.plan = random->PlanRoom(child.type, childDepth);
+	for (auto& child : currentRoom_->nextRooms) {
+		if (child.plan.planned) { continue; } // 抽選済み、またはファイルで指定済み
+		child.plan = random->PlanRoom(child.type, childDepth, config_);
 	}
 }

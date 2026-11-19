@@ -37,7 +37,7 @@ void Result::Update(FloorManager* floor) {
 
 		float left = 227.0f;
 		float width = 1053.0f - left;
-		float endX = left + (float(floor->GetCurrentDepth()) / float(floor->kMaxDepth)) * width;
+		float endX = left + (float(floor->GetCurrentDepth()) / float(floor->GetMaxDepth())) * width;
 
 		float sinWave_ = sinf(10.0f * std::numbers::pi_v<float> * resultTime_ * 0.3f);
 		resultCursor_->SetPosition({ endX * resultArrowMove_, 180 + sinWave_ * 10 });
