@@ -29,7 +29,7 @@ public:
 	bool IsDead() { return isDead_; }
 	bool CanErase() { return canErase_; }
 	Vector2 GetPrePos() { return prePos_; }
-	bool CanHit() { return noHitTimer_.IsFinished(); }
+	bool CanHit() { return !noHitTimer_.IsActive(); }
 
 	void OnHitWall(EffectManager* effectManager, DamageAreaManager* damageAreaManager);
 	void OnHitAnything(EffectManager* effectManager, DamageAreaManager* damageAreaManager);

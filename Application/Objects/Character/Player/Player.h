@@ -3,6 +3,7 @@
 #include "Objects/Character/Character.h"
 #include "Objects/Item/Passive/Passive.h"
 #include "Wallet/Wallet.h"
+#include "Objects/Character/Player/PlayerActionState/PlayerActionState.h"
 
 class Camera;
 class MapCheck;
@@ -28,7 +29,7 @@ public:
 	// 被弾
 	void Hit(float damage, const Vector2& from);
 
-	// 各パッシブアイテム発生イベント
+	// 各パッシブアイテム発動条件のイベント
 	void OnDealDamage(const Vector2& pos);
 	void OnEliminate(const Vector2& enemyPos);
 	void OnHit(const Vector2& from);
@@ -36,9 +37,9 @@ public:
 
 	void Move(MapCheck* mapCheck);
 	void Trigger(BulletManager* bulletManager, Camera* camera);
-	void Boost(MapCheck* mapCheck);
-	void Fall();
 	void Stun(MapCheck* mapCheck);
+	void OnStunEnd() override;
+	void OnFallEnd() override;
 
 	float GetInteractRadius() const { return interactRadius_; }
 	Weapon* GetWeapon() const { return weapon_.get(); }
@@ -56,9 +57,11 @@ public:
 	void SetWeapon(std::unique_ptr<Weapon> weapon);
 	void AddPassive(std::unique_ptr<Passive> passive);
 
-	void Stop() { boostTimer_->Reset(); }
+	void Stop();
 
 private:
+	friend class PlayerDodge;
+
 	// 照準
 	std::unique_ptr<Model> direction_ = nullptr;
 
@@ -79,37 +82,36 @@ private:
 	Vector2 attackDirection_ = {};
 
 	// スタン時間
-	std::unique_ptr<Timer> stunTimer_ = nullptr;
 	float stunTime_ = 0.6f;
 	Vector2 knockbackVel_{};
 
 	bool isFall_ = false;
+	MapCheck* mapCheck_ = nullptr;
 	Vector3 landPos_{};
-	std::unique_ptr<Timer> hitColorTimer_ = nullptr;
+	Timer hitColorTimer_;
 	float invincibleTimeOnHit_ = 1.0f;
 	float invincibleTimeOnDodge_ = 0.25f;
 
 	// モデル
-	std::unique_ptr<Model> model_ = nullptr;
-	std::unique_ptr<Model> shadowModel_ = nullptr;
+	std::unique_ptr<Model> model_;
+	std::unique_ptr<Model> shadowModel_;
 	std::unique_ptr<Model> instancing_[2];
 	Transform instancingTransforms[4]{};
 
 	// ダッシュ
 	bool canBoost_ = false;
 	bool isUsingBoost_ = false;
-	std::unique_ptr<Timer> boostTimer_;
+	std::unique_ptr<PlayerActionState> actionState_;
 	float maxBoostTime_ = 0.25f;
 	float boostSpeed_ = 15.0f;
-	Vector3 boostDir_{};
 	int boostCoolTime_ = 10;
 
 	// 射撃
-	std::unique_ptr<Timer> shootCooldownTimer_;
+	Timer shootCooldownTimer_;
 
 	// 所持武器
-	std::unique_ptr<Weapon> weapon_ = nullptr;
-	std::unique_ptr<Weapon> subWeapon_ = nullptr;
+	std::unique_ptr<Weapon> weapon_;
+	std::unique_ptr<Weapon> subWeapon_;
 
 	// 移動パーティクル
 	std::unique_ptr<ParticleSystem> moveParticle_;

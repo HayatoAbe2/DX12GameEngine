@@ -34,7 +34,7 @@ float Weapon::Trigger(const Vector3& pos, const Vector2& dir, BulletManager* bul
 
 void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulletManager, Character* from, bool isPress) {
 	reloadStartTimer_.Update();
-	if (reloadStartTimer_.IsFinished()) {
+	if (reloadStartTimer_.GetState() == TimerState::Finished) {
 		float deltatime = GameContext::GetInstance().GetDeltatime();
 		float chargeTime = data_.stats.chargeTime * data_.modifiers[int(ModifierStats::coolTime)].multiply;
 		charge_ = (std::min)(data_.stats.maxCharge, charge_ + deltatime / chargeTime);
@@ -46,7 +46,7 @@ void Weapon::Update(const Vector3& pos, const Vector2& dir, BulletManager* bulle
 		auto& timer = data_.traits.burst->timer;
 		timer.Update();
 
-		if (timer.IsFinished() && current > 0 && current < maxCount) {
+		if (timer.GetState() == TimerState::Finished && current > 0 && current < maxCount) {
 			// 方向は一度目のもので固定
 			Fire(pos, data_.traits.burst->dir, bulletManager, from);
 		}

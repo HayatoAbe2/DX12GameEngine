@@ -1,5 +1,11 @@
 #pragma once
 
+enum class TimerState {
+    Idle,       // 開始前
+    Running,    // 計測中
+    Finished    // 終了
+};
+
 /// <summary>
 /// 汎用タイマークラス
 /// </summary>
@@ -12,14 +18,13 @@ public:
     void AddTime(float additionalTime);
 
     // リセット
-    void Reset() { time_ = 0; isActive_ = false; }
+    void Reset() { time_ = 0; state_ = TimerState::Idle; }
 
-    bool IsFinished() const {
-        return !isActive_;
+    TimerState GetState() const {
+        return state_;
     }
-
     bool IsActive() const {
-        return isActive_;
+        return state_ == TimerState::Running;
     }
 
     float GetRemaining() const {
@@ -32,5 +37,5 @@ public:
 private:
     float time_ = 0.0f;
     float startTime_ = 0.0f;
-    bool isActive_ = false;
+    TimerState state_ = TimerState::Idle;
 };

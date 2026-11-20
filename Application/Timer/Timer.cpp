@@ -4,18 +4,18 @@
 void Timer::Start(float duration) {
 	time_ = duration;
     startTime_ = duration;
-	isActive_ = true;
+    state_ = TimerState::Running;
 }
 
 void Timer::Update() {
-    if (!isActive_) return;
+    if (state_ != TimerState::Running) return;
     auto& ctx = GameContext::GetInstance();
 
     time_ -= ctx.GetDeltatime();
 
     if (time_ <= 0.0f) {
         time_ = 0.0f;
-        isActive_ = false;
+        state_ = TimerState::Finished;
     }
 }
 
@@ -26,4 +26,3 @@ void Timer::AddTime(float additionalTime) {
 
     time_ += additionalTime;
 }
-

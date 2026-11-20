@@ -5,7 +5,7 @@
 #include "Objects/Bullet/BulletManager.h"
 #include "Timer/Timer.h"
 #include "GameCommon.h"
-#include "Objects/Character/Enemy/EnemyState/EnemyState.h"
+#include "Objects/Character/Enemy/EnemyActionState/EnemyActionState.h"
 #include "Objects/Character/Character.h"
 
 class MapCheck;
@@ -26,7 +26,8 @@ public:
 
 	// Update内関数
 	void Stun(MapCheck* mapCheck);
-	void Fall();
+	void OnStunEnd() override;
+	void OnFallEnd() override;
 
 	// 描画
 	void Draw();
@@ -42,7 +43,7 @@ public:
 	EnemyStatus GetStatus() const { return status_; }
 
 	void SetAttackDir(Vector2 dir) { attackDir_ = dir; }
-	void SetState(std::unique_ptr<EnemyState> state) { nextState_ = std::move(state); }
+	void SetState(std::unique_ptr<EnemyActionState> state) { nextState_ = std::move(state); }
 	bool IsAttacking() { return isAttacking_; }
 	Weapon* GetCurrentWeapon() { return currentWeapon_; }
 	Timer& GetAttackTimer() { return attackCoolTimer_; }
@@ -78,18 +79,18 @@ private:
 	float searchRadius_ = 8.0f;
 
 	// スタン時間
-	Timer stunTimer_;
 	Timer hitColorTimer_;
 
 	// 落下
 	bool isFall_ = false;
+	MapCheck* mapCheck_ = nullptr;
 
 	// プレイヤーに近づく最小距離
 	float minDistance_ = 10.0f;
 
 	// 行動状態
-	std::unique_ptr<EnemyState> currentState_ = nullptr;
-	std::unique_ptr<EnemyState> nextState_ = nullptr;
+	std::unique_ptr<EnemyActionState> currentState_ = nullptr;
+	std::unique_ptr<EnemyActionState> nextState_ = nullptr;
 
 	// 攻撃中
 	bool isAttacking_ = false;

@@ -42,7 +42,7 @@ void Result::Update(FloorManager* floor) {
 		float sinWave_ = sinf(10.0f * std::numbers::pi_v<float> * resultTime_ * 0.3f);
 		resultCursor_->SetPosition({ endX * resultArrowMove_, 180 + sinWave_ * 10 });
 
-		if (resultTimer_.IsFinished() &&
+		if (resultTimer_.GetState() == TimerState::Finished &&
 			(input.keyboard.IsRelease(DIK_SPACE) || input.gamepad.IsRelease(XINPUT_GAMEPAD_A))) {
 			fade_->StartFadeOut();
 			return;

@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Objects/Character/Player/PlayerActionState/Dodge/PlayerDodge.h"
 #include "Objects/Bullet/BulletManager.h"
 #include "Map/MapCheck.h"
 #include "Objects/Item/ItemManager.h"
@@ -14,6 +15,11 @@
 
 Player::~Player() {
 
+}
+
+void Player::Stop() {
+	actionState_.reset();
+	isUsingBoost_ = false;
 }
 
 void Player::Initialize(ItemManager* itemManager) {
@@ -62,17 +68,11 @@ void Player::Initialize(ItemManager* itemManager) {
 	moveParticle_->SetLifeTime(10);
 	moveParticle_->SetColor({ 0.6f, 0.6f, 0.6f, 1.0f });
 
-	shootCooldownTimer_ = std::make_unique<Timer>();
 	shootCooldownSprite_ = asset.LoadSprite("Resources/Debug/White1x1.png");
 	shootCooldownSprite_->SetPivot({ 0.0f,0.5f });
 	shootCooldownSprite_->SetSize(scSize_);
 	Vector2 windowSize = ctx.GetRenderWindowSize();
 	shootCooldownSprite_->SetPosition({ (windowSize.x - scSize_.x) / 2.0f, windowSize.y / 2.0f - scSize_.y * 2.5f });
-
-	// タイマー類
-	hitColorTimer_ = std::make_unique<Timer>();
-	stunTimer_ = std::make_unique<Timer>();
-	boostTimer_ = std::make_unique<Timer>();
 
 	attackDirection_ = Normalize(Vector2(1, 0));
 	transform_.rotate.y = -std::atan2(attackDirection_.y, attackDirection_.x) + std::numbers::pi_v<float> / 2.0f;
@@ -82,6 +82,7 @@ void Player::Initialize(ItemManager* itemManager) {
 }
 
 void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager) {
+	mapCheck_ = mapCheck;
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
@@ -107,10 +108,10 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 		}
 	}
 
-	if (hitColorTimer_->IsActive()) {
-		hitColorTimer_->Update();
+	if (hitColorTimer_.IsActive()) {
+		hitColorTimer_.Update();
 
-		if (hitColorTimer_->IsFinished()) {
+		if (hitColorTimer_.GetState() == TimerState::Finished) {
 			for (auto& mesh : model_->GetData()->meshes) {
 				auto data = model_->GetMaterial(0)->GetData();
 				data.color = { 1.0f,1.0f,1.0f,1.0f };
@@ -120,12 +121,20 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	}
 
 	if (isFall_) {
-		Fall();
+		auto* activeReaction = reaction_.get();
+		if (activeReaction && activeReaction->Update(this) && reaction_.get() == activeReaction) reaction_.reset();
 	} else {
-		if (isUsingBoost_) {
-			Boost(mapCheck);
+		if (actionState_) {
+			auto* activeState = actionState_.get();
+			if (activeState->Update(this, mapCheck) && actionState_.get() == activeState) actionState_.reset();
 		} else {
 			Move(mapCheck);
+
+			// 行動Stateの処理
+			if (actionState_) {
+				auto* activeState = actionState_.get();
+				if (activeState->Update(this, mapCheck) && actionState_.get() == activeState) actionState_.reset();
+			}
 		}
 
 		for (auto& p : passives_) {
@@ -187,7 +196,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 			weaponTransform_ = transform_;
 			weaponTransform_.translate += {std::sin(transform_.rotate.y), 0.5f, std::cos(transform_.rotate.y)}; // 前方に配置
 
-			if (shootCooldownTimer_->IsFinished()) {
+			if (!shootCooldownTimer_.IsActive()) {
 				// 射撃
 #ifdef USE_IMGUI
 				if (ctx.IsSceneWindowHovered()) {
@@ -203,15 +212,20 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 				}
 
 			} else {
-				shootCooldownTimer_->Update();
+				shootCooldownTimer_.Update();
 			}
 
-			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / shootCooldownTimer_->GetStartTime()), scSize_.y });
-			shootCooldownSprite_->SetSize({ scSize_.x * (1.0f - shootCooldownTimer_->GetRemaining() / shootCooldownTimer_->GetStartTime()), scSize_.y });
+			const float startTime = shootCooldownTimer_.GetStartTime();
+			const float cooldownProgress = startTime > 0.0f
+				? 1.0f - shootCooldownTimer_.GetRemaining() / startTime
+				: 1.0f;
+			shootCooldownSprite_->SetSize({ scSize_.x * cooldownProgress, scSize_.y });
 		}
 
-		if (stunTimer_->IsActive()) {
+		if (reaction_) {
 			Stun(mapCheck);
+			auto* activeReaction = reaction_.get();
+			if (activeReaction && activeReaction->Update(this) && reaction_.get() == activeReaction) reaction_.reset();
 		}
 	}
 
@@ -280,7 +294,7 @@ void Player::Draw(Camera* camera) {
 		render.DrawModel(direction_.get());
 
 		// クールダウン表示
-		if (shootCooldownTimer_->IsActive()) {
+		if (shootCooldownTimer_.IsActive()) {
 			render.DrawSprite(shootCooldownSprite_.get());
 		}
 	}
@@ -304,16 +318,14 @@ void Player::Draw(Camera* camera) {
 }
 
 void Player::Hit(float damage, const Vector2& from) {
-	auto& ctx = GameContext::GetInstance();
-
-	if (invincibleTimer_.IsFinished()) {
+	if (!invincibleTimer_.IsActive()) {
 
 		if (damage > 0) {
 			hp_ -= damage;
 			invincibleTimer_.Start(invincibleTimeOnHit_);
 
 			// 行動不能
-			stunTimer_->Start(stunTime_);
+			Character::Stun(stunTime_);
 
 			// ノックバック
 			knockbackVel_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * 20.0f;
@@ -322,7 +334,7 @@ void Player::Hit(float damage, const Vector2& from) {
 			auto data = model_->GetMaterial(0)->GetData();
 			data.color = { 3.0f,3.0f,3.0f,1.0f };
 			model_->GetMaterial(0)->SetData(data);
-			hitColorTimer_->Start(0.2f);
+			hitColorTimer_.Start(0.2f);
 
 			// 被ダメージ時の位置を記憶
 			landPos_ = transform_.translate;
@@ -403,8 +415,8 @@ void Player::Move(MapCheck* mapCheck) {
 	// ダッシュ入力
 	if ((input.keyboard.IsTrigger(DIK_SPACE) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_X)) && Length(normalized) > 0.1f && boostCoolTime_ < 0) {
 		isUsingBoost_ = true;
-		boostTimer_->Start(maxBoostTime_);
-		boostDir_ = { normalized.x,0,-normalized.y };
+		Vector3 dodgeDirection = { normalized.x,0,-normalized.y };
+		actionState_ = std::make_unique<PlayerDodge>(dodgeDirection, boostSpeed_, maxBoostTime_);
 		// ダッシュ前の位置を記憶
 		landPos_ = transform_.translate;
 
@@ -422,6 +434,7 @@ void Player::Move(MapCheck* mapCheck) {
 		moveParticleEmitTimer_ = 0;
 
 		invincibleTimer_.Start(invincibleTimeOnDodge_);
+		return;
 	}
 
 	// 速度をもとに移動
@@ -463,65 +476,38 @@ void Player::Trigger(BulletManager* bulletManager, Camera* camera) {
 	auto& input = ctx.Input();
 
 	if (weapon_) {
-		shootCooldownTimer_->Start(weapon_->Trigger(weaponTransform_.translate, attackDirection_, bulletManager, this));
+		shootCooldownTimer_.Start(weapon_->Trigger(weaponTransform_.translate, attackDirection_, bulletManager, this));
 	}
 }
 
-void Player::Boost(MapCheck* mapCheck) {
-	auto& ctx = GameContext::GetInstance();
-	auto& audio = ctx.Audio();
-
-	// ダッシュ
-	velocity_ = boostDir_ * boostSpeed_ * ctx.GetDeltatime();
-
-	Vector2 pos = { transform_.translate.x,transform_.translate.z };
-	for (int i = 0; i < 4; ++i) {
-		pos.x += velocity_.x / 4.0f;
-		mapCheck->ResolveCollisionX(pos, radius_, isUsingBoost_);
-		pos.y += velocity_.z / 4.0f;
-		mapCheck->ResolveCollisionY(pos, radius_, isUsingBoost_);
-	}
-	transform_.translate.x = pos.x;
-	transform_.translate.z = pos.y;
-
-	boostTimer_->Update();
-
-	if (boostTimer_->IsFinished()) { // 終了時
-		isUsingBoost_ = false;
-
-		// 落下判定
-		if (mapCheck->IsFall({ transform_.translate.x,transform_.translate.z })) {
-			isFall_ = true;
-			audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
-		}
-	}
-}
-
-void Player::Fall() {
-	// 落下
-	transform_.translate.y -= 1.0f;
+void Player::OnFallEnd() {
 	if (transform_.translate.y < -20.0f) {
 		hp_ -= maxHp_ / 8.0f;
 		invincibleTimer_.Start(invincibleTimeOnHit_);
 
 		// その前にいた位置に戻す
 		transform_.translate = landPos_;
-		isFall_ = false;
-		stunTimer_->Reset();
+	}
+	isFall_ = false;
+}
+
+void Player::OnStunEnd() {
+	if (mapCheck_ && mapCheck_->IsFall({ transform_.translate.x, transform_.translate.z })) {
+		GameContext::GetInstance().Audio().SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
+		isFall_ = true;
+		Character::Fall();
 	}
 }
 
 void Player::Stun(MapCheck* mapCheck) {
 	auto& ctx = GameContext::GetInstance();
-	auto& audio = ctx.Audio();
 
-	if (stunTimer_->IsActive()) {
-		stunTimer_->Update();
+	if (reaction_) {
 
 		// ノックバック
 		model_->SetScale({ 1,1,1 });
 		float length = Length(knockbackVel_) * ctx.GetDeltatime();
-		float x = stunTimer_->GetRemaining() / stunTime_;
+		float x = GetReactionRemaining() / stunTime_;
 		length *= x * x;
 		if (length < 0) { length = 0; }
 		knockbackVel_ = Normalize(knockbackVel_) * length;
@@ -533,10 +519,6 @@ void Player::Stun(MapCheck* mapCheck) {
 			mapCheck->ResolveCollisionX(pos, radius_, true);
 			pos.y += knockbackVel_.y / 3.0f;
 			mapCheck->ResolveCollisionY(pos, radius_, true);
-		}
-
-		if (stunTimer_->IsFinished() && mapCheck->IsFall(pos)) {
-			audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
 		}
 
 		transform_.translate = { pos.x, model_->GetTransform().translate.y, pos.y };

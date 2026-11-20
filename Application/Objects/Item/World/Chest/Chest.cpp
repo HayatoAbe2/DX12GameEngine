@@ -26,7 +26,7 @@ void Chest::Update() {
 		float rate = 1.0f - (appierTimer_.GetRemaining() / kAppierTime);
 		float t = rate * rate;
 		height_ = kSpawnHeight * (1.0f - t);
-		if (appierTimer_.IsFinished()) {
+		if (appierTimer_.GetState() == TimerState::Finished) {
 			phase_ = ChestPhase::PlayingAnimation;
 			height_ = 0;
 		}
@@ -52,7 +52,7 @@ void Chest::Update() {
 			data.color.w = dyingTimer_.GetRemaining() / kDyingTime;
 			mat->SetData(data);
 		}
-		if (dyingTimer_.IsFinished()) {
+		if (dyingTimer_.GetState() == TimerState::Finished) {
 			isDead_ = true;
 		}
 	}

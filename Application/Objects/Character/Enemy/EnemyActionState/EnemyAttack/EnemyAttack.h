@@ -4,9 +4,8 @@
 /// <summary>
 /// 攻撃と待ち時間待機
 /// </summary>
-class EnemyAttack : public EnemyState {
+class EnemyAttack : public EnemyActionState {
 public:
-	EnemyAttack();
 	void Update(Enemy* enemy, Player* player, MapCheck* mapCheck, BulletManager* bulletManager) override;
 
 private:
@@ -15,7 +14,7 @@ private:
 	float EaseIn(float start, float end, float t);
 
 	// 方向転換
-	std::unique_ptr<Timer> rotateTimer_;
+	Timer rotateTimer_;
 	const float minRotateTimer_ = 0.5f;
 	const float maxRotateTimer_ = 0.8f;
 };

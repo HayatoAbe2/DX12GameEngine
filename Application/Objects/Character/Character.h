@@ -3,11 +3,15 @@
 #include "Objects/Weapon/ShooterInfo/ShooterInfo.h"
 #include "Timer/Timer.h"
 #include "HitboxDisplay/HitboxDisplay.h"
+#include "Objects/Character/Reaction/CharacterReaction.h"
+
+class PlayerDodge;
 
 /// <summary>
 /// キャラクター基底
 /// </summary>
 class Character {
+friend class PlayerDodge;
 public:
 	// トランスフォーム
 	virtual Transform GetTransform() { return transform_; }
@@ -45,13 +49,20 @@ public:
 		maxHp_ += addMaxHP;
 		hp_ = (std::min)(hp_, maxHp_);
 	}
+
+	// 動けない状態が戻るときの処理
+	virtual void OnStunEnd() {}
+	virtual void OnFallEnd() {}
+	bool HasReaction() const { return reaction_ != nullptr; }
+	float GetReactionRemaining() const { return reaction_ ? reaction_->GetRemaining() : 0.0f; }
 protected:
+	// 反応状態
+	std::unique_ptr<CharacterReaction> reaction_;
+
 	// 被弾
 	virtual void Hit(float damage, const Vector2& from);
-
 	// 行動不能
-	virtual void Stun();
-
+	virtual void Stun(float time);
 	// 落下
 	virtual void Fall();
 
@@ -62,7 +73,7 @@ protected:
 	// 半径
 	float radius_ = 0.5f;
 
-	// 重さ
+	// 重さ(ぶつかったときの押し出しに関係)
 	float weight_ = 10;
 
 	// チーム
@@ -75,7 +86,7 @@ protected:
 	// 死亡
 	bool isDead_ = false;
 
-	// 飛行する
+	// 飛行(穴に落ちない)
 	bool canFly_ = false;
 
 	// 無敵タイマー
