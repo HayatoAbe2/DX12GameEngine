@@ -13,21 +13,21 @@ void DamageArea::Update() {
 
 	switch (phase_) {
 	case AreaPhase::Warning:
-		if (timer_.IsFinished()) {
+		if (timer_.GetState() == TimerState::Finished) {
 			phase_ = AreaPhase::Active;
 			timer_.Start(param_.duration);
 		}
 		break;
 
 	case AreaPhase::Active:
-		if (timer_.IsFinished()) {
+		if (timer_.GetState() == TimerState::Finished) {
 			phase_ = AreaPhase::Ended;
 			timer_.Start(0);
 		}
 		break;
 
 	case AreaPhase::Ended:
-		if (timer_.IsFinished()) {
+		if (timer_.GetState() == TimerState::Finished) {
 			isDead_ = true;
 		}
 		break;

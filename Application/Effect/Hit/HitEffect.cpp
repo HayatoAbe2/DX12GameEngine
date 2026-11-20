@@ -15,13 +15,12 @@ void HitEffect::Initialize(const Vector3& pos, const Vector4& color) {
 	data.uvTransform.m[3][1] = 0.5f * ctx.RandomInt(0, 1);
 	spark_->GetMaterial(1)->SetData(data);
 
-	timer_ = std::make_unique<Timer>();
-	timer_->Start(duration_);
+	timer_.Start(duration_);
 }
 
 void HitEffect::Update() {
-	if (timer_ && timer_->IsActive()) {
-		float rate = 1.0f - timer_->GetRemaining() / duration_;
+	if (timer_.IsActive()) {
+		float rate = 1.0f - timer_.GetRemaining() / duration_;
 		if (rate < peak_) {
 			float x = rate / peak_;
 			// easeOutExpo
@@ -33,7 +32,7 @@ void HitEffect::Update() {
 		}
 
 		spark_->SetScale({ size_, size_, size_ });
-		timer_->Update();
+		timer_.Update();
 	}
 }
 

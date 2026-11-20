@@ -11,13 +11,12 @@ ExplodeEffect::ExplodeEffect(const Vector3 pos, const Vector4 color, const float
 	data.color = color;
 	dome_->GetMaterial(1)->SetData(data);
 
-	timer_ = std::make_unique<Timer>();
-	timer_->Start(duration_);
+	timer_.Start(duration_);
 }
 
 void ExplodeEffect::Update() {
-	if (timer_ && timer_->IsActive()) {
-		float x = 1.0f - timer_->GetRemaining() / duration_;
+	if (timer_.GetState() == TimerState::Running) {
+		float x = 1.0f - timer_.GetRemaining() / duration_;
 		// easeOutd
 		size_ = Lerp(0.0f, maxSize_, 1.0f - powf(2.0f, -10.0f * x));
 
@@ -32,7 +31,7 @@ void ExplodeEffect::Update() {
 		}
 		dome_->GetMaterial(1)->SetData(data);
 
-		timer_->Update();
+		timer_.Update();
 	}
 }
 

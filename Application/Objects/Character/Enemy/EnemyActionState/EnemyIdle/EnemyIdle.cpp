@@ -1,11 +1,7 @@
 #include "EnemyIdle.h"
 #include "Objects/Character/Player/Player.h"
 #include "Map/MapCheck.h"
-#include "Objects/Character/Enemy/EnemyState/EnemyApproach/EnemyApproach.h"
-
-EnemyIdle::EnemyIdle() {
-	randomTimer_ = std::make_unique<Timer>();
-}
+#include "Objects/Character/Enemy/EnemyActionState/EnemyApproach/EnemyApproach.h"
 
 void EnemyIdle::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
@@ -19,18 +15,22 @@ void EnemyIdle::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, BulletM
 	}
 
 	// プレイヤーを見つけてない
+	if (randomTimer_.GetState() == TimerState::Idle) {
+		randomTimer_.Start(ctx.RandomFloat(minRandomStopTime_, maxRandomStopTime_));
+	}
+
 	if (isMoving_) {
-		randomTimer_->Update();
-		if (randomTimer_->IsFinished()) {
+		randomTimer_.Update();
+		if (randomTimer_.GetState() == TimerState::Finished) {
 			isMoving_ = false;
-			randomTimer_->Start(ctx.RandomFloat(minRandomStopTime_, maxRandomStopTime_));
+			randomTimer_.Start(ctx.RandomFloat(minRandomStopTime_, maxRandomStopTime_));
 			velocity_ = {};
 		}
 	} else {
-		randomTimer_->Update();
-		if (randomTimer_->IsFinished()) {
+		randomTimer_.Update();
+		if (randomTimer_.GetState() == TimerState::Finished) {
 			isMoving_ = true;
-			randomTimer_->Start(ctx.RandomFloat(minRandomMoveTime_, maxRandomMoveTime_));
+			randomTimer_.Start(ctx.RandomFloat(minRandomMoveTime_, maxRandomMoveTime_));
 
 			Vector2 direction = Normalize(Vector2{ ctx.RandomFloat(-1,1), ctx.RandomFloat(-1,1) });
 			velocity_.x = direction.x * enemy->GetStatus().moveSpeed / 3.0f;

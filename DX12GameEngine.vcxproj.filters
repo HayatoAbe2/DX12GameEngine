@@ -226,9 +226,9 @@
     <ClCompile Include="Engine\Asset\Manager\AnimationManager\AnimationManager.cpp" />
     <ClCompile Include="Application\Timer\Timer.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.cpp" />
-    <ClCompile Include="Application\Objects\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.cpp" />
+    <ClCompile Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyApproach\EnemyApproach.cpp" />
+    <ClCompile Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyAttack\EnemyAttack.cpp" />
+    <ClCompile Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyIdle\EnemyIdle.cpp" />
     <ClCompile Include="Application\UI\Equipment\EquipmentUI.cpp" />
     <ClCompile Include="Resources\Shaders\Outline\Outline.PS.hlsl" />
     <ClCompile Include="Editor\SceneEditor\SceneEditor.cpp" />
@@ -279,6 +279,9 @@
     <ClCompile Include="Application\Data\EnemySerializer.cpp" />
     <ClCompile Include="Application\Data\WeaponSerializer.cpp" />
     <ClCompile Include="Application\UI\DrawNumbers\DrawNumbers.cpp" />
+    <ClCompile Include="Application\Objects\Character\Reaction\Fall\CharacterFall.cpp" />
+    <ClCompile Include="Application\Objects\Character\Reaction\Stun\CharacterStun.cpp" />
+    <ClCompile Include="Application\Objects\Character\Player\PlayerActionState\Dodge\PlayerDodge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -558,10 +561,10 @@
     <ClInclude Include="Externals\nlohmann\json.hpp" />
     <ClInclude Include="Engine\SceneObject\Model\Skeleton.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Circle.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyApproach\EnemyApproach.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyAttack\EnemyAttack.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyIdle\EnemyIdle.h" />
-    <ClInclude Include="Application\Objects\Character\Enemy\EnemyState\EnemyState.h" />
+    <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyApproach\EnemyApproach.h" />
+    <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyAttack\EnemyAttack.h" />
+    <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyIdle\EnemyIdle.h" />
+    <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyActionState.h" />
     <ClInclude Include="Application\UI\Equipment\EquipmentUI.h" />
     <ClInclude Include="Application\Objects\Weapon\Trait\BulletTrait.h" />
     <ClInclude Include="Application\Objects\Weapon\ShooterInfo\ShooterInfo.h" />
@@ -630,6 +633,10 @@
     <ClInclude Include="Application\Data\WeaponSerializer.h" />
     <ClInclude Include="Editor\NameReferences.h" />
     <ClInclude Include="Application\UI\DrawNumbers\DrawNumbers.h" />
+    <ClInclude Include="Application\Objects\Character\Reaction\CharacterReaction.h" />
+    <ClInclude Include="Application\Objects\Character\Reaction\Fall\CharacterFall.h" />
+    <ClInclude Include="Application\Objects\Character\Reaction\Stun\CharacterStun.h" />
+    <ClInclude Include="Application\Objects\Character\Player\PlayerActionState\Dodge\PlayerDodge.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

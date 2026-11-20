@@ -1,10 +1,6 @@
 #include "EnemyAttack.h"
 #include "Objects/Character/Player/Player.h"
 
-EnemyAttack::EnemyAttack() {
-	rotateTimer_ = std::make_unique<Timer>();
-}
-
 void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
 	Transform transform = enemy->GetTransform();
@@ -33,9 +29,9 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 		transform.rotate = { 0,-std::atan2(attackDirection.y, attackDirection.x) + std::numbers::pi_v<float> / 2.0f,0 };
 		enemy->SetAttackDir(attackDirection);
 
-		if (rotateTimer_->IsFinished()) {
+		if (rotateTimer_.GetState() != TimerState::Running) {
 			// 方向転換の間隔
-			rotateTimer_->Start(ctx.RandomFloat(minRotateTimer_, maxRotateTimer_));
+			rotateTimer_.Start(ctx.RandomFloat(minRotateTimer_, maxRotateTimer_));
 
 			// 移動
 			Vector2 direction = Normalize(Vector2{ ctx.RandomFloat(-1,1), ctx.RandomFloat(-1,1) });
@@ -44,11 +40,11 @@ void EnemyAttack::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bulle
 			velocity_.z = direction.y * status.moveSpeed;
 		}
 
-		rotateTimer_->Update();
+		rotateTimer_.Update();
 	}
 
 	// 攻撃タイマー
-	if (attackTimer.IsFinished() || enemy->IsAttacking()) {
+	if (attackTimer.GetState() == TimerState::Finished || enemy->IsAttacking()) {
 		enemy->Attack(bulletManager);
 	} else {
 		attackTimer.Update();

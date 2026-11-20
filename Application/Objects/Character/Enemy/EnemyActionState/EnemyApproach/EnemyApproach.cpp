@@ -1,17 +1,13 @@
 #include "EnemyApproach.h"
-#include "Objects/Character/Enemy/EnemyState/EnemyAttack/EnemyAttack.h"
+#include "Objects/Character/Enemy/EnemyActionState/EnemyAttack/EnemyAttack.h"
 #include "Objects/Character/Player/Player.h"
-
-EnemyApproach::EnemyApproach() {
-	rotateTimer_ = std::make_unique<Timer>();
-}
 
 void EnemyApproach::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, BulletManager* bulletManager) {
 	auto& ctx = GameContext::GetInstance();
 
-	if (rotateTimer_->IsFinished()) {
+	if (rotateTimer_.GetState() != TimerState::Running) {
 		// 方向転換の間隔
-		rotateTimer_->Start(ctx.RandomFloat(minRotateTimer_, maxRotateTimer_));
+		rotateTimer_.Start(ctx.RandomFloat(minRotateTimer_, maxRotateTimer_));
 
 		float length = Length(player->GetTransform().translate - enemy->GetTransform().translate);
 
@@ -42,5 +38,5 @@ void EnemyApproach::Update(Enemy* enemy, Player* player, MapCheck* mapCheck, Bul
 		}
 	}
 
-	rotateTimer_->Update();
+	rotateTimer_.Update();
 }

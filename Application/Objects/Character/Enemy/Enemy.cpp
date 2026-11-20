@@ -3,15 +3,15 @@
 #include "EnemyStatus.h"
 #include "Objects/Character/Player/Player.h"
 
-#include "Objects/Character/Enemy/EnemyState/EnemyApproach/EnemyApproach.h"
-#include "Objects/Character/Enemy/EnemyState/EnemyAttack/EnemyAttack.h"
-#include "Objects/Character/Enemy/EnemyState/EnemyIdle/EnemyIdle.h"
+#include "Objects/Character/Enemy/EnemyActionState/EnemyApproach/EnemyApproach.h"
+#include "Objects/Character/Enemy/EnemyActionState/EnemyAttack/EnemyAttack.h"
+#include "Objects/Character/Enemy/EnemyActionState/EnemyIdle/EnemyIdle.h"
 
 #include <numbers>
 #include <cmath>
 
 Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) {
- 	status_ = status;
+	status_ = status;
 	maxHp_ = status_.hp;
 	hp_ = status_.hp;
 	radius_ = status_.radius;
@@ -46,12 +46,14 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 }
 
 void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager) {
+	mapCheck_ = mapCheck;
 	// 出現完了までは動かない
-	if (appierTimer_.IsActive()) {
+	if (appierTimer_.GetState() == TimerState::Running) {
 		appierTimer_.Update();
 
-		if (appierTimer_.IsFinished()) {
+		if (appierTimer_.GetState() == TimerState::Finished) {
 			transform_.translate.y = 0;
+			appierTimer_.Reset();
 		} else {
 			return;
 		}
@@ -59,9 +61,9 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 
 	prePos_ = transform_.translate;
 
-	if (hitColorTimer_.IsActive()) {
+	if (hitColorTimer_.GetState() == TimerState::Running) {
 		hitColorTimer_.Update();
-		if (hitColorTimer_.IsFinished()) {
+		if (hitColorTimer_.GetState() == TimerState::Finished) {
 
 			// 色を元に戻す
 			auto mat = model_->GetMaterials();
@@ -69,18 +71,22 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 			for (int i = 0; i < mat.size(); ++i) {
 				mat[i]->SetData(defaultMat[i]->GetData());
 			}
+			hitColorTimer_.Reset();
 		}
 	}
 	slowTimer_.Update();
 
 	// 落下
 	if (isFall_) {
-		Fall();
+		auto* activeReaction = reaction_.get();
+		if (activeReaction && activeReaction->Update(this) && reaction_.get() == activeReaction) reaction_.reset();
 		return;
 	}
 
-	if (stunTimer_.IsActive()) {
+	if (reaction_) {
 		Stun(mapCheck);
+		auto* activeReaction = reaction_.get();
+		if (activeReaction && activeReaction->Update(this) && reaction_.get() == activeReaction) reaction_.reset();
 		return;
 	}
 
@@ -91,10 +97,10 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	velocity_ = currentState_->GetVelocity() * ctx.GetDeltatime();
 	if (nextState_) {
 		currentState_ = std::move(nextState_);
-	nextState_ = nullptr; 
+		nextState_ = nullptr;
 	}
 
-	if (slowTimer_.IsActive()) {
+	if (slowTimer_.GetState() == TimerState::Running) {
 		velocity_ *= 0.4f;
 	}
 
@@ -115,7 +121,7 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 
 void Enemy::Attack(BulletManager* bulletManager) {
 	// 武器なし/クールタイム中
-	if (!currentWeapon_ || attackCoolTimer_.IsActive()) {
+	if (!currentWeapon_ || attackCoolTimer_.GetState() == TimerState::Running) {
 		return;
 	}
 
@@ -125,11 +131,6 @@ void Enemy::Attack(BulletManager* bulletManager) {
 }
 
 void Enemy::Stun(MapCheck* mapCheck) {
-	auto& ctx = GameContext::GetInstance();
-	auto& audio = ctx.Audio();
-
-	stunTimer_.Update();
-
 	// ノックバック
 	model_->SetScale({ 1,1,1 });
 	float length = Length(knockbackVelocity_);
@@ -146,19 +147,20 @@ void Enemy::Stun(MapCheck* mapCheck) {
 		mapCheck->ResolveCollisionY(pos, status_.radius, true);
 	}
 
-	if (!stunTimer_.IsActive() && !status_.canFly) {
-		isFall_ = mapCheck->IsFall(pos);
-		if (isFall_) { audio.SoundPlay(L"Resources/Sounds/SE/fall.mp3", false); }
-	}
 	transform_.translate = { pos.x,model_->GetTransform().translate.y,pos.y };
 }
 
-void Enemy::Fall() {
-	// 落下
-	transform_.translate -= Vector3{ 0,0.7f,0 };
-	if (transform_.translate.y < -10.0f) {
-		isDead_ = true;
+void Enemy::OnStunEnd() {
+	if (!status_.canFly && mapCheck_ && mapCheck_->IsFall({ transform_.translate.x, transform_.translate.z })) {
+		GameContext::GetInstance().Audio().SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
+		isFall_ = true;
+		Character::Fall();
 	}
+}
+
+void Enemy::OnFallEnd() {
+	if (transform_.translate.y < -10.0f) isDead_ = true;
+	isFall_ = false;
 }
 
 void Enemy::Draw() {
@@ -176,7 +178,7 @@ void Enemy::Draw() {
 		render.DrawModel(shadowModel_.get());
 	}
 
-	if (appierTimer_.IsActive()) {
+	if (appierTimer_.GetState() == TimerState::Running) {
 		float r = appierTimer_.GetRemaining() / kAppierTime;
 		Vector3 t = model_->GetTransform().translate;
 		t.y = -r * r * r * 1.5f;
@@ -196,7 +198,7 @@ void Enemy::Hit(float damage, const Vector2& from, const float knockback) {
 
 	if (status_.stunResist < 10) {
 		// 行動不能
-		stunTimer_.Start(float(10 - status_.stunResist) / 60);
+		Character::Stun(float(10 - status_.stunResist) / 60);
 
 		// ノックバック
 		knockbackVelocity_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * knockback;

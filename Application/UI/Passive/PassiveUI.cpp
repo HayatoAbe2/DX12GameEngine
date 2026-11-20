@@ -18,7 +18,7 @@ void PassiveUI::Draw() {
 
 		// 他の入力をしたら非表示
 		if ((input.gamepad.IsAnyTrigger() || Length(input.gamepad.GetLeftStick()) >= kStickDeadzone) &&
-			padSelectTimer_.IsFinished()) {
+			padSelectTimer_.GetState() == TimerState::Finished) {
 			isSelectShow_ = false;
 		}
 
