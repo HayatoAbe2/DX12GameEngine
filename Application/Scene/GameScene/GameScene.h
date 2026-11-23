@@ -19,6 +19,7 @@
 #include "Editor/SpawnRateEditor/SpawnRateEditor.h"
 #include <Editor/EnemyEditor/EnemyEditor.h>
 #include <Editor/WeaponEditor/WeaponEditor.h>
+#include "Editor/FloorEditor/FloorEditor.h"
 
 // ゲームシーン
 class GameScene final : public BaseScene {
@@ -40,6 +41,11 @@ public:
 
 	// 次の部屋に移動
 	void MoveToNextRoom(Direction direction);
+
+	// フロアを作る(設定を読み直し、最初の部屋と、その次の部屋の内容まで用意する)
+	void SetupFloor();
+	// 今の進行を捨てて、フロアを作り直す(フロアエディタから)
+	void RegenerateFloor();
 
 private:
 	void LoadSound();
@@ -114,4 +120,8 @@ private:
 	std::unique_ptr<SpawnRateEditor> spawnEditor_ = nullptr;
 	std::unique_ptr<EnemyEditor> enemyEditor_ = nullptr;
 	std::unique_ptr<WeaponEditor> weaponEditor_ = nullptr;
+	std::unique_ptr<FloorEditor> floorEditor_ = nullptr;
+
+	// フロアエディタからの作り直し要求(描画の途中で生成しないよう、次の更新で行う)
+	bool regenerateFloorRequested_ = false;
 };

@@ -165,7 +165,10 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Data\EnemySerializer.cpp" />
+    <ClCompile Include="Application\Data\FloorConfigSerializer.cpp" />
+    <ClCompile Include="Application\Data\RoomPlanSerializer.cpp" />
     <ClCompile Include="Application\Data\WeaponSerializer.cpp" />
+    <ClCompile Include="Application\Map\FloorConfig.cpp" />
     <ClCompile Include="Application\Objects\Character\Character.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyApproach\EnemyApproach.cpp" />
     <ClCompile Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyAttack\EnemyAttack.cpp" />
@@ -180,6 +183,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Application\UI\DrawNumbers\DrawNumbers.cpp" />
     <ClCompile Include="Application\Objects\Character\Reaction\Stun\CharacterStun.cpp" />
     <ClCompile Include="Editor\EnemyEditor\EnemyEditor.cpp" />
+    <ClCompile Include="Editor\FloorEditor\FloorEditor.cpp" />
     <ClCompile Include="Editor\WeaponEditor\WeaponEditor.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
@@ -471,8 +475,11 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Controller.h" />
     <ClInclude Include="Application\Data\DataIssue.h" />
     <ClInclude Include="Application\Data\EnemySerializer.h" />
+    <ClInclude Include="Application\Data\FloorConfigSerializer.h" />
     <ClInclude Include="Application\Data\JsonFormat.h" />
+    <ClInclude Include="Application\Data\RoomPlanSerializer.h" />
     <ClInclude Include="Application\Data\WeaponSerializer.h" />
+    <ClInclude Include="Application\Map\FloorConfig.h" />
     <ClInclude Include="Application\Map\FloorSetting.h" />
     <ClInclude Include="Application\Objects\Character\Character.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyData.h" />
@@ -499,6 +506,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Editor\EditorFile.h" />
     <ClInclude Include="Editor\EditorUtil.h" />
     <ClInclude Include="Editor\EnemyEditor\EnemyEditor.h" />
+    <ClInclude Include="Editor\FloorEditor\FloorEditor.h" />
     <ClInclude Include="Editor\NameReferences.h" />
     <ClInclude Include="Editor\WeaponEditor\WeaponEditor.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />

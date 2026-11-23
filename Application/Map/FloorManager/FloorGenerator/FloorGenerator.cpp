@@ -1,54 +1,27 @@
 #include "FloorGenerator.h"
-#include "Map/FloorSetting.h" 
 
-Room* FloorGenerator::GenerateFloor(int maxDepth) {
+Room* FloorGenerator::GenerateFloor(const FloorConfig& config) {
 	// 最初の部屋
 	Room first;
 	first.type = RoomType::Start;
 	first.startDirection = Direction::South;
 
-	// 続く部屋
-	GenerateRooms(first, 1, maxDepth);
-
 	floor_ = first;
 	return &floor_;
 }
 
-void FloorGenerator::GenerateRooms(Room& room, int depth, int maxDepth) {
-	if (depth > maxDepth) {
+void FloorGenerator::EnsureNextRooms(Room& room, int depth, const FloorConfig& config) {
+	const int nextDepth = depth + 1;
+	if (nextDepth > config.goalDepth) {
 		return;
 	}
 
-	for (int i = 0; i < 3; ++i) { // 3部屋接続
+	auto& ctx = GameContext::GetInstance();
+	while (room.nextRooms.size() < 3) { // 3部屋接続
 		Room next;
 
-		if (depth >= maxDepth) {
-			// 最後はゴール部屋
-			next.type = RoomType::Goal;
-		} else if (depth == kStartFloorNumber) {
-			next.type = RoomType::Start;
-		} else if (depth == kStartFloorNumber + 1) {
-			next.type = RoomType::Combat;
-		} else if (depth == kRestFloorNumber) {
-			next.type = RoomType::Shop;
-		} else if (depth == kGoalFloorNumber - 1) {
-			next.type = RoomType::Boss;
-		} else {
-			auto& ctx = GameContext::GetInstance();
-			const int r = ctx.RandomInt(0, 100);
-			if (r < 90) {
-				if (ctx.RandomInt(0, 100) < 10) {
-					next.type = RoomType::Elite;
-				} else {
-					next.type = RoomType::Combat;
-				}
-			} else {
-				next.type = RoomType::Shop;
-			}
-		}
-
-		// 再帰させて追加
-		GenerateRooms(next, depth + 1, maxDepth);
+		// 部屋タイプ設定
+		next.type = config.RoomTypeAt(nextDepth, room.type, ctx.RandomFloat(0.0f, 1.0f));
 		room.nextRooms.push_back(std::move(next));
 	}
 }

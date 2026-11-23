@@ -282,6 +282,10 @@
     <ClCompile Include="Application\Objects\Character\Reaction\Fall\CharacterFall.cpp" />
     <ClCompile Include="Application\Objects\Character\Reaction\Stun\CharacterStun.cpp" />
     <ClCompile Include="Application\Objects\Character\Player\PlayerActionState\Dodge\PlayerDodge.cpp" />
+    <ClCompile Include="Application\Data\FloorConfigSerializer.cpp" />
+    <ClCompile Include="Application\Data\RoomPlanSerializer.cpp" />
+    <ClCompile Include="Editor\FloorEditor\FloorEditor.cpp" />
+    <ClCompile Include="Application\Map\FloorConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
@@ -637,6 +641,10 @@
     <ClInclude Include="Application\Objects\Character\Reaction\Fall\CharacterFall.h" />
     <ClInclude Include="Application\Objects\Character\Reaction\Stun\CharacterStun.h" />
     <ClInclude Include="Application\Objects\Character\Player\PlayerActionState\Dodge\PlayerDodge.h" />
+    <ClInclude Include="Application\Map\FloorConfig.h" />
+    <ClInclude Include="Application\Data\RoomPlanSerializer.h" />
+    <ClInclude Include="Editor\FloorEditor\FloorEditor.h" />
+    <ClInclude Include="Application\Data\FloorConfigSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

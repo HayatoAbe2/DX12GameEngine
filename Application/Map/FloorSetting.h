@@ -1,7 +1,7 @@
 #pragma once
 
-constexpr int kStartFloorNumber = 0;
-constexpr int kGoalFloorNumber = 10;
-constexpr int kEarlyFloorNumber = 3;
-constexpr int kRestFloorNumber = 5;
-constexpr int kBossFloorNumber = 9;
+constexpr int kEarlyFloorNumber = 3; // 序盤扱いの部屋
+
+constexpr bool kSaveFloorPlan = false; // true: 予定が決まるたびにファイルへ書く
+constexpr bool kLoadFloorPlan = false; // true: フロア生成後にファイルの予定を読む
+constexpr const char* kFloorPlanPath = "Resources/Data/Floor/FloorPlan.json";
