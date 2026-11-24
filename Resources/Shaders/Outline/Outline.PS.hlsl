@@ -8,6 +8,8 @@ struct Material
 Texture2D<float32_t4> gTexture : register(t0);
 // Depthを読む
 Texture2D<float32_t> gDepthTexture : register(t1);
+// マスク(OutlineMaskパスで描画、映っている部分が1)
+Texture2D<float32_t4> gMaskTexture : register(t2);
 
 SamplerState gSamplerLinear : register(s0);
 SamplerState gSamplerPoint : register(s1);
@@ -50,12 +52,15 @@ PixelShaderOutput main(VertexShaderOutput input)
 	
     // 畳み込み
 	float32_t2 difference = float32_t2(0.0f, 0.0f);
+	// マスク対象があるか(1ピクセル分広げたマスク)
+	float32_t mask = 0.0f;
     
 	for (int32_t x = 0; x < 3; ++x)
 	{
 		for (int32_t y = 0; y < 3; ++y)
 		{
 			float32_t2 texcoord = input.texcoord + kIndex3x3[x][y] * uvStepSize;
+			mask = max(mask, gMaskTexture.Sample(gSamplerPoint, texcoord).r);
 			float32_t ndcDepth = gDepthTexture.Sample(gSamplerPoint, texcoord);
 			// depth->ViewZ
 			float32_t4 viewSpace = mul(float32_t4(0.0f, 0.0f, ndcDepth, 1.0f), gMaterial.projectionInverse);
@@ -68,6 +73,8 @@ PixelShaderOutput main(VertexShaderOutput input)
 	
 	float32_t weight = length(difference);
 	weight = saturate(weight);
+	// OutlineMaskパスならマスク対象だけかける
+	weight *= mask;
 
 	PixelShaderOutput output;
 	output.color.rgb = (1.0f - weight) * gTexture.Sample(gSamplerLinear, input.texcoord).rgb;

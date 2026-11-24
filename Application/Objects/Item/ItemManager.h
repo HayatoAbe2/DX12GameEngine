@@ -20,6 +20,7 @@ public:
 	void Initialize(WeaponManager* weaponManager, EnemyManager* enemyManager, BulletManager* bulletManager);
 	void Update(Player* player, RoomState roomState);
 	void Draw();
+	void DrawOutline();
 
 	// 近くのアイテムにインタラクト
 	void Interact(Player* player);

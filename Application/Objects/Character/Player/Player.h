@@ -25,6 +25,8 @@ public:
 	void Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager);
 	// 描画
 	void Draw(Camera* camera);
+	// アウトライン用マスクの描画(OutlineMaskパス中に、Drawの後で呼ぶ)
+	void DrawOutline();
 
 	// 被弾
 	void Hit(float damage, const Vector2& from);
@@ -133,6 +135,7 @@ private:
 
 	ItemManager* itemManager_ = nullptr;
 
+	// アニメーション
 	std::shared_ptr<Animation> walk_;
 	std::shared_ptr<Animation> sneak_;
 

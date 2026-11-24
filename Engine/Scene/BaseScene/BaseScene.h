@@ -24,6 +24,10 @@ public:
 	/// 描画処理
 	/// </summary>
 	virtual void Draw();
+	/// <summary>
+	/// アウトライン描画(モデルのみ)
+	/// </summary>
+	virtual void DrawOutline();
 
 	// 登録オブジェクト取得
 	std::vector<SceneObject*> GetObjects() {

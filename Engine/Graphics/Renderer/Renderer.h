@@ -99,6 +99,7 @@ public:
 	// ImGuiシーンのサイズ
 	Vector2 GetSceneWindowSize() { return dxContext_->GetSceneWindowSize(); }
 
+	// レンダーパス切り替え
 	void BeginPass(RenderPass pass, bool clear) { dxContext_->BeginPass(pass, clear); }
 
 #ifdef USE_IMGUI
@@ -114,7 +115,14 @@ private:
 	void InitializeCircle();
 	void InitializeSkybox();
 
+	// Scene以外のパス(OutlineMaskなど)ではモデル以外を描画しないための確認
+	bool IsScenePass() { return dxContext_->GetCurrentPass() == RenderPass::Scene; }
+
 	DirectXContext* dxContext_ = nullptr;
+
+	// OutlineMaskパスでモデルを描画するときのシェーダー
+	ShaderHandle outlineMaskShader_;			// DrawModel用
+	ShaderHandle outlineMaskInstanceShader_;	// DrawModelInstance用
 
 	// ConstantBuffer管理
 	ConstantBufferManager* cbManager_ = nullptr;

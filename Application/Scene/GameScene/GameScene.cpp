@@ -266,6 +266,16 @@ void GameScene::Draw() {
 	itemManager_->Draw();
 	effectManager_->Draw(camera_.get());
 
+	// アウトライン(隠れた部分に描かないように他の描画後)
+	if (phase_ != Phase::RESULT) {
+		render.BeginPass(RenderPass::OutlineMask);
+		player_->DrawOutline();
+		enemyManager_->DrawOutline();
+		itemManager_->DrawOutline();
+		BaseScene::DrawOutline();
+		render.BeginPass(RenderPass::Scene);
+	}
+
 	// ui
 	if (!enableEditMode_) {
 		uiDrawer_->Draw();

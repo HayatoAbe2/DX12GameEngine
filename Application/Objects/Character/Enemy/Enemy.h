@@ -31,6 +31,8 @@ public:
 
 	// 描画
 	void Draw();
+	// アウトライン用マスクの描画(OutlineMaskパス中に、Drawの後で呼ぶ)
+	void DrawOutline();
 
 	// 被ダメージ時
 	void Hit(float damage, const Vector2& from, const float knockback);

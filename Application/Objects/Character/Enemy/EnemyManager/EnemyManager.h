@@ -25,6 +25,8 @@ public:
 
 	void Update(MapCheck* mapCheck, Player* player, BulletManager* bulletManager, ItemManager* itemManager);
 	void Draw();
+	// アウトライン用マスクの描画(OutlineMaskパス中に、Drawの後で呼ぶ)
+	void DrawOutline();
 
 	// 敵スポーン
 	void Spawn(std::vector<std::unique_ptr<Enemy>> enemy);

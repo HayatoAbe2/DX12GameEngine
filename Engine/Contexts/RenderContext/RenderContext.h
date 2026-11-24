@@ -41,8 +41,8 @@ public:
 	void SetCamera(Camera* camera) { renderer_->SetCamera(camera); }
 	Camera* GetCamera() { return renderer_->GetCamera(); }
 
-	// レンダーパス変更
-	void BeginPass(RenderPass pass, bool clear = true) { renderer_->BeginPass(pass, clear); }
+	// レンダーパス変更(clearがtrueなら切り替え先をクリア)
+	void BeginPass(RenderPass pass, bool clear = false) { renderer_->BeginPass(pass, clear); }
 private:
 	Renderer* renderer_ = nullptr;
 	LightManager* lightManager_ = nullptr;

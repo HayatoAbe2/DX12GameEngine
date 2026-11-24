@@ -163,6 +163,13 @@ void Enemy::OnFallEnd() {
 	isFall_ = false;
 }
 
+void Enemy::DrawOutline() {
+	auto& render = GameContext::GetInstance().Render();
+
+	// Drawで設定したトランスフォーム(出現演出を含む)のまま、本体だけ描画
+	render.DrawModel(model_.get());
+}
+
 void Enemy::Draw() {
 	auto& ctx = GameContext::GetInstance();
 	auto& render = ctx.Render();

@@ -14,14 +14,14 @@ class Logger;
 class ShaderCompiler;
 
 /// <summary>
-/// 登録したシェーダーのハンドル
+/// 登録したシェーダーを指すハンドル
 /// </summary>
 struct ShaderHandle {
 	static constexpr uint32_t kInvalidIndex = 0xFFFFFFFF;
 
 	uint32_t index = kInvalidIndex;
 
-	// 登録済みのシェーダーを指しているか
+	// 登録済みのシェーダーを指しているか(既定値は無効。無効なら標準のシェーダーで描画される)
 	bool IsValid() const { return index != kInvalidIndex; }
 };
 
@@ -32,7 +32,8 @@ struct ShaderDesc {
 	std::wstring vs;	// 頂点シェーダーのhlslファイルパス
 	std::wstring ps;	// ピクセルシェーダーのhlslファイルパス
 
-	// モデル用のPSOとRootSignatureの種類
+	// PSOの設定(Cull,Depth,InputLayout)とRootSignatureを流用するモデル用の種類
+	// Standard:DrawModel用、Instancing:DrawInstancedModel用
 	MainPSOType base = MainPSOType::Standard;
 };
 
@@ -80,6 +81,10 @@ private:
 
 	std::vector<ShaderData> shaders_;
 	std::unordered_map<std::string, uint32_t> nameToIndex_;
+
+	//
+	// 参照
+	//
 
 	// ログ出力
 	Logger* logger_ = nullptr;

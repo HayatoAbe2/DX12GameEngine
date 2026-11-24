@@ -47,10 +47,11 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	renderTextureResource_[0] = CreateRenderTextureResource();
 	renderTextureResource_[1] = CreatePostEffectResource();
 	sceneViewResource_ = CreateSceneViewResource();
+	outlineMaskResource_ = CreateOutlineMaskResource();
 
 	// RTV作成
 	renderTargetManager_ = std::make_unique<RenderTargetManager>();
-	renderTargetManager_->Initialize(swapChain_.Get(), deviceManager_->GetDevice().Get(), descriptorHeapManager_.get(), renderTextureResource_, sceneViewResource_);
+	renderTargetManager_->Initialize(swapChain_.Get(), deviceManager_->GetDevice().Get(), descriptorHeapManager_.get(), renderTextureResource_, sceneViewResource_, outlineMaskResource_);
 
 	// SRVマネージャー
 	descriptorManager_ = std::make_unique<SRVManager>();
@@ -67,6 +68,10 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	sceneViewSRVIndex_ = descriptorManager_->Allocate();
 	descriptorManager_->CreateRenderTextureSRV(sceneViewSRVIndex_, sceneViewResource_);
 	descriptorManager_->GetGPUHandle(sceneViewSRVIndex_);
+
+	// アウトライン用マスクのリソース
+	outlineMaskSRVIndex_ = descriptorManager_->Allocate();
+	descriptorManager_->CreateRenderTextureSRV(outlineMaskSRVIndex_, outlineMaskResource_);
 
 	renderTargetManager_->GetRenderTextureRTVHandle();
 	sceneViewRTVHandle_ = renderTargetManager_->GetSceneViewRTVHandle();
@@ -220,6 +225,7 @@ void DirectXContext::BeginFrame() {
 		for (auto& resource : renderTextureResource_) {
 			resource.Reset();
 		}
+		outlineMaskResource_.Reset();
 		depthStencilResource_.Reset();
 		swapChain_->ResizeBuffers(2, UINT(windowRect_.right), UINT(windowRect_.bottom), DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
@@ -229,12 +235,14 @@ void DirectXContext::BeginFrame() {
 		renderTextureState_[0] = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		renderTextureState_[1] = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 		sceneViewResource_ = CreateSceneViewResource();
+		outlineMaskResource_ = CreateOutlineMaskResource();
+		outlineMaskState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
 		// DepthSRV再作成
 		depthStencilResource_ = CreateDepthStencilTextureResource(deviceManager_->GetDevice());
 
 		// RTV再生成
-		renderTargetManager_->Resize(swapChain_.Get(), deviceManager_->GetDevice().Get(), renderTextureResource_, sceneViewResource_);
+		renderTargetManager_->Resize(swapChain_.Get(), deviceManager_->GetDevice().Get(), renderTextureResource_, sceneViewResource_, outlineMaskResource_);
 
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // Format。基本的にはResourceに合わせる
@@ -246,6 +254,7 @@ void DirectXContext::BeginFrame() {
 			descriptorManager_->CreateRenderTextureSRV(renderTextureSRVIndex_[i], renderTextureResource_[i]);
 		}
 		descriptorManager_->CreateRenderTextureSRV(sceneViewSRVIndex_, sceneViewResource_);
+		descriptorManager_->CreateRenderTextureSRV(outlineMaskSRVIndex_, outlineMaskResource_);
 		descriptorManager_->CreateDepthSRV(depthTextureSRVIndex_, depthStencilResource_);
 	}
 
@@ -265,6 +274,14 @@ void DirectXContext::BeginFrame() {
 
 	// 指定した深度で画面全体をクリアする
 	cmdList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	// アウトライン用マスクを何も映っていない状態(0)にクリア
+	Transition(cmdList.Get(), outlineMaskResource_.Get(), outlineMaskState_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	float maskClearColor[] = { 0.0f,0.0f,0.0f,0.0f };
+	cmdList->ClearRenderTargetView(renderTargetManager_->GetOutlineMaskRTVHandle(), maskClearColor, 0, nullptr);
+
+	// フレーム開始時はScene
+	currentPass_ = RenderPass::Scene;
 	// 描画用のDescriptorHeapの設定
 	ID3D12DescriptorHeap* descriptorHeapsRaw[] = { descriptorManager_->GetHeap().Get() };
 	cmdList->SetDescriptorHeaps(1, descriptorHeapsRaw);
@@ -302,6 +319,9 @@ void DirectXContext::EndFrame() {
 
 	PostBuffer* src = &buffer[0];
 	PostBuffer* dst = &buffer[1];
+
+	// アウトライン用マスクをRTV→SRV(ポストエフェクトで読む)
+	Transition(cmdList.Get(), outlineMaskResource_.Get(), outlineMaskState_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	// depthBarrier
 	depthBarrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -417,6 +437,41 @@ void DirectXContext::EndFrame() {
 	fixFPS_->Update();
 }
 
+void DirectXContext::BeginPass(RenderPass pass, bool clear) {
+	auto cmdList = commandListManager_->GetCommandList();
+
+	// 深度は全パス共通
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = descriptorHeapManager_->GetCPUDescriptorHandle(descriptorHeapManager_->GetDSVHeap().Get(), descriptorHeapManager_->GetDSVHeapSize(), 0);
+
+	switch (pass) {
+	case RenderPass::Scene: {
+		// 通常シーン
+		Transition(cmdList.Get(), renderTextureResource_[0].Get(), renderTextureState_[0], D3D12_RESOURCE_STATE_RENDER_TARGET);
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetRenderTextureRTVHandle()[0];
+		cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+		if (clear) {
+			float clearColor[] = { 0.1f,0.25f,0.5f,1.0f }; // 青っぽい色。RGBAの順
+			cmdList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+			cmdList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		}
+		break;
+	}
+	case RenderPass::OutlineMask: {
+		// アウトライン用(隠れた部分は描画しない)
+		Transition(cmdList.Get(), outlineMaskResource_.Get(), outlineMaskState_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetOutlineMaskRTVHandle();
+		cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
+		if (clear) {
+			float maskClearColor[] = { 0.0f,0.0f,0.0f,0.0f };
+			cmdList->ClearRenderTargetView(rtvHandle, maskClearColor, 0, nullptr);
+		}
+		break;
+	}
+	}
+
+	currentPass_ = pass;
+}
+
 void DirectXContext::ApplyPostEffect(PostEffectType type, const PostBuffer& src, const PostBuffer& dst) {
 	auto cmd = commandListManager_->GetCommandList();
 
@@ -447,6 +502,8 @@ void DirectXContext::ApplyPostEffect(PostEffectType type, const PostBuffer& src,
 		cmd->SetGraphicsRootDescriptorTable(1, descriptorManager_->GetGPUHandle(depthTextureSRVIndex_));
 		outlineData_->projectionInverse = Inverse(camera_->projectionMatrix_);
 		cmd->SetGraphicsRootConstantBufferView(2, outlineResource_->GetGPUVirtualAddress());
+		// キャラクターのマスク
+		cmd->SetGraphicsRootDescriptorTable(3, descriptorManager_->GetGPUHandle(outlineMaskSRVIndex_));
 		break;
 	case PostEffectType::Dissolve:
 		cmd->SetGraphicsRootDescriptorTable(1, dissolveMaskHandle_);
@@ -539,6 +596,43 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreatePostEffectResource(
 	clearValue.Color[1] = 0.0f;
 	clearValue.Color[2] = 0.0f;
 	clearValue.Color[3] = 1.0f;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+
+	HRESULT hr =
+		deviceManager_->GetDevice()->CreateCommittedResource(
+			&heapProperties,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+			&clearValue,
+			IID_PPV_ARGS(&resource));
+
+	assert(SUCCEEDED(hr));
+
+	return resource;
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXContext::CreateOutlineMaskResource() {
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = windowRect_.right;
+	resourceDesc.Height = windowRect_.bottom;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;	// 通常のPSOと同じ形式にして、そのまま描画できるようにする
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+	D3D12_CLEAR_VALUE clearValue{};
+	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearValue.Color[0] = 0.0f;
+	clearValue.Color[1] = 0.0f;
+	clearValue.Color[2] = 0.0f;
+	clearValue.Color[3] = 0.0f;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 

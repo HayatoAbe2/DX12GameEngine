@@ -61,6 +61,12 @@ void EnemyManager::Draw() {
 	}
 }
 
+void EnemyManager::DrawOutline() {
+	for (const auto& enemy : activeEnemies_) {
+		enemy->DrawOutline();
+	}
+}
+
 void EnemyManager::Spawn(std::vector<std::unique_ptr<Enemy>> enemy) {
 	// 控えの敵を出現させる
 	for (auto& e : enemy) {

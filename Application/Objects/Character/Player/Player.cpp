@@ -98,7 +98,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	prePos_ = transform_.translate;
 	model_->Update();
 	Vector2 d = attackDirection_ * directionFactor;
-	light.GetPointLight(lightNumber_).position = prePos_ + Vector3{d.x, kLightHeight, d.y};
+	light.GetPointLight(lightNumber_).position = prePos_ + Vector3{ d.x, kLightHeight, d.y };
 
 	invincibleTimer_.Update();
 	if (invincibleTimer_.IsActive() && !isUsingBoost_) {
@@ -256,6 +256,13 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	if (hp_ <= 0.0f) {
 		isDead_ = true;
 	}
+}
+
+void Player::DrawOutline() {
+	auto& render = GameContext::GetInstance().Render();
+
+	// Drawで設定したトランスフォームのまま、本体だけ描画
+	render.DrawModel(model_.get());
 }
 
 void Player::Draw(Camera* camera) {
@@ -554,7 +561,7 @@ void Player::SetWeapon(std::unique_ptr<Weapon> weapon) {
 void Player::AddPassive(std::unique_ptr<Passive> passive) {
 	Sprite* sprite = passive->GetSprite();
 	int index = int(passives_.size());
-	sprite->SetPosition({ 500.0f + 80 * index, sprite->GetSize().y / 2.0f}); // 画面上位置の押し出し
+	sprite->SetPosition({ 500.0f + 80 * index, sprite->GetSize().y / 2.0f }); // 画面上位置の押し出し
 
 	passives_.push_back(std::move(passive));
 }

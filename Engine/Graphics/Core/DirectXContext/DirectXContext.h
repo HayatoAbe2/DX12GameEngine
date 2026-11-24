@@ -53,7 +53,15 @@ public:
 	/// </summary>
 	void EndFrame();
 
-	void BeginPass(RenderPass pass, bool clear = true);
+	/// <summary>
+	/// 描画パスの切り替え
+	/// </summary>
+	/// <param name="pass">切り替え先のパス</param>
+	/// <param name="clear">trueなら切り替え先をクリア(Scene:色と深度、OutlineMask:マスク)。フレーム開始時にクリア済みなので、通常はfalse</param>
+	void BeginPass(RenderPass pass, bool clear = false);
+
+	// 現在の描画パス
+	RenderPass GetCurrentPass() const { return currentPass_; }
 
 	// アクセサ
 	RECT GetWindowRect() { return windowRect_; }
@@ -107,6 +115,11 @@ private:
 	/// </summary>
 	/// <returns></returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateSceneViewResource();
+
+	/// <summary>
+	/// アウトライン用マスクの作成
+	/// </summary>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateOutlineMaskResource();
 
 	/// <summary>
 	/// Viewport,Scissor設定
@@ -216,6 +229,14 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE sceneViewRTVHandle_;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE dissolveMaskHandle_{};
+
+	// アウトライン用マスク(OutlineMaskパスで、キャラクターが映っている部分を1で描く)
+	Microsoft::WRL::ComPtr<ID3D12Resource> outlineMaskResource_;
+	uint32_t outlineMaskSRVIndex_;
+	D3D12_RESOURCE_STATES outlineMaskState_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+
+	// 現在の描画パス
+	RenderPass currentPass_ = RenderPass::Scene;
 
 	D3D12_RESOURCE_STATES renderTextureState_[2]{
 		D3D12_RESOURCE_STATE_RENDER_TARGET,

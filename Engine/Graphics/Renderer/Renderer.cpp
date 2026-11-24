@@ -34,6 +34,18 @@ void Renderer::Initialize(DirectXContext* dxContext) {
 	skinningSystem_ = std::make_unique<SkinningSystem>();
 	particleCompute_ = std::make_unique<ParticleCompute>();
 
+	// OutlineMaskパス用のシェーダー登録
+	auto shaderLibrary = dxContext_->GetShaderLibrary();
+	outlineMaskShader_ = shaderLibrary->Register("OutlineMask", {
+		.vs = L"Resources/Shaders/Object3d.VS.hlsl",
+		.ps = L"Resources/Shaders/OutlineMask.PS.hlsl",
+		.base = MainPSOType::Standard });
+
+	outlineMaskInstanceShader_ = shaderLibrary->Register("OutlineMaskInstance", {
+		.vs = L"Resources/Shaders/Instance.VS.hlsl",
+		.ps = L"Resources/Shaders/OutlineMask.PS.hlsl",
+		.base = MainPSOType::Instancing });
+
 	InitializePlane();
 	InitializeRing();
 	InitializeCylinder();
@@ -79,6 +91,11 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, BlendMode ble
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Standard, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Standard).Get();
+	if (dxContext_->GetCurrentPass() == RenderPass::OutlineMask) {
+		// OutlineMaskパスでは、マスク用のシェーダーでブレンドなしで描画
+		shader = outlineMaskShader_;
+		blendMode = BlendMode::None;
+	}
 	if (shader.IsValid()) {
 		// 指定されたシェーダーに差し替え
 		auto shaderLibrary = dxContext_->GetShaderLibrary();
@@ -118,6 +135,11 @@ void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManag
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Instancing, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Instancing).Get();
+	if (dxContext_->GetCurrentPass() == RenderPass::OutlineMask) {
+		// OutlineMaskパスでは、マスク用のシェーダーでブレンドなしで描画
+		shader = outlineMaskInstanceShader_;
+		blendMode = BlendMode::None;
+	}
 	if (shader.IsValid()) {
 		// 指定されたシェーダーに差し替え
 		auto shaderLibrary = dxContext_->GetShaderLibrary();
@@ -150,6 +172,9 @@ void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManag
 }
 
 void Renderer::DrawParticles(ParticleSystem* particleSys, BlendMode blendMode) {
+	// Scene以外のパスではモデル以外は描画しない
+	if (!IsScenePass()) { return; }
+
 	particleSys->PreDraw(camera_);
 
 	Material* material = particleSys->GetMaterial();
@@ -182,6 +207,9 @@ void Renderer::DrawParticles(ParticleSystem* particleSys, BlendMode blendMode) {
 }
 
 void Renderer::DrawGPUParticle(ParticleSystem* particleSys, BlendMode blendMode) {
+	// Scene以外のパスではモデル以外は描画しない
+	if (!IsScenePass()) { return; }
+
 	Material* material = particleSys->GetMaterial();
 	// マテリアル更新
 	material->UpdateGPU();
@@ -216,6 +244,9 @@ void Renderer::DrawGPUParticle(ParticleSystem* particleSys, BlendMode blendMode)
 }
 
 void Renderer::DrawPrimitive(Primitive* primitive, BlendMode blendMode) {
+	// Scene以外のパスではモデル以外は描画しない
+	if (!IsScenePass()) { return; }
+
 	Material* material = primitive->GetMaterial();
 	// マテリアル更新
 	material->UpdateGPU();
@@ -267,6 +298,9 @@ void Renderer::DrawPrimitive(Primitive* primitive, BlendMode blendMode) {
 };
 
 void Renderer::DrawSprite(Sprite* sprite, BlendMode blendMode) {
+	// Scene以外のパスではモデル以外は描画しない
+	if (!IsScenePass()) { return; }
+
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Sprite, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Standard).Get();
@@ -859,6 +893,9 @@ void Renderer::InitializeSkybox() {
 }
 
 void Renderer::DrawSkybox(Texture* texture) {
+	// Scene以外のパスではモデル以外は描画しない
+	if (!IsScenePass()) { return; }
+
 	skybox.transformData->WVP = skybox.transformData->World * camera_->viewMatrix_ * camera_->projectionMatrix_;
 
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();

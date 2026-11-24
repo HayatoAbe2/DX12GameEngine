@@ -478,7 +478,7 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange[3] = {};
 	// t0
 	descriptorRange[0].BaseShaderRegister = 0;	// 0から始まる
 	descriptorRange[0].NumDescriptors = 1;		// 数は1つ
@@ -490,8 +490,14 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// SRVを使う
 	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+	// t2
+	descriptorRange[2].BaseShaderRegister = 2;
+	descriptorRange[2].NumDescriptors = 1;
+	descriptorRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	// SRVを使う
+	descriptorRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
 	// RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[3] = {};
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
 
 	// t0(テクスチャSRV)
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;					// DescriptorTableを使う
@@ -510,6 +516,12 @@ void RootSignatureManager::CreateFullscreenRootSignature() {
 	rootParameters[2].Descriptor.ShaderRegister = 0;
 	rootParameters[2].Descriptor.RegisterSpace = 0;
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	// t2(アウトライン用マスクSRV)
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRange[2];
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
 
 	// -------------------------
 

@@ -22,7 +22,7 @@ void ItemManager::Initialize(WeaponManager* weaponManager, EnemyManager* enemyMa
 	controlKey_->SetSize({ 64,64 });
 	controlKey_->SetPosition({ 640 - 32,720 - 460 });
 	controlKey_->SetTextureRect(0, 64 * 9, 64, 64);
-	controlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.dds");
+	controlPad_ = asset.LoadSprite("Resources/Images/Control/XboxController.png");
 	controlPad_->SetSize({ 64,64 });
 	controlPad_->SetPosition({ 640 - 32,720 - 460 });
 	controlPad_->SetTextureRect(64 * 2, 64 * 8, 64, 64);
@@ -133,6 +133,13 @@ void ItemManager::Draw() {
 				render.DrawSprite(controlKey_.get());
 			}
 		}
+	}
+}
+
+void ItemManager::DrawOutline() {
+	// アウトライン描画
+	for (const auto& c : chests_) {
+		c->Draw();
 	}
 }
 

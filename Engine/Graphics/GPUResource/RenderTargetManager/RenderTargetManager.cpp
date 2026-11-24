@@ -2,7 +2,7 @@
 #include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include <cassert>
 
-void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2>& renderTextureResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& sceneViewResource) {
+void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* device, DescriptorHeapManager* heapManager, std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2>& renderTextureResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& sceneViewResource, const Microsoft::WRL::ComPtr<ID3D12Resource>& outlineMaskResource) {
 	// ---------------------
 	// SwapChain
 	// ---------------------
@@ -30,6 +30,7 @@ void RenderTargetManager::Initialize(IDXGISwapChain4* swapChain, ID3D12Device* d
 	CreateRTV(renderTextureRTVHandle_[0], device, renderTextureResource[0]);
 	CreateRTV(renderTextureRTVHandle_[1], device, renderTextureResource[1]);
 	CreateRTV(sceneViewRTVHandle_, device, sceneViewResource);
+	CreateRTV(outlineMaskRTVHandle_, device, outlineMaskResource);
 }
 
 void RenderTargetManager::CreateRTV(D3D12_CPU_DESCRIPTOR_HANDLE& nextHandle, ID3D12Device* device, Microsoft::WRL::ComPtr<ID3D12Resource> resource) {
@@ -47,7 +48,8 @@ void RenderTargetManager::Resize(
 	IDXGISwapChain4* swapChain,
 	ID3D12Device* device,
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> renderTexture,
-	Microsoft::WRL::ComPtr<ID3D12Resource> sceneView) {
+	Microsoft::WRL::ComPtr<ID3D12Resource> sceneView,
+	Microsoft::WRL::ComPtr<ID3D12Resource> outlineMask) {
 	for (int i = 0; i < 2; i++) {
 		swapChainResources_[i].Reset();
 	}
@@ -82,4 +84,9 @@ void RenderTargetManager::Resize(
 		sceneView.Get(),
 		&rtvDesc_,
 		sceneViewRTVHandle_);
+
+	device->CreateRenderTargetView(
+		outlineMask.Get(),
+		&rtvDesc_,
+		outlineMaskRTVHandle_);
 }
