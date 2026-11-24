@@ -8,6 +8,7 @@ class LightContext {
 public:
 	LightContext(LightManager* lightManager);
 
+	void SetDirectionalLight(DirectionalLight directionalLight);
 	int AddPointLight();
 	void RemovePointLight(int index);
 	PointLight& GetPointLight(int index);

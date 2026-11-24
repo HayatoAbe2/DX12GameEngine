@@ -4,6 +4,10 @@ LightContext::LightContext(LightManager* lightManager) :
 	lightManager_(lightManager) {
 }
 
+void LightContext::SetDirectionalLight(DirectionalLight directionalLight) {
+	lightManager_->SetDirectionalLight(directionalLight);
+}
+
 int LightContext::AddPointLight() {
 	return lightManager_->AddPointLight();
 }

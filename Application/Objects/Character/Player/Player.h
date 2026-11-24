@@ -135,5 +135,10 @@ private:
 
 	std::shared_ptr<Animation> walk_;
 	std::shared_ptr<Animation> sneak_;
+
+	// ライト
+	int lightNumber_ = -1;
+	const float directionFactor = 0.5f;
+	const float kLightHeight = 1.0f;
 };
 

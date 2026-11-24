@@ -10,6 +10,12 @@ void GameScene::Initialize() {
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 	auto& render = ctx.Render();
+	auto& light = ctx.Light();
+
+	DirectionalLight directionalLight;
+	directionalLight.direction = { 0,-1,0 };
+	directionalLight.intensity = 0.1f;
+	light.SetDirectionalLight(directionalLight);
 
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();

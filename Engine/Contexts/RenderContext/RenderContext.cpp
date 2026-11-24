@@ -7,16 +7,16 @@ RenderContext::RenderContext(Renderer* renderer, LightManager* lightManager) :
 	lightManager_(lightManager) {
 }
 
-void RenderContext::DrawModel(Model* model, BlendMode blendMode) {
-	renderer_->DrawModel(model, lightManager_, blendMode);
+void RenderContext::DrawModel(Model* model, BlendMode blendMode, ShaderHandle shader) {
+	renderer_->DrawModel(model, lightManager_, blendMode, shader);
 }
 
 void RenderContext::DrawSprite(Sprite* sprite, BlendMode blendMode) {
 	renderer_->DrawSprite(sprite, blendMode);
 }
 
-void RenderContext::DrawInstancedModel(InstancedModel* instancedModel, BlendMode blendMode) {
-	renderer_->DrawModelInstance(instancedModel, lightManager_, blendMode);
+void RenderContext::DrawInstancedModel(InstancedModel* instancedModel, BlendMode blendMode, ShaderHandle shader) {
+	renderer_->DrawModelInstance(instancedModel, lightManager_, blendMode, shader);
 }
 
 void RenderContext::DrawParticle(ParticleSystem* particleSystem, BlendMode blendMode) {

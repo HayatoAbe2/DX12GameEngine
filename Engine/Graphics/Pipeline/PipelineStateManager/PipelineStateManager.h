@@ -28,6 +28,22 @@ public:
 
 	ID3D12PipelineState* GetPSO(MainPSOType psoType, BlendMode mode) { return mainPSO_[int(psoType)][int(mode)].Get(); }
 
+	// メインPSOが使っているRootSignatureを取得
+	ID3D12RootSignature* GetRootSignature(MainPSOType psoType) { return mainPSOData[int(psoType)].rootSignature.Get(); }
+
+	/// <summary>
+	/// モデル用PSOの設定(Cull,Depth,InputLayoutなど)を流用して、シェーダーだけ差し替えたPSOを作成
+	/// </summary>
+	/// <param name="base">流用元(Standard,Instancingのみ)</param>
+	/// <param name="vsBlob">頂点シェーダー</param>
+	/// <param name="psBlob">ピクセルシェーダー</param>
+	/// <param name="outPSO">ブレンドモードごとの出力先</param>
+	void CreateVariant(
+		MainPSOType base,
+		const Microsoft::WRL::ComPtr<IDxcBlob>& vsBlob,
+		const Microsoft::WRL::ComPtr<IDxcBlob>& psBlob,
+		std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::Count)>& outPSO);
+
 	ID3D12PipelineState* GetGridPSO() { return gridPSO_.Get(); }
 	ID3D12PipelineState* GetCopyImagePSO() { return copyImagePSO_.Get(); }
 	ID3D12PipelineState* GetSceneViewPSO() { return sceneViewPSO_.Get(); }
@@ -104,6 +120,9 @@ private:
 
 	// DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
+
+	// モデル用PSO(Standard,Instancing)のベース設定(CreateVariantで流用する)
+	std::array<D3D12_GRAPHICS_PIPELINE_STATE_DESC, size_t(MainPSOType::Count)> mainBaseDesc_{};
 
 	// PSO
 	std::array<std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::Count)>, size_t(MainPSOType::Count)> mainPSO_;

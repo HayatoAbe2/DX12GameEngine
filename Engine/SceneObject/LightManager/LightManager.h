@@ -12,12 +12,19 @@ public:
 	~LightManager();
 
 	void Initialize(BufferManager* bufferManager, Logger* logger);
-	
+
 	void Update();
 
 	void DrawImGui();
 
-	#pragma region pointLight
+#pragma region pointLight
+	// 方向ライト設定
+	void SetDirectionalLight(DirectionalLight light) {
+		directionalLightData_ = light;
+	}
+#pragma endregion
+
+#pragma region pointLight
 	// ポイントライト追加
 	int AddPointLight() {
 		for (int i = 0; i < maxPointLights; i++) {
@@ -39,7 +46,7 @@ public:
 		assert(index >= 0);
 		return pointLightsData_[index];
 	}
-	#pragma endregion
+#pragma endregion
 
 #pragma region spotLight
 	// スポットライト追加

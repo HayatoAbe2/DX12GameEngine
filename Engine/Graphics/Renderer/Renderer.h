@@ -45,14 +45,16 @@ public:
 	/// モデル描画
 	/// </summary>
 	/// <param name="blendMode">ブレンドモード</param>
-	void DrawModel(Model* model, LightManager* lightManager, BlendMode blendMode);
+	/// <param name="shader">使用するシェーダー(無効なら標準のシェーダー)</param>
+	void DrawModel(Model* model, LightManager* lightManager, BlendMode blendMode, ShaderHandle shader = {});
 
 	/// <summary>
 	/// インスタンスモデル描画
 	/// </summary>
 	/// <param name="model">複数インスタンスを持つモデル</param>
 	/// <param name="blendMode">ブレンドモード</param>
-	void DrawModelInstance(InstancedModel* model, LightManager* lightManager, BlendMode blendMode);
+	/// <param name="shader">使用するシェーダー(無効なら標準のシェーダー)</param>
+	void DrawModelInstance(InstancedModel* model, LightManager* lightManager, BlendMode blendMode, ShaderHandle shader = {});
 
 	void DrawParticles(ParticleSystem* particleSys, BlendMode blendMode);
 	void DrawGPUParticle(ParticleSystem* particleSys, BlendMode blendMode);
@@ -71,6 +73,10 @@ public:
 
 	// Skybox描画
 	void DrawSkybox(Texture* texture);
+
+	// シェーダー登録(コンパイルとPSO作成を行うため、初期化時に1回だけ行う)
+	ShaderHandle RegisterShader(const std::string& name, const ShaderDesc& desc) { return dxContext_->GetShaderLibrary()->Register(name, desc); }
+	ShaderHandle FindShader(const std::string& name) { return dxContext_->GetShaderLibrary()->Find(name); }
 
 	// ポストエフェクト設定
 	void AddPostEffect(PostEffectType type) { dxContext_->AddPostEffect(type); }

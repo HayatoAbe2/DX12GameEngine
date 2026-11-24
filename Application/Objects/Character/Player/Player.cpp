@@ -28,6 +28,13 @@ void Player::Initialize(ItemManager* itemManager) {
 
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
+	auto& light = ctx.Light();
+
+	// ライト
+	lightNumber_ = light.AddPointLight();
+	PointLight& pointLight = light.GetPointLight(lightNumber_);
+	pointLight.decay = 1.0f;
+	pointLight.intensity = 0.5f;
 
 	model_ = asset.LoadModel("Resources/Debug/human", "walk.gltf");
 	auto matData = model_->GetMaterial(0)->GetData();
@@ -86,9 +93,12 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 	auto& input = ctx.Input();
+	auto& light = ctx.Light();
 
 	prePos_ = transform_.translate;
 	model_->Update();
+	Vector2 d = attackDirection_ * directionFactor;
+	light.GetPointLight(lightNumber_).position = prePos_ + Vector3{d.x, kLightHeight, d.y};
 
 	invincibleTimer_.Update();
 	if (invincibleTimer_.IsActive() && !isUsingBoost_) {

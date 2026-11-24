@@ -10,6 +10,7 @@
 #include "Engine/Graphics/Core/DescriptorHeapManager/DescriptorHeapManager.h"
 #include "Engine/Graphics/GPUResource/SRVManager/SRVManager.h"
 #include "Engine/Graphics/Pipeline/PipelineStateManager/PipelineStateManager.h"
+#include "Engine/Graphics/Pipeline/ShaderLibrary/ShaderLibrary.h"
 #include "Engine/Graphics/Utility/FixFPS/FixFPS.h"
 #include "Engine/Graphics/Debug/ImGuiManager/ImGuiManager.h"
 #include "Engine/Graphics/Renderer/PostEffectType.h"
@@ -62,6 +63,7 @@ public:
 	SRVManager* GetSRVManager() { return descriptorManager_.get(); }
 	PipelineStateManager* GetPipelineStateManager() { return pipelineStateManager_.get(); }
 	RootSignatureManager* GetRootSignatureManager() { return rootSignatureManager_.get(); }
+	ShaderLibrary* GetShaderLibrary() { return shaderLibrary_.get(); }
 	BufferManager* GetBufferManager() { return bufferManager_.get(); }
 	ConstantBufferManager* GetConstantBufferManager() { return constantBufferManager_.get(); }
 	FixFPS* GetFixFPS() { return fixFPS_.get(); }
@@ -171,6 +173,9 @@ private:
 
 	// パイプラインステート管理クラス
 	std::unique_ptr<PipelineStateManager> pipelineStateManager_ = nullptr;
+
+	// 追加シェーダー管理クラス(ゲームコードから登録したシェーダー)
+	std::unique_ptr<ShaderLibrary> shaderLibrary_ = nullptr;
 
 	// FPS固定クラス
 	std::unique_ptr<FixFPS> fixFPS_ = nullptr;

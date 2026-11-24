@@ -114,6 +114,9 @@ void PipelineStateManager::CreateStandardPSO() {
 	baseDesc.SampleDesc.Count = 1;
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+	// CreateVariantで流用するため保存
+	mainBaseDesc_[int(MainPSOType::Standard)] = baseDesc;
+
 	// --- 各ブレンドモードごとのPSO生成 ---
 	auto& pso = mainPSO_[int(MainPSOType::Standard)];
 	CreatePSO(baseDesc, CreateNoneBlendDesc(), &pso[static_cast<int>(BlendMode::None)]);			// ブレンドなし
@@ -148,6 +151,9 @@ void PipelineStateManager::CreateInstancingPSO() {
 	baseDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	baseDesc.SampleDesc.Count = 1;
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+	// CreateVariantで流用するため保存
+	mainBaseDesc_[int(MainPSOType::Instancing)] = baseDesc;
 
 	auto& pso = mainPSO_[int(MainPSOType::Instancing)];
 	CreatePSO(baseDesc, CreateNoneBlendDesc(), &pso[static_cast<int>(BlendMode::None)]);			// ブレンドなし
@@ -479,6 +485,32 @@ void PipelineStateManager::CreatePostEffectPSO(PostEffectData& postEffect) {
 	postEffect.desc.PS = { postEffect.psBlob->GetBufferPointer(), postEffect.psBlob->GetBufferSize() };
 
 	CreatePSO(postEffect.desc, CreateNoneBlendDesc(), &postEffect.pso); // ブレンドなし
+}
+
+void PipelineStateManager::CreateVariant(
+	MainPSOType base,
+	const Microsoft::WRL::ComPtr<IDxcBlob>& vsBlob,
+	const Microsoft::WRL::ComPtr<IDxcBlob>& psBlob,
+	std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::Count)>& outPSO) {
+
+	// 流用できるのはモデル用のみ
+	assert(base == MainPSOType::Standard || base == MainPSOType::Instancing);
+	assert(vsBlob);
+	assert(psBlob);
+
+	// 流用元の設定をコピーして、シェーダーだけ差し替える
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC baseDesc = mainBaseDesc_[int(base)];
+	assert(baseDesc.pRootSignature);
+	baseDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
+	baseDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
+
+	// --- 各ブレンドモードごとのPSO生成 ---
+	CreatePSO(baseDesc, CreateNoneBlendDesc(), &outPSO[static_cast<int>(BlendMode::None)]);			// ブレンドなし
+	CreatePSO(baseDesc, CreateAlphaBlendDesc(), &outPSO[static_cast<int>(BlendMode::Normal)]);		// αブレンド
+	CreatePSO(baseDesc, CreateAddBlendDesc(), &outPSO[static_cast<int>(BlendMode::Add)]);			// 加算
+	CreatePSO(baseDesc, CreateSubtractBlendDesc(), &outPSO[static_cast<int>(BlendMode::Subtract)]);	// 減算
+	CreatePSO(baseDesc, CreateMultiplyBlendDesc(), &outPSO[static_cast<int>(BlendMode::Multiply)]);	// 乗算
+	CreatePSO(baseDesc, CreateScreenBlendDesc(), &outPSO[static_cast<int>(BlendMode::Screen)]);		// スクリーン
 }
 
 void PipelineStateManager::CreateComputePSO(ComputePSOData& psoData, Microsoft::WRL::ComPtr<ID3D12PipelineState>& pso) {

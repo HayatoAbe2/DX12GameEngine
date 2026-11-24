@@ -12,6 +12,7 @@
 #include "Engine/SceneObject/Particle/ParticleSystem/ParticleSystem.h"
 #include "Engine/Scene/Camera/Camera.h"
 #include <numbers>
+#include <cassert>
 
 void Renderer::Initialize(DirectXContext* dxContext) {
 	dxContext_ = dxContext;
@@ -70,7 +71,7 @@ void Renderer::UpdateSpriteTransform(Sprite* sprite) {
 	dxContext_->GetCommandListManager()->GetCommandList()->SetGraphicsRootConstantBufferView(1, cbAddress);
 }
 
-void Renderer::DrawModel(Model* model, LightManager* lightManager, BlendMode blendMode) {
+void Renderer::DrawModel(Model* model, LightManager* lightManager, BlendMode blendMode, ShaderHandle shader) {
 	// GPUに渡すデータの更新
 	cameraData_->position = camera_->transform_.translate;
 	if (lightManager) { lightManager->Update(); }
@@ -78,6 +79,13 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, BlendMode ble
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Standard, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Standard).Get();
+	if (shader.IsValid()) {
+		// 指定されたシェーダーに差し替え
+		auto shaderLibrary = dxContext_->GetShaderLibrary();
+		assert(shaderLibrary->GetBase(shader) == MainPSOType::Standard);
+		pso = shaderLibrary->GetPSO(shader, blendMode);
+		rootSig = shaderLibrary->GetRootSignature(shader);
+	}
 	if (!model->GetData()->JointWeights.empty()) {
 		// GPUでのスキニング処理
 		auto computePSO = dxContext_->GetPipelineStateManager()->GetSkinningComputePSO();
@@ -102,7 +110,7 @@ void Renderer::DrawModel(Model* model, LightManager* lightManager, BlendMode ble
 	DrawNode(model, cmdList, model->GetRootNode(), MakeIdentity4x4());
 }
 
-void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManager, BlendMode blendMode) {
+void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManager, BlendMode blendMode, ShaderHandle shader) {
 	// GPUに渡すデータの更新
 	cameraData_->position = camera_->transform_.translate;
 	if (lightManager) { lightManager->Update(); }
@@ -110,6 +118,13 @@ void Renderer::DrawModelInstance(InstancedModel* model, LightManager* lightManag
 	auto cmdList = dxContext_->GetCommandListManager()->GetCommandList();
 	auto pso = dxContext_->GetPipelineStateManager()->GetPSO(MainPSOType::Instancing, blendMode);
 	auto rootSig = dxContext_->GetRootSignatureManager()->GetRootSignature(RootSignatures::Instancing).Get();
+	if (shader.IsValid()) {
+		// 指定されたシェーダーに差し替え
+		auto shaderLibrary = dxContext_->GetShaderLibrary();
+		assert(shaderLibrary->GetBase(shader) == MainPSOType::Instancing);
+		pso = shaderLibrary->GetPSO(shader, blendMode);
+		rootSig = shaderLibrary->GetRootSignature(shader);
+	}
 
 	// PSO設定
 	cmdList->SetPipelineState(pso);

@@ -175,6 +175,10 @@ void DirectXContext::Initialize(HWND hwnd, Logger* logger) {
 	// PSOマネージャー
 	pipelineStateManager_->Initialize(deviceManager_->GetDevice(), rootSignatureManager_.get());
 
+	// 追加シェーダー管理(PSOマネージャーの初期化後に行う)
+	shaderLibrary_ = std::make_unique<ShaderLibrary>();
+	shaderLibrary_->Initialize(logger_, shaderCompiler_.get(), pipelineStateManager_.get());
+
 	SetViewportAndScissor();
 
 	imGuiManager_ = std::make_unique<ImGuiManager>();

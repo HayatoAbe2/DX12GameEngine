@@ -185,6 +185,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Editor\EnemyEditor\EnemyEditor.cpp" />
     <ClCompile Include="Editor\FloorEditor\FloorEditor.cpp" />
     <ClCompile Include="Editor\WeaponEditor\WeaponEditor.cpp" />
+    <ClCompile Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -511,6 +512,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Editor\WeaponEditor\WeaponEditor.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
+    <ClInclude Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />
