@@ -26,12 +26,15 @@ void FloorManager::Initialize() {
 
 bool FloorManager::ReloadConfig(std::vector<DataIssue>* issues) {
 	FloorConfig loaded;
+
+	// ロード失敗
 	if (!FloorConfigSerializer::Load(kFloorConfigPath, loaded)) {
 		if (issues) { issues->push_back({ true, "FloorConfig.json を読めません" }); }
 		return false;
 	}
 
 	bool ok = true;
+	// エラー確認
 	for (auto& issue : FloorConfigSerializer::Validate(loaded)) {
 		if (issue.isError) { ok = false; }
 		if (issues) { issues->push_back(std::move(issue)); }

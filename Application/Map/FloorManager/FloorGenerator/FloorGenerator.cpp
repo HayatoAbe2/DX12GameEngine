@@ -119,4 +119,18 @@ void FloorGenerator::LoadRoom(Room* room, Direction enterDir) {
 			}
 		}
 	}
+
+	// タイル色を変える
+	for (auto& floor : scene.FindInstancedModelsByTag("floor")) {
+		for (int i = 0; i < floor->GetNumInstance(); ++i) {
+			float r = ctx.RandomFloat(0.5f, 1.0f);
+			floor->SetInstanceColor(i, { r,r,r,1 });
+		}
+	}
+	for (auto& wall : scene.FindInstancedModelsByTag("wall")) {
+		for (int i = 0; i < wall->GetNumInstance(); ++i) {
+			float r = ctx.RandomFloat(0.8f, 1.0f);
+			wall->SetInstanceColor(i, { r,r,r,1 });
+		}
+	}
 }

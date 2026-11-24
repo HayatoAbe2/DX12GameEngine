@@ -14,7 +14,7 @@ void GameScene::Initialize() {
 
 	DirectionalLight directionalLight;
 	directionalLight.direction = { 0,-1,0 };
-	directionalLight.intensity = 0.1f;
+	directionalLight.intensity = 0.2f;
 	light.SetDirectionalLight(directionalLight);
 
 	debugCamera_ = std::make_unique<DebugCamera>();

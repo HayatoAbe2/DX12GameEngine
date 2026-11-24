@@ -359,12 +359,7 @@ void Renderer::DrawNodeInstance(InstancedModel* model, Microsoft::WRL::ComPtr<ID
 	Matrix4x4 nodeWorld = parentWorld * node->localMatrix;
 
 	// トランスフォーム更新
-	std::vector<Vector4> colors;
-	colors.resize(model->GetNumInstance());
-	for (auto& color : colors) {
-		color = { 1,1,1,1 };
-	}
-	model->UpdateInstanceTransformWithNode(camera_, nodeWorld, colors);
+	model->UpdateInstanceTransformWithNode(camera_, nodeWorld, model->GetInstanceColor());
 
 	// メッシュを描画
 	for (uint32_t meshIndex : node->meshIndices) {

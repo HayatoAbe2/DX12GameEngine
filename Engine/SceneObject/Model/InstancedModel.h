@@ -45,6 +45,7 @@ public:
 
 	void AddInstanceTransform() {
 		transforms_.push_back({});
+		instanceColor_.push_back({ 1,1,1,1 });
 	}
 	void SetTransforms(int index, const Transform& transform) {
 		if (index < 0 || index >= numInstance_) return;
@@ -89,10 +90,15 @@ public:
 	// マテリアル
 	Material* GetMaterial(int index) { return material_[index].get(); }
 
+	// マテリアルにかける色
+	void SetInstanceColor(int index, Vector4 color) { if (static_cast<size_t>(index) < instanceColor_.size()) instanceColor_[index] = color; }
+	const std::vector<Vector4>& GetInstanceColor() const { return instanceColor_; }
+
 	// rootNode取得
 	ModelNode* GetRootNode() { return rootNode_.get(); }
 
 	const std::string& GetDirectoryPath() { return directory_; }
+
 
 private:
 
@@ -101,6 +107,9 @@ private:
 
 	// マテリアル
 	std::vector<std::unique_ptr<Material>> material_{};
+
+	// インスタンスごとに掛ける色
+	std::vector<Vector4> instanceColor_;
 
 	// 根ノード
 	std::unique_ptr<ModelNode> rootNode_{};

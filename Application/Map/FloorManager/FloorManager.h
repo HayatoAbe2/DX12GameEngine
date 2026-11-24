@@ -18,10 +18,9 @@ public:
 
 	void LoadNextRoom(Direction exitDir);
 	Vector2 GetStartPos();
-	void Reset();
 
 	int GetCurrentDepth() { return currentDepth_; }
-	// 今のフロアのゴールの階層(フロアを作ったときの設定で決まる。途中で設定を変えてもずれない)
+	// 今フロアのゴール階層
 	int GetMaxDepth() const { return maxDepth_; }
 	RoomType GetCurrentType() const { return currentRoom_ ? currentRoom_->type : RoomType::Start; }
 	std::vector<RoomConnector> GetConnector();
@@ -34,7 +33,7 @@ public:
 		return currentRoom_ ? currentRoom_->plan : kEmpty;
 	}
 
-	// フロア設定(FloorEditor が保存するファイル)を読み直す。壊れている・エラーがあるときは今の設定のまま
+	// フロア設定を読み直す。エラーがあるときは今の設定のまま
 	bool ReloadConfig(std::vector<DataIssue>* issues = nullptr);
 	const FloorConfig& GetConfig() const { return config_; }
 
