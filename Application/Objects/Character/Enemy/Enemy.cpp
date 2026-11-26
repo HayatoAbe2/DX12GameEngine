@@ -7,10 +7,11 @@
 #include "Objects/Character/Enemy/EnemyActionState/EnemyAttack/EnemyAttack.h"
 #include "Objects/Character/Enemy/EnemyActionState/EnemyIdle/EnemyIdle.h"
 
+#include <algorithm>
 #include <numbers>
 #include <cmath>
 
-Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons) {
+Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons, WeaponSwitch weaponSwitch) {
 	status_ = status;
 	maxHp_ = status_.hp;
 	hp_ = status_.hp;
@@ -31,6 +32,12 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	if (!weapons_.empty()) {
 		currentWeapon_ = weapons_[0].get();
 	}
+
+	// 武器切り替えまでの攻撃回数
+	weaponSwitch_ = weaponSwitch;
+	weaponSwitch_.minAttacks = max(1, weaponSwitch_.minAttacks);
+	weaponSwitch_.maxAttacks = max(weaponSwitch_.minAttacks, weaponSwitch_.maxAttacks);
+	remainingAttacks_ = RollAttackCount();
 
 	// 初期State
 	currentState_ = std::make_unique<EnemyIdle>();
@@ -76,13 +83,7 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	}
 	slowTimer_.Update();
 
-	// 落下
-	if (isFall_) {
-		auto* activeReaction = reaction_.get();
-		if (activeReaction && activeReaction->Update(this) && reaction_.get() == activeReaction) reaction_.reset();
-		return;
-	}
-
+	// 現在の反応状態
 	if (reaction_) {
 		Stun(mapCheck);
 		auto* activeReaction = reaction_.get();
@@ -119,11 +120,24 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 	}
 }
 
+int Enemy::RollAttackCount() const {
+	if (weaponSwitch_.minAttacks == weaponSwitch_.maxAttacks) { return weaponSwitch_.minAttacks; }
+	return GameContext::GetInstance().RandomInt(weaponSwitch_.minAttacks, weaponSwitch_.maxAttacks);
+}
+
 void Enemy::Attack(BulletManager* bulletManager) {
 	// 武器なし/クールタイム中
 	if (!currentWeapon_ || attackCoolTimer_.GetState() == TimerState::Running) {
 		return;
 	}
+
+	// 武器が複数あるなら、規定回数攻撃したら切り替え
+	if (weapons_.size() > 1 && remainingAttacks_ <= 0) {
+		weaponIndex_ = (weaponIndex_ + 1) % int(weapons_.size());
+		currentWeapon_ = weapons_[weaponIndex_].get();
+		remainingAttacks_ = RollAttackCount();
+	}
+	--remainingAttacks_;
 
 	// 攻撃してクールタイム設定
 	float time = currentWeapon_->Trigger(model_->GetTransform().translate, attackDir_, bulletManager, this);
@@ -152,21 +166,18 @@ void Enemy::Stun(MapCheck* mapCheck) {
 
 void Enemy::OnStunEnd() {
 	if (!status_.canFly && mapCheck_ && mapCheck_->IsFall({ transform_.translate.x, transform_.translate.z })) {
-		GameContext::GetInstance().Audio().SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
-		isFall_ = true;
 		Character::Fall();
 	}
 }
 
 void Enemy::OnFallEnd() {
-	if (transform_.translate.y < -10.0f) isDead_ = true;
-	isFall_ = false;
+	isDead_ = true;
 }
 
 void Enemy::DrawOutline() {
 	auto& render = GameContext::GetInstance().Render();
 
-	// Drawで設定したトランスフォーム(出現演出を含む)のまま、本体だけ描画
+	// アウトライン描画
 	render.DrawModel(model_.get());
 }
 
@@ -177,7 +188,7 @@ void Enemy::Draw() {
 	model_->SetTransform(transform_);
 	model_->Update();
 	// 影描画
-	if (!isFall_) {
+	if (GetCurrentReaction() != CharacterReactionState::Fall) {
 		Transform shadowTransform = model_->GetTransform();
 		shadowTransform.scale.y = 0.0f;
 		shadowTransform.translate.y = 0.01f;

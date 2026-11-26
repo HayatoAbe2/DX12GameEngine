@@ -4,6 +4,12 @@
 
 class Character;
 
+enum class CharacterReactionState {
+	None,
+	Fall,
+	Stun
+};
+
 // キャラクター全体の反応状態
 class CharacterReaction {
 public:
@@ -16,6 +22,8 @@ public:
 	// true を返したら反応状態を終了する
 	virtual bool Update(Character* self) = 0;
 
+	// 現在State
+	virtual CharacterReactionState GetCurrentState() const = 0;
 protected:
 	Timer timer_;
 };

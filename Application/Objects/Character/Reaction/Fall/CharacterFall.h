@@ -11,4 +11,5 @@ class CharacterFall : public CharacterReaction {
 public:
 	CharacterFall() { timer_.Start(kCharacterFallTime); }
 	bool Update(Character* self) override;
+	CharacterReactionState GetCurrentState() const override { return CharacterReactionState::Fall; }
 };

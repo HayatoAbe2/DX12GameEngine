@@ -8,6 +8,7 @@ class CharacterStun : public CharacterReaction {
 public:
 	CharacterStun(float time) { timer_.Start(time); }
 	bool Update(Character* self) override;
+	CharacterReactionState GetCurrentState() const override { return CharacterReactionState::Stun; }
 private:
 };
 

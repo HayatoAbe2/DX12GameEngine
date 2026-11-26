@@ -61,6 +61,12 @@ EnemyData FromJson(const json& j) {
 
 	e.weapons = Get<std::vector<std::string>>(j, "weapons", {});
 
+	const auto sw = j.find("weaponSwitch"); // 武器の切り替え回数
+	if (sw != j.end() && sw->is_object()) {
+		e.weaponSwitch.minAttacks = Get(*sw, "min", 1);
+		e.weaponSwitch.maxAttacks = Get(*sw, "max", 1);
+	}
+
 	const auto count = j.find("spawnCount"); // 出現数
 	if (count != j.end() && count->is_object()) {
 		e.minSpawnCount = Get(*count, "min", 1);
@@ -88,6 +94,9 @@ ojson ToJson(const EnemyData& e) {
 	}
 
 	j["weapons"] = e.weapons;
+	if (e.weapons.size() > 1) { // 武器が1つ以下なら意味がないので書かない
+		j["weaponSwitch"] = { { "min", e.weaponSwitch.minAttacks }, { "max", e.weaponSwitch.maxAttacks } };
+	}
 	j["spawnCount"] = { { "min", e.minSpawnCount }, { "max", e.maxSpawnCount } };
 	return j;
 }
@@ -104,6 +113,10 @@ std::vector<DataIssue> Validate(const EnemyData& e) {
 	if (e.status.stunResist < 0.0f) { warn("スタン耐性が負の値です"); }
 	if (e.minSpawnCount < 1) { error("出現数の最小は1以上にしてください"); }
 	if (e.minSpawnCount > e.maxSpawnCount) { error("出現数の最小が最大を超えています"); }
+	if (e.weapons.size() > 1) {
+		if (e.weaponSwitch.minAttacks < 1) { error("武器を切り替える回数の最小は1以上にしてください"); }
+		if (e.weaponSwitch.minAttacks > e.weaponSwitch.maxAttacks) { error("武器を切り替える回数の最小が最大を超えています"); }
+	}
 	if (e.status.traits.contactDamage && e.status.traits.contactDamage->damage < 0.0f) {
 		error("接触ダメージは0以上にしてください");
 	}

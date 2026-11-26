@@ -393,9 +393,6 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 	if (d.weapons.empty() && s.attackRadius > 0.0f) {
 		issues.push_back({ false, "武器が無いため、攻撃範囲に入っても攻撃しません" });
 	}
-	if (d.weapons.size() > 1) {
-		issues.push_back({ false, "複数の武器を持たせても、現在は先頭の武器しか使われません" });
-	}
 	const bool hasError = std::any_of(issues.begin(), issues.end(), [](const DataIssue& i) { return i.isError; });
 
 	// ---- ヘッダ ----
@@ -522,6 +519,18 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 		ImGui::BeginDisabled(weaponNames.empty());
 		if (ImGui::Button("武器を追加")) { d.weapons.push_back(weaponNames.front()); }
 		ImGui::EndDisabled();
+
+		// 武器が2つ以上のとき: 何回攻撃したら次の武器に切り替えるか(上から順に繰り返す)
+		if (d.weapons.size() > 1) {
+			ImGui::SeparatorText("武器の切り替え");
+			EditorUtil::DragInt("最小回数", &d.weaponSwitch.minAttacks, 0.1f, 1, 100);
+			EditorUtil::DragInt("最大回数", &d.weaponSwitch.maxAttacks, 0.1f, 1, 100);
+			if (d.weaponSwitch.minAttacks == d.weaponSwitch.maxAttacks) {
+				ImGui::TextDisabled("%d回攻撃するごとに、次の武器へ切り替えます", d.weaponSwitch.minAttacks);
+			} else {
+				ImGui::TextDisabled("%d〜%d回の間でランダムに決めて、次の武器へ切り替えます", d.weaponSwitch.minAttacks, d.weaponSwitch.maxAttacks);
+			}
+		}
 	}
 
 	// 操作が終わったタイミングで履歴に積む(ドラッグ・入力中は積まない)

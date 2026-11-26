@@ -123,7 +123,7 @@ std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, Weapo
 			weapon = weaponManager->GetEnemyAttack(weaponName);
 			if (weapon) { weapons.push_back(std::move(weapon)); }
 		}
-		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons)));
+		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons), data.weaponSwitch));
 	}
 
 	return enemies;

@@ -13,4 +13,15 @@ void Character::Stun(float time) {
 void Character::Fall() {
 	// 反応状態を変更
 	reaction_ = std::make_unique<CharacterFall>();
+
+	auto& ctx = GameContext::GetInstance();
+	ctx.Audio().SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
+}
+
+CharacterReactionState Character::GetCurrentReaction() {
+	if (reaction_) {
+		return reaction_->GetCurrentState();
+	} else {
+		return CharacterReactionState::None;
+	}
 }

@@ -25,7 +25,7 @@ public:
 	void Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletManager);
 	// 描画
 	void Draw(Camera* camera);
-	// アウトライン用マスクの描画(OutlineMaskパス中に、Drawの後で呼ぶ)
+	// アウトライン用マスクの描画(OutlineMaskパス中)
 	void DrawOutline();
 
 	// 被弾
@@ -37,8 +37,10 @@ public:
 	void OnHit(const Vector2& from);
 	void OnDodge();
 
-	void Move(MapCheck* mapCheck);
+	void Move(MapCheck* mapCheck); 
 	void Trigger(BulletManager* bulletManager, Camera* camera);
+
+	// 状態
 	void Stun(MapCheck* mapCheck);
 	void OnStunEnd() override;
 	void OnFallEnd() override;
@@ -54,15 +56,17 @@ public:
 		return result;
 	}
 	Wallet& GetWallet() { return wallet_; }
-	bool IsBoosting() { return isUsingBoost_; }
+	bool IsDodging() { return actionState_->GetCurrentState() == PlayerState::Dodge; }
 
 	void SetWeapon(std::unique_ptr<Weapon> weapon);
 	void AddPassive(std::unique_ptr<Passive> passive);
 
+	// 現在の行動状態
+	PlayerState GetCurrentState();
+
 	void Stop();
 
 private:
-	friend class PlayerDodge;
 
 	// 照準
 	std::unique_ptr<Model> direction_ = nullptr;
@@ -72,9 +76,6 @@ private:
 
 	// アイテム取得範囲
 	float interactRadius_ = 1.5f;
-
-	// 速度
-	Vector3 velocity_ = { 0,0,0 };
 
 	// 移動の速さ
 	float moveSpeed_ = 10.0f;
@@ -87,7 +88,6 @@ private:
 	float stunTime_ = 0.6f;
 	Vector2 knockbackVel_{};
 
-	bool isFall_ = false;
 	MapCheck* mapCheck_ = nullptr;
 	Vector3 landPos_{};
 	Timer hitColorTimer_;
@@ -100,12 +100,11 @@ private:
 	std::unique_ptr<Model> instancing_[2];
 	Transform instancingTransforms[4]{};
 
+	// アクション状態
+	std::unique_ptr<PlayerActionState> actionState_;
+
 	// ダッシュ
 	bool canBoost_ = false;
-	bool isUsingBoost_ = false;
-	std::unique_ptr<PlayerActionState> actionState_;
-	float maxBoostTime_ = 0.25f;
-	float boostSpeed_ = 15.0f;
 	int boostCoolTime_ = 10;
 
 	// 射撃

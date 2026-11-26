@@ -11,7 +11,6 @@ class PlayerDodge;
 /// キャラクター基底
 /// </summary>
 class Character {
-friend class PlayerDodge;
 public:
 	// トランスフォーム
 	virtual Transform GetTransform() { return transform_; }
@@ -23,6 +22,9 @@ public:
 
 	// 半径
 	float GetRadius() const { return radius_; }
+
+	// 速度
+	Vector3 GetVelocity() const { return velocity_; }
 
 	// 重さ
 	float GetWeight() const { return weight_; }
@@ -53,11 +55,10 @@ public:
 	// 動けない状態が戻るときの処理
 	virtual void OnStunEnd() {}
 	virtual void OnFallEnd() {}
-	bool HasReaction() const { return reaction_ != nullptr; }
+
+	// 現在の反応
+	CharacterReactionState GetCurrentReaction();
 	float GetReactionRemaining() const { return reaction_ ? reaction_->GetRemaining() : 0.0f; }
-protected:
-	// 反応状態
-	std::unique_ptr<CharacterReaction> reaction_;
 
 	// 被弾
 	virtual void Hit(float damage, const Vector2& from);
@@ -65,6 +66,9 @@ protected:
 	virtual void Stun(float time);
 	// 落下
 	virtual void Fall();
+protected:
+	// 反応状態
+	std::unique_ptr<CharacterReaction> reaction_;
 
 	// トランスフォーム
 	Transform transform_;
@@ -75,6 +79,9 @@ protected:
 
 	// 重さ(ぶつかったときの押し出しに関係)
 	float weight_ = 10;
+
+	// 速度
+	Vector3 velocity_ = { 0,0,0 };
 
 	// チーム
 	Team team_;

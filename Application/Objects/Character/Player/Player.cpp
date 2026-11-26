@@ -19,7 +19,6 @@ Player::~Player() {
 
 void Player::Stop() {
 	actionState_.reset();
-	isUsingBoost_ = false;
 }
 
 void Player::Initialize(ItemManager* itemManager) {
@@ -101,7 +100,8 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 	light.GetPointLight(lightNumber_).position = prePos_ + Vector3{ d.x, kLightHeight, d.y };
 
 	invincibleTimer_.Update();
-	if (invincibleTimer_.IsActive() && !isUsingBoost_) {
+	if (invincibleTimer_.IsActive() && GetCurrentState() != PlayerState::Dodge) {
+		// 無敵表示
 		float t = invincibleTimer_.GetRemaining() * 10.0f;
 		float strength = (std::sin(t) + 1.0f) * 0.5f; // 0~1
 		float c = Lerp(1.0f, 2.0f, strength);
@@ -130,11 +130,13 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 		}
 	}
 
-	if (isFall_) {
+	if (reaction_) {
+		// 現在の反応状態の処理(終わったら解除)
 		auto* activeReaction = reaction_.get();
-		if (activeReaction && activeReaction->Update(this) && reaction_.get() == activeReaction) reaction_.reset();
+		if (activeReaction->Update(this) && reaction_.get() == activeReaction) reaction_.reset();
 	} else {
 		if (actionState_) {
+			// 現在の行動の処理(終わったら解除)
 			auto* activeState = actionState_.get();
 			if (activeState->Update(this, mapCheck) && actionState_.get() == activeState) actionState_.reset();
 		} else {
@@ -147,6 +149,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 			}
 		}
 
+		// パッシブアイテムの更新
 		for (auto& p : passives_) {
 			p->OnUpdate(weapon_.get(), subWeapon_.get());
 		}
@@ -261,7 +264,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 void Player::DrawOutline() {
 	auto& render = GameContext::GetInstance().Render();
 
-	// Drawで設定したトランスフォームのまま、本体だけ描画
+	// アウトライン描画
 	render.DrawModel(model_.get());
 }
 
@@ -271,14 +274,14 @@ void Player::Draw(Camera* camera) {
 
 	// 影描画
 	Transform shadowTransform;
-	if (!isFall_) {
+	if (GetCurrentReaction() != CharacterReactionState::Fall) {
 		shadowTransform = transform_;
 		shadowTransform.scale.y = 0.0f;
 		shadowTransform.translate.y = 0.01f;
 		shadowModel_->SetTransform(shadowTransform);
 		render.DrawModel(shadowModel_.get());
 	}
-	if (isUsingBoost_) {
+	if (GetCurrentState() == PlayerState::Dodge) {
 		for (int i = 0; i < 2; ++i) {
 			render.AddPostEffect(PostEffectType::BoxFilter5x5);
 			render.AddPostEffect(PostEffectType::GaussianFilter3x3);
@@ -431,9 +434,8 @@ void Player::Move(MapCheck* mapCheck) {
 
 	// ダッシュ入力
 	if ((input.keyboard.IsTrigger(DIK_SPACE) || input.gamepad.IsTrigger(XINPUT_GAMEPAD_X)) && Length(normalized) > 0.1f && boostCoolTime_ < 0) {
-		isUsingBoost_ = true;
 		Vector3 dodgeDirection = { normalized.x,0,-normalized.y };
-		actionState_ = std::make_unique<PlayerDodge>(dodgeDirection, boostSpeed_, maxBoostTime_);
+		actionState_ = std::make_unique<PlayerDodge>();
 		// ダッシュ前の位置を記憶
 		landPos_ = transform_.translate;
 
@@ -458,9 +460,9 @@ void Player::Move(MapCheck* mapCheck) {
 	Vector2 pos = { transform_.translate.x,transform_.translate.z };
 	for (int i = 0; i < 4; ++i) {
 		pos.x += velocity_.x / 4.0f;
-		mapCheck->ResolveCollisionX(pos, radius_, isUsingBoost_);
+		mapCheck->ResolveCollisionX(pos, radius_, GetCurrentState() == PlayerState::Dodge);
 		pos.y += velocity_.z / 4.0f;
-		mapCheck->ResolveCollisionY(pos, radius_, isUsingBoost_);
+		mapCheck->ResolveCollisionY(pos, radius_, GetCurrentState() == PlayerState::Dodge);
 	}
 	transform_.translate.x = pos.x;
 	transform_.translate.z = pos.y;
@@ -505,13 +507,11 @@ void Player::OnFallEnd() {
 		// その前にいた位置に戻す
 		transform_.translate = landPos_;
 	}
-	isFall_ = false;
 }
 
 void Player::OnStunEnd() {
+	// 落下チェック
 	if (mapCheck_ && mapCheck_->IsFall({ transform_.translate.x, transform_.translate.z })) {
-		GameContext::GetInstance().Audio().SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
-		isFall_ = true;
 		Character::Fall();
 	}
 }
@@ -564,4 +564,12 @@ void Player::AddPassive(std::unique_ptr<Passive> passive) {
 	sprite->SetPosition({ 500.0f + 80 * index, sprite->GetSize().y / 2.0f }); // 画面上位置の押し出し
 
 	passives_.push_back(std::move(passive));
+}
+
+PlayerState Player::GetCurrentState() {
+	if (actionState_) {
+		return actionState_->GetCurrentState();
+	} else {
+		return PlayerState::Idle;
+	}
 }

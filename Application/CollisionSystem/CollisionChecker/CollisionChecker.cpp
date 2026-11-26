@@ -22,7 +22,7 @@ void CollisionChecker::CheckPlayer(Player* player, Bullet* bullet) {
 	Segment2D segment = { bullet->GetPrePos(), bullet->GetCollider().center };
 	Circle circle = { player->GetRadius() + bullet->GetCollider().radius, ToXZ(player->GetTransform().translate) };
 	if (CheckCollision(segment, circle)) {
-		if (player->IsBoosting()) {
+		if (player->IsDodging()) {
 			// 回避
 			player->OnDodge();
 		} else {
@@ -59,7 +59,7 @@ void CollisionChecker::CheckPlayer(Player* player, DamageArea* area) {
 
 	Circle circle = { player->GetRadius(), ToXZ(player->GetTransform().translate) };
 	if (CheckCollision(circle, area->GetCollider())) {
-		if (player->IsBoosting()) {
+		if (player->IsDodging()) {
 			// 回避
 			player->OnDodge();
 		} else {

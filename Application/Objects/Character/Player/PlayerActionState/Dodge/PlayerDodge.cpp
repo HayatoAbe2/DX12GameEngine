@@ -4,35 +4,33 @@
 #include <cmath>
 #include <numbers>
 
-PlayerDodge::PlayerDodge(const Vector3& direction, float speed, float duration)
-	: direction_(direction), speed_(speed) {
-	timer_.Start(duration);
+PlayerDodge::PlayerDodge() {
+	timer_.Start(duration_);
 }
 
 bool PlayerDodge::Update(Player* player, MapCheck* mapCheck) {
 	auto& ctx = GameContext::GetInstance();
-	player->transform_.rotate.y = -std::atan2(direction_.z, direction_.x) + std::numbers::pi_v<float> / 2.0f;
+	Transform transform = player->GetTransform();
+	direction_ = Normalize(player->GetVelocity());
 	Vector3 velocity = direction_ * speed_ * ctx.GetDeltatime();
-	Vector2 pos = { player->transform_.translate.x, player->transform_.translate.z };
+	Vector2 pos = { transform.translate.x, transform.translate.z };
 	for (int i = 0; i < 4; ++i) {
 		pos.x += velocity.x / 4.0f;
-		mapCheck->ResolveCollisionX(pos, player->radius_, true);
+		mapCheck->ResolveCollisionX(pos, player->GetRadius(), true);
 		pos.y += velocity.z / 4.0f;
-		mapCheck->ResolveCollisionY(pos, player->radius_, true);
+		mapCheck->ResolveCollisionY(pos, player->GetRadius(), true);
 	}
-	player->transform_.translate.x = pos.x;
-	player->transform_.translate.z = pos.y;
+	transform.translate.x = pos.x;
+	transform.translate.z = pos.y;
+	player->SetPosition(ToXZ(transform.translate));
 
 	timer_.Update();
 	if (timer_.GetState() != TimerState::Finished) {
 		return false;
 	}
 
-	player->isUsingBoost_ = false;
 	if (mapCheck->IsFall(pos)) {
-		player->isFall_ = true;
-		player->Character::Fall();
-		ctx.Audio().SoundPlay(L"Resources/Sounds/SE/fall.mp3", false);
+		player->Fall();
 	}
 	return true;
 }

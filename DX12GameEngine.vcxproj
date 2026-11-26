@@ -489,6 +489,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyIdle\EnemyIdle.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyActionState.h" />
     <ClInclude Include="Application\Map\Room\RoomData.h" />
+    <ClInclude Include="Application\Objects\Character\Player\PlayerActionState\PlayerActionState.h" />
     <ClInclude Include="Application\Objects\Item\World\Interactable.h" />
     <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
     <ClInclude Include="Application\Objects\Weapon\ShooterInfo\ShooterInfo.h" />

@@ -17,7 +17,7 @@ class Player;
 class Enemy final : public Character {
 public:
 	virtual ~Enemy() = default;
-	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons);
+	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons, WeaponSwitch weaponSwitch = {});
 
 	/// <summary>
 	/// 更新
@@ -57,7 +57,6 @@ private:
 	EnemyStatus status_;
 
 	// 移動
-	Vector3 velocity_{};
 	Vector2 knockbackVelocity_{};
 
 	// モデル
@@ -67,6 +66,12 @@ private:
 	// 武器
 	std::vector<std::unique_ptr<Weapon>> weapons_; // 複数ある場合
 	Weapon* currentWeapon_ = nullptr;
+
+	// 複数の武器の切り替え(一定回数攻撃したら次の武器へ)
+	WeaponSwitch weaponSwitch_;
+	int weaponIndex_ = 0;
+	int remainingAttacks_ = 1;   // 今の武器で、あと何回攻撃するか
+	int RollAttackCount() const;
 
 	// 射撃クールダウン
 	Timer attackCoolTimer_;
@@ -83,8 +88,7 @@ private:
 	// スタン時間
 	Timer hitColorTimer_;
 
-	// 落下
-	bool isFall_ = false;
+	// map判定
 	MapCheck* mapCheck_ = nullptr;
 
 	// プレイヤーに近づく最小距離
