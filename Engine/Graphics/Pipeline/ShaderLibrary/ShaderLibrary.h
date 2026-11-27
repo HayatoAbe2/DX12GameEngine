@@ -32,8 +32,7 @@ struct ShaderDesc {
 	std::wstring vs;	// 頂点シェーダーのhlslファイルパス
 	std::wstring ps;	// ピクセルシェーダーのhlslファイルパス
 
-	// PSOの設定(Cull,Depth,InputLayout)とRootSignatureを流用するモデル用の種類
-	// Standard:DrawModel用、Instancing:DrawInstancedModel用
+	// PSOの設定
 	MainPSOType base = MainPSOType::Standard;
 };
 

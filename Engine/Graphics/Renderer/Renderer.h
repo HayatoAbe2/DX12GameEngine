@@ -124,6 +124,9 @@ private:
 	ShaderHandle outlineMaskShader_;			// DrawModel用
 	ShaderHandle outlineMaskInstanceShader_;	// DrawModelInstance用
 
+	// スプライトの下のアウトライン用マスクを消すシェーダー
+	ShaderHandle spriteMaskEraseShader_;
+
 	// ConstantBuffer管理
 	ConstantBufferManager* cbManager_ = nullptr;
 

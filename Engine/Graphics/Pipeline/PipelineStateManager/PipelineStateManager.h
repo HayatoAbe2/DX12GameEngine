@@ -32,9 +32,9 @@ public:
 	ID3D12RootSignature* GetRootSignature(MainPSOType psoType) { return mainPSOData[int(psoType)].rootSignature.Get(); }
 
 	/// <summary>
-	/// モデル用PSOの設定(Cull,Depth,InputLayoutなど)を流用して、シェーダーだけ差し替えたPSOを作成
+	/// PSOの設定を流用して、シェーダーだけ差し替えたPSOを作成
 	/// </summary>
-	/// <param name="base">流用元(Standard,Instancingのみ)</param>
+	/// <param name="base">流用元</param>
 	/// <param name="vsBlob">頂点シェーダー</param>
 	/// <param name="psBlob">ピクセルシェーダー</param>
 	/// <param name="outPSO">ブレンドモードごとの出力先</param>
@@ -121,7 +121,7 @@ private:
 	// DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
-	// モデル用PSO(Standard,Instancing)のベース設定(CreateVariantで流用する)
+	// PSOのベース設定(CreateVariantで使用
 	std::array<D3D12_GRAPHICS_PIPELINE_STATE_DESC, size_t(MainPSOType::Count)> mainBaseDesc_{};
 
 	// PSO

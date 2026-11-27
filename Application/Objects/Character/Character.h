@@ -5,7 +5,6 @@
 #include "HitboxDisplay/HitboxDisplay.h"
 #include "Objects/Character/Reaction/CharacterReaction.h"
 
-class PlayerDodge;
 
 /// <summary>
 /// キャラクター基底

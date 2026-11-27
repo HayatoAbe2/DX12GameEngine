@@ -120,6 +120,9 @@
     <ClCompile Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
@@ -286,10 +289,15 @@
     <ClCompile Include="Application\Data\RoomPlanSerializer.cpp" />
     <ClCompile Include="Editor\FloorEditor\FloorEditor.cpp" />
     <ClCompile Include="Application\Map\FloorConfig.cpp" />
-    <ClCompile Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\Object3d.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\OutlineMask.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SpriteMaskErase.PS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="Resources\shaders\Object3d.VS.hlsl">
@@ -410,6 +418,9 @@
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\Camera\Camera.h">
@@ -646,8 +657,6 @@
     <ClInclude Include="Application\Data\RoomPlanSerializer.h" />
     <ClInclude Include="Editor\FloorEditor\FloorEditor.h" />
     <ClInclude Include="Application\Data\FloorConfigSerializer.h" />
-    <ClInclude Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.h" />
-    <ClInclude Include="Application\Objects\Character\Player\PlayerActionState\PlayerActionState.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt">

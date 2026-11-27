@@ -282,6 +282,7 @@ void DirectXContext::BeginFrame() {
 
 	// フレーム開始時はScene
 	currentPass_ = RenderPass::Scene;
+	outlineMaskUsed_ = false;
 	// 描画用のDescriptorHeapの設定
 	ID3D12DescriptorHeap* descriptorHeapsRaw[] = { descriptorManager_->GetHeap().Get() };
 	cmdList->SetDescriptorHeaps(1, descriptorHeapsRaw);
@@ -445,7 +446,6 @@ void DirectXContext::BeginPass(RenderPass pass, bool clear) {
 
 	switch (pass) {
 	case RenderPass::Scene: {
-		// 通常シーン
 		Transition(cmdList.Get(), renderTextureResource_[0].Get(), renderTextureState_[0], D3D12_RESOURCE_STATE_RENDER_TARGET);
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetRenderTextureRTVHandle()[0];
 		cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
@@ -457,7 +457,7 @@ void DirectXContext::BeginPass(RenderPass pass, bool clear) {
 		break;
 	}
 	case RenderPass::OutlineMask: {
-		// アウトライン用(隠れた部分は描画しない)
+		outlineMaskUsed_ = true;
 		Transition(cmdList.Get(), outlineMaskResource_.Get(), outlineMaskState_, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTargetManager_->GetOutlineMaskRTVHandle();
 		cmdList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);

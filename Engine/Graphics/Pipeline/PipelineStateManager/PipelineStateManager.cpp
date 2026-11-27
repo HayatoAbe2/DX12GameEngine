@@ -197,6 +197,9 @@ void PipelineStateManager::CreateSpritePSO() {
 	baseDesc.SampleDesc.Count = 1;
 	baseDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+	// CreateVariantで流用するため保存
+	mainBaseDesc_[int(MainPSOType::Sprite)] = baseDesc;
+
 	// --- 各ブレンドモードごとのPSO生成 ---
 	auto& pso = mainPSO_[int(MainPSOType::Sprite)];
 	CreatePSO(baseDesc, CreateNoneBlendDesc(), &pso[static_cast<int>(BlendMode::None)]);			// ブレンドなし
@@ -493,8 +496,8 @@ void PipelineStateManager::CreateVariant(
 	const Microsoft::WRL::ComPtr<IDxcBlob>& psBlob,
 	std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::Count)>& outPSO) {
 
-	// 流用できるのはモデル用のみ
-	assert(base == MainPSOType::Standard || base == MainPSOType::Instancing);
+
+	assert(base == MainPSOType::Standard || base == MainPSOType::Instancing || base == MainPSOType::Sprite);
 	assert(vsBlob);
 	assert(psBlob);
 

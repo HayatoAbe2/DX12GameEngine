@@ -185,7 +185,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Editor\EnemyEditor\EnemyEditor.cpp" />
     <ClCompile Include="Editor\FloorEditor\FloorEditor.cpp" />
     <ClCompile Include="Editor\WeaponEditor\WeaponEditor.cpp" />
-    <ClCompile Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.cpp" />
     <ClCompile Include="Engine\Math\CollisionShape\Collisions\Collisions.cpp" />
     <ClCompile Include="Engine\Math\VectorConvert\VectorConvert.cpp" />
     <ClCompile Include="Engine\SceneObject\Model\AnimationPlayer\AnimationPlayer.cpp" />
@@ -214,6 +213,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClCompile Include="Engine\Graphics\Core\CommandListManager\CommandListManager.cpp" />
     <ClCompile Include="Engine\Graphics\Core\DeviceManager\DeviceManager.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.cpp" />
+    <ClCompile Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.cpp" />
     <ClCompile Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.cpp" />
     <ClCompile Include="Engine\App\App.cpp" />
     <ClCompile Include="Engine\Io\AudioSystem\AudioSystem.cpp" />
@@ -397,6 +397,16 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Resources\shaders\OutlineMask.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\SpriteMaskErase.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\Particle.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -489,7 +499,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyIdle\EnemyIdle.h" />
     <ClInclude Include="Application\Objects\Character\Enemy\EnemyActionState\EnemyActionState.h" />
     <ClInclude Include="Application\Map\Room\RoomData.h" />
-    <ClInclude Include="Application\Objects\Character\Player\PlayerActionState\PlayerActionState.h" />
     <ClInclude Include="Application\Objects\Item\World\Interactable.h" />
     <ClInclude Include="Application\Objects\Item\Passive\PassiveItems.h" />
     <ClInclude Include="Application\Objects\Weapon\ShooterInfo\ShooterInfo.h" />
@@ -513,7 +522,6 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Editor\WeaponEditor\WeaponEditor.h" />
     <ClInclude Include="Engine\Asset\Resource\Resource.h" />
     <ClInclude Include="Editor\SceneEditor\GizmoCtx.h" />
-    <ClInclude Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Capsule.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Collisions\Collisions.h" />
     <ClInclude Include="Engine\Math\CollisionShape\Segment.h" />
@@ -554,6 +562,7 @@ if exist "$(WindowsSdkDir)bin\$(WindowsSdkVersion)\x64\dxil.dll" copy "$(Windows
     <ClInclude Include="Engine\Graphics\Core\DeviceManager\DeviceManager.h" />
     <ClInclude Include="Engine\SceneObject\Model\Node.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\PipelineStateManager\PipelineStateManager.h" />
+    <ClInclude Include="Engine\Graphics\Pipeline\ShaderLibrary\ShaderLibrary.h" />
     <ClInclude Include="Engine\Graphics\Pipeline\RootSignatureManager\RootSignatureManager.h" />
     <ClInclude Include="Engine\Math\CollisionShape\AABB.h" />
     <ClInclude Include="Engine\App\App.h" />

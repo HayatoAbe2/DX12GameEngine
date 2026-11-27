@@ -40,11 +40,15 @@ void Renderer::Initialize(DirectXContext* dxContext) {
 		.vs = L"Resources/Shaders/Object3d.VS.hlsl",
 		.ps = L"Resources/Shaders/OutlineMask.PS.hlsl",
 		.base = MainPSOType::Standard });
-
 	outlineMaskInstanceShader_ = shaderLibrary->Register("OutlineMaskInstance", {
 		.vs = L"Resources/Shaders/Instance.VS.hlsl",
 		.ps = L"Resources/Shaders/OutlineMask.PS.hlsl",
 		.base = MainPSOType::Instancing });
+	// スプライトの下のマスクを消すシェーダー(スプライトと同じ設定で、アルファブレンドで消す)
+	spriteMaskEraseShader_ = shaderLibrary->Register("SpriteMaskErase", {
+		.vs = L"Resources/Shaders/Object3d.VS.hlsl",
+		.ps = L"Resources/Shaders/SpriteMaskErase.PS.hlsl",
+		.base = MainPSOType::Sprite });
 
 	InitializePlane();
 	InitializeRing();
@@ -323,6 +327,15 @@ void Renderer::DrawSprite(Sprite* sprite, BlendMode blendMode) {
 	cmdList->SetGraphicsRootDescriptorTable(2, sprite->GetTextureSRVHandle());
 	// ドローコール
 	cmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+
+	// OutlineMaskパスの後に描画するスプライトは、下のマスクを消してアウトラインが出ないようにする
+	if (dxContext_->IsOutlineMaskUsed() && (blendMode == BlendMode::None || blendMode == BlendMode::Normal)) {
+		// ルートシグネチャ、CBV、頂点バッファ、SRVはそのまま。マスクへの描画先とPSOだけ差し替えて同じスプライトを描画
+		dxContext_->BeginPass(RenderPass::OutlineMask);
+		cmdList->SetPipelineState(dxContext_->GetShaderLibrary()->GetPSO(spriteMaskEraseShader_, blendMode));
+		cmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		dxContext_->BeginPass(RenderPass::Scene);
+	}
 }
 
 void Renderer::DrawNode(Model* model, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList, ModelNode* node, const Matrix4x4& parentWorld) {

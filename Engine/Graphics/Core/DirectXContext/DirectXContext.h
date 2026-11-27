@@ -63,6 +63,9 @@ public:
 	// 現在の描画パス
 	RenderPass GetCurrentPass() const { return currentPass_; }
 
+	// このフレームでOutlineMaskパスを使ったか(使った後に描画するスプライトは、下のマスクを消す)
+	bool IsOutlineMaskUsed() const { return outlineMaskUsed_; }
+
 	// アクセサ
 	RECT GetWindowRect() { return windowRect_; }
 	DeviceManager* GetDeviceManager() { return deviceManager_.get(); }
@@ -237,6 +240,9 @@ private:
 
 	// 現在の描画パス
 	RenderPass currentPass_ = RenderPass::Scene;
+
+	// このフレームでOutlineMaskパスを使ったか
+	bool outlineMaskUsed_ = false;
 
 	D3D12_RESOURCE_STATES renderTextureState_[2]{
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
