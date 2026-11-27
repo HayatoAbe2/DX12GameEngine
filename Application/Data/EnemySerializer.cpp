@@ -28,6 +28,29 @@ T Get(const json& j, const char* key, T defaultValue) {
 	}
 }
 
+// アニメーション1つ分(キーが無ければ「なし」)
+CharacterAnimation ReadAnimation(const json& parent, const char* key) {
+	CharacterAnimation a{};
+	const auto it = parent.find(key);
+	if (it == parent.end() || !it->is_object()) { return a; }
+	a.index = Get(*it, "index", -1);
+	a.duration = Get(*it, "duration", -1.0f);
+	if (a.duration <= 0.0f) { a.duration = -1.0f; } // 0以下は「元の長さ」に揃える
+	return a;
+}
+
+// 使うアニメーションを書く
+void WriteAnimation(ojson& parent, const char* key, const CharacterAnimation& a) {
+	// indexが-1なら書かない
+	if (a.index < 0) { return; }
+	ojson j = ojson::object();
+	j["index"] = a.index;
+
+	// durationがなければ書かない
+	if (a.duration > 0.0f) { j["duration"] = F(a.duration); }
+	parent[key] = std::move(j);
+}
+
 } // namespace
 
 namespace EnemySerializer {
@@ -37,7 +60,15 @@ EnemyData FromJson(const json& j) {
 	if (!j.is_object()) { return e; }
 
 	e.modelName = Get<std::string>(j, "modelName", "");
-	e.animationIndex = Get(j, "animationIndex", -1);
+	
+	// アニメーション
+	const auto animations = j.find("animations");
+	if (animations != j.end() && animations->is_object()) {
+		e.animations[static_cast<int>(EnemyAnimations::Idle)] = ReadAnimation(*animations, "attack");
+		e.animations[static_cast<int>(EnemyAnimations::Attack)] = ReadAnimation(*animations, "attack");
+		e.animations[static_cast<int>(EnemyAnimations::Dead)] = ReadAnimation(*animations, "dead");
+		e.animations[static_cast<int>(EnemyAnimations::Hit)] = ReadAnimation(*animations, "hit");
+	}
 
 	// ステータス
 	e.status.hp = Get(j, "hp", e.status.hp);
@@ -80,7 +111,13 @@ ojson ToJson(const EnemyData& e) {
 	ojson j = ojson::object();
 
 	j["modelName"] = e.modelName;
-	j["animationIndex"] = e.animationIndex;
+
+	ojson animations = ojson::object();
+	WriteAnimation(animations, "idle", e.animations[static_cast<int>(EnemyAnimations::Idle)]);
+	WriteAnimation(animations, "attack", e.animations[static_cast<int>(EnemyAnimations::Attack)]);
+	WriteAnimation(animations, "dead", e.animations[static_cast<int>(EnemyAnimations::Dead)]);
+	WriteAnimation(animations, "hit", e.animations[static_cast<int>(EnemyAnimations::Hit)]);
+	if (!animations.empty()) { j["animations"] = std::move(animations); }
 	j["hp"] = F(e.status.hp);
 	j["radius"] = F(e.status.radius);
 	j["moveSpeed"] = F(e.status.moveSpeed);
@@ -111,6 +148,16 @@ std::vector<DataIssue> Validate(const EnemyData& e) {
 	if (e.status.radius <= 0.0f) { error("半径は0より大きくしてください"); }
 	if (e.status.moveSpeed < 0.0f) { error("移動速度は0以上にしてください"); }
 	if (e.status.stunResist < 0.0f) { warn("スタン耐性が負の値です"); }
+	const std::pair<const char*, const CharacterAnimation*> animations[] = {
+		{ "待機", &e.animations[static_cast<int>(EnemyAnimations::Idle)] },
+		{ "攻撃", &e.animations[static_cast<int>(EnemyAnimations::Attack)] },
+		{ "死亡", &e.animations[static_cast<int>(EnemyAnimations::Dead)] },
+		{ "被弾", &e.animations[static_cast<int>(EnemyAnimations::Hit)] },
+	};
+	for (const auto& [label, a] : animations) {
+		if (a->index < -1) { error(std::string(label) + "アニメーションの番号は-1以上にしてください"); }
+		if (a->index >= 0 && a->duration > 60.0f) { warn(std::string(label) + "アニメーションの再生時間が60秒を超えています"); }
+	}
 	if (e.minSpawnCount < 1) { error("出現数の最小は1以上にしてください"); }
 	if (e.minSpawnCount > e.maxSpawnCount) { error("出現数の最小が最大を超えています"); }
 	if (e.weapons.size() > 1) {

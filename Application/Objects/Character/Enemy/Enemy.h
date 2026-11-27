@@ -62,6 +62,8 @@ private:
 	// モデル
 	std::unique_ptr<Model> model_ = nullptr;
 	std::unique_ptr<Model> shadowModel_ = nullptr;
+	// アニメーション
+	std::array<std::shared_ptr<Animation>, static_cast<int>(EnemyAnimations::Count)> animations;
 
 	// 武器
 	std::vector<std::unique_ptr<Weapon>> weapons_; // 複数ある場合

@@ -5,7 +5,6 @@
 #include "HitboxDisplay/HitboxDisplay.h"
 #include "Objects/Character/Reaction/CharacterReaction.h"
 
-
 /// <summary>
 /// キャラクター基底
 /// </summary>

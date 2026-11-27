@@ -1,7 +1,11 @@
 {
     "Fly": {
         "modelName": "Dragon.glb",
-        "animationIndex": 2,
+        "animations": {
+            "idle": {
+                "index": 2
+            }
+        },
         "hp": 10.0,
         "radius": 1.0,
         "moveSpeed": 5.5,

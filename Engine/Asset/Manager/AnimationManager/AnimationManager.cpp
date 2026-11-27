@@ -7,11 +7,10 @@
 std::vector<std::shared_ptr<Animation>> AnimationManager::Load(const std::string& directoryPath, const std::string& filename, const std::function<uint32_t()>& generateID) {
 	std::string filePath = directoryPath + "/" + filename;
 
+	std::vector<std::shared_ptr<Animation>> animations;
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
-	assert(scene->mNumAnimations != 0); // アニメーションなし
 
-	std::vector<std::shared_ptr<Animation>> animations;
 	for (uint32_t animationIndex = 0;
 		animationIndex < scene->mNumAnimations;
 		++animationIndex) {

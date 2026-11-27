@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include "EnemyStatus.h"
+#include "Objects/Character/CharacterAnimation.h"
+#include <array>
 
 /// <summary>
 /// 武器を切り替えるまでの攻撃回数
@@ -13,12 +15,25 @@ struct WeaponSwitch {
 };
 
 /// <summary>
+/// 敵が使うアニメーション
+/// </summary>
+enum class EnemyAnimations {
+	Idle,
+	Attack,
+	Dead,
+	Hit,
+
+	Count
+};
+
+/// <summary>
 /// 敵データ
 /// </summary>
 struct EnemyData {
 	// モデル
 	std::string modelName;
-	int animationIndex = -1;
+	// アニメーション
+	std::array<CharacterAnimation,static_cast<int>(EnemyAnimations::Count)> animations;
 
 	// ステータス
 	EnemyStatus status;

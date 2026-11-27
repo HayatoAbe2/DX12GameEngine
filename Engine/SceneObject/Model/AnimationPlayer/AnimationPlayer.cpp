@@ -8,7 +8,7 @@ AnimationPlayer::AnimationPlayer(std::shared_ptr<Animation> animation, const std
 }
 
 void AnimationPlayer::Update(ModelNode& rootNode) {
-	animationTime_ += GameContext::GetInstance().GetDeltatime();
+	animationTime_ += GameContext::GetInstance().GetDeltatime() * animation_->speed;
 	animationTime_ = std::fmod(animationTime_, animation_->duration);
 
 	Vector3 translate = CalculateValue(nodeAnim_.translate, animationTime_);
@@ -20,7 +20,7 @@ void AnimationPlayer::Update(ModelNode& rootNode) {
 
 void AnimationPlayer::Update(Skeleton& skeleton) {
 	float deltaTime = GameContext::GetInstance().GetDeltatime();
-	animationTime_ += deltaTime;
+	animationTime_ += deltaTime * animation_->speed;
 
 	if (animation_->isLoop) {
 		// ループ
@@ -31,7 +31,7 @@ void AnimationPlayer::Update(Skeleton& skeleton) {
 
 	// 次のアニメーションへの補間
 	if (nextAnimation_) {
-		nextAnimationTime_ += deltaTime;
+		nextAnimationTime_ += deltaTime * nextAnimation_->speed;
 		nextAnimationTime_ = std::fmod(nextAnimationTime_, nextAnimation_->duration);
 		blendTime_ += deltaTime;
 	}

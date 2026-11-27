@@ -98,14 +98,20 @@ std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, Weapo
 	for (int i = 0; i < n; ++i) {
 		auto model = asset.LoadModel("Resources/Models/Enemy", data.modelName);
 		auto shadow = asset.LoadModel("Resources/Models/Enemy", data.modelName);
-		if (data.animationIndex >= 0) {
-			// アニメーション割り当て(あれば)
-			std::vector<std::shared_ptr<Animation>> anim = asset.LoadAnimation("Resources/Models/Enemy",data.modelName);
-			if (data.animationIndex < anim.size()) {
-				anim[data.animationIndex]->isLoop = true;
-				model->SetAnimation(anim[data.animationIndex]);
-				shadow->SetAnimation(anim[data.animationIndex]);
+
+		// アニメーション
+		std::vector<std::shared_ptr<Animation>> anims = asset.LoadAnimation("Resources/Models/Enemy", data.modelName);
+		for (int j = 0; j < static_cast<int>(EnemyAnimations::Count); ++j) {
+			if (data.animations[j].index < anims.size()) {
+				std::shared_ptr<Animation> anim = anims[j];
+				anim->isLoop = true;
+				anim->SetTotalDuration(data.animations[j].duration);
 			}
+		}
+		if (anims[static_cast<int>(EnemyAnimations::Idle)]) {
+			std::shared_ptr<Animation> idleAnim = anims[static_cast<int>(EnemyAnimations::Idle)];
+			model->SetAnimation(idleAnim);
+			shadow->SetAnimation(idleAnim);
 		}
 
 		// 位置をずらす
@@ -118,7 +124,7 @@ std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, Weapo
 
 		// 武器割り当て
 		std::vector<std::unique_ptr<Weapon>> weapons;
-		for (auto& weaponName : data.weapons) { 
+		for (auto& weaponName : data.weapons) {
 			std::unique_ptr<Weapon> weapon;
 			weapon = weaponManager->GetEnemyAttack(weaponName);
 			if (weapon) { weapons.push_back(std::move(weapon)); }

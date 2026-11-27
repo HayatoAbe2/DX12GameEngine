@@ -24,6 +24,25 @@ namespace {
 			return std::isalnum(c) || c == '_';
 		});
 	}
+
+#ifdef USE_IMGUI
+	// アニメーション1つ分の設定(番号と、再生時間を指定するか)
+	void DrawAnimationSlot(const char* label, CharacterAnimation& anim) {
+		ImGui::PushID(label);
+		ImGui::TextUnformatted(label);
+		ImGui::Indent();
+		EditorUtil::DragInt("番号(-1:アニメーションなし)", &anim.index, 0.1f, -1, 64);
+
+		ImGui::BeginDisabled(anim.index < 0);
+		bool fit = anim.duration > 0.0f;
+		if (ImGui::Checkbox("再生時間を指定(速度を合わせる)", &fit)) { anim.duration = fit ? 1.0f : -1.0f; }
+		if (fit) { EditorUtil::DragFloat("再生時間(秒)", &anim.duration, 0.01f, 0.05f, 60.0f); }
+		ImGui::EndDisabled();
+
+		ImGui::Unindent();
+		ImGui::PopID();
+	}
+#endif
 }
 
 EnemyEditor::EnemyEditor() {
@@ -432,8 +451,9 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 	EditorUtil::DrawIssues(issues);
 	ImGui::Separator();
 
-	// ---- 見た目 ----
-	if (ImGui::CollapsingHeader("見た目", ImGuiTreeNodeFlags_DefaultOpen)) {
+	// ===== モデルとアニメーション =====
+	if (ImGui::CollapsingHeader("モデル、アニメーション", ImGuiTreeNodeFlags_DefaultOpen)) {
+		ImGui::SeparatorText("モデル");
 		const char* preview = d.modelName.empty() ? "(未選択)" : d.modelName.c_str();
 		if (ImGui::BeginCombo("モデル", preview)) {
 			for (const std::string& model : models_) {
@@ -446,89 +466,100 @@ void EnemyEditor::DrawEditor(Entry& entry, const std::vector<std::string>& weapo
 		if (!d.modelName.empty() && std::find(models_.begin(), models_.end(), d.modelName) == models_.end()) {
 			ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s にモデルが見つかりません", kModelDir);
 		}
-		EditorUtil::DragInt("アニメーション番号(-1でなし)", &d.animationIndex, 0.1f, -1, 64);
+
+		ImGui::SeparatorText("アニメーション");
+		DrawAnimationSlot("待機", d.animations[static_cast<int>(EnemyAnimations::Idle)]);
+		DrawAnimationSlot("攻撃", d.animations[static_cast<int>(EnemyAnimations::Attack)]);
+		DrawAnimationSlot("死亡", d.animations[static_cast<int>(EnemyAnimations::Dead)]);
+		DrawAnimationSlot("被弾", d.animations[static_cast<int>(EnemyAnimations::Hit)]);
 	}
 
-	// ---- ステータス ----
-	if (ImGui::CollapsingHeader("ステータス", ImGuiTreeNodeFlags_DefaultOpen)) {
-		EditorUtil::DragFloat("HP", &s.hp, 0.5f, 0.0f, 100000.0f, "%.1f");
-		EditorUtil::DragFloat("大きさ(半径)", &s.radius, 0.01f, 0.0f, 20.0f);
-		EditorUtil::DragFloat("移動速度", &s.moveSpeed, 0.05f, 0.0f, 100.0f);
-		EditorUtil::DragFloat("発見範囲", &s.defaultSearchRadius, 0.5f, 0.0f, 1000.0f, "%.1f");
-		EditorUtil::DragFloat("攻撃範囲", &s.attackRadius, 0.1f, -1.0f, 1000.0f, "%.1f");
-		EditorUtil::DragFloat("スタン耐性", &s.stunResist, 0.1f, 0.0f, 100.0f, "%.1f");
-		ImGui::Checkbox("飛行", &s.canFly);
+	// ===== パラメータ =====
+	if (ImGui::CollapsingHeader("パラメータ", ImGuiTreeNodeFlags_DefaultOpen)) {
+		// ステータス
+		ImGui::SeparatorText("ステータス");
+		{
+			EditorUtil::DragFloat("HP", &s.hp, 0.5f, 0.0f, 100000.0f, "%.1f");
+			EditorUtil::DragFloat("大きさ(半径)", &s.radius, 0.01f, 0.0f, 20.0f);
+			EditorUtil::DragFloat("移動速度", &s.moveSpeed, 0.05f, 0.0f, 100.0f);
+			EditorUtil::DragFloat("発見範囲", &s.defaultSearchRadius, 0.5f, 0.0f, 1000.0f, "%.1f");
+			EditorUtil::DragFloat("攻撃範囲", &s.attackRadius, 0.1f, -1.0f, 1000.0f, "%.1f");
+			EditorUtil::DragFloat("スタン耐性", &s.stunResist, 0.1f, 0.0f, 100.0f, "%.1f");
+			ImGui::Checkbox("飛行", &s.canFly);
 
-		ContactDamage contactDefault{};
-		contactDefault.damage = 3.0f;
-		EditorUtil::Section("接触ダメージ", s.traits.contactDamage, contactDefault, [](ContactDamage& c) {
-			EditorUtil::DragFloat("ダメージ", &c.damage, 0.1f, 0.0f, 1000.0f, "%.1f");
-		});
-	}
-
-	// ---- 出現数 ----
-	if (ImGui::CollapsingHeader("出現数", ImGuiTreeNodeFlags_DefaultOpen)) {
-		EditorUtil::DragInt("最小", &d.minSpawnCount, 0.1f, 1, 100);
-		EditorUtil::DragInt("最大", &d.maxSpawnCount, 0.1f, 1, 100);
-	}
-
-	// ---- 武器 ----
-	if (ImGui::CollapsingHeader("武器", ImGuiTreeNodeFlags_DefaultOpen)) {
-		int removeIndex = -1;
-		int swapIndex = -1;   // swapIndex と swapIndex+1 を入れ替える
-
-		for (int i = 0; i < int(d.weapons.size()); ++i) {
-			ImGui::PushID(i);
-			std::string& current = d.weapons[i];
-
-			ImGui::SetNextItemWidth(220.0f);
-			if (ImGui::BeginCombo("##weapon", current.empty() ? "(未選択)" : current.c_str())) {
-				for (const std::string& name : weaponNames) {
-					const bool selected = (name == current);
-					if (ImGui::Selectable(name.c_str(), selected)) { current = name; }
-					if (selected) { ImGui::SetItemDefaultFocus(); }
-				}
-				ImGui::EndCombo();
-			}
-			ImGui::SameLine();
-			ImGui::BeginDisabled(i == 0);
-			if (ImGui::ArrowButton("##up", ImGuiDir_Up)) { swapIndex = i - 1; }
-			ImGui::EndDisabled();
-			ImGui::SameLine();
-			ImGui::BeginDisabled(i + 1 >= int(d.weapons.size()));
-			if (ImGui::ArrowButton("##down", ImGuiDir_Down)) { swapIndex = i; }
-			ImGui::EndDisabled();
-			ImGui::SameLine();
-			if (ImGui::Button("削除")) { removeIndex = i; }
-
-			// 武器の目安
-			if (const WeaponData* weapon = findWeapon ? findWeapon(current) : nullptr) {
-				const float range = WeaponSerializer::EstimateRange(*weapon);
-				if (range >= WeaponSerializer::kMaxRange) {
-					ImGui::TextDisabled("    射程: 壁まで / ダメージ %.1f", weapon->bullet.damage);
-				} else {
-					ImGui::TextDisabled("    射程: %.1f / ダメージ %.1f", range, weapon->bullet.damage);
-				}
-			}
-			ImGui::PopID();
+			ContactDamage contactDefault{};
+			contactDefault.damage = 3.0f;
+			EditorUtil::Section("接触ダメージ", s.traits.contactDamage, contactDefault, [](ContactDamage& c) {
+				EditorUtil::DragFloat("ダメージ", &c.damage, 0.1f, 0.0f, 1000.0f, "%.1f");
+			});
 		}
 
-		if (removeIndex >= 0) { d.weapons.erase(d.weapons.begin() + removeIndex); }
-		if (swapIndex >= 0) { std::swap(d.weapons[swapIndex], d.weapons[swapIndex + 1]); }
+		// 出現数
+		ImGui::SeparatorText("出現数");
+		{
+			EditorUtil::DragInt("最小", &d.minSpawnCount, 0.1f, 1, 100);
+			EditorUtil::DragInt("最大", &d.maxSpawnCount, 0.1f, 1, 100);
+		}
 
-		ImGui::BeginDisabled(weaponNames.empty());
-		if (ImGui::Button("武器を追加")) { d.weapons.push_back(weaponNames.front()); }
-		ImGui::EndDisabled();
+		// 武器
+		ImGui::SeparatorText("武器");
+		{
+			int removeIndex = -1;
+			int swapIndex = -1;   // swapIndex と swapIndex+1 を入れ替える
 
-		// 武器が2つ以上のとき: 何回攻撃したら次の武器に切り替えるか(上から順に繰り返す)
-		if (d.weapons.size() > 1) {
-			ImGui::SeparatorText("武器の切り替え");
-			EditorUtil::DragInt("最小回数", &d.weaponSwitch.minAttacks, 0.1f, 1, 100);
-			EditorUtil::DragInt("最大回数", &d.weaponSwitch.maxAttacks, 0.1f, 1, 100);
-			if (d.weaponSwitch.minAttacks == d.weaponSwitch.maxAttacks) {
-				ImGui::TextDisabled("%d回攻撃するごとに、次の武器へ切り替えます", d.weaponSwitch.minAttacks);
-			} else {
-				ImGui::TextDisabled("%d〜%d回の間でランダムに決めて、次の武器へ切り替えます", d.weaponSwitch.minAttacks, d.weaponSwitch.maxAttacks);
+			for (int i = 0; i < int(d.weapons.size()); ++i) {
+				ImGui::PushID(i);
+				std::string& current = d.weapons[i];
+
+				ImGui::SetNextItemWidth(220.0f);
+				if (ImGui::BeginCombo("##weapon", current.empty() ? "(未選択)" : current.c_str())) {
+					for (const std::string& name : weaponNames) {
+						const bool selected = (name == current);
+						if (ImGui::Selectable(name.c_str(), selected)) { current = name; }
+						if (selected) { ImGui::SetItemDefaultFocus(); }
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::SameLine();
+				ImGui::BeginDisabled(i == 0);
+				if (ImGui::ArrowButton("##up", ImGuiDir_Up)) { swapIndex = i - 1; }
+				ImGui::EndDisabled();
+				ImGui::SameLine();
+				ImGui::BeginDisabled(i + 1 >= int(d.weapons.size()));
+				if (ImGui::ArrowButton("##down", ImGuiDir_Down)) { swapIndex = i; }
+				ImGui::EndDisabled();
+				ImGui::SameLine();
+				if (ImGui::Button("削除")) { removeIndex = i; }
+
+				// 武器の目安
+				if (const WeaponData* weapon = findWeapon ? findWeapon(current) : nullptr) {
+					const float range = WeaponSerializer::EstimateRange(*weapon);
+					if (range >= WeaponSerializer::kMaxRange) {
+						ImGui::TextDisabled("    射程: 壁まで / ダメージ %.1f", weapon->bullet.damage);
+					} else {
+						ImGui::TextDisabled("    射程: %.1f / ダメージ %.1f", range, weapon->bullet.damage);
+					}
+				}
+				ImGui::PopID();
+			}
+
+			if (removeIndex >= 0) { d.weapons.erase(d.weapons.begin() + removeIndex); }
+			if (swapIndex >= 0) { std::swap(d.weapons[swapIndex], d.weapons[swapIndex + 1]); }
+
+			ImGui::BeginDisabled(weaponNames.empty());
+			if (ImGui::Button("武器を追加")) { d.weapons.push_back(weaponNames.front()); }
+			ImGui::EndDisabled();
+
+			// 武器が2つ以上のとき: 何回攻撃したら次の武器に切り替えるか(上から順に繰り返す)
+			if (d.weapons.size() > 1) {
+				ImGui::SeparatorText("武器の切り替え");
+				EditorUtil::DragInt("最小回数", &d.weaponSwitch.minAttacks, 0.1f, 1, 100);
+				EditorUtil::DragInt("最大回数", &d.weaponSwitch.maxAttacks, 0.1f, 1, 100);
+				if (d.weaponSwitch.minAttacks == d.weaponSwitch.maxAttacks) {
+					ImGui::TextDisabled("%d回攻撃するごとに、次の武器へ切り替えます", d.weaponSwitch.minAttacks);
+				} else {
+					ImGui::TextDisabled("%d〜%d回の間でランダムに決めて、次の武器へ切り替えます", d.weaponSwitch.minAttacks, d.weaponSwitch.maxAttacks);
+				}
 			}
 		}
 	}
