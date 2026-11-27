@@ -207,7 +207,7 @@ void Bullet::Move(MapCheck* mapCheck, EffectManager* effectManager, DamageAreaMa
 void Bullet::OnHitWall(EffectManager* effectManager, DamageAreaManager* damageAreaManager) {
 	Hit();
 
-	// 仮処理(貫通が壁で消えないため)
+	// 貫通弾は壁で消える
 	if (data_.traits.onHitEnemy.piercing) {
 		isDead_ = true;
 	}

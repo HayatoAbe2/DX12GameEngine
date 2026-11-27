@@ -696,7 +696,7 @@ void WeaponEditor::DrawPreview(const WeaponData& w) {
 		draw->AddCircle(ImVec2(origin.x, origin.y - 40.0f), w.bullet.traits.move.orbit->radius * scale, color, 48);
 	} else {
 		const int lines = (w.traits.multiShot && !w.traits.multiShot->random) ? (std::max)(1, int(w.traits.multiShot->count)) : 1;
-		const float maxAngle = (w.traits.multiShot ? w.traits.multiShot->maxAngle : 0.0f) * 3.14159265f / 180.0f;
+		const float maxAngle = (w.traits.multiShot ? w.traits.multiShot->maxAngle : 0.0f) * std::numbers::pi_v<float> / 180.0f;
 		for (int i = 0; i < lines; ++i) {
 			const float angle = (lines > 1) ? -maxAngle * 0.5f + maxAngle * float(i) / float(lines - 1) : 0.0f;
 			const ImVec2 end(origin.x + std::sin(angle) * drawRange * scale, origin.y - std::cos(angle) * drawRange * scale);

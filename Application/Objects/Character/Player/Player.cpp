@@ -189,12 +189,8 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 
 		if (weapon_) {
 
-
-			if (input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > kTriggerThreshold) {
-				weapon_->Update(transform_.translate, attackDirection_, bulletManager, this, true);
-			} else {
-				weapon_->Update(transform_.translate, attackDirection_, bulletManager, this, false);
-			}
+			bool isFiring = input.mouse.IsPress(MouseButton::Left) || input.gamepad.GetRTrigger() > kTriggerThreshold;
+			weapon_->Update(transform_.translate, attackDirection_, bulletManager, this, isFiring);
 
 			if (subWeapon_) {
 				subWeapon_->Update(transform_.translate, attackDirection_, bulletManager, this);
@@ -220,7 +216,7 @@ void Player::Update(MapCheck* mapCheck, Camera* camera, BulletManager* bulletMan
 #ifdef USE_IMGUI
 				}
 #endif
-				if (input.gamepad.GetRTrigger() > 0.2f) {
+				if (input.gamepad.GetRTrigger() > kTriggerThreshold) {
 					Trigger(bulletManager, camera);
 				}
 
