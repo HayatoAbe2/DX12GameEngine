@@ -4,6 +4,9 @@
         "animations": {
             "idle": {
                 "index": 2
+            },
+            "attack": {
+                "index": 2
             }
         },
         "hp": 10.0,
@@ -41,12 +44,19 @@
     },
     "Hedgehog_Single": {
         "modelName": "hedgehog.glb",
-        "animationIndex": 2,
-        "hp": 5,
+        "animations": {
+            "idle": {
+                "index": 2
+            },
+            "attack": {
+                "index": 2
+            }
+        },
+        "hp": 5.0,
         "radius": 0.5,
         "moveSpeed": 3.5,
         "defaultSearchRadius": 100.0,
-        "stunResist": 0,
+        "stunResist": 0.0,
         "canFly": false,
         "attackRadius": -1.0,
         "traits": {
@@ -101,12 +111,19 @@
     },
     "Hedgehog_Group": {
         "modelName": "hedgehog.glb",
-        "animationIndex": 2,
-        "hp": 5,
+        "animations": {
+            "idle": {
+                "index": 2
+            },
+            "attack": {
+                "index": 2
+            }
+        },
+        "hp": 5.0,
         "radius": 0.5,
         "moveSpeed": 3.5,
         "defaultSearchRadius": 100.0,
-        "stunResist": 0,
+        "stunResist": 0.0,
         "canFly": false,
         "attackRadius": -1.0,
         "traits": {

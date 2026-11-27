@@ -9,6 +9,7 @@
 #include "Objects/Item/ItemManager.h"
 #include "Data/EnemySerializer.h"
 
+#include <algorithm>
 #include <fstream>
 #include <cassert>
 #include <Externals/nlohmann/json.hpp>
@@ -38,7 +39,7 @@ void EnemyManager::Update(MapCheck* mapCheck, Player* player, BulletManager* bul
 	activeEnemies_.erase(
 		std::remove_if(activeEnemies_.begin(), activeEnemies_.end(),
 			[&](const std::unique_ptr<Enemy>& enemy) {
-				if (enemy->IsDead()) {
+				if (enemy->IsRemovable()) {
 					itemManager->SpawnMoney(enemy->GetTransform().translate, 15);
 
 					if (GameContext::GetInstance().RandomInt(0, 100) >= 95) {
@@ -94,24 +95,32 @@ std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, Weapo
 	auto& ctx = GameContext::GetInstance();
 	auto& asset = ctx.Asset();
 
+	// アニメーション
+	EnemyAnimator::Animations enemyAnimations{};
+	const bool useAnimation = std::any_of(data.animations.begin(), data.animations.end(),
+		[](const CharacterAnimation& a) { return a.index >= 0; });
+	if (useAnimation) {
+		const std::vector<std::shared_ptr<Animation>> loaded = asset.LoadAnimation("Resources/Models/Enemy", data.modelName);
+		for (int j = 0; j < static_cast<int>(EnemyAnimations::Count); ++j) {
+			const CharacterAnimation& setting = data.animations[j];
+			if (setting.index < 0 || setting.index >= static_cast<int>(loaded.size())) { continue; }
+
+			auto animation = std::make_shared<Animation>(*loaded[setting.index]);
+			animation->isLoop = (j == static_cast<int>(EnemyAnimations::Idle)); // 通常だけループ
+			animation->SetTotalDuration(setting.duration);
+			enemyAnimations[j] = std::move(animation);
+		}
+	}
+
 	int n = ctx.RandomInt(data.minSpawnCount, data.maxSpawnCount);
 	for (int i = 0; i < n; ++i) {
 		auto model = asset.LoadModel("Resources/Models/Enemy", data.modelName);
 		auto shadow = asset.LoadModel("Resources/Models/Enemy", data.modelName);
 
-		// アニメーション
-		std::vector<std::shared_ptr<Animation>> anims = asset.LoadAnimation("Resources/Models/Enemy", data.modelName);
-		for (int j = 0; j < static_cast<int>(EnemyAnimations::Count); ++j) {
-			if (data.animations[j].index < anims.size()) {
-				std::shared_ptr<Animation> anim = anims[j];
-				anim->isLoop = true;
-				anim->SetTotalDuration(data.animations[j].duration);
-			}
-		}
-		if (anims[static_cast<int>(EnemyAnimations::Idle)]) {
-			std::shared_ptr<Animation> idleAnim = anims[static_cast<int>(EnemyAnimations::Idle)];
-			model->SetAnimation(idleAnim);
-			shadow->SetAnimation(idleAnim);
+		// 通常アニメーション
+		if (const auto& idle = enemyAnimations[static_cast<int>(EnemyAnimations::Idle)]) {
+			model->SetAnimation(idle);
+			shadow->SetAnimation(idle);
 		}
 
 		// 位置をずらす
@@ -129,7 +138,7 @@ std::vector<std::unique_ptr<Enemy>> EnemyManager::MakeEnemies(Vector3 pos, Weapo
 			weapon = weaponManager->GetEnemyAttack(weaponName);
 			if (weapon) { weapons.push_back(std::move(weapon)); }
 		}
-		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons), data.weaponSwitch));
+		enemies.push_back(std::make_unique<Enemy>(std::move(model), std::move(shadow), spawnPos, data.status, std::move(weapons), data.weaponSwitch, enemyAnimations));
 	}
 
 	return enemies;

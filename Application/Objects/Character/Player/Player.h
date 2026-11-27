@@ -56,7 +56,7 @@ public:
 		return result;
 	}
 	Wallet& GetWallet() { return wallet_; }
-	bool IsDodging() { return actionState_->GetCurrentState() == PlayerState::Dodge; }
+	bool IsDodging() { return GetCurrentState() == PlayerState::Dodge; }
 
 	void SetWeapon(std::unique_ptr<Weapon> weapon);
 	void AddPassive(std::unique_ptr<Passive> passive);

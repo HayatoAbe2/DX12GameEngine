@@ -79,8 +79,8 @@ void CollisionChecker::CheckEnemy(Enemy* enemy, Bullet* bullet, Player* player) 
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
-	// 敵の弾だったら判定しない
-	if (bullet->GetTeam() == Team::Enemy || bullet->IsDead() || !bullet->CanHit()) { return; }
+	// 死亡演出中の敵・敵の弾は判定しない
+	if (enemy->IsDead() || bullet->GetTeam() == Team::Enemy || bullet->IsDead() || !bullet->CanHit()) { return; }
 
 	Segment2D segment = { bullet->GetPrePos(), bullet->GetCollider().center };
 	Circle circle = { enemy->GetRadius() + bullet->GetCollider().radius, ToXZ(enemy->GetTransform().translate) };
@@ -118,8 +118,8 @@ void CollisionChecker::CheckEnemy(Enemy* enemy, DamageArea* area, Player* player
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
-	// 敵のエリアだったら判定しない
-	if (area->GetTeam() == Team::Enemy || !area->IsEnable()) { return; }
+	// 死亡演出中の敵・敵のエリアは判定しない
+	if (enemy->IsDead() || area->GetTeam() == Team::Enemy || !area->IsEnable()) { return; }
 
 	Circle circle = { enemy->GetRadius(), ToXZ(enemy->GetTransform().translate) };
 
@@ -145,8 +145,8 @@ void CollisionChecker::CheckContactDamage(Player* player, Enemy* enemy) {
 	auto& ctx = GameContext::GetInstance();
 	auto& audio = ctx.Audio();
 
-	// 判定しない条件
-	if (player->IsInvincible()) {
+	// 判定しない条件(死亡演出中の敵は接触ダメージを与えない)
+	if (player->IsInvincible() || enemy->IsDead()) {
 		return;
 	}
 

@@ -7,6 +7,7 @@
 #include "GameCommon.h"
 #include "Objects/Character/Enemy/EnemyActionState/EnemyActionState.h"
 #include "Objects/Character/Character.h"
+#include "Objects/Character/Enemy/EnemyAnimator.h"
 
 class MapCheck;
 class Player;
@@ -17,7 +18,7 @@ class Player;
 class Enemy final : public Character {
 public:
 	virtual ~Enemy() = default;
-	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons, WeaponSwitch weaponSwitch = {});
+	Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadow, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons, WeaponSwitch weaponSwitch = {}, EnemyAnimator::Animations animations = {});
 
 	/// <summary>
 	/// 更新
@@ -40,7 +41,10 @@ public:
 	// 敵ごとの関数
 	void Attack(BulletManager* bulletManager);
 
+	// 死亡した(HPが0以下 / 落下)。死亡アニメーション中も true
 	bool IsDead() { return isDead_; }
+	// 取り除ける
+	bool IsRemovable() { return isDead_ && !animator_.IsDying(); }
 
 	EnemyStatus GetStatus() const { return status_; }
 
@@ -63,7 +67,9 @@ private:
 	std::unique_ptr<Model> model_ = nullptr;
 	std::unique_ptr<Model> shadowModel_ = nullptr;
 	// アニメーション
-	std::array<std::shared_ptr<Animation>, static_cast<int>(EnemyAnimations::Count)> animations;
+	EnemyAnimator animator_;
+	const float kAnimationBlendTime = 0.1f;   // アニメーションの切り替えにかける時間
+	void StartDeath();
 
 	// 武器
 	std::vector<std::unique_ptr<Weapon>> weapons_; // 複数ある場合

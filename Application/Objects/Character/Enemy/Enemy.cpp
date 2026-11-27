@@ -11,7 +11,7 @@
 #include <numbers>
 #include <cmath>
 
-Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons, WeaponSwitch weaponSwitch) {
+Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, Vector3 pos, EnemyStatus status, std::vector<std::unique_ptr<Weapon>> rWeapons, WeaponSwitch weaponSwitch, EnemyAnimator::Animations animations) {
 	status_ = status;
 	maxHp_ = status_.hp;
 	hp_ = status_.hp;
@@ -38,6 +38,17 @@ Enemy::Enemy(std::unique_ptr<Model> model, std::unique_ptr<Model> shadowModel, V
 	weaponSwitch_.minAttacks = max(1, weaponSwitch_.minAttacks);
 	weaponSwitch_.maxAttacks = max(weaponSwitch_.minAttacks, weaponSwitch_.maxAttacks);
 	remainingAttacks_ = RollAttackCount();
+
+	// アニメーション(モデルと影の両方に設定する)
+	animator_.Initialize(animations, [this](const std::shared_ptr<Animation>& animation, bool blend) {
+		for (Model* model : { model_.get(), shadowModel_.get() }) {
+			if (blend && model->IsUseAnimation()) {
+				model->ChangeAnimation(animation, kAnimationBlendTime);
+			} else {
+				model->SetAnimation(animation);
+			}
+		}
+	});
 
 	// 初期State
 	currentState_ = std::make_unique<EnemyIdle>();
@@ -82,6 +93,12 @@ void Enemy::Update(MapCheck* mapCheck, Player* player, BulletManager* bulletMana
 		}
 	}
 	slowTimer_.Update();
+
+	// アニメーション(攻撃・被弾のあとに通常へ戻す、死亡の完了待ち)
+	animator_.Update();
+
+	// 死亡演出中は動かない(アニメーションが終わったら IsRemovable になる)
+	if (isDead_) { return; }
 
 	// 現在の反応状態
 	if (reaction_) {
@@ -142,6 +159,7 @@ void Enemy::Attack(BulletManager* bulletManager) {
 	// 攻撃してクールタイム設定
 	float time = currentWeapon_->Trigger(model_->GetTransform().translate, attackDir_, bulletManager, this);
 	attackCoolTimer_.Start(time);
+	animator_.Play(EnemyAnimations::Attack);
 }
 
 void Enemy::Stun(MapCheck* mapCheck) {
@@ -209,22 +227,41 @@ void Enemy::Draw() {
 	hitboxDisplay_->Draw();
 }
 
+void Enemy::StartDeath() {
+	// 落下中は死亡アニメーションを使わない(落下が終わったら取り除かれる)
+	if (GetCurrentReaction() == CharacterReactionState::Fall) { return; }
+
+	// 攻撃を止めて、その場で死亡アニメーションを再生する
+	attackCoolTimer_.Reset();
+	isAttacking_ = false;
+	velocity_ = { 0.0f, 0.0f, 0.0f };
+	animator_.Play(EnemyAnimations::Dead);
+}
+
 void Enemy::Hit(float damage, const Vector2& from, const float knockback) {
+	// 死亡演出中は受け付けない
+	if (isDead_) { return; }
 
 	status_.hp -= damage;
-	if (status_.hp <= 0) { isDead_ = true; }
+	if (status_.hp <= 0) {
+		isDead_ = true;
+		StartDeath();
+	} else {
+		if (status_.stunResist < 10) {
+			// 行動不能
+			Character::Stun(float(10 - status_.stunResist) / 60);
 
-	if (status_.stunResist < 10) {
-		// 行動不能
-		Character::Stun(float(10 - status_.stunResist) / 60);
+			// ノックバック
+			knockbackVelocity_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * knockback;
+		}
 
-		// ノックバック
-		knockbackVelocity_ = Normalize(ToXZ(model_->GetTransform().translate) - from) * knockback;
-	}
+		// 待機状態なら発見させる
+		if (dynamic_cast<EnemyIdle*>(currentState_.get())) {
+			currentState_ = std::make_unique<EnemyApproach>();
+		}
 
-	// 待機状態なら発見させる
-	if (dynamic_cast<EnemyIdle*>(currentState_.get())) {
-		currentState_ = std::make_unique<EnemyApproach>();
+		// 被弾アニメーション
+		animator_.Play(EnemyAnimations::Hit);
 	}
 
 	// ダメージを受けたら赤くする
